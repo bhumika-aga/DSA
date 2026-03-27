@@ -1,0 +1,677 @@
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  .plan {
+    padding: 1.5rem 0;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .stat {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .phase-section {
+    margin-bottom: 2rem;
+  }
+
+  .phase-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  .topic-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+
+  .topic-card:hover {
+    border-color: var(--color-border-secondary);
+    background: var(--color-background-secondary);
+  }
+
+  .topic-card.active {
+    border-color: var(--color-border-info);
+  }
+
+  .tc-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tc-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .tc-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tc-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .tc-sub {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+
+  .tc-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-days {
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .badge-q {
+    background: var(--color-background-info);
+    color: var(--color-text-info);
+  }
+
+  .tc-detail {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .3s ease;
+  }
+
+  .tc-detail.open {
+    max-height: 500px;
+  }
+
+  .detail-inner {
+    padding-top: 12px;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    margin-top: 12px;
+  }
+
+  .detail-inner h4 {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+  }
+
+  .pattern-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .pattern-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+  }
+
+  .company-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .co {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .co-g {
+    background: #e8f4ea;
+    color: #1a6b2d;
+  }
+
+  .co-m {
+    background: #e8f0fb;
+    color: #1558a8;
+  }
+
+  .co-a {
+    background: #fff3e0;
+    color: #a85f00;
+  }
+
+  .co-ms {
+    background: #f0f4ff;
+    color: #2b4fa8;
+  }
+
+  .co-f {
+    background: #e8f4fb;
+    color: #0e6fa5;
+  }
+
+  .co-u {
+    background: #f5edfc;
+    color: #6e2da8;
+  }
+
+  .co-ap {
+    background: #fce8ea;
+    color: #a82030;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .co-g {
+      background: #1a3d20;
+      color: #6dbf7e;
+    }
+
+    .co-m {
+      background: #1a2840;
+      color: #7aabf4;
+    }
+
+    .co-a {
+      background: #3d2800;
+      color: #f0a840;
+    }
+
+    .co-ms {
+      background: #1a2040;
+      color: #8aabf4;
+    }
+
+    .co-f {
+      background: #0e2d3d;
+      color: #5abcf0;
+    }
+
+    .co-u {
+      background: #2d1a40;
+      color: #c47af0;
+    }
+
+    .co-ap {
+      background: #3d1015;
+      color: #f07a85;
+    }
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: transparent;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background .15s;
+  }
+
+  .action-btn:hover {
+    background: var(--color-background-secondary);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .phase-p1 {
+    background: #AFA9EC;
+  }
+
+  .phase-p2 {
+    background: #5DCAA5;
+  }
+
+  .phase-p3 {
+    background: #EF9F27;
+  }
+
+  .phase-p4 {
+    background: #F0997B;
+  }
+
+  .ph-bar {
+    height: 3px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="plan">
+  <div class="header">
+    <h1>DSA Mastery — Full Study Plan</h1>
+    <p>Kunal-style: pattern-first, intuition-before-code, company-tagged problems. Click any topic to see patterns,
+      sub-topics & companies.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num">20</div>
+      <div class="stat-lbl">Topics</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-lbl">Phases</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">16–20</div>
+      <div class="stat-lbl">Weeks</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">300+</div>
+      <div class="stat-lbl">Problems</div>
+    </div>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot phase-p1"></div>Phase 1 — Foundations
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot phase-p2"></div>Phase 2 — Core DS
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot phase-p3"></div>Phase 3 — Advanced DS & Algos
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot phase-p4"></div>Phase 4 — Patterns & Interview Prep
+    </div>
+  </div>
+</div>
+
+<script>
+  const phases = [
+    {
+      label: "Phase 1 — Foundations (Weeks 1–3)",
+      color: "#AFA9EC",
+      topics: [
+        {
+          icon: "⚙️", title: "Java & Programming Fundamentals",
+          sub: "Loops, recursion, OOP, time/space complexity basics",
+          days: "5 days", qs: "20 Q",
+          patterns: ["Iteration", "Base case thinking", "Big-O analysis"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
+          ],
+          subtopics: "Variables, data types, control flow, methods, OOP pillars, intro to Big-O"
+        },
+        {
+          icon: "🔁", title: "Recursion & Backtracking",
+          sub: "The core mental model — think, trust, induct",
+          days: "7 days", qs: "30 Q",
+          patterns: ["Recursive tree", "Backtracking", "Divide & Conquer seed", "Memoization intro"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Stack frames, tail recursion, subsets, permutations, N-Queens, Sudoku Solver, Word Search"
+        },
+        {
+          icon: "📊", title: "Bit Manipulation",
+          sub: "AND, OR, XOR tricks & number theory foundations",
+          days: "3 days", qs: "15 Q",
+          patterns: ["XOR cancellation", "Bit masking", "Power of 2 check", "Brian Kernighan"],
+          companies: [
+            { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
+          ],
+          subtopics: "Bitwise ops, set/clear/toggle bit, count set bits, single number, missing number"
+        }
+      ]
+    },
+    {
+      label: "Phase 2 — Core Data Structures (Weeks 4–9)",
+      color: "#5DCAA5",
+      topics: [
+        {
+          icon: "📋", title: "Arrays & Strings",
+          sub: "Two pointers, sliding window, prefix sums",
+          days: "8 days", qs: "40 Q",
+          patterns: ["Two pointers", "Sliding window", "Prefix sum", "Kadane's algorithm", "Dutch flag"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Subarrays, sorting tricks, anagram checks, longest substring, container with water, trapping rain"
+        },
+        {
+          icon: "⚡", title: "Sorting & Searching",
+          sub: "Every sort, binary search in all its disguises",
+          days: "5 days", qs: "25 Q",
+          patterns: ["Binary search on answer", "Merge sort divide", "Partition (QuickSelect)", "Counting sort"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
+          ],
+          subtopics: "Bubble/Selection/Insertion/Merge/Quick/Heap/Radix sort, binary search variants, Kth element"
+        },
+        {
+          icon: "🗂️", title: "Linked Lists",
+          sub: "Slow-fast pointers, reversal patterns, merge",
+          days: "6 days", qs: "28 Q",
+          patterns: ["Fast & slow pointers", "Reverse in-place", "Merge two lists", "Cycle detection"],
+          companies: [
+            { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Singly/doubly/circular LL, detect cycle (Floyd's), LRU Cache, merge K sorted, palindrome LL"
+        },
+        {
+          icon: "📚", title: "Stacks & Queues",
+          sub: "Monotonic stack, BFS scaffolding",
+          days: "5 days", qs: "25 Q",
+          patterns: ["Monotonic stack", "Next greater element", "Deque sliding window", "BFS via queue"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Facebook", cls: "co-f" }
+          ],
+          subtopics: "Balanced parens, min-stack, largest rectangle in histogram, sliding window max, implement queue using stacks"
+        },
+        {
+          icon: "🗃️", title: "HashMap & HashSet",
+          sub: "Frequency maps, grouping, two-sum patterns",
+          days: "4 days", qs: "20 Q",
+          patterns: ["Frequency counting", "Complement lookup", "Grouping by key", "Rolling hash"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Two sum, group anagrams, top K frequent, subarray sum equals K, longest consecutive sequence"
+        },
+        {
+          icon: "🌳", title: "Trees (Binary & BST)",
+          sub: "DFS/BFS traversals, recursion on trees",
+          days: "10 days", qs: "45 Q",
+          patterns: ["DFS (pre/in/post)", "BFS level-order", "Height recursion", "Morris traversal", "BST property"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
+          ],
+          subtopics: "Tree traversals, LCA, diameter, balanced check, serialize/deserialize, BST validation, kth smallest"
+        },
+        {
+          icon: "⛰️", title: "Heaps & Priority Queues",
+          sub: "Top-K problems, merge K sorted, median stream",
+          days: "5 days", qs: "20 Q",
+          patterns: ["Min/Max heap", "Two heaps (median)", "Top K elements", "K-way merge"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
+          ],
+          subtopics: "Heap implementation, Kth largest, merge K sorted lists, find median from data stream, task scheduler"
+        }
+      ]
+    },
+    {
+      label: "Phase 3 — Advanced Structures & Algorithms (Weeks 10–15)",
+      color: "#EF9F27",
+      topics: [
+        {
+          icon: "🕸️", title: "Graphs",
+          sub: "BFS, DFS, Dijkstra, Union-Find, Topological sort",
+          days: "12 days", qs: "45 Q",
+          patterns: ["BFS shortest path", "DFS connected components", "Topological sort", "Union-Find", "Dijkstra/Bellman-Ford", "Cycle detection"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Graph representations, number of islands, clone graph, course schedule, network delay time, alien dictionary"
+        },
+        {
+          icon: "💡", title: "Greedy Algorithms",
+          sub: "Local optimal → global optimal proofs",
+          days: "5 days", qs: "20 Q",
+          patterns: ["Interval scheduling", "Activity selection", "Greedy exchange argument", "Huffman/Kruskal"],
+          companies: [
+            { name: "Amazon", cls: "co-a" }, { name: "Google", cls: "co-g" }, { name: "Microsoft", cls: "co-ms" }
+          ],
+          subtopics: "Jump game, merge intervals, non-overlapping intervals, gas station, task scheduler"
+        },
+        {
+          icon: "🧩", title: "Dynamic Programming",
+          sub: "Memoization → tabulation, all DP patterns",
+          days: "15 days", qs: "55 Q",
+          patterns: ["0/1 Knapsack", "Unbounded knapsack", "LCS/LIS", "Matrix DP", "Interval DP", "DP on trees", "Bitmask DP", "Digit DP"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Fibonacci memoization, 0/1 knapsack, coin change, longest common subsequence, edit distance, house robber, palindrome partitioning"
+        },
+        {
+          icon: "🔤", title: "Tries",
+          sub: "Prefix trees for string problems",
+          days: "4 days", qs: "15 Q",
+          patterns: ["Prefix lookup", "Auto-complete", "XOR max trie", "Word search II"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }
+          ],
+          subtopics: "Implement trie, search suggestions, word break, maximum XOR, replace words"
+        },
+        {
+          icon: "📐", title: "Segment Trees & BIT",
+          sub: "Range queries, prefix sums in log time",
+          days: "5 days", qs: "15 Q",
+          patterns: ["Range sum query", "Point update", "Lazy propagation", "Fenwick BIT"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
+          ],
+          subtopics: "Build segment tree, range min/max/sum, count of smaller numbers after self, reverse pairs"
+        }
+      ]
+    },
+    {
+      label: "Phase 4 — Interview Patterns & Mock Prep (Weeks 16–20)",
+      color: "#F0997B",
+      topics: [
+        {
+          icon: "🔍", title: "Advanced Recursion & Divide & Conquer",
+          sub: "Master theorem, merge sort variants, median of medians",
+          days: "4 days", qs: "15 Q",
+          patterns: ["D&C on sorted arrays", "QuickSelect", "Karatsuba-style", "Closest pair"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }
+          ],
+          subtopics: "Count inversions, median of two sorted arrays, expression evaluation, powerful integers"
+        },
+        {
+          icon: "🎯", title: "Two Pointers & Sliding Window (Deep Dive)",
+          sub: "All window variants consolidated",
+          days: "3 days", qs: "20 Q",
+          patterns: ["Fixed window", "Variable window", "Multi-pointer", "Shrink-expand"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Longest substring without repeat, min window substring, fruit into baskets, 3-sum, 4-sum"
+        },
+        {
+          icon: "🔗", title: "String Algorithms",
+          sub: "KMP, Rabin-Karp, Z-algorithm",
+          days: "4 days", qs: "15 Q",
+          patterns: ["KMP failure function", "Rolling hash", "Z-function", "Palindromic structures"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Microsoft", cls: "co-ms" }, { name: "Amazon", cls: "co-a" }
+          ],
+          subtopics: "Pattern matching KMP, repeated string match, shortest palindrome, longest palindromic substring (Manacher)"
+        },
+        {
+          icon: "🏆", title: "Math & Number Theory",
+          sub: "GCD, primes, modular arithmetic, combinatorics",
+          days: "4 days", qs: "15 Q",
+          patterns: ["Sieve of Eratosthenes", "Fast exponentiation", "Modular inverse", "Combinatorics nCr"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Apple", cls: "co-ap" }, { name: "Microsoft", cls: "co-ms" }
+          ],
+          subtopics: "Pow(x,n), sqrt(x), count primes, happy number, Excel sheet column, Pascal's triangle"
+        },
+        {
+          icon: "🧠", title: "Mock Interviews & System Thinking",
+          sub: "FAANG-style mock rounds + self-assessment",
+          days: "7 days", qs: "Mixed",
+          patterns: ["STAR pattern explanation", "Clarify before coding", "Complexity trade-off", "Edge case first"],
+          companies: [
+            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }, { name: "Uber", cls: "co-u" }
+          ],
+          subtopics: "Timed mock rounds, verbal walkthroughs, dry runs, code reviews, behavioral + technical combo"
+        }
+      ]
+    }
+  ];
+
+  const phaseColors = ["#AFA9EC", "#5DCAA5", "#EF9F27", "#F0997B"];
+  const container = document.getElementById('phases');
+  let openCard = null;
+
+  phases.forEach((phase, pi) => {
+    const section = document.createElement('div');
+    section.className = 'phase-section';
+    const bar = document.createElement('div');
+    bar.className = 'ph-bar';
+    bar.style.background = phaseColors[pi];
+    const lbl = document.createElement('div');
+    lbl.className = 'phase-label';
+    lbl.textContent = phase.label;
+    section.appendChild(bar);
+    section.appendChild(lbl);
+
+    phase.topics.forEach((t, ti) => {
+      const card = document.createElement('div');
+      card.className = 'topic-card';
+      const coHTML = t.companies.map(c => `<span class="co ${c.cls}">${c.name}</span>`).join('');
+      const ptHTML = t.patterns.map(p => `<span class="pattern-tag">${p}</span>`).join('');
+      card.innerHTML = `
+      <div class="tc-top">
+        <div class="tc-icon">${t.icon}</div>
+        <div class="tc-main">
+          <div class="tc-title">${t.title}</div>
+          <div class="tc-sub">${t.sub}</div>
+        </div>
+        <div class="tc-right">
+          <span class="badge badge-days">${t.days}</span>
+          <span class="badge badge-q">${t.qs}</span>
+        </div>
+      </div>
+      <div class="tc-detail">
+        <div class="detail-inner">
+          <h4>Key patterns</h4>
+          <div class="pattern-list">${ptHTML}</div>
+          <h4>Sub-topics</h4>
+          <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;line-height:1.6">${t.subtopics}</p>
+          <h4>Asked at</h4>
+          <div class="company-list">${coHTML}</div>
+          <button class="action-btn" onclick="sendPrompt('Start lecture for: ${t.title}')">Start this lecture ↗</button>
+        </div>
+      </div>
+    `;
+      card.querySelector('.tc-top').addEventListener('click', () => {
+        const detail = card.querySelector('.tc-detail');
+        const isOpen = detail.classList.contains('open');
+        if (openCard && openCard !== card) {
+          openCard.querySelector('.tc-detail').classList.remove('open');
+          openCard.classList.remove('active');
+        }
+        detail.classList.toggle('open', !isOpen);
+        card.classList.toggle('active', !isOpen);
+        openCard = !isOpen ? card : null;
+      });
+      section.appendChild(card);
+    });
+    container.appendChild(section);
+  });
+</script>
