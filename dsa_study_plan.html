@@ -1,677 +1,2119 @@
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
 
-  body {
-    font-family: var(--font-sans);
-  }
-
-  .plan {
-    padding: 1.5rem 0;
-  }
-
-  .header {
-    margin-bottom: 2rem;
-  }
-
-  .header h1 {
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin-bottom: 6px;
-  }
-
-  .header p {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-  }
-
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 2rem;
-  }
-
-  .stat {
-    background: var(--color-background-secondary);
-    border-radius: var(--border-radius-md);
-    padding: 14px 12px;
-    text-align: center;
-  }
-
-  .stat-num {
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-lbl {
-    font-size: 12px;
-    color: var(--color-text-secondary);
-  }
-
-  .phase-section {
-    margin-bottom: 2rem;
-  }
-
-  .phase-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--color-text-tertiary);
-    margin-bottom: 10px;
-    padding-left: 4px;
-  }
-
-  .topic-card {
-    background: var(--color-background-primary);
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg);
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: border-color .15s, background .15s;
-  }
-
-  .topic-card:hover {
-    border-color: var(--color-border-secondary);
-    background: var(--color-background-secondary);
-  }
-
-  .topic-card.active {
-    border-color: var(--color-border-info);
-  }
-
-  .tc-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .tc-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  .tc-main {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .tc-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-primary);
-  }
-
-  .tc-sub {
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    margin-top: 2px;
-  }
-
-  .tc-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .badge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .badge-days {
-    background: var(--color-background-secondary);
-    color: var(--color-text-secondary);
-    border: 0.5px solid var(--color-border-tertiary);
-  }
-
-  .badge-q {
-    background: var(--color-background-info);
-    color: var(--color-text-info);
-  }
-
-  .tc-detail {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height .3s ease;
-  }
-
-  .tc-detail.open {
-    max-height: 500px;
-  }
-
-  .detail-inner {
-    padding-top: 12px;
-    border-top: 0.5px solid var(--color-border-tertiary);
-    margin-top: 12px;
-  }
-
-  .detail-inner h4 {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-bottom: 8px;
-  }
-
-  .pattern-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 12px;
-  }
-
-  .pattern-tag {
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 0.5px solid var(--color-border-tertiary);
-    color: var(--color-text-secondary);
-    background: var(--color-background-secondary);
-  }
-
-  .company-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .co {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-
-  .co-g {
-    background: #e8f4ea;
-    color: #1a6b2d;
-  }
-
-  .co-m {
-    background: #e8f0fb;
-    color: #1558a8;
-  }
-
-  .co-a {
-    background: #fff3e0;
-    color: #a85f00;
-  }
-
-  .co-ms {
-    background: #f0f4ff;
-    color: #2b4fa8;
-  }
-
-  .co-f {
-    background: #e8f4fb;
-    color: #0e6fa5;
-  }
-
-  .co-u {
-    background: #f5edfc;
-    color: #6e2da8;
-  }
-
-  .co-ap {
-    background: #fce8ea;
-    color: #a82030;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .co-g {
-      background: #1a3d20;
-      color: #6dbf7e;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Mastery — Complete Study Plan</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
 
-    .co-m {
-      background: #1a2840;
-      color: #7aabf4;
+    :root {
+      --bg: #0f0f13;
+      --bg2: #16161c;
+      --bg3: #1e1e26;
+      --bg4: #26262f;
+      --border: #2a2a35;
+      --border2: #38384a;
+      --text: #e8e6f0;
+      --text2: #9896a8;
+      --text3: #5c5a6e;
+      --accent: #7c6af7;
+      --accent2: #5b4de0;
+      --accent-bg: rgba(124, 106, 247, .12);
+      --green: #3ecf8e;
+      --green-bg: rgba(62, 207, 142, .1);
+      --amber: #f5a623;
+      --amber-bg: rgba(245, 166, 35, .1);
+      --red: #f06a6a;
+      --red-bg: rgba(240, 106, 106, .1);
+      --blue: #4fa3f7;
+      --blue-bg: rgba(79, 163, 247, .1);
+      --pink: #e879a0;
+      --pink-bg: rgba(232, 121, 160, .1);
+      --teal: #38c9c9;
+      --teal-bg: rgba(56, 201, 201, .1);
+      --orange: #f08c52;
+      --orange-bg: rgba(240, 140, 82, .1);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Sora', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh
+    }
+
+    /* ── Layout ── */
+    .shell {
+      display: flex;
+      min-height: 100vh
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 280px;
+      min-width: 280px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 0 0 40px;
+      flex-shrink: 0
+    }
+
+    .sb-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px
+    }
+
+    .sb-logo-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .sb-logo-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.02em
+    }
+
+    .sb-logo-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px
+    }
+
+    .sb-section {
+      padding: 0 8px;
+      margin-bottom: 4px
+    }
+
+    .sb-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding: 10px 12px 6px;
+      display: block
+    }
+
+    .sb-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 400;
+      transition: background .12s, color .12s;
+      text-decoration: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left
+    }
+
+    .sb-link:hover {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .sb-link.active {
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-weight: 500
+    }
+
+    .sb-link .sb-icon {
+      font-size: 15px;
+      flex-shrink: 0;
+      width: 20px;
+      text-align: center
+    }
+
+    .sb-link .sb-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: var(--bg4);
+      color: var(--text3);
+      font-family: var(--mono)
+    }
+
+    .sb-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 12px
+    }
+
+    .phase-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 15, 19, .9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 40px;
+      gap: 16px
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .topbar-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .pill-v {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(62, 207, 142, .25)
+    }
+
+    .pill-t {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid rgba(124, 106, 247, .25)
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text3)
+    }
+
+    .stat-mini {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .stat-mini-val {
+      font-weight: 600;
+      color: var(--text);
+      font-family: var(--mono)
+    }
+
+    /* ── Content ── */
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 40px 120px
+    }
+
+    /* ── Page Header ── */
+    .page-hero {
+      margin-bottom: 40px
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid rgba(124, 106, 247, .3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 16px
+    }
+
+    .hero-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: 10px
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 660px
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px
+    }
+
+    .hstat {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      min-width: 100px
+    }
+
+    .hstat-val {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: var(--mono);
+      color: var(--accent);
+      line-height: 1
+    }
+
+    .hstat-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px
+    }
+
+    /* ── Timeline / Phase Headers ── */
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 40px 0 16px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border)
+    }
+
+    .phase-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-family: var(--mono)
+    }
+
+    .phase-info {
+      flex: 1
+    }
+
+    .phase-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -.01em
+    }
+
+    .phase-meta {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 2px
+    }
+
+    .phase-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    /* Phase color schemes */
+    .ph1 {
+      background: rgba(124, 106, 247, .08);
+      border-color: rgba(124, 106, 247, .2)
+    }
+
+    .ph1 .phase-num {
+      background: rgba(124, 106, 247, .15);
+      color: var(--accent)
+    }
+
+    .ph1 .phase-tag {
+      background: rgba(124, 106, 247, .15);
+      color: var(--accent)
+    }
+
+    .ph2 {
+      background: rgba(62, 207, 142, .06);
+      border-color: rgba(62, 207, 142, .2)
+    }
+
+    .ph2 .phase-num {
+      background: rgba(62, 207, 142, .15);
+      color: var(--green)
+    }
+
+    .ph2 .phase-tag {
+      background: rgba(62, 207, 142, .15);
+      color: var(--green)
+    }
+
+    .ph3 {
+      background: rgba(245, 166, 35, .06);
+      border-color: rgba(245, 166, 35, .2)
+    }
+
+    .ph3 .phase-num {
+      background: rgba(245, 166, 35, .15);
+      color: var(--amber)
+    }
+
+    .ph3 .phase-tag {
+      background: rgba(245, 166, 35, .15);
+      color: var(--amber)
+    }
+
+    .ph4 {
+      background: rgba(240, 106, 106, .06);
+      border-color: rgba(240, 106, 106, .2)
+    }
+
+    .ph4 .phase-num {
+      background: rgba(240, 106, 106, .15);
+      color: var(--red)
+    }
+
+    .ph4 .phase-tag {
+      background: rgba(240, 106, 106, .15);
+      color: var(--red)
+    }
+
+    .ph5 {
+      background: rgba(79, 163, 247, .06);
+      border-color: rgba(79, 163, 247, .2)
+    }
+
+    .ph5 .phase-num {
+      background: rgba(79, 163, 247, .15);
+      color: var(--blue)
+    }
+
+    .ph5 .phase-tag {
+      background: rgba(79, 163, 247, .15);
+      color: var(--blue)
+    }
+
+    /* ── Lecture Cards Grid ── */
+    .lecture-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 8px
+    }
+
+    /* ── Lecture Card ── */
+    .lcard {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s, box-shadow .15s
+    }
+
+    .lcard:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3)
+    }
+
+    .lcard.expanded {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent)
+    }
+
+    .lcard-top {
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .lcard-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0
+    }
+
+    .lcard-meta {
+      flex: 1;
+      min-width: 0
+    }
+
+    .lcard-num {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 3px;
+      font-family: var(--mono)
+    }
+
+    .lcard-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -.01em;
+      line-height: 1.3
+    }
+
+    .lcard-sub {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 3px;
+      line-height: 1.4
+    }
+
+    .lcard-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      flex-shrink: 0
+    }
+
+    .dur-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: var(--bg4);
+      color: var(--text3);
+      border: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    .q-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 5px;
+      white-space: nowrap
+    }
+
+    .lcard-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease, opacity .2s;
+      opacity: 0;
+    }
+
+    .lcard.expanded .lcard-body {
+      max-height: 600px;
+      opacity: 1
+    }
+
+    .lcard-inner {
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border)
+    }
+
+    .lcard-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text3);
+      margin: 12px 0 7px
+    }
+
+    .pattern-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 2px
+    }
+
+    .ptag {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 5px;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-weight: 400
+    }
+
+    .company-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px
+    }
+
+    .ctag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500
+    }
+
+    .co-g {
+      background: rgba(62, 207, 142, .12);
+      color: var(--green)
     }
 
     .co-a {
-      background: #3d2800;
-      color: #f0a840;
+      background: rgba(245, 166, 35, .12);
+      color: var(--amber)
     }
 
-    .co-ms {
-      background: #1a2040;
-      color: #8aabf4;
+    .co-m {
+      background: rgba(79, 163, 247, .12);
+      color: var(--blue)
     }
 
     .co-f {
-      background: #0e2d3d;
-      color: #5abcf0;
+      background: rgba(240, 106, 106, .12);
+      color: var(--red)
     }
 
     .co-u {
-      background: #2d1a40;
-      color: #c47af0;
+      background: rgba(124, 106, 247, .12);
+      color: var(--accent)
     }
 
     .co-ap {
-      background: #3d1015;
-      color: #f07a85;
+      background: rgba(56, 201, 201, .12);
+      color: var(--teal)
     }
-  }
 
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    padding: 8px 14px;
-    border-radius: var(--border-radius-md);
-    border: 0.5px solid var(--color-border-secondary);
-    background: transparent;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background .15s;
-  }
-
-  .action-btn:hover {
-    background: var(--color-background-secondary);
-  }
-
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 0.5px solid var(--color-border-tertiary);
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--color-text-secondary);
-  }
-
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-
-  .phase-p1 {
-    background: #AFA9EC;
-  }
-
-  .phase-p2 {
-    background: #5DCAA5;
-  }
-
-  .phase-p3 {
-    background: #EF9F27;
-  }
-
-  .phase-p4 {
-    background: #F0997B;
-  }
-
-  .ph-bar {
-    height: 3px;
-    border-radius: 2px;
-    margin-bottom: 10px;
-  }
-</style>
-
-<div class="plan">
-  <div class="header">
-    <h1>DSA Mastery — Full Study Plan</h1>
-    <p>Kunal-style: pattern-first, intuition-before-code, company-tagged problems. Click any topic to see patterns,
-      sub-topics & companies.</p>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat">
-      <div class="stat-num">20</div>
-      <div class="stat-lbl">Topics</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">4</div>
-      <div class="stat-lbl">Phases</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">16–20</div>
-      <div class="stat-lbl">Weeks</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">300+</div>
-      <div class="stat-lbl">Problems</div>
-    </div>
-  </div>
-
-  <div id="phases"></div>
-
-  <div class="legend">
-    <div class="legend-item">
-      <div class="legend-dot phase-p1"></div>Phase 1 — Foundations
-    </div>
-    <div class="legend-item">
-      <div class="legend-dot phase-p2"></div>Phase 2 — Core DS
-    </div>
-    <div class="legend-item">
-      <div class="legend-dot phase-p3"></div>Phase 3 — Advanced DS & Algos
-    </div>
-    <div class="legend-item">
-      <div class="legend-dot phase-p4"></div>Phase 4 — Patterns & Interview Prep
-    </div>
-  </div>
-</div>
-
-<script>
-  const phases = [
-    {
-      label: "Phase 1 — Foundations (Weeks 1–3)",
-      color: "#AFA9EC",
-      topics: [
-        {
-          icon: "⚙️", title: "Java & Programming Fundamentals",
-          sub: "Loops, recursion, OOP, time/space complexity basics",
-          days: "5 days", qs: "20 Q",
-          patterns: ["Iteration", "Base case thinking", "Big-O analysis"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
-          ],
-          subtopics: "Variables, data types, control flow, methods, OOP pillars, intro to Big-O"
-        },
-        {
-          icon: "🔁", title: "Recursion & Backtracking",
-          sub: "The core mental model — think, trust, induct",
-          days: "7 days", qs: "30 Q",
-          patterns: ["Recursive tree", "Backtracking", "Divide & Conquer seed", "Memoization intro"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Stack frames, tail recursion, subsets, permutations, N-Queens, Sudoku Solver, Word Search"
-        },
-        {
-          icon: "📊", title: "Bit Manipulation",
-          sub: "AND, OR, XOR tricks & number theory foundations",
-          days: "3 days", qs: "15 Q",
-          patterns: ["XOR cancellation", "Bit masking", "Power of 2 check", "Brian Kernighan"],
-          companies: [
-            { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
-          ],
-          subtopics: "Bitwise ops, set/clear/toggle bit, count set bits, single number, missing number"
-        }
-      ]
-    },
-    {
-      label: "Phase 2 — Core Data Structures (Weeks 4–9)",
-      color: "#5DCAA5",
-      topics: [
-        {
-          icon: "📋", title: "Arrays & Strings",
-          sub: "Two pointers, sliding window, prefix sums",
-          days: "8 days", qs: "40 Q",
-          patterns: ["Two pointers", "Sliding window", "Prefix sum", "Kadane's algorithm", "Dutch flag"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Subarrays, sorting tricks, anagram checks, longest substring, container with water, trapping rain"
-        },
-        {
-          icon: "⚡", title: "Sorting & Searching",
-          sub: "Every sort, binary search in all its disguises",
-          days: "5 days", qs: "25 Q",
-          patterns: ["Binary search on answer", "Merge sort divide", "Partition (QuickSelect)", "Counting sort"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
-          ],
-          subtopics: "Bubble/Selection/Insertion/Merge/Quick/Heap/Radix sort, binary search variants, Kth element"
-        },
-        {
-          icon: "🗂️", title: "Linked Lists",
-          sub: "Slow-fast pointers, reversal patterns, merge",
-          days: "6 days", qs: "28 Q",
-          patterns: ["Fast & slow pointers", "Reverse in-place", "Merge two lists", "Cycle detection"],
-          companies: [
-            { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Singly/doubly/circular LL, detect cycle (Floyd's), LRU Cache, merge K sorted, palindrome LL"
-        },
-        {
-          icon: "📚", title: "Stacks & Queues",
-          sub: "Monotonic stack, BFS scaffolding",
-          days: "5 days", qs: "25 Q",
-          patterns: ["Monotonic stack", "Next greater element", "Deque sliding window", "BFS via queue"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Facebook", cls: "co-f" }
-          ],
-          subtopics: "Balanced parens, min-stack, largest rectangle in histogram, sliding window max, implement queue using stacks"
-        },
-        {
-          icon: "🗃️", title: "HashMap & HashSet",
-          sub: "Frequency maps, grouping, two-sum patterns",
-          days: "4 days", qs: "20 Q",
-          patterns: ["Frequency counting", "Complement lookup", "Grouping by key", "Rolling hash"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Two sum, group anagrams, top K frequent, subarray sum equals K, longest consecutive sequence"
-        },
-        {
-          icon: "🌳", title: "Trees (Binary & BST)",
-          sub: "DFS/BFS traversals, recursion on trees",
-          days: "10 days", qs: "45 Q",
-          patterns: ["DFS (pre/in/post)", "BFS level-order", "Height recursion", "Morris traversal", "BST property"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }
-          ],
-          subtopics: "Tree traversals, LCA, diameter, balanced check, serialize/deserialize, BST validation, kth smallest"
-        },
-        {
-          icon: "⛰️", title: "Heaps & Priority Queues",
-          sub: "Top-K problems, merge K sorted, median stream",
-          days: "5 days", qs: "20 Q",
-          patterns: ["Min/Max heap", "Two heaps (median)", "Top K elements", "K-way merge"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
-          ],
-          subtopics: "Heap implementation, Kth largest, merge K sorted lists, find median from data stream, task scheduler"
-        }
-      ]
-    },
-    {
-      label: "Phase 3 — Advanced Structures & Algorithms (Weeks 10–15)",
-      color: "#EF9F27",
-      topics: [
-        {
-          icon: "🕸️", title: "Graphs",
-          sub: "BFS, DFS, Dijkstra, Union-Find, Topological sort",
-          days: "12 days", qs: "45 Q",
-          patterns: ["BFS shortest path", "DFS connected components", "Topological sort", "Union-Find", "Dijkstra/Bellman-Ford", "Cycle detection"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Graph representations, number of islands, clone graph, course schedule, network delay time, alien dictionary"
-        },
-        {
-          icon: "💡", title: "Greedy Algorithms",
-          sub: "Local optimal → global optimal proofs",
-          days: "5 days", qs: "20 Q",
-          patterns: ["Interval scheduling", "Activity selection", "Greedy exchange argument", "Huffman/Kruskal"],
-          companies: [
-            { name: "Amazon", cls: "co-a" }, { name: "Google", cls: "co-g" }, { name: "Microsoft", cls: "co-ms" }
-          ],
-          subtopics: "Jump game, merge intervals, non-overlapping intervals, gas station, task scheduler"
-        },
-        {
-          icon: "🧩", title: "Dynamic Programming",
-          sub: "Memoization → tabulation, all DP patterns",
-          days: "15 days", qs: "55 Q",
-          patterns: ["0/1 Knapsack", "Unbounded knapsack", "LCS/LIS", "Matrix DP", "Interval DP", "DP on trees", "Bitmask DP", "Digit DP"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Fibonacci memoization, 0/1 knapsack, coin change, longest common subsequence, edit distance, house robber, palindrome partitioning"
-        },
-        {
-          icon: "🔤", title: "Tries",
-          sub: "Prefix trees for string problems",
-          days: "4 days", qs: "15 Q",
-          patterns: ["Prefix lookup", "Auto-complete", "XOR max trie", "Word search II"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }
-          ],
-          subtopics: "Implement trie, search suggestions, word break, maximum XOR, replace words"
-        },
-        {
-          icon: "📐", title: "Segment Trees & BIT",
-          sub: "Range queries, prefix sums in log time",
-          days: "5 days", qs: "15 Q",
-          patterns: ["Range sum query", "Point update", "Lazy propagation", "Fenwick BIT"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }
-          ],
-          subtopics: "Build segment tree, range min/max/sum, count of smaller numbers after self, reverse pairs"
-        }
-      ]
-    },
-    {
-      label: "Phase 4 — Interview Patterns & Mock Prep (Weeks 16–20)",
-      color: "#F0997B",
-      topics: [
-        {
-          icon: "🔍", title: "Advanced Recursion & Divide & Conquer",
-          sub: "Master theorem, merge sort variants, median of medians",
-          days: "4 days", qs: "15 Q",
-          patterns: ["D&C on sorted arrays", "QuickSelect", "Karatsuba-style", "Closest pair"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }
-          ],
-          subtopics: "Count inversions, median of two sorted arrays, expression evaluation, powerful integers"
-        },
-        {
-          icon: "🎯", title: "Two Pointers & Sliding Window (Deep Dive)",
-          sub: "All window variants consolidated",
-          days: "3 days", qs: "20 Q",
-          patterns: ["Fixed window", "Variable window", "Multi-pointer", "Shrink-expand"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Facebook", cls: "co-f" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Longest substring without repeat, min window substring, fruit into baskets, 3-sum, 4-sum"
-        },
-        {
-          icon: "🔗", title: "String Algorithms",
-          sub: "KMP, Rabin-Karp, Z-algorithm",
-          days: "4 days", qs: "15 Q",
-          patterns: ["KMP failure function", "Rolling hash", "Z-function", "Palindromic structures"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Microsoft", cls: "co-ms" }, { name: "Amazon", cls: "co-a" }
-          ],
-          subtopics: "Pattern matching KMP, repeated string match, shortest palindrome, longest palindromic substring (Manacher)"
-        },
-        {
-          icon: "🏆", title: "Math & Number Theory",
-          sub: "GCD, primes, modular arithmetic, combinatorics",
-          days: "4 days", qs: "15 Q",
-          patterns: ["Sieve of Eratosthenes", "Fast exponentiation", "Modular inverse", "Combinatorics nCr"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Amazon", cls: "co-a" }, { name: "Apple", cls: "co-ap" }, { name: "Microsoft", cls: "co-ms" }
-          ],
-          subtopics: "Pow(x,n), sqrt(x), count primes, happy number, Excel sheet column, Pascal's triangle"
-        },
-        {
-          icon: "🧠", title: "Mock Interviews & System Thinking",
-          sub: "FAANG-style mock rounds + self-assessment",
-          days: "7 days", qs: "Mixed",
-          patterns: ["STAR pattern explanation", "Clarify before coding", "Complexity trade-off", "Edge case first"],
-          companies: [
-            { name: "Google", cls: "co-g" }, { name: "Facebook", cls: "co-f" }, { name: "Amazon", cls: "co-a" }, { name: "Microsoft", cls: "co-ms" }, { name: "Apple", cls: "co-ap" }, { name: "Uber", cls: "co-u" }
-          ],
-          subtopics: "Timed mock rounds, verbal walkthroughs, dry runs, code reviews, behavioral + technical combo"
-        }
-      ]
+    .co-fl {
+      background: rgba(232, 121, 160, .12);
+      color: var(--pink)
     }
-  ];
 
-  const phaseColors = ["#AFA9EC", "#5DCAA5", "#EF9F27", "#F0997B"];
-  const container = document.getElementById('phases');
-  let openCard = null;
+    .co-ad {
+      background: rgba(240, 140, 82, .12);
+      color: var(--orange)
+    }
 
-  phases.forEach((phase, pi) => {
-    const section = document.createElement('div');
-    section.className = 'phase-section';
-    const bar = document.createElement('div');
-    bar.className = 'ph-bar';
-    bar.style.background = phaseColors[pi];
-    const lbl = document.createElement('div');
-    lbl.className = 'phase-label';
-    lbl.textContent = phase.label;
-    section.appendChild(bar);
-    section.appendChild(lbl);
+    .topics-list {
+      margin-top: 0
+    }
 
-    phase.topics.forEach((t, ti) => {
-      const card = document.createElement('div');
-      card.className = 'topic-card';
-      const coHTML = t.companies.map(c => `<span class="co ${c.cls}">${c.name}</span>`).join('');
-      const ptHTML = t.patterns.map(p => `<span class="pattern-tag">${p}</span>`).join('');
-      card.innerHTML = `
-      <div class="tc-top">
-        <div class="tc-icon">${t.icon}</div>
-        <div class="tc-main">
-          <div class="tc-title">${t.title}</div>
-          <div class="tc-sub">${t.sub}</div>
+    .topics-list li {
+      font-size: 12px;
+      color: var(--text2);
+      margin: 3px 0;
+      list-style: none;
+      padding-left: 14px;
+      position: relative
+    }
+
+    .topics-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--text3);
+      font-weight: 600
+    }
+
+    /* ── New badge ── */
+    .new-badge {
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(62, 207, 142, .3);
+      font-weight: 600;
+      letter-spacing: .05em;
+      vertical-align: middle;
+      margin-left: 6px
+    }
+
+    /* ── Legend Row ── */
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 32px;
+      font-size: 12px
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text2)
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    /* ── Responsive ── */
+    @media(max-width:800px) {
+      .sidebar {
+        display: none
+      }
+
+      .content {
+        padding: 24px 16px 80px
+      }
+
+      .lecture-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <!-- ── SIDEBAR ── -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <span class="sb-logo-icon">🎯</span>
+        <div class="sb-logo-title">DSA Mastery Course</div>
+        <div class="sb-logo-sub">Kunal-style · 27 Topics · 24 Weeks</div>
+      </div>
+
+      <div class="sb-section">
+        <span class="sb-label">Phases</span>
+        <a class="sb-link" href="#phase1"><span class="sb-icon">🟣</span> Phase 1 — Foundations <span
+            class="sb-badge">5</span></a>
+        <a class="sb-link" href="#phase2"><span class="sb-icon">🟢</span> Phase 2 — Core DS <span
+            class="sb-badge">9</span></a>
+        <a class="sb-link" href="#phase3"><span class="sb-icon">🟡</span> Phase 3 — Advanced <span
+            class="sb-badge">7</span></a>
+        <a class="sb-link" href="#phase4new"><span class="sb-icon">🔴</span> Phase 4 — Patterns &amp; Prep <span
+            class="sb-badge">6</span></a>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <div class="sb-section">
+        <span class="sb-label">Quick Jump</span>
+        <a class="sb-link" href="#l1"><span class="sb-icon">1</span> Java Fundamentals</a>
+        <a class="sb-link" href="#l2"><span class="sb-icon">2</span> Recursion & Backtracking</a>
+        <a class="sb-link" href="#l3"><span class="sb-icon">3</span> Bit Manipulation</a>
+        <a class="sb-link" href="#l4"><span class="sb-icon">4</span> Arrays & Strings</a>
+        <a class="sb-link" href="#l5"><span class="sb-icon">5</span> Sorting & Searching</a>
+        <a class="sb-link" href="#l6"><span class="sb-icon">6</span> Linked Lists</a>
+        <a class="sb-link" href="#l7"><span class="sb-icon">7</span> Stacks & Queues</a>
+        <a class="sb-link" href="#l8"><span class="sb-icon">8</span> HashMap & HashSet</a>
+        <a class="sb-link" href="#l9"><span class="sb-icon">9</span> Two Pointers</a>
+        <a class="sb-link" href="#l10"><span class="sb-icon">10</span> Sliding Window</a>
+        <a class="sb-link" href="#l11"><span class="sb-icon">11</span> Binary Trees</a>
+        <a class="sb-link" href="#l12"><span class="sb-icon">12</span> BST & Balanced Trees</a>
+        <a class="sb-link" href="#l13"><span class="sb-icon">13</span> Heaps & Priority Queue</a>
+        <a class="sb-link" href="#l14"><span class="sb-icon">14</span> Tries</a>
+        <a class="sb-link" href="#l15"><span class="sb-icon">15</span> Graphs — BFS/DFS</a>
+        <a class="sb-link" href="#l16"><span class="sb-icon">16</span> Graphs — Advanced</a>
+        <a class="sb-link" href="#l17"><span class="sb-icon">17</span> Segment Trees & BIT</a>
+        <a class="sb-link" href="#l18"><span class="sb-icon">18</span> Dynamic Programming I</a>
+        <a class="sb-link" href="#l19"><span class="sb-icon">19</span> Dynamic Programming II</a>
+        <a class="sb-link" href="#l20"><span class="sb-icon">20</span> Greedy Algorithms</a>
+        <a class="sb-link" href="#l21"><span class="sb-icon">21</span> Divide & Conquer</a>
+        <a class="sb-link" href="#l22"><span class="sb-icon">22</span> String Algorithms</a>
+        <a class="sb-link" href="#l23"><span class="sb-icon">23</span> Math & Number Theory</a>
+        <a class="sb-link" href="#l24"><span class="sb-icon">24</span> Mock Interviews</a>
+      </div>
+    </nav>
+
+    <!-- ── MAIN ── -->
+    <div class="main" id="mainScroll">
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-pill pill-t">27 Topics · 4 Phases</span>
         </div>
-        <div class="tc-right">
-          <span class="badge badge-days">${t.days}</span>
-          <span class="badge badge-q">${t.qs}</span>
+        <div class="topbar-right">
+          <div class="stat-mini">📚 <span class="stat-mini-val">27</span>&nbsp;topics</div>
+          <div class="stat-mini">⏱ <span class="stat-mini-val">24</span>&nbsp;weeks</div>
+          <div class="stat-mini">💼 <span class="stat-mini-val">595+</span>&nbsp;problems</div>
+          <div class="stat-mini">🏷 <span class="stat-mini-val">FAANG</span>&nbsp;tagged</div>
         </div>
       </div>
-      <div class="tc-detail">
-        <div class="detail-inner">
-          <h4>Key patterns</h4>
-          <div class="pattern-list">${ptHTML}</div>
-          <h4>Sub-topics</h4>
-          <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;line-height:1.6">${t.subtopics}</p>
-          <h4>Asked at</h4>
-          <div class="company-list">${coHTML}</div>
-          <button class="action-btn" onclick="sendPrompt('Start lecture for: ${t.title}')">Start this lecture ↗</button>
+
+      <div class="content">
+
+        <!-- Hero -->
+        <div class="page-hero">
+          <div class="hero-kicker">🗺 DSA Mastery — Complete Study Plan</div>
+          <h1 class="hero-title">From Zero to<br>FAANG-Ready</h1>
+          <p class="hero-sub">Kunal-style: pattern-first, intuition-before-code, company-tagged. 27 comprehensive topics
+            across 4 phases — including OOP, Matrix Problems, Union-Find, Monotonic Patterns, and Design DS. Every topic
+            includes lecture notes, key patterns, sub-topic breakdown, and a full assignment. 595+ problems,
+            FAANG-tagged.</p>
+          <div class="hero-stats">
+            <div class="hstat"><span class="hstat-val">27</span><span class="hstat-lbl">Total Topics</span></div>
+            <div class="hstat"><span class="hstat-val">4</span><span class="hstat-lbl">Phases</span></div>
+            <div class="hstat"><span class="hstat-val">24</span><span class="hstat-lbl">Weeks</span></div>
+            <div class="hstat"><span class="hstat-val">595+</span><span class="hstat-lbl">Problems</span></div>
+            <div class="hstat"><span class="hstat-val">7</span><span class="hstat-lbl">Companies tagged</span></div>
+          </div>
         </div>
-      </div>
-    `;
-      card.querySelector('.tc-top').addEventListener('click', () => {
-        const detail = card.querySelector('.tc-detail');
-        const isOpen = detail.classList.contains('open');
-        if (openCard && openCard !== card) {
-          openCard.querySelector('.tc-detail').classList.remove('open');
-          openCard.classList.remove('active');
-        }
-        detail.classList.toggle('open', !isOpen);
-        card.classList.toggle('active', !isOpen);
-        openCard = !isOpen ? card : null;
+
+        <!-- Legend -->
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#7c6af7"></div>Phase 1 — Foundations (Wks 1–4)
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#3ecf8e"></div>Phase 2 — Core Data Structures (Wks 5–11)
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f5a623"></div>Phase 3 — Advanced Algorithms (Wks 12–17)
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f06a6a"></div>Phase 4 — Interview Patterns & Prep (Wks 18–24)
+          </div>
+
+        </div>
+
+        <!-- ════════════════════════════════════════════
+         PHASE 1
+    ════════════════════════════════════════════ -->
+        <div id="phase1" class="phase-header ph1" style="scroll-margin-top:20px">
+          <div class="phase-num">1</div>
+          <div class="phase-info">
+            <div class="phase-title">Foundations</div>
+            <div class="phase-meta">Weeks 1–4 · 5 topics · ~95 problems — Build the mental models everything else rests
+              on</div>
+          </div>
+          <span class="phase-tag">5 Topics</span>
+        </div>
+
+        <div class="lecture-grid">
+
+          <!-- L1 -->
+          <div class="lcard" id="l1" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(124,106,247,.15)">⚙️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 01</div>
+                <div class="lcard-title">Java & Programming Fundamentals</div>
+                <div class="lcard-sub">Data types, OOP, loops, Big-O analysis</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(62,207,142,.12);color:var(--green)">20 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Iteration patterns</span><span class="ptag">Big-O rules</span>
+                  <span class="ptag">Pass-by-value vs ref</span><span class="ptag">Type casting</span>
+                  <span class="ptag">Array manipulation</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>8 primitive types + reference types, heap vs stack</li>
+                  <li>All loop types: for, while, do-while, for-each</li>
+                  <li>Methods, overloading, pass-by-value gotcha</li>
+                  <li>Arrays: declaration, 2D arrays, Arrays utility class</li>
+                  <li>Big-O: 4 simplification rules, common complexities</li>
+                  <li>Java Collections cheat sheet: ArrayList, HashMap, PriorityQueue, Deque</li>
+                  <li>Space complexity, auxiliary space concept</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-f">Facebook</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L2 -->
+          <div class="lcard" id="l2" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(124,106,247,.15)">🔁</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 02</div>
+                <div class="lcard-title">Recursion & Backtracking</div>
+                <div class="lcard-sub">Think-Trust-Induct, call stack, all BT patterns</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">7 days</span>
+                <span class="q-badge" style="background:rgba(62,207,142,.12);color:var(--green)">30 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Recursive tree</span><span class="ptag">Include/Exclude</span>
+                  <span class="ptag">Permutations (swap)</span><span class="ptag">Backtracking template</span>
+                  <span class="ptag">Pruning</span><span class="ptag">Memoization intro</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Linear, tree, tail, mutual recursion types</li>
+                  <li>Parameterized vs functional recursion</li>
+                  <li>Before vs after recursive call (pre/post-order seed)</li>
+                  <li>Fast power O(log n), digit sum, string reversal</li>
+                  <li>Subsets (power set), permutations</li>
+                  <li>Universal backtracking template</li>
+                  <li>N-Queens, Sudoku Solver, Word Search, Rat in Maze</li>
+                  <li>Fibonacci: naive O(2ⁿ) → memoized O(n)</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-ap">Apple</span>
+                  <span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L3 -->
+          <div class="lcard" id="l3" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(124,106,247,.15)">📊</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 03</div>
+                <div class="lcard-title">Bit Manipulation</div>
+                <div class="lcard-sub">AND/OR/XOR tricks, masking, Brian Kernighan</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">3 days</span>
+                <span class="q-badge" style="background:rgba(62,207,142,.12);color:var(--green)">18 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">XOR cancellation</span><span class="ptag">Bit masking</span>
+                  <span class="ptag">Power of 2 check</span><span class="ptag">Brian Kernighan</span>
+                  <span class="ptag">Left/right shift tricks</span><span class="ptag">Two's complement</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Bitwise operators: AND, OR, XOR, NOT, left/right shift</li>
+                  <li>Get, set, clear, toggle, check nth bit</li>
+                  <li>Count set bits (Brian Kernighan's algorithm)</li>
+                  <li>Power of 2 check: n & (n-1) == 0</li>
+                  <li>Single number (XOR), missing number, find two non-repeating</li>
+                  <li>Subsets using bit masks (iterative subset generation)</li>
+                  <li>Swap without temp, fast multiply/divide by 2</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-ap">Apple</span><span class="ctag co-g">Google</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid -->
+
+        <!-- ════════════════════════════════════════════
+         PHASE 2
+    ════════════════════════════════════════════ -->
+        <div id="phase2" class="phase-header ph2" style="scroll-margin-top:20px">
+          <div class="phase-num">2</div>
+          <div class="phase-info">
+            <div class="phase-title">Core Data Structures</div>
+            <div class="phase-meta">Weeks 5–11 · 9 topics · ~243 problems — The structures used in 90% of interviews
+            </div>
+          </div>
+          <span class="phase-tag">9 Topics</span>
+        </div>
+
+        <div class="lecture-grid">
+
+          <!-- L4 -->
+          <div class="lcard" id="l4" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">📋</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 04</div>
+                <div class="lcard-title">Arrays & Strings — Deep Dive</div>
+                <div class="lcard-sub">Prefix sums, Kadane's, Dutch flag, frequency maps</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">6 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">35 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Prefix sum</span><span class="ptag">Suffix array</span>
+                  <span class="ptag">Kadane's (max subarray)</span><span class="ptag">Dutch national flag</span>
+                  <span class="ptag">Frequency array/map</span><span class="ptag">In-place rotation</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Prefix sum array: range queries in O(1)</li>
+                  <li>2D prefix sums: submatrix sum queries</li>
+                  <li>Kadane's algorithm (max subarray) — full derivation</li>
+                  <li>Dutch national flag (3-way partition)</li>
+                  <li>Rotation: reversal algorithm O(1) space</li>
+                  <li>String: immutability, StringBuilder, char frequency</li>
+                  <li>Rabin-Karp rolling hash (intro)</li>
+                  <li>Anagram checks, zigzag patterns, spiral matrix</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-ap">Apple</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L5 -->
+          <div class="lcard" id="l5" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">⚡</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 05</div>
+                <div class="lcard-title">Sorting & Searching</div>
+                <div class="lcard-sub">Every sort algorithm + binary search in all disguises</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">6 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">30 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Binary search on answer</span><span class="ptag">QuickSelect (Kth element)</span>
+                  <span class="ptag">Counting sort</span><span class="ptag">Merge sort (count inversions)</span>
+                  <span class="ptag">Search in rotated array</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Bubble, Selection, Insertion sort — with analysis</li>
+                  <li>Merge sort — stable, O(n log n), space O(n)</li>
+                  <li>Quick sort — partitioning, pivot strategies, O(n log n) avg</li>
+                  <li>Heap sort, Counting sort, Radix sort</li>
+                  <li>Binary search: all variants (first/last occurrence, rotated array)</li>
+                  <li>Binary search on answer (minimize max, maximize min)</li>
+                  <li>QuickSelect for Kth largest in O(n) avg</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-ap">Apple</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L6 -->
+          <div class="lcard" id="l6" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">🗂️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 06</div>
+                <div class="lcard-title">Linked Lists</div>
+                <div class="lcard-sub">Floyd's cycle, reversal, merge, LRU Cache</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">6 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">28 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Fast & slow pointers</span><span class="ptag">Reverse in-place</span>
+                  <span class="ptag">Merge two sorted lists</span><span class="ptag">Cycle detection (Floyd's)</span>
+                  <span class="ptag">K-group reversal</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Singly, doubly, circular linked list implementations</li>
+                  <li>Floyd's tortoise & hare — detect cycle, find entry point</li>
+                  <li>Reverse: iterative (3-pointer) and recursive</li>
+                  <li>Merge two sorted, merge K sorted lists</li>
+                  <li>Find Nth node from end (two-pointer)</li>
+                  <li>Palindrome linked list check</li>
+                  <li>LRU Cache (HashMap + Doubly Linked List)</li>
+                  <li>Intersection point of two linked lists</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L7 -->
+          <div class="lcard" id="l7" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">📚</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 07</div>
+                <div class="lcard-title">Stacks & Queues</div>
+                <div class="lcard-sub">Monotonic stack, deque, BFS scaffolding</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">25 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Monotonic stack</span><span class="ptag">Next greater element</span>
+                  <span class="ptag">Deque sliding window max</span><span class="ptag">BFS via queue</span>
+                  <span class="ptag">Stack simulating recursion</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Stack: array-based, linked-list-based, Java's Deque</li>
+                  <li>Balanced parentheses, valid brackets</li>
+                  <li>Min-stack in O(1) time</li>
+                  <li>Monotonic stack — next/previous greater/smaller element</li>
+                  <li>Largest rectangle in histogram</li>
+                  <li>Sliding window maximum (deque)</li>
+                  <li>Implement queue using two stacks (and vice versa)</li>
+                  <li>Stock span problem, daily temperatures</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-f">Facebook</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L8 -->
+          <div class="lcard" id="l8" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">🗃️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 08</div>
+                <div class="lcard-title">HashMap & HashSet</div>
+                <div class="lcard-sub">Frequency maps, grouping, two-sum family</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">22 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Frequency counting</span><span class="ptag">Complement lookup</span>
+                  <span class="ptag">Grouping by key</span><span class="ptag">Rolling hash</span>
+                  <span class="ptag">Hashing internals</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>HashMap internals: hash function, load factor, rehashing</li>
+                  <li>Collision resolution: chaining vs open addressing</li>
+                  <li>Two sum, three sum, four sum family</li>
+                  <li>Group anagrams, isomorphic strings</li>
+                  <li>Top K frequent elements</li>
+                  <li>Subarray sum equals K (prefix sum + hashmap)</li>
+                  <li>Longest consecutive sequence O(n)</li>
+                  <li>Design: LRU Cache, LFU Cache</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L9 — NEW -->
+          <div class="lcard" id="l9" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">👆</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 09</div>
+                <div class="lcard-title">Two Pointers — Complete</div>
+                <div class="lcard-sub">All two-pointer variants: converging, diverging, multi-array</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">22 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Left-right convergence</span><span class="ptag">Slow-fast (same direction)</span>
+                  <span class="ptag">Multi-array merge</span><span class="ptag">Partition</span>
+                  <span class="ptag">Remove duplicates</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics (standalone lecture — critical pattern)</div>
+                <ul class="topics-list">
+                  <li>Two pointers on sorted array: Two Sum II, container with water</li>
+                  <li>3-sum, 4-sum using two pointers</li>
+                  <li>Trapping rain water (two pointer O(1) space)</li>
+                  <li>Move zeroes, remove duplicates in-place</li>
+                  <li>Squares of sorted array, valid palindrome II</li>
+                  <li>Merge two sorted arrays (no extra space)</li>
+                  <li>Minimum size subarray sum (two pointer variant)</li>
+                  <li>Comparing Strings with backspaces</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L10 — NEW -->
+          <div class="lcard" id="l10" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(62,207,142,.12)">🪟</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 10</div>
+                <div class="lcard-title">Sliding Window — Complete</div>
+                <div class="lcard-sub">Fixed, variable, multi-pointer windows; all string window problems</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">22 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Fixed-size window</span><span class="ptag">Variable-size window
+                    (expand/shrink)</span>
+                  <span class="ptag">Window with constraints</span><span class="ptag">At most K distinct</span>
+                  <span class="ptag">Minimum window substring</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Fixed window: max sum of K-size subarray</li>
+                  <li>Variable window: longest substring without repeat</li>
+                  <li>Window with hashmap: character frequency tracking</li>
+                  <li>Minimum window substring (hardest variant)</li>
+                  <li>Longest subarray with sum ≤ K</li>
+                  <li>Fruit into baskets (at most 2 distinct)</li>
+                  <li>Permutation in string (anagram in string)</li>
+                  <li>Count subarrays with exactly K distinct (at-most trick)</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-u">Uber</span>
+                  <span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid -->
+
+        <!-- ════════════════════════════════════════════
+         PHASE 3
+    ════════════════════════════════════════════ -->
+        <div id="phase3" class="phase-header ph3" style="scroll-margin-top:20px">
+          <div class="phase-num">3</div>
+          <div class="phase-info">
+            <div class="phase-title">Advanced Structures &amp; Algorithms</div>
+            <div class="phase-meta">Weeks 12–17 · 7 topics · ~177 problems — The differentiators that separate good from
+              great</div>
+          </div>
+          <span class="phase-tag">7 Topics</span>
+        </div>
+
+        <div class="lecture-grid">
+
+          <!-- L11 -->
+          <div class="lcard" id="l11" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🌳</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 11</div>
+                <div class="lcard-title">Binary Trees</div>
+                <div class="lcard-sub">All traversals, path problems, LCA, serialization</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">8 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">40 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">DFS (pre/in/post)</span><span class="ptag">BFS level-order</span>
+                  <span class="ptag">Height/depth recursion</span><span class="ptag">Path sum</span>
+                  <span class="ptag">LCA</span><span class="ptag">Morris traversal</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Binary tree representation and construction</li>
+                  <li>DFS: pre/in/post-order (recursive & iterative)</li>
+                  <li>BFS: level-order, zigzag, right side view</li>
+                  <li>Height, diameter, balanced check, max path sum</li>
+                  <li>LCA (Lowest Common Ancestor) — O(n)</li>
+                  <li>Serialize/deserialize binary tree</li>
+                  <li>Morris traversal — O(1) space traversal</li>
+                  <li>Count nodes in complete binary tree</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-ap">Apple</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L12 -->
+          <div class="lcard" id="l12" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🎄</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 12</div>
+                <div class="lcard-title">BST & Balanced Trees</div>
+                <div class="lcard-sub">BST property, AVL, Red-Black, TreeMap internals</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">25 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">BST search/insert/delete</span><span class="ptag">Inorder = sorted</span>
+                  <span class="ptag">Validate BST</span><span class="ptag">Kth smallest</span>
+                  <span class="ptag">Floor/ceil in BST</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>BST property, search, insert, delete — all cases</li>
+                  <li>Inorder traversal yields sorted order</li>
+                  <li>Validate BST (min/max bounds approach)</li>
+                  <li>Kth smallest/largest in BST</li>
+                  <li>Floor, ceil, predecessor, successor</li>
+                  <li>Convert sorted array/list to balanced BST</li>
+                  <li>AVL rotations (conceptual), Red-Black tree overview</li>
+                  <li>Java TreeMap / TreeSet internals</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-ap">Apple</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L13 -->
+          <div class="lcard" id="l13" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">⛰️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 13</div>
+                <div class="lcard-title">Heaps & Priority Queues</div>
+                <div class="lcard-sub">Min/max heap, top-K, two heaps, K-way merge</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">22 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Min/max heap build</span><span class="ptag">Two heaps (median)</span>
+                  <span class="ptag">Top-K elements</span><span class="ptag">K-way merge</span>
+                  <span class="ptag">Event scheduling</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Heap implementation from scratch (heapify, sift up/down)</li>
+                  <li>Heap sort algorithm</li>
+                  <li>Kth largest element (min-heap of size K)</li>
+                  <li>Top K frequent elements, sort characters by frequency</li>
+                  <li>Find median from data stream (two heaps)</li>
+                  <li>Merge K sorted lists/arrays</li>
+                  <li>Task scheduler, meeting rooms II</li>
+                  <li>Sliding window median</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-f">Facebook</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L14 -->
+          <div class="lcard" id="l14" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🔤</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 14</div>
+                <div class="lcard-title">Tries (Prefix Trees)</div>
+                <div class="lcard-sub">Auto-complete, word search, XOR max trie</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">18 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Prefix lookup</span><span class="ptag">Word insert/search/delete</span>
+                  <span class="ptag">Auto-complete / suggestions</span><span class="ptag">XOR max trie</span>
+                  <span class="ptag">Word Search II (trie + DFS)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Trie node structure, insert, search, startsWith</li>
+                  <li>Delete from trie (tricky edge cases)</li>
+                  <li>Count words with given prefix</li>
+                  <li>Word Break problem using trie</li>
+                  <li>Replace words (prefix replacement)</li>
+                  <li>Maximum XOR using binary trie</li>
+                  <li>Word Search II (Boggle — trie + backtracking)</li>
+                  <li>Design autocomplete / search suggestions system</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-f">Facebook</span>
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L15 -->
+          <div class="lcard" id="l15" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🕸️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 15</div>
+                <div class="lcard-title">Graphs — BFS & DFS</div>
+                <div class="lcard-sub">Representations, traversals, connected components, islands</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">8 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">35 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">BFS shortest path</span><span class="ptag">DFS connected components</span>
+                  <span class="ptag">Grid BFS/DFS</span><span class="ptag">Bipartite check</span>
+                  <span class="ptag">Cycle detection (directed/undirected)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Adjacency list vs matrix; when to use each</li>
+                  <li>BFS: shortest path (unweighted), level-by-level</li>
+                  <li>DFS: connected components, path existence</li>
+                  <li>Cycle detection in directed graph (color DFS)</li>
+                  <li>Cycle detection in undirected graph (Union-Find / DFS)</li>
+                  <li>Bipartite graph check</li>
+                  <li>Number of islands, surrounded regions, rotting oranges</li>
+                  <li>Multi-source BFS (0/1 matrix, walls and gates)</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-f">Facebook</span>
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L16 -->
+          <div class="lcard" id="l16" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🌐</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Lecture 16</div>
+                <div class="lcard-title">Graphs — Advanced</div>
+                <div class="lcard-sub">Dijkstra, Bellman-Ford, Topo sort, Union-Find, MST</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">8 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">30 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Dijkstra (weighted BFS)</span><span class="ptag">Bellman-Ford</span>
+                  <span class="ptag">Topological sort (Kahn's + DFS)</span><span class="ptag">Union-Find (DSU)</span>
+                  <span class="ptag">Kruskal's MST</span><span class="ptag">Floyd-Warshall</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Dijkstra's algorithm with min-heap O((V+E) log V)</li>
+                  <li>Bellman-Ford — negative weights, detect negative cycle</li>
+                  <li>Floyd-Warshall — all-pairs shortest path</li>
+                  <li>Topological sort: Kahn's (BFS) and DFS approach</li>
+                  <li>Course schedule, alien dictionary, task ordering</li>
+                  <li>Union-Find with path compression + union by rank</li>
+                  <li>Kruskal's MST, Prim's MST</li>
+                  <li>Network delay time, cheapest flights within K stops</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-f">Facebook</span>
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid -->
+
+        <!-- ════ NEW Phase 3 Topics ════ -->
+        <div class="lecture-grid">
+
+          <div class="lcard" id="matrix" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🧮</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 12</div>
+                <div class="lcard-title">Matrix Problems</div>
+                <div class="lcard-sub">Spiral, in-place rotation, multi-source BFS, grid DFS</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">20 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Spiral traversal</span><span class="ptag">In-place rotation</span>
+                  <span class="ptag">Multi-source BFS</span><span class="ptag">Grid DFS / Flood Fill</span>
+                  <span class="ptag">Row/col walk O(m+n)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Spiral Matrix I/II — peel outer ring: right → down → left → up</li>
+                  <li>Rotate Image 90° — transpose then reverse rows, O(1) space</li>
+                  <li>Set Matrix Zeroes — use first row/col as in-place markers</li>
+                  <li>Game of Life — 2-bit encoding for in-place state machine</li>
+                  <li>Multi-source BFS — 01 Matrix, Rotting Oranges, Walls &amp; Gates</li>
+                  <li>Grid DFS — Islands, Max Area, Flood Fill, Surrounded Regions</li>
+                  <li>Pacific Atlantic Water Flow — two-pass DFS from coasts inward</li>
+                  <li>Search a 2D Matrix II — O(m+n) staircase from top-right corner</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="unionfind" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🔗</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 16</div>
+                <div class="lcard-title">Union-Find (DSU)</div>
+                <div class="lcard-sub">Path compression, union by rank, dynamic connectivity</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">3 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">15 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Path compression find()</span><span class="ptag">Union by rank/size</span>
+                  <span class="ptag">Dynamic connectivity</span><span class="ptag">Cycle detection</span>
+                  <span class="ptag">Online set merging</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Naive O(n) find → path compression → O(α) amortized</li>
+                  <li>Union by rank: always attach the shorter tree under taller</li>
+                  <li>Inverse Ackermann α(n) — practically constant for all n</li>
+                  <li>Number of Provinces — connected-components with DSU</li>
+                  <li>Redundant Connection — first edge creating a cycle</li>
+                  <li>Graph Valid Tree — connected + n-1 edges, no cycle</li>
+                  <li>Accounts Merge — union emails, group by find(representative)</li>
+                  <li>Number of Islands II — online queries adding land cells</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-f">Facebook</span>
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="intervals" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">📐</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 18</div>
+                <div class="lcard-title">Intervals &amp; Sweep Line</div>
+                <div class="lcard-sub">Event sweep, difference arrays, Skyline</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">3 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">12 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Event sweep (+1/-1)</span><span class="ptag">Difference array O(1)</span>
+                  <span class="ptag">Sort by start → merge</span><span class="ptag">Skyline (heap sweep)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Overlap check: a.end &gt; b.start (sorted by start)</li>
+                  <li>Merge Intervals — sort by start, greedy extension O(n log n)</li>
+                  <li>Insert Interval — find position, merge neighbors O(n)</li>
+                  <li>Min Meeting Rooms — event sweep: +1 start, -1 end, track peak</li>
+                  <li>Difference array — O(1) range add, O(n) prefix sum reconstruct</li>
+                  <li>Car Pooling, Corporate Flight Bookings — difference array</li>
+                  <li>The Skyline Problem — sweep line + max-heap</li>
+                  <li>Employee Free Time — merge all, find gaps</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Segment Trees & BIT -->
+          <div class="lcard" id="segtree" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">📐</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 19</div>
+                <div class="lcard-title">Segment Trees &amp; Binary Indexed Tree</div>
+                <div class="lcard-sub">Range queries, point updates, lazy propagation, Fenwick BIT</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">18 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Range sum/min/max query O(log n)</span><span class="ptag">Point update O(log
+                    n)</span>
+                  <span class="ptag">Lazy propagation (range update)</span><span class="ptag">Fenwick BIT (prefix
+                    sums)</span>
+                  <span class="ptag">2D BIT for matrix queries</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Segment tree: build O(n), query O(log n), update O(log n) — recursive implementation</li>
+                  <li>Lazy propagation — defer range updates, push down on query O(log n) amortized</li>
+                  <li>Fenwick / BIT — simpler O(log n) prefix sum + point update, uses bit manipulation</li>
+                  <li>Count of Smaller Numbers After Self — BIT with coordinate compression</li>
+                  <li>Reverse Pairs — merge sort or BIT approach</li>
+                  <li>Range Sum Query (Mutable) — classic segment tree application</li>
+                  <li>2D BIT for sub-matrix sum queries</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Programming I -->
+          <div class="lcard" id="dp1" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🧩</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 20</div>
+                <div class="lcard-title">Dynamic Programming I — Foundations</div>
+                <div class="lcard-sub">Memoization → tabulation, 0/1 knapsack, LCS, LIS, edit distance</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">10 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">40 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">0/1 Knapsack family</span><span class="ptag">Unbounded knapsack</span>
+                  <span class="ptag">LCS (2D DP)</span><span class="ptag">LIS — O(n²) DP, O(n log n) patience</span>
+                  <span class="ptag">Edit distance</span><span class="ptag">Interval / partition DP</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Identify overlapping subproblems + optimal substructure — the two DP criteria</li>
+                  <li>Top-down (memoization with HashMap/array) vs bottom-up (tabulation with loops)</li>
+                  <li>0/1 Knapsack and all variants: subset sum, partition equal subset, target sum</li>
+                  <li>Unbounded knapsack: coin change (min coins), coin change II (count ways), rod cutting</li>
+                  <li>Longest Common Subsequence and variants (print LCS, shortest common supersequence)</li>
+                  <li>LIS — O(n²) DP and O(n log n) patience sort with binary search</li>
+                  <li>Edit Distance — insert/delete/replace, min operations to transform</li>
+                  <li>Matrix Chain Multiplication — interval DP: try all split points</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-ap">Apple</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Programming II -->
+          <div class="lcard" id="dp2" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">🧠</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 21</div>
+                <div class="lcard-title">Dynamic Programming II — Advanced</div>
+                <div class="lcard-sub">Grid DP, DP on trees, bitmask DP, digit DP, state machine DP</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">8 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">30 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Grid DP (unique paths)</span><span class="ptag">DP on trees</span>
+                  <span class="ptag">Bitmask DP (TSP)</span><span class="ptag">Digit DP</span>
+                  <span class="ptag">State machine (buy/sell stocks)</span><span class="ptag">Probability DP</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Grid DP: unique paths, minimum path sum, dungeon game, cherry pickup</li>
+                  <li>DP on trees: house robber III, binary tree cameras, tree knapsack</li>
+                  <li>Bitmask DP: traveling salesman O(n²·2ⁿ), assignment problem, Hamiltonian path</li>
+                  <li>Digit DP: count numbers with specific digit property in range [L,R]</li>
+                  <li>State machine DP: buy/sell stocks (all 6 variants with cooldown, fee, K transactions)</li>
+                  <li>Probability DP: knight probability on chessboard, soup servings</li>
+                  <li>Space optimization — rolling array: reduce O(n²) space to O(n)</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Greedy Algorithms -->
+          <div class="lcard" id="greedy" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(245,166,35,.12)">💡</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 17</div>
+                <div class="lcard-title">Greedy Algorithms</div>
+                <div class="lcard-sub">Exchange argument proofs, interval scheduling, Huffman coding</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(245,166,35,.12);color:var(--amber)">22 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Interval scheduling</span><span class="ptag">Activity selection</span>
+                  <span class="ptag">Exchange argument proof</span><span class="ptag">Huffman coding</span>
+                  <span class="ptag">Greedy + sort</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>When greedy works: exchange argument — prove no swap improves solution</li>
+                  <li>Activity selection / interval scheduling — sort by end time, pick greedily</li>
+                  <li>Non-overlapping intervals — sort by end, count removals</li>
+                  <li>Jump Game I &amp; II — can reach end? minimum jumps?</li>
+                  <li>Gas station circular tour — greedy start point selection</li>
+                  <li>Huffman coding — priority queue builds optimal prefix-free code</li>
+                  <li>Task Scheduler — arrange tasks with cooldown gaps</li>
+                  <li>Candy distribution, Lemonade Change — local greedy decisions</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-g">Google</span>
+                  <span class="ctag co-m">Microsoft</span><span class="ctag co-f">Facebook</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid P3 -->
+
+        <!-- ════ PHASE 4 — Interview Patterns & Prep ════ -->
+        <div id="phase4new" class="phase-header ph4" style="scroll-margin-top:20px">
+          <div class="phase-num">4</div>
+          <div class="phase-info">
+            <div class="phase-title">Interview Patterns &amp; Mock Prep</div>
+            <div class="phase-meta">Weeks 18–24 · 6 topics · ~80 problems — Speed, recognition, mock rounds</div>
+          </div>
+          <span class="phase-tag">6 Topics</span>
+        </div>
+
+        <div class="lecture-grid">
+
+          <div class="lcard" id="monotonic" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(240,106,106,.12)">📊</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 25</div>
+                <div class="lcard-title">Monotonic Patterns (Deep Dive)</div>
+                <div class="lcard-sub">All 4 stack variants, contribution technique, monotone deque</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">3 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">15 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Unified Template — 4 Variants</div>
+                <div class="pattern-tags">
+                  <span class="ptag">NGE — mono decreasing stack</span><span class="ptag">NSE — mono increasing</span>
+                  <span class="ptag">PGE / PSE — reverse direction</span><span class="ptag">Contribution
+                    technique</span>
+                  <span class="ptag">Monotone deque O(n)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>NGE: left→right, mono-decreasing, pop when arr[i] &gt; stack.top</li>
+                  <li>NSE: left→right, mono-increasing, pop when arr[i] &lt; stack.top</li>
+                  <li>PGE/PSE: same stacks, traverse right→left</li>
+                  <li>Largest Rectangle in Histogram — NSE left + PSE right as width</li>
+                  <li>Maximal Rectangle — row-by-row histogram + LRH technique</li>
+                  <li>Sum of Subarray Minimums — contribution: left×right boundary counts</li>
+                  <li>Sliding Window Maximum — monotone deque, front = current max</li>
+                  <li>Daily Temperatures, Stock Span — NGE/PGE applications</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="designds" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(240,106,106,.12)">🏗️</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 26</div>
+                <div class="lcard-title">Design Data Structures</div>
+                <div class="lcard-sub">LRU, LFU, RandomizedSet, Min Stack, Median Stream</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">5 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">15 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">HashMap + DLL (LRU/LFU)</span><span class="ptag">HashMap + Array (RandomSet)</span>
+                  <span class="ptag">Two-stack trick</span><span class="ptag">Two Heaps (Median)</span>
+                  <span class="ptag">Lazy deletion</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>LRU Cache: HashMap(key→node) + DLL — O(1) get/put/evict. Dummy head+tail.</li>
+                  <li>LFU Cache: freq→DLL map + key→(node,freq) map + minFreq tracking</li>
+                  <li>Min Stack: two stacks — main + auxiliary monotone min tracking</li>
+                  <li>RandomizedSet: HashMap(val→idx) + ArrayList — O(1) insert/delete/getRandom</li>
+                  <li>Median from Stream: max-heap lower + min-heap upper, balance after insert</li>
+                  <li>Time-Based Key-Value Store — HashMap + binary search on timestamps</li>
+                  <li>Design Autocomplete — Trie + PriorityQueue for top-3</li>
+                  <li>Snapshot Array — copy-on-write + binary search on snapshot IDs</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="tpdive" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(240,106,106,.12)">🎯</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 23</div>
+                <div class="lcard-title">Two Pointers &amp; Sliding Window (Deep Dive)</div>
+                <div class="lcard-sub">All variants: fixed, variable, at-most trick, opposite ends</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">3 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">20 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">Fixed window</span><span class="ptag">Variable expand/shrink</span>
+                  <span class="ptag">Opposite ends</span><span class="ptag">At-most K trick</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Fixed: slide right, drop left — Max Sum K, Permutation in String</li>
+                  <li>Variable: grow until invalid, shrink until valid — longest window</li>
+                  <li>Opposite ends: Two Sum II, 3Sum, Container, Trapping Rain Water</li>
+                  <li>At-most trick: f(exactly K) = f(≤K) – f(≤K-1)</li>
+                  <li>Min Window Substring — freq map + formed/required counters</li>
+                  <li>Longest Repeating Char Replacement — (size – maxFreq) ≤ k</li>
+                  <li>Fruit Into Baskets, K Different Integers</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-a">Amazon</span>
+                  <span class="ctag co-f">Facebook</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="stringalgos" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(240,106,106,.12)">🔤</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 24</div>
+                <div class="lcard-title">String Algorithms</div>
+                <div class="lcard-sub">KMP, Rabin-Karp, Z-algorithm, Manacher's O(n)</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">4 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">15 Q</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">Key Patterns</div>
+                <div class="pattern-tags">
+                  <span class="ptag">KMP failure function O(n+m)</span><span class="ptag">Rabin-Karp rolling hash</span>
+                  <span class="ptag">Z-array O(n)</span><span class="ptag">Manacher's all palindromes O(n)</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>KMP: lps[i] = longest proper prefix = suffix. No backtracking O(n+m).</li>
+                  <li>Rabin-Karp: polynomial rolling hash, O(n) avg, collision re-check</li>
+                  <li>Z-algorithm: Z[i] = match length of s[i..] with prefix. O(n).</li>
+                  <li>Manacher's: mirror cached palindromes, all in O(n)</li>
+                  <li>Repeated Substring Pattern — KMP: period divides n</li>
+                  <li>Shortest Palindrome — KMP finds longest palindromic prefix</li>
+                  <li>Implement strStr() — choose by constraints</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-a">Amazon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lcard" id="mocks" onclick="toggleCard(this)">
+            <div class="lcard-top">
+              <div class="lcard-icon" style="background:rgba(240,106,106,.12)">🧠</div>
+              <div class="lcard-meta">
+                <div class="lcard-num">Topic 27</div>
+                <div class="lcard-title">Mock Interviews &amp; System Thinking</div>
+                <div class="lcard-sub">UMPIRE, timed rounds, edge cases, behavioral STAR</div>
+              </div>
+              <div class="lcard-right">
+                <span class="dur-badge">7 days</span>
+                <span class="q-badge" style="background:rgba(240,106,106,.12);color:var(--red)">Mixed</span>
+              </div>
+            </div>
+            <div class="lcard-body">
+              <div class="lcard-inner">
+                <div class="lcard-section-title">UMPIRE Framework</div>
+                <div class="pattern-tags">
+                  <span class="ptag">U — Understand</span><span class="ptag">M — Match pattern</span>
+                  <span class="ptag">P — Plan</span><span class="ptag">I — Implement</span>
+                  <span class="ptag">R — Review &amp; dry run</span><span class="ptag">E — Evaluate complexity</span>
+                </div>
+                <div class="lcard-section-title">Sub-topics</div>
+                <ul class="topics-list">
+                  <li>Days 1–2: Mock Round 1 — Easy/Medium, 45-min, verbal walkthrough</li>
+                  <li>Days 3–4: Mock Round 2 — Medium/Hard, brute → optimal narration</li>
+                  <li>Day 5: Edge-case drills — null, empty, overflow, max constraints</li>
+                  <li>Day 6: System design basics — REST, caching, load balancing, DBs</li>
+                  <li>Day 7: Behavioral STAR — projects, conflicts, leadership stories</li>
+                  <li>Pattern drill: identify pattern in 60 seconds</li>
+                  <li>High-frequency FAANG problem list per company</li>
+                </ul>
+                <div class="lcard-section-title">Asked at</div>
+                <div class="company-tags">
+                  <span class="ctag co-g">Google</span><span class="ctag co-f">Facebook</span>
+                  <span class="ctag co-a">Amazon</span><span class="ctag co-m">Microsoft</span>
+                  <span class="ctag co-ap">Apple</span><span class="ctag co-u">Uber</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid P4 -->
+
+
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /shell -->
+
+  <script>
+    function toggleCard(card) {
+      const wasExpanded = card.classList.contains('expanded');
+      document.querySelectorAll('.lcard.expanded').forEach(c => c.classList.remove('expanded'));
+      if (!wasExpanded) card.classList.add('expanded');
+    }
+    document.getElementById('mainScroll').addEventListener('scroll', function () {
+      const sections = document.querySelectorAll('[id^="phase"]');
+      let cur = '';
+      sections.forEach(s => {
+        if (s.getBoundingClientRect().top < 160) cur = s.id;
       });
-      section.appendChild(card);
+      document.querySelectorAll('.sb-link').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+      });
     });
-    container.appendChild(section);
-  });
-</script>
+  </script>
+
+</body>
+
+</html>
