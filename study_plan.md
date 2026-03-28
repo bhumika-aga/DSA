@@ -19,7 +19,7 @@
 
 1. **Follow the phases in order** — each builds on the previous
 2. **Master patterns, not problems** — recognize the pattern, then solve any variant
-3. **Think before you code** — Kunal's mantra: understand the intuition first
+3. **Think before you code** — Mantra: understand the intuition first
 4. **Practice daily** — consistency beats intensity
 5. **Tag your solves** — track which patterns and companies you've covered
 
@@ -1146,7 +1146,7 @@
 | **Saturday** | Weekly assignment (10–12 problems, timed)     | 4–5 hrs |
 | **Sunday**   | Review weak areas, update cheat sheet, rest   | 2–3 hrs |
 
-## 🎯 Kunal's Learning Principles
+## 🎯 Our Learning Principles
 
 1. **Don't memorize — understand.** Explain it like you'd teach a 5-year-old.
 2. **Draw it out.** Every recursion tree, every pointer move, every state transition.
