@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 4 — Arrays & Strings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ─── Reset & Base ─────────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f7f6f3;
+            --bg3: #efede9;
+            --border: #e3e0d9;
+            --border2: #d0ccc4;
+            --text: #37352f;
+            --text2: #6b6860;
+            --text3: #9b9790;
+            --accent: #2383e2;
+            --accent-bg: #e8f1fc;
+            --green: #0f7b6c;
+            --green-bg: #e9f5f3;
+            --red: #c0392b;
+            --red-bg: #fdf0ee;
+            --yellow: #8a6d00;
+            --yellow-bg: #fdf6e3;
+            --purple: #6940a5;
+            --purple-bg: #f0ecf9;
+            --orange: #c75b0e;
+            --orange-bg: #fef0e7;
+            --pink: #ad1a72;
+            --pink-bg: #fce8f3;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Merriweather', serif;
+            --sidebar-w: 260px;
+            --content-max: 860px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #191919;
+            --bg2: #212121;
+            --bg3: #2d2d2d;
+            --border: #333;
+            --border2: #444;
+            --text: #e8e6e1;
+            --text2: #9b9790;
+            --text3: #6b6860;
+            --accent: #5ba4f5;
+            --accent-bg: #1a2d42;
+            --green: #4db6a8;
+            --green-bg: #0e2420;
+            --red: #e07070;
+            --red-bg: #2e1414;
+            --yellow: #d4a42a;
+            --yellow-bg: #2a1f06;
+            --purple: #a07dd4;
+            --purple-bg: #1e1530;
+            --orange: #e0893a;
+            --orange-bg: #2a1608;
+            --pink: #e06aac;
+            --pink-bg: #2a1020;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+            display: flex;
+            min-height: 100vh;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* ─── Sidebar ──────────────────────────────────────────────────── */
+        #sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .lecture-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .sidebar-meta {
+            color: var(--text3);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .toc-label {
+            padding: 0 16px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text3);
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px;
+            cursor: pointer;
+            border-radius: 0;
+            color: var(--text2);
+            transition: background .12s, color .12s;
+            text-decoration: none;
+        }
+
+        .toc-item:hover,
+        .toc-item.active {
+            background: var(--bg3);
+            color: var(--text);
+        }
+
+        .toc-item.active {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .toc-item .toc-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .toc-sub {
+            padding-left: 36px;
+            font-size: 12px;
+            color: var(--text3);
+        }
+
+        .toc-sub:hover {
+            color: var(--text2);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 16px;
+        }
+
+        /* ─── Main Content ─────────────────────────────────────────────── */
+        #main {
+            flex: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        #content {
+            max-width: var(--content-max);
+            margin: 0 auto;
+            padding: 48px 64px 120px;
+        }
+
+        /* ─── Page Header ──────────────────────────────────────────────── */
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .page-title {
+            font-family: var(--serif);
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text2);
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            background: var(--bg2);
+        }
+
+        .meta-chip.accent {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: var(--accent-bg);
+        }
+
+        .meta-chip.green {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green-bg);
+        }
+
+        .meta-chip.yellow {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border-color: var(--yellow-bg);
+        }
+
+        /* ─── Notion Blocks ────────────────────────────────────────────── */
+        .section {
+            margin-bottom: 8px;
+            scroll-margin-top: 20px;
+        }
+
+        .h1 {
+            font-family: var(--serif);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 40px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+            scroll-margin-top: 20px;
+        }
+
+        .h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 6px;
+        }
+
+        p {
+            color: var(--text);
+            margin: 0 0 10px;
+            line-height: 1.75;
+        }
+
+        /* ─── Callout Blocks ───────────────────────────────────────────── */
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 14px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-body {
+            flex: 1;
+        }
+
+        .callout-body strong {
+            font-weight: 600;
+        }
+
+        .callout.blue {
+            background: var(--accent-bg);
+            color: var(--text);
+        }
+
+        .callout.green {
+            background: var(--green-bg);
+            color: var(--text);
+        }
+
+        .callout.yellow {
+            background: var(--yellow-bg);
+            color: var(--text);
+        }
+
+        .callout.red {
+            background: var(--red-bg);
+            color: var(--text);
+        }
+
+        .callout.purple {
+            background: var(--purple-bg);
+            color: var(--text);
+        }
+
+        .callout.orange {
+            background: var(--orange-bg);
+            color: var(--text);
+        }
+
+        /* ─── Code Blocks ──────────────────────────────────────────────── */
+        .code-block {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text2);
+            gap: 10px;
+        }
+
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg);
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 13.5px;
+            line-height: 1.75;
+            tab-size: 4;
+        }
+
+        .kw {
+            color: #0550ae;
+            font-weight: 500;
+        }
+
+        .cm {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .str {
+            color: #0a8043;
+        }
+
+        .num {
+            color: #953800;
+        }
+
+        .fn {
+            color: #8250df;
+        }
+
+        .cls {
+            color: #1a7f37;
+        }
+
+        .ret {
+            color: #0550ae;
+        }
+
+        [data-theme="dark"] .kw {
+            color: #79c0ff;
+        }
+
+        [data-theme="dark"] .cm {
+            color: #8b949e;
+        }
+
+        [data-theme="dark"] .str {
+            color: #a5d6ff;
+        }
+
+        [data-theme="dark"] .num {
+            color: #ff9150;
+        }
+
+        [data-theme="dark"] .fn {
+            color: #d2a8ff;
+        }
+
+        [data-theme="dark"] .cls {
+            color: #7ee787;
+        }
+
+        [data-theme="dark"] .ret {
+            color: #79c0ff;
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: var(--red);
+        }
+
+        [data-theme="dark"] code {
+            color: var(--orange);
+        }
+
+        /* ─── Toggles / Collapsibles ───────────────────────────────────── */
+        details {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg2);
+            list-style: none;
+            transition: background .12s;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary:hover {
+            background: var(--bg3);
+        }
+
+        summary .toggle-arrow {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .2s;
+            color: var(--text3);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        details[open] summary .toggle-arrow {
+            transform: rotate(90deg);
+        }
+
+        .details-body {
+            padding: 14px 16px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ─── Tables ───────────────────────────────────────────────────── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 14px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        thead th {
+            background: var(--bg2);
+            padding: 9px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: .03em;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover td {
+            background: var(--bg2);
+        }
+
+        /* ─── Bullet / Numbered Lists ──────────────────────────────────── */
+        ul,
+        ol {
+            padding-left: 24px;
+            margin: 8px 0 12px;
+        }
+
+        li {
+            margin: 4px 0;
+            line-height: 1.7;
+        }
+
+        li::marker {
+            color: var(--text3);
+        }
+
+        /* ─── Divider ──────────────────────────────────────────────────── */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0;
+        }
+
+        /* ─── Practice Problem Cards ───────────────────────────────────── */
+        .prob-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+
+        .prob-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .12s;
+        }
+
+        .prob-header:hover {
+            background: var(--bg3);
+        }
+
+        .prob-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .prob-num {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 4px;
+        }
+
+        .prob-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .prob-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-family: var(--sans);
+        }
+
+        .tag-easy {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .tag-med {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+
+        .tag-hard {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .tag-co {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .tag-pat {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+
+        .tag-lc {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+
+        .prob-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .prob-body {
+            padding: 16px;
+            background: var(--bg);
+        }
+
+        .prob-section {
+            margin-bottom: 14px;
+        }
+
+        .prob-section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text3);
+            margin-bottom: 6px;
+        }
+
+        .iobox {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text2);
+            white-space: pre-wrap;
+        }
+
+        /* ─── Tree / Recursion Diagrams (ASCII-style) ─────────────────── */
+        .ascii-tree {
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text2);
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .ascii-tree .hl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ascii-tree .ret {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .ascii-tree .nd {
+            color: var(--orange);
+        }
+
+        /* ─── Visual Stack Diagram ─────────────────────────────────────── */
+        .stack-vis {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2px;
+            width: 220px;
+            margin: 12px 0;
+        }
+
+        .stack-frame {
+            padding: 8px 14px;
+            border-radius: 5px;
+            font-family: var(--mono);
+            font-size: 13px;
+            border: 1.5px solid var(--border2);
+            background: var(--bg2);
+            color: var(--text);
+            transition: all .3s;
+        }
+
+        .stack-frame.active {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .stack-frame.ret-frame {
+            background: var(--green-bg);
+            border-color: var(--green);
+            color: var(--green);
+            opacity: .7;
+        }
+
+        /* ─── Complexity Badge ─────────────────────────────────────────── */
+        .complexity-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .cx-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: var(--mono);
+            border: 1px solid var(--border);
+            background: var(--bg2);
+        }
+
+        .cx-badge .cx-label {
+            font-size: 11px;
+            font-family: var(--sans);
+            color: var(--text3);
+        }
+
+        .cx-badge .cx-val {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cx-badge.green {
+            background: var(--green-bg);
+            border-color: var(--green);
+        }
+
+        .cx-badge.yellow {
+            background: var(--yellow-bg);
+            border-color: var(--yellow);
+        }
+
+        .cx-badge.red {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        .cx-badge .cx-val.green {
+            color: var(--green);
+        }
+
+        .cx-badge .cx-val.yellow {
+            color: var(--yellow);
+        }
+
+        .cx-badge .cx-val.red {
+            color: var(--red);
+        }
+
+        /* ─── Pattern Banner ───────────────────────────────────────────── */
+        .pattern-banner {
+            background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .pattern-banner h4 {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+
+        .pattern-banner p {
+            font-size: 14px;
+            font-family: var(--mono);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.8;
+        }
+
+        /* ─── Top Bar ──────────────────────────────────────────────────── */
+        #topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px 10px 28px;
+            font-size: 13px;
+            color: var(--text2);
+            gap: 12px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb a {
+            color: var(--text3);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width .3s;
+        }
+
+        #darkToggle {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s;
+        }
+
+        #darkToggle:hover {
+            background: var(--bg3);
+        }
+
+        /* ─── Checklist ─────────────────────────────────────────────────── */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .cb-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border2);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            font-size: 11px;
+        }
+
+        .checklist-item.done .cb-box {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+        .checklist-item.done .cb-text {
+            text-decoration: line-through;
+            color: var(--text3);
+        }
+
+        /* ─── Hover highlight links ────────────────────────────────────── */
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── Scrollbar ─────────────────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text3);
+        }
+
+        /* ─── Responsive ─────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            #sidebar {
+                display: none;
+            }
+
+            #content {
+                padding: 24px 20px 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ─── Top Bar ────────────────────────────────────────────────── -->
+    <div
+        style="position:fixed;top:0;left:var(--sidebar-w);right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:6px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;height:36px">
+        <div style="color:var(--text3)">DSA Course › Phase 1 › <strong style="color:var(--text)">Lecture 3</strong>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+            <span style="color:var(--text3)">Reading progress</span>
+            <div style="width:120px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+                <div id="progressFill"
+                    style="width:0%;height:100%;background:var(--accent);border-radius:2px;transition:width .1s"></div>
+            </div>
+            <button onclick="toggleDark()" id="darkToggle"
+                style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:var(--sans)">🌙
+                Dark</button>
+        </div>
+    </div>
+
+    <!-- ─── Sidebar ────────────────────────────────────────────────── -->
+    <div id="sidebar" style="padding-top:46px">
+        <div class="sidebar-header">
+            <span class="lecture-badge">🎯 DSA Course</span>
+            <div class="sidebar-title">Arrays & Strings</div>
+            <div class="sidebar-meta">Lecture 4 of 24 · Phase 2</div>
+        </div>
+
+        <div style="padding:0 16px; margin-bottom:16px;">
+            <div style="height:4px; background:var(--bg3); border-radius:2px; overflow:hidden;">
+                <div id="progressFill" style="height:100%; width:0%; background:var(--accent); transition:width 0.1s;">
+                </div>
+            </div>
+        </div>
+
+        <nav aria-label="Table of Contents">
+            <div class="toc-label" style="margin-top:12px">ON THIS PAGE</div>
+
+            <a class="toc-item" href="#prefix-sum">
+                <span class="toc-icon">1️⃣</span> Prefix Sum Arrays
+            </a>
+            <a class="toc-item toc-sub" href="#prefix-1d">1D Memory Logic</a>
+            <a class="toc-item toc-sub" href="#prefix-2d">2D Matrix Logic</a>
+
+            <a class="toc-item" href="#kadane">
+                <span class="toc-icon">2️⃣</span> Kadane's Algorithm
+            </a>
+            <a class="toc-item toc-sub" href="#kadane-logic">The Reset Baggage</a>
+
+            <a class="toc-item" href="#dutch">
+                <span class="toc-icon">3️⃣</span> Dutch National Flag
+            </a>
+            <a class="toc-item toc-sub" href="#dutch-zones">Analyzing 3 Zones</a>
+
+            <a class="toc-item" href="#freq">
+                <span class="toc-icon">4️⃣</span> Frequency Arrays
+            </a>
+            <a class="toc-item toc-sub" href="#freq-chars">O(1) Char Maps</a>
+
+            <a class="toc-item" href="#rotate">
+                <span class="toc-icon">5️⃣</span> The Reversal Trick
+            </a>
+            <a class="toc-item" href="#immutability">
+                <span class="toc-icon">6️⃣</span> String Immutability
+            </a>
+            <a class="toc-item" href="#rabin-karp">
+                <span class="toc-icon">7️⃣</span> Rolling Hashes
+            </a>
+
+            <div class="sb-div"></div>
+
+            <a class="toc-item" href="#practice">
+                <span class="toc-icon">💪</span> Practice Problems
+            </a>
+            <a class="toc-item" href="Assignment.md" target="_blank">
+                <span class="toc-icon">📝</span> Assignment (35 Qs)
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a class="toc-item" href="#checklist">
+                <span class="toc-icon">✅</span> Completion Checklist
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <div style="padding: 8px 16px;">
+                <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">NAVIGATE</div>
+                <a class="toc-item" href="../Lecture3/lecture3_notes.html"
+                    style="padding:5px 0;font-size:13px;color:var(--text3);">← Lecture 3: Bit
+                    Manipulation</a>
+                <a class="toc-item" href="#" style="padding:5px 0;font-size:13px;color:var(--text3);">→ Lecture 5:
+                    Sorting
+                    & Searching</a>
+            </div>
+    </div>
+    <!-- ─── Main content ───────────────────────────────────────────── -->
+    <div id="main" style="padding-top:36px">
+        <div id="content">
+
+            <!-- ── HEADER ── -->
+            <div class="page-header">
+                <span class="page-emoji">🗄️</span>
+                <h1 class="page-title">Arrays & Strings — Deep Dive</h1>
+                <p class="page-subtitle">Mastering contiguous blocks of memory with mathematical tricks, frequencies,
+                    and in-place manipulation.</p>
+
+                <div class="meta-row">
+                    <span class="meta-chip accent">📖 Lecture 4</span>
+                    <span class="meta-chip green">O(n) Mastery</span>
+                    <span class="meta-chip yellow">Memory Layouts</span>
+                </div>
+            </div>
+
+            <div class="callout blue">
+                <span class="callout-icon">💡</span>
+                <div class="callout-body">
+                    <strong>Why Arrays matter at scale:</strong> Arrays are the single most cache-friendly data
+                    structure in computer science. Modern CPUs pull contiguous chunks of memory into the L1 cache. A
+                    linear scan of an array is orders of magnitude faster than traversing a Linked List, even if both
+                    are O(N).
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 1: PREFIX SUMS ═════════════════════════════ -->
+            <h2 class="h1" id="prefix-sum">1️⃣ Prefix Sums (1D and 2D)</h2>
+            <p>Imagine your bank account. If you want to know exactly how much you spent between Wednesday and Friday,
+                you don't need to manually add up Wednesday + Thursday + Friday's receipts. You can simply look at your
+                total balance on Friday and subtract your total balance from Tuesday!</p>
+
+            <p>This is the essence of <strong>Prefix Sums</strong>. They allow you to answer multiple Range Sum Queries
+                in <strong>O(1) time</strong> after a single <strong>O(N) precomputation</strong> step.</p>
+
+            <h3 class="h2" id="prefix-1d">The 1D Memory Logic</h3>
+            <p>We build a new array <code>P</code> where <code>P[i]</code> stores the sum of all elements from index
+                <code>0</code> up to <code>i</code>.
+            </p>
+
+            <div class="ascii-tree">
+                <span class="cm">// Original Array (Daily Expenses):</span>
+                arr = [ <span class="nd">3</span>, <span class="nd">1</span>, <span class="nd">4</span>, <span
+                    class="nd">1</span>, <span class="nd">5</span> ]
+
+                <span class="cm">// Prefix Sum Array (Cumulative Spending):</span>
+                <span class="cm">// P[0] = 3</span>
+                <span class="cm">// P[1] = P[0] + 1 = 4</span>
+                <span class="cm">// P[2] = P[1] + 4 = 8</span>
+                P = [ <span class="hl">3</span>, <span class="hl">4</span>, <span class="hl">8</span>, <span
+                    class="hl">9</span>, <span class="hl">14</span> ]
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java</div>
+                </div>
+                <pre><span class="kw">int</span>[] P = <span class="kw">new</span> <span class="kw">int</span>[arr.length];
+P[<span class="num">0</span>] = arr[<span class="num">0</span>];
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; arr.length; i++) {
+    P[i] = P[i - <span class="num">1</span>] + arr[i];
+}</pre>
+            </div>
+
+            <p><strong>To find the sum of range [L, R]:</strong></p>
+            <ul>
+                <li>If <code>L == 0</code>: Return <code>P[R]</code> (You want the sum from the very beginning).</li>
+                <li>If <code>L &gt; 0</code>: Return <code>P[R] - P[L - 1]</code> (You drop all the "baggage" that came
+                    before <code>L</code>).</li>
+            </ul>
+
+            <h3 class="h2" id="prefix-2d">The 2D Matrix Logic</h3>
+            <p>What if you have a 2D matrix (like a grid of numbers) and you want the sum of a specific rectangle? Doing
+                nested loops takes an incredibly slow O(N²M²). Instead, we use the <strong>Inclusion-Exclusion
+                    Principle</strong> (think Venn Diagrams).</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Formula Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Precompute `P[i][j]`</strong></td>
+                            <td><code>arr[i][j] + P[i-1][j] + P[i][j-1] - P[i-1][j-1]</code>
+                                <br><span style="font-size:12px;color:var(--text3)">Add the cell itself + the rectangle
+                                    ABOVE + the rectangle LEFT. Since the top-left corner was added twice, subtract it
+                                    once!</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Query `(r1,c1)` to `(r2,c2)`</strong></td>
+                            <td><code>P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</code>
+                                <br><span style="font-size:12px;color:var(--text3)">Take the giant rectangle ending at
+                                    (r2, c2). Cut off the top part. Cut off the left part. Since you cut out the
+                                    top-left corner TWICE, add it back once!</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 2: KADANE'S ALGORITHM ═════════════════════════════ -->
+            <h2 class="h1" id="kadane">2️⃣ Kadane's Algorithm — Maximum Subarray</h2>
+            <p>If you're looking for the largest possible sum from a contiguous chunk of an array, checking every chunk
+                takes O(n³). Sliding over them takes O(n²). Kadane's algorithm discovers the answer in a blazingly fast
+                <strong>O(N) single pass!</strong>
+            </p>
+
+            <h3 class="h2" id="kadane-logic">The "Reset" Baggage Intuition</h3>
+            <p>Kadane’s works on a simple philosophy: <strong>If my past is dragging me down (negative sum), I must drop
+                    the baggage and start fresh!</strong></p>
+            <p>At every step, you must make a greedy choice: Do I append the current number to the existing subarray
+                chain, OR do I cut ties and start a brand-new subarray at this exact number?</p>
+
+            <div class="ascii-tree">
+                <span class="cm">Let's dry run the array: [-2, 1, -3, 4]</span>
+
+                [ <span class="nd">-2</span> ] -> currentMax = -2.
+                (It's terrible, but it's the only subarray so far.)
+
+                [ <span class="hl"> 1</span> ] -> Do I append 1 to -2 (gives -1)? Or start fresh at 1?
+                (Clearly, 1 > -1. Start fresh!)
+                <span class="ret">currentMax = 1</span>
+
+                [ <span class="nd">-3</span> ] -> Do I append -3 to 1 (gives -2)? Or start fresh at -3?
+                (-2 is technically better than -3. Keep the chain!)
+                <span class="ret">currentMax = -2</span>
+
+                [ <span class="hl"> 4</span> ] -> Do I append 4 to -2 (gives 2)? Or start fresh at 4?
+                (4 > 2. Drop the baggage!)
+                <span class="ret">currentMax = 4</span>
+
+                <span class="hl">Global Max recorded during this trip: 4</span>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · Maximum Subarray</div>
+                </div>
+                <pre><span class="kw">public int</span> <span class="fn">maxSubArray</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> currentMax = nums[<span class="num">0</span>];
+    <span class="kw">int</span> globalMax = nums[<span class="num">0</span>];
+    
+    <span class="cm">// Start loop at index 1!</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {
+        <span class="cm">// The Core Philosophy: Do I accept the baggage or ditch it?</span>
+        currentMax = Math.max(nums[i], currentMax + nums[i]);
+        globalMax = Math.max(globalMax, currentMax);
+    }
+    <span class="ret">return</span> globalMax;
+}</pre>
+            </div>
+
+            <div class="callout green">
+                <span class="callout-icon">🌟</span>
+                <div class="callout-body">
+                    <strong>Extensions:</strong> You can apply Kadane's logic to find the <strong>Max Product
+                        Subarray</strong> (track both `minProduct` and `maxProduct` because a negative * negative = huge
+                    positive!) or the <strong>Best Time to Buy & Sell Stock</strong> (track the `minPrice` backwards).
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 3: DUTCH NATIONAL FLAG ═════════════════════════════ -->
+            <h2 class="h1" id="dutch">3️⃣ Dutch National Flag (Three-Way Partition)</h2>
+            <p>What if you are given an array of <code>0s, 1s, and 2s</code> and told to sort them in a <strong>single
+                    pass</strong> in O(1) space? Invented by Edsger Dijkstra, the DNF approach maintains 4 strictly
+                defined zones using 3 pointers: <code>low</code>, <code>mid</code>, and <code>high</code>.</p>
+
+            <h3 class="h2" id="dutch-zones">Analyzing 3 Zones</h3>
+            <p>The array starts entirely in the "Unknown" zone. The goal is to shrink the Unknown zone until `mid`
+                passes `high`.</p>
+            <ul>
+                <li><code>0 to low - 1</code>: The confirmed <strong>0s zone</strong>.</li>
+                <li><code>low to mid - 1</code>: The confirmed <strong>1s zone</strong>.</li>
+                <li><code>mid to high</code>: The <strong>UNEXPLORED zone</strong>.</li>
+                <li><code>high + 1 to N - 1</code>: The confirmed <strong>2s zone</strong>.</li>
+            </ul>
+
+            <div class="ascii-tree">
+                <span class="cm">Before sorting: ALL elements are between mid and high (Unknown)</span>
+                [ <span class="nd">2</span>, <span class="nd">0</span>, <span class="nd">2</span>, <span
+                    class="nd">1</span>, <span class="nd">1</span>, <span class="nd">0</span> ]
+                ↑ ↑
+                <span class="hl">mid(low) high</span>
+
+                <span class="cm">If nums[mid] == 0:</span> Swap(low, mid), increment BOTH. (1s shift right)
+                <span class="cm">If nums[mid] == 1:</span> Increment mid. (It's already in the middle)
+                <span class="cm">If nums[mid] == 2:</span> Swap(mid, high), decrement high. (DO NOT increment mid!)
+            </div>
+
+            <div class="callout orange">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>Why don't we increment `mid` when swapping a `2` with `high`?</strong><br>
+                    Because when you pull an element from the `high` index into the `mid` index, that element came from
+                    the <strong>Unexplored Zone</strong>. You don't know if the number you just pulled is a 0, 1, or 2!
+                    It must be processed again by the loop.
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · Sort Colors</div>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
+    <span class="cm">// Initialize the strict bounds</span>
+    <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
+    
+    <span class="kw">while</span> (mid &lt;= high) {
+        <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) {
+            swap(nums, low, mid);
+            low++; mid++;
+        } <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) {
+            mid++;
+        } <span class="kw">else</span> { <span class="cm">// nums[mid] == 2</span>
+            swap(nums, mid, high);
+            high--; <span class="cm">// Warning! Don't increment mid!</span>
+        }
+    }
+}</pre>
+            </div>
+            <hr>
+
+            <!-- ═══ SECTION 4: FREQUENCY ARRAYS ═════════════════════════════ -->
+            <h2 class="h1" id="freq">4️⃣ Frequency Arrays vs HashMaps</h2>
+            <p>When solving an Anagram substring string count problem, the instinct is to use `HashMap<Character,
+                    Integer>`. But what if you are strictly mapping lowercase english letters?</p>
+            <p><strong>HashMaps are painfully slow.</strong> They require creating an Object for every Key/Value pair,
+                suffer from hashing collisions, and cause Memory Fragmentation. If the character set is just `'a' -
+                'z'`, a flat <code>int[26]</code> array is the absolute fastest way to count in O(1) time!</p>
+
+            <h3 class="h2" id="freq-chars">The Character Mapping Trick</h3>
+            <p>In ASCII, `'a'` is 97, `'b'` is 98. <br>Therefore, <code>'c' - 'a' = 99 - 97 = 2</code>.</p>
+
+            <div class="ascii-tree">
+                <span class="cm">Mapping 'a' to 'z' strictly into Indexes 0 through 25</span>
+                char: <span class="hl">'a' 'b' 'c' ... 'z'</span>
+                idx: [ <span class="nd">0 1 2 ... 25</span> ]
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · Valid Anagram O(N)</div>
+                </div>
+                <pre><span class="kw">public boolean</span> <span class="fn">isAnagram</span>(String s, String t) {
+    <span class="cm">// If lengths don't match, they trivially aren't anagrams!</span>
+    <span class="kw">if</span> (s.length() != t.length()) <span class="ret">return false</span>;
+    
+    <span class="cm">// Only 26 english letters!</span>
+    <span class="kw">int</span>[] count = <span class="kw">new int</span>[<span class="num">26</span>];
+    
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {
+        count[s.charAt(i) - <span class="str">'a'</span>]++;  <span class="cm">// 'c' maps to count[2]</span>
+        count[t.charAt(i) - <span class="str">'a'</span>]--;  <span class="cm">// Balance exactly on the opposite side</span>
+    }
+    
+    <span class="cm">// If any count isn't exactly 0, they had different letter distributions.</span>
+    <span class="kw">for</span> (<span class="kw">int</span> val : count) {
+        <span class="kw">if</span> (val != <span class="num">0</span>) <span class="ret">return false</span>;
+    }
+    <span class="ret">return true</span>;
+}</pre>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 5: THE REVERSAL ALGORITHM ═════════════════════════ -->
+            <h2 class="h1" id="rotate">5️⃣ The Reversal Algorithm (Rotate Array)</h2>
+            <p>How do we rotate an array by <code>k</code> steps using <strong>O(1) auxiliary space</strong>? Moving
+                elements one by one takes O(n*k). The math trick is three simple reversals.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · Rotate by K</div>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    k = k % nums.length;
+    <span class="cm">// Step 1: reverse the entire array</span>
+    reverse(nums, <span class="num">0</span>, nums.length - <span class="num">1</span>);
+    <span class="cm">// Step 2: reverse the first k elements</span>
+    reverse(nums, <span class="num">0</span>, k - <span class="num">1</span>);
+    <span class="cm">// Step 3: reverse the remaining rest</span>
+    reverse(nums, k, nums.length - <span class="num">1</span>);
+}</pre>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 6: STRING IMMUTABILITY ═════════════════════════ -->
+            <h2 class="h1" id="immutability">6️⃣ String Immutability & StringBuilder</h2>
+            <p>In Java, Python, and C#, Strings are <strong>immutable</strong>. Once created, they cannot be changed.
+                This means `s += "a"` creates a brand-new string in memory and copies all existing characters over!</p>
+
+            <div class="callout red">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>The O(N²) Trap:</strong> If you append N characters in a loop using <code>+=</code>, you
+                    perform $1 + 2 + 3 + ... + N = O(N^2)$ array copies. You will get TLE (Time Limit Exceeded) on
+                    LeetCode.
+                </div>
+            </div>
+
+            <p><strong>The Fix:</strong> Always use a dynamic resizing array buffer for loops.</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · StringBuilder</div>
+                </div>
+                <pre><span class="cm">// O(N) Time - Amortized constant time appends</span>
+StringBuilder sb = <span class="kw">new</span> StringBuilder();
+<span class="kw">for</span> (<span class="kw">char</span> c : chars) {
+    sb.append(c);
+}
+<span class="ret">return</span> sb.toString();</pre>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 7: RABIN-KARP & ROLLING HASH ═════════════════════════ -->
+            <h2 class="h1" id="rabin-karp">7️⃣ Rabin-Karp & Rolling Hash Intro</h2>
+            <p>If you search for a substring of length M in a string of length N, the naive match is O(N × M).
+                Rabin-Karp converts the substring to a numerical <strong>hash</strong> to do this in O(N) overall time.
+            </p>
+
+            <p><strong>The Mechanics:</strong> A "Rolling Hash" allows you to slide a window by conceptually
+                <em>subtracting</em> the old character dropping out, and <em>adding</em> the new character shifting in,
+                doing this math in strictly <code>O(1)</code> time per shift instead of recomputing the M length hash
+                from scratch.
+            </p>
+
+            <div class="callout purple">
+                <span class="callout-icon">🧠</span>
+                <div class="callout-body">
+                    <strong>Rolling formula:</strong>
+                    <code>hash = (hash - (oldChar * base^(M-1))) * base + newChar</code>.
+                    <br>You will apply this heavily in finding duplicate substrings and pattern matching.
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ═══ IN-LECTURE PRACTICE ════════════════════════════════ -->
+            <h2 class="h1" id="practice">💪 In-Lecture Practice Problems</h2>
+            <p>Implement these core manipulations directly in code. These form the base for advanced windowing
+                techniques.</p>
+
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">P01</div>
+                        <div class="prob-title">Rotate Image (2D In-Place)</div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-lc">LC 48</span>
+                        </div>
+                    </div>
+                    <div class="prob-right">
+                        <span class="meta-chip green"
+                            style="background:transparent;border-color:var(--green)">O(N²)</span>
+                        <span class="meta-chip" style="background:transparent">O(1) Space</span>
+                    </div>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">The Trick</div>
+                        <p>To rotate a matrix 90 degrees clockwise in-place, the simplest approach is a two-step
+                            mathematical trick: first transpose the matrix (swap row and col indices), then reverse each
+                            row horizontally!</p>
+                    </div>
+
+                    <div class="prob-section">
+                        <div class="prob-section-label">Solution</div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">Java</div><button class="copy-btn"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] matrix) {
+    <span class="kw">int</span> n = matrix.length;
+    
+    <span class="cm">// 1. Transpose: Swap matrix[i][j] with matrix[j][i]</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+        <span class="kw">for</span> (<span class="kw">int</span> j = i; j &lt; n; j++) {
+            <span class="kw">int</span> temp = matrix[i][j];
+            matrix[i][j] = matrix[j][i];
+            matrix[j][i] = temp;
+        }
+    }
+    
+    <span class="cm">// 2. Reverse each row left to right</span>
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; n; r++) {
+        <span class="kw">int</span> left = <span class="num">0</span>, right = n - <span class="num">1</span>;
+        <span class="kw">while</span> (left &lt; right) {
+            <span class="kw">int</span> temp = matrix[r][left];
+            matrix[r][left] = matrix[r][right];
+            matrix[r][right] = temp;
+            left++; right--;
+        }
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ═══ ASSIGNMENT & CHECKLIST ═════════════════════════════ -->
+
+            <div class="callout orange" style="margin-top:40px">
+                <span class="callout-icon">📝</span>
+                <div class="callout-body">
+                    <strong>Lecture 4 Assignment — 35 Problems</strong><br>
+                    Includes 6 Easy, 17 Medium, 5 Hard problems, and complexity analysis puzzles on prefix sums and
+                    Kadane's algorithm.
+                    <div style="margin-top:12px">
+                        <a href="Assignment.md" class="res-btn assignment" target="_blank"
+                            style="display:inline-block;padding:8px 16px;background:var(--orange);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:13px">Open
+                            Assignment →</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
+            <p>Ensure you've mastered these array manipulation mechanics before moving to Sorting.</p>
+
+            <div style="margin:20px 0; display:flex; flex-direction:column; gap:8px;">
+                <div class="checklist-item" onclick="toggleCheck(this)"
+                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                    <div class="cb-box"
+                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                        ✓</div>
+                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I understand
+                        how to query a 2D Prefix Sum matrix in O(1) time</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)"
+                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                    <div class="cb-box"
+                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                        ✓</div>
+                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I can
+                        implement Kadane's algorithm tracking both running max and global max</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)"
+                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                    <div class="cb-box"
+                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                        ✓</div>
+                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I can sort
+                        0s, 1s, and 2s in one pass using the Dutch National Flag approach</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)"
+                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                    <div class="cb-box"
+                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                        ✓</div>
+                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I completed
+                        at least 20 problems from the Assignment file</span>
+                </div>
+            </div>
+
+        </div><!-- #content -->
+    </div><!-- #main -->
+
+    <script>
+        function toggleCheck(el) {
+            const box = el.querySelector('.cb-box');
+            const txt = el.querySelector('.cb-text');
+            if (box.style.color === 'transparent' || !box.style.color) {
+                box.style.color = '#fff';
+                box.style.backgroundColor = 'var(--green)';
+                box.style.borderColor = 'var(--green)';
+                txt.style.color = 'var(--text3)';
+                txt.style.textDecoration = 'line-through';
+            } else {
+                box.style.color = 'transparent';
+                box.style.backgroundColor = 'transparent';
+                box.style.borderColor = 'var(--border2)';
+                txt.style.color = 'var(--text)';
+                txt.style.textDecoration = 'none';
+            }
+        }
+
+        // Active TOC tracking
+        document.getElementById('main').addEventListener('scroll', function () {
+            const sections = document.querySelectorAll('[id]');
+            let current = '';
+            sections.forEach(s => {
+                if (s.getBoundingClientRect().top < 120) current = s.id;
+            });
+            document.querySelectorAll('.toc-item').forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+            });
+        });
+
+        function toggleProb(header) {
+            const body = header.nextElementSibling;
+            const open = body.style.display === 'block';
+            body.style.display = open ? 'none' : 'block';
+            header.style.backgroundColor = open ? 'var(--bg2)' : 'var(--bg3)';
+        }
+
+        function copyCode(btn) {
+            const pre = btn.parentElement.nextElementSibling;
+            navigator.clipboard.writeText(pre.innerText);
+            const old = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = old, 1500);
+        }
+
+        // Dark mode toggle
+        function toggleDark() {
+            const html = document.documentElement;
+            const btn = document.getElementById('darkToggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                btn.innerText = '🌙 Dark';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.innerText = '☀️ Light';
+            }
+        }
+    </script>
+</body>
+
+</html>
