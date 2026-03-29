@@ -1020,7 +1020,8 @@
     <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
     <a class="toc-item" href="#strings"><span class="toc-icon">🔤</span>String Essentials</a>
     <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
+    <div class="sb-div"></div>
+    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Completion Checklist</a>
 
     <div class="sb-div"></div>
     <div style="padding:8px 16px">
@@ -1059,7 +1060,7 @@
           <span class="meta-chip accent">📖 Lecture 1</span>
           <span class="meta-chip accent">Phase 1 — Foundations</span>
           <span class="meta-chip yellow">⏱ 5 days</span>
-          <span class="meta-chip green">🎯 20 practice problems</span>
+          <span class="meta-chip green">🎯 27 problems</span>
           <span class="meta-chip">💼 Google · Amazon · Microsoft</span>
         </div>
       </div>
@@ -2625,7 +2626,7 @@ queue.peek();    <span class="cm">// view front</span></pre>
       <hr>
 
       <!-- ══ SECTION 7.8: STRING BASICS ══════════════════════════ -->
-      <h2 class="h1" id="strings">�� String Essentials for DSA</h2>
+      <h2 class="h1" id="strings">🔤 String Essentials for DSA</h2>
 
       <p>Java strings are <strong>immutable</strong> — every modification creates a new string. This is the #1 interview
         trap for beginners.</p>
@@ -2819,38 +2820,109 @@ queue.peek();    <span class="cm">// view front</span></pre>
   </div><!-- #main -->
 
   <script>
+    // Universal Dark Mode Toggle
     function toggleDark() {
-      const d = document.documentElement;
-      const dark = d.getAttribute('data-theme') === 'dark';
-      d.setAttribute('data-theme', dark ? '' : 'dark');
-      document.getElementById('darkToggle').textContent = dark ? '🌙 Dark' : '☀️ Light';
+      const html = document.documentElement;
+      const btn = document.getElementById('darkToggle');
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        btn.innerText = '🌙 Dark';
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        btn.innerText = '☀️ Light';
+      }
     }
+
+    // Universal Progress & TOC Tracker inside #main scroll boundary
     document.getElementById('main').addEventListener('scroll', function () {
       const el = this;
-      const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-      document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+
+      // 1. Progress Bar calculation
+      if (document.getElementById('progressFill')) {
+        const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+      }
+
+      // 2. Active TOC Highlighting
       const sections = document.querySelectorAll('[id]');
-      let cur = '';
-      sections.forEach(s => { if (s.getBoundingClientRect().top < 120) cur = s.id; });
+      let current = '';
+      sections.forEach(s => {
+        if (s.getBoundingClientRect().top < 150) current = s.id;
+      });
       document.querySelectorAll('.toc-item').forEach(a => {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
       });
     });
-    function toggleProb(header) {
-      const body = header.nextElementSibling;
+
+    // Universal Problem Visibility Toggle
+    function toggleProb(headerEl) {
+      const body = headerEl.nextElementSibling;
+      if (!body) return;
       const open = body.style.display === 'block';
       body.style.display = open ? 'none' : 'block';
-      const arrow = header.querySelector('span:last-child');
-      if (arrow) arrow.style.transform = open ? '' : 'rotate(90deg)';
+      headerEl.style.backgroundColor = open ? 'var(--bg2)' : 'var(--bg3)';
+
+      // If there's an arrow span dynamically toggle it
+      const arrow = headerEl.querySelector('span:last-child');
+      if (arrow && arrow.innerText.includes('▼')) {
+        arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+        arrow.style.color = open ? 'var(--text3)' : 'var(--accent)';
+      }
     }
-    function toggleCheck(item) { item.classList.toggle('done'); }
+
+    // Universal Copy Code To Clipboard
     function copyCode(btn) {
-      const pre = btn.closest('.code-block').querySelector('pre');
-      navigator.clipboard.writeText(pre.innerText).then(() => {
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 1500);
+      const pre = btn.parentElement.nextElementSibling;
+      // Get text without the span tags if any syntax highlighting exists
+      const textToCopy = pre.innerText;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const origText = btn.innerText;
+        btn.innerText = 'Copied!';
+        btn.style.background = 'var(--green-bg)';
+        btn.style.color = 'var(--green)';
+        btn.style.borderColor = 'var(--green)';
+
+        setTimeout(() => {
+          btn.innerText = origText;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 2000);
       });
     }
+
+    // Universal Checklist Toggle logic
+    function toggleCheck(el) {
+      const box = el.querySelector('.cb-box');
+      const txt = el.querySelector('.cb-text');
+      if (!box || !txt) return;
+
+      if (box.style.color === 'transparent' || !box.style.color) {
+        box.style.color = '#fff';
+        box.style.backgroundColor = 'var(--green)';
+        box.style.borderColor = 'var(--green)';
+        txt.style.color = 'var(--text3)';
+        txt.style.textDecoration = 'line-through';
+      } else {
+        box.style.color = 'transparent';
+        box.style.backgroundColor = 'transparent';
+        box.style.borderColor = 'var(--border2)';
+        txt.style.color = 'var(--text)';
+        txt.style.textDecoration = 'none';
+      }
+    }
+
+    // Final fallback: details arrows
+    document.querySelectorAll('details').forEach(det => {
+      det.addEventListener('toggle', function () {
+        const arrow = this.querySelector('.toggle-arrow');
+        if (arrow) {
+          if (this.open) arrow.style.transform = 'rotate(90deg)';
+          else arrow.style.transform = 'rotate(0deg)';
+        }
+      });
+    });
   </script>
 </body>
 
