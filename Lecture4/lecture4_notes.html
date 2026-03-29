@@ -9,6 +9,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
         rel="stylesheet">
+    <!-- KaTeX for Premium Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body);"></script>
     <style>
         /* ─── Reset & Base ─────────────────────────────────────────────── */
         *,
@@ -741,14 +746,14 @@
         /* ─── Tree / Recursion Diagrams (ASCII-style) ─────────────────── */
         .ascii-tree {
             font-family: var(--mono);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 12.5px;
+            line-height: 1.5;
             color: var(--text2);
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            margin: 10px 0;
+            background: var(--bg);
+            border-left: 3px solid var(--bg3);
+            border-radius: 0;
+            padding: 4px 16px;
+            margin: 12px 0;
             overflow-x: auto;
             white-space: pre;
         }
@@ -1073,38 +1078,35 @@
         <a class="toc-item" href="#kadane">
             <span class="toc-icon">🎒</span> Kadane's Algorithm
         </a>
-        <a class="toc-item toc-sub" href="#kadane-logic">The Reset Baggage</a>
 
         <a class="toc-item" href="#dutch">
             <span class="toc-icon">🚩</span> Dutch National Flag
         </a>
-        <a class="toc-item toc-sub" href="#dutch-zones">Analyzing 3 Zones</a>
+
+        <a class="toc-item" href="#rotate">
+            <span class="toc-icon">🔄</span> Rotation Algorithm
+        </a>
 
         <a class="toc-item" href="#freq">
             <span class="toc-icon">🔤</span> Frequency Arrays
         </a>
-        <a class="toc-item toc-sub" href="#freq-chars">O(1) Char Maps</a>
-
-        <a class="toc-item" href="#rotate">
-            <span class="toc-icon">🔄</span> The Reversal Trick
-        </a>
 
         <a class="toc-item" href="#immutability">
-            <span class="toc-icon">🔒</span> String Immutability
+            <span class="toc-icon">🧵</span> String Foundations
         </a>
 
         <a class="toc-item" href="#rabin-karp">
-            <span class="toc-icon">🔍</span> Rabin-Karp Intro
+            <span class="toc-icon">🔑</span> Rolling Hash Intro
         </a>
 
         <a class="toc-item" href="#spiral">
             <span class="toc-icon">🌀</span> 2D Traversals
         </a>
-        <a class="toc-item toc-sub" href="#spiral-logic">Shrinking Wall Analogy</a>
 
         <a class="toc-item" href="#practice">
             <span class="toc-icon">💪</span> Practice Problems
         </a>
+
         <a class="toc-item" href="#assignment">
             <span class="toc-icon">📝</span> Assignment
         </a>
@@ -1133,17 +1135,16 @@
             <!-- ── HEADER ── -->
             <div class="page-header">
                 <span class="page-emoji">🗄️</span>
-                <h1 class="page-title">Arrays & Strings — Deep Dive</h1>
-                <p class="page-subtitle">Mastering contiguous blocks of memory with mathematical tricks,
-                    frequencies,
-                    and in-place manipulation.</p>
+                <h1 class="page-title">Arrays & Strings Masterclass</h1>
+                <p class="page-subtitle">Mastering the foundation of contiguous memory: prefix calculations, greedy
+                    optimizations, and efficient string manipulations.</p>
 
                 <div class="meta-row">
                     <span class="meta-chip accent">📖 Lecture 4</span>
-                    <span class="meta-chip accent">Phase 2 — Core Data Structures</span>
-                    <span class="meta-chip yellow">⏱ 6 days</span>
+                    <span class="meta-chip accent">Phase 2 — Core DSA</span>
+                    <span class="meta-chip yellow">⏱ 8 days</span>
                     <span class="meta-chip green">🎯 35 problems</span>
-                    <span class="meta-chip">💼 Google · Amazon · Facebook · Microsoft · Apple · Uber</span>
+                    <span class="meta-chip">💼 FAANG Essential</span>
                 </div>
             </div>
 
@@ -1153,8 +1154,7 @@
                     <strong>Why Arrays matter at scale:</strong> Arrays are the single most cache-friendly data
                     structure in computer science. Modern CPUs pull contiguous chunks of memory into the L1 cache. A
                     linear scan of an array is orders of magnitude faster than traversing a Linked List, even if
-                    both
-                    are O(N).
+                    both are O(N).
                 </div>
             </div>
 
@@ -1172,7 +1172,7 @@
                 Queries
                 in <strong>O(1) time</strong> after a single <strong>O(N) precomputation</strong> step.</p>
 
-            <h3 class="h2" id="prefix-1d">The 1D Memory Logic</h3>
+            <h3 class="h2" id="prefix-1d">1.1 The 1D Memory Logic</h3>
             <p>We build a new array <code>P</code> where <code>P[i]</code> stores the sum of all elements from index
                 <code>0</code> up to <code>i</code>.
             </p>
@@ -1183,38 +1183,47 @@
                     class="nd">1</span>, <span class="nd">5</span> ]
 
                 <span class="cm">// Prefix Sum Array (Cumulative Spending):</span>
-                <span class="cm">// P[0] = 3</span>
-                <span class="cm">// P[1] = P[0] + 1 = 4</span>
-                <span class="cm">// P[2] = P[1] + 4 = 8</span>
-                P = [ <span class="hl">3</span>, <span class="hl">4</span>, <span class="hl">8</span>, <span
-                    class="hl">9</span>, <span class="hl">14</span> ]
+                P[0] = 3
+                P[1] = P[0] + 1 = 4
+                P[2] = P[1] + 4 = 8
+                P[3] = P[2] + 1 = 9
+                P[4] = P[3] + 5 = 14
+
+                <span class="hl">P = [ 3, 4, 8, 9, 14 ]</span>
             </div>
 
-            <div class="code-block">
+            <div class="code-block" style="border-left: 4px solid var(--accent)">
                 <div class="code-header">
-                    <div class="code-lang">☕ Java</div>
+                    <div class="code-lang">📝 Prefix Sum — Pseudo-code</div>
                 </div>
-                <pre><span class="kw">int</span>[] P = <span class="kw">new</span> <span class="kw">int</span>[arr.length];
-P[<span class="num">0</span>] = arr[<span class="num">0</span>];
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; arr.length; i++) {
-    P[i] = P[i - <span class="num">1</span>] + arr[i];
-}</pre>
+                <pre><span class="cm">// Step 1: Precompute (Build Prefix Array)</span>
+P[0] = A[0]
+For i from 1 to N-1: 
+   P[i] = P[i-1] + A[i]
+
+<span class="cm">// Step 2: Query(L, R) in O(1)</span>
+Return P[R] - (L > 0 ? P[L-1] : 0)</pre>
             </div>
 
-            <p><strong>To find the sum of range [L, R]:</strong></p>
-            <ul>
-                <li>If <code>L == 0</code>: Return <code>P[R]</code> (You want the sum from the very beginning).
-                </li>
-                <li>If <code>L &gt; 0</code>: Return <code>P[R] - P[L - 1]</code> (You drop all the "baggage" that
-                    came
-                    before <code>L</code>).</li>
-            </ul>
+            <h3 class="h2" id="prefix-2d">1.2 The 2D Submatrix Logic</h3>
+            <p>What if you have a 2D matrix (like a grid of numbers) and you want the sum of a specific
+                rectangle? Treat
+                the matrix as a series of rectangles. Doing
+                nested loops takes an incredibly slow O(N²M²). Using the <strong>Inclusion-Exclusion
+                    Principle</strong>,
+                you
+                can find the sum of any sub-rectangle in O(1) (think Venn Diagrams).</p>
 
-            <h3 class="h2" id="prefix-2d">The 2D Matrix Logic</h3>
-            <p>What if you have a 2D matrix (like a grid of numbers) and you want the sum of a specific rectangle?
-                Doing
-                nested loops takes an incredibly slow O(N²M²). Instead, we use the <strong>Inclusion-Exclusion
-                    Principle</strong> (think Venn Diagrams).</p>
+            <div class="callout green">
+                <span class="callout-icon">🚀</span>
+                <div class="callout-body">
+                    <strong>Optimization Hint:</strong> If you are updating values frequently and querying
+                    ranges, a
+                    vanilla Prefix Array is slow (\( O(N) \) updates). Instead, use a <strong>Fenwick Tree
+                        (BIT)</strong>
+                    to get \( O(\log N) \) updates and queries.
+                </div>
+            </div>
 
             <div class="table-wrap">
                 <table>
@@ -1230,7 +1239,8 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
                             <td><code>arr[i][j] + P[i-1][j] + P[i][j-1] - P[i-1][j-1]</code>
                                 <br><span style="font-size:12px;color:var(--text3)">Add the cell itself + the
                                     rectangle
-                                    ABOVE + the rectangle LEFT. Since the top-left corner was added twice, subtract
+                                    ABOVE + the rectangle LEFT. Since the top-left corner was added twice,
+                                    subtract
                                     it
                                     once!</span>
                             </td>
@@ -1238,7 +1248,8 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
                         <tr>
                             <td><strong>Query `(r1,c1)` to `(r2,c2)`</strong></td>
                             <td><code>P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</code>
-                                <br><span style="font-size:12px;color:var(--text3)">Take the giant rectangle ending
+                                <br><span style="font-size:12px;color:var(--text3)">Take the giant rectangle
+                                    ending
                                     at
                                     (r2, c2). Cut off the top part. Cut off the left part. Since you cut out the
                                     top-left corner TWICE, add it back once!</span>
@@ -1248,22 +1259,31 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
                 </table>
             </div>
 
+            <div class="code-block" style="border-left: 4px solid var(--green)">
+                <div class="code-header">
+                    <div class="code-lang">📝 2D Submatrix — Logic</div>
+                </div>
+                <pre><span class="cm">// To find sum from (r1, c1) to (r2, c2):</span>
+Sum = P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</pre>
+            </div>
+
             <hr>
 
             <!-- ═══ SECTION 2: KADANE'S ALGORITHM ═════════════════════════════ -->
             <h2 class="h1" id="kadane">2️⃣ Kadane's Algorithm — Maximum Subarray</h2>
-            <p>If you're looking for the largest possible sum from a contiguous chunk of an array, checking every
+            <p>If you're looking for the largest possible sum from a contiguous chunk of an array,checking every
                 chunk
-                takes O(n³). Sliding over them takes O(n²). Kadane's algorithm discovers the answer in a blazingly
-                fast
-                <strong>O(N) single pass!</strong>
+                takes O(n³). Kadane's algorithm
+                finds the answer in a blazingly fast
+                <strong>\( O(N) \) single pass!</strong>
             </p>
 
-            <h3 class="h2" id="kadane-logic">The "Reset" Baggage Intuition</h3>
-            <p>Kadane’s works on a simple philosophy: <strong>If my past is dragging me down (negative sum), I must
-                    drop
-                    the baggage and start fresh!</strong></p>
-            <p>At every step, you must make a greedy choice: Do I append the current number to the existing subarray
+            <h3 class="h2" id="kadane-logic">2.1 The "Reset" Philosophy</h3>
+            <p>Kadane’s works on a simple intuition: <strong>If my past is dragging me down (negative sum), I
+                    must
+                    drop the baggage and start fresh!</strong></p>
+            <p>At every step, you must make a greedy choice: Do I append the current number to the existing
+                subarray
                 chain, OR do I cut ties and start a brand-new subarray at this exact number?</p>
 
             <div class="ascii-tree">
@@ -1309,7 +1329,8 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
                 <span class="callout-icon">🌟</span>
                 <div class="callout-body">
                     <strong>Extensions:</strong> You can apply Kadane's logic to find the <strong>Max Product
-                        Subarray</strong> (track both `minProduct` and `maxProduct` because a negative * negative =
+                        Subarray</strong> (track both `minProduct` and `maxProduct` because a negative *
+                    negative =
                     huge
                     positive!) or the <strong>Best Time to Buy & Sell Stock</strong> (track the `minPrice`
                     backwards).
@@ -1321,8 +1342,9 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
             <!-- ═══ SECTION 3: DUTCH NATIONAL FLAG ═════════════════════════════ -->
             <h2 class="h1" id="dutch">3️⃣ Dutch National Flag (Three-Way Partition)</h2>
             <p>What if you are given an array of <code>0s, 1s, and 2s</code> and told to sort them in a
-                <strong>single
-                    pass</strong> in O(1) space? Invented by Edsger Dijkstra, the DNF approach maintains 4 strictly
+                <strong>single pass</strong> in \( O(1) \) space? Invented by Edsger Dijkstra, the DNF approach
+                maintains 4
+                strictly
                 defined zones using 3 pointers: <code>low</code>, <code>mid</code>, and <code>high</code>.
             </p>
 
@@ -1337,15 +1359,40 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
             </ul>
 
             <div class="ascii-tree">
-                <span class="cm">Before sorting: ALL elements are between mid and high (Unknown)</span>
+                <span class="cm">// Before sorting: ALL elements are between mid and high (Unknown)</span>
                 [ <span class="nd">2</span>, <span class="nd">0</span>, <span class="nd">2</span>, <span
                     class="nd">1</span>, <span class="nd">1</span>, <span class="nd">0</span> ]
                 ↑ ↑
-                <span class="hl">mid(low) high</span>
+                <span class="hl">mid(low)</span> <span class="hl">high</span>
 
-                <span class="cm">If nums[mid] == 0:</span> Swap(low, mid), increment BOTH. (1s shift right)
-                <span class="cm">If nums[mid] == 1:</span> Increment mid. (It's already in the middle)
-                <span class="cm">If nums[mid] == 2:</span> Swap(mid, high), decrement high. (DO NOT increment mid!)
+                <span class="cm">// If nums[mid] == 0:</span> Swap(low, mid), increment BOTH.
+                <span class="cm">// If nums[mid] == 1:</span> Increment mid.
+                <span class="cm">// If nums[mid] == 2:</span> Swap(mid, high), decrement high. (DO NOT inc mid!)
+            </div>
+            <div class="callout blue">
+                <span class="callout-icon">🏗️</span>
+                <div class="callout-body">
+                    <strong>Why it works:</strong> DNF isn't just for Dutch flags. It's the basis for
+                    <strong>3-Way Partitioning</strong> in QuickSort. This reduces complexity from \(O(N \log
+                    N)\)
+                    to \(O(N)\) when the array contains many identical elements.
+                </div>
+            </div>
+
+
+            <div class="code-block" style="border-left: 4px solid var(--red)">
+                <div class="code-header">
+                    <div class="code-lang">📝 DNF — Pseudo-code</div>
+                </div>
+                <pre><span class="kw">While</span> mid <= high:
+   If arr[mid] == 0:
+      Swap(arr[low], arr[mid])
+      low++, mid++
+   Else if arr[mid] == 1:
+      mid++ 
+   Else if arr[mid] == 2:
+      Swap(arr[mid], arr[high])
+      high--</pre>
             </div>
 
             <div class="callout orange">
@@ -1362,44 +1409,96 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
 
             <div class="code-block">
                 <div class="code-header">
-                    <div class="code-lang">☕ Java · Sort Colors</div>
+                    <div class="code-lang">☕ Java · DNF Implementation · Sort Colors</div>
                 </div>
                 <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
-    <span class="cm">// Initialize the strict bounds</span>
     <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
-    
     <span class="kw">while</span> (mid &lt;= high) {
-        <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) {
-            swap(nums, low, mid);
-            low++; mid++;
-        } <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) {
-            mid++;
-        } <span class="kw">else</span> { <span class="cm">// nums[mid] == 2</span>
-            swap(nums, mid, high);
-            high--; <span class="cm">// Warning! Don't increment mid!</span>
-        }
+        <span class="kw">int</span> val = nums[mid];
+        <span class="kw">if</span> (val == <span class="num">0</span>) <span class="fn">swap</span>(nums, low++, mid++);
+        <span class="kw">else if</span> (val == <span class="num">1</span>) mid++;
+        <span class="kw">else</span> <span class="fn">swap</span>(nums, mid, high--);
     }
 }</pre>
             </div>
+
             <hr>
 
-            <!-- ═══ SECTION 4: FREQUENCY ARRAYS ═════════════════════════════ -->
-            <h2 class="h1" id="freq">4️⃣ Frequency Arrays vs HashMaps</h2>
-            <p>When solving an Anagram substring string count problem, the instinct is to use `HashMap<Character,
-                    Integer>`. But what if you are strictly mapping lowercase english letters?</p>
+            <!-- ═══ SECTION 4: ROTATION ═════════════════════════════ -->
+            <h2 class="h1" id="rotate">4️⃣ The Reversal Algorithm (In-Place)</h2>
+            <p>Rotating an array by \( K \) steps can be done in secondary space \( O(N) \), but the
+                <strong>Reversal
+                    Trick</strong> does it in <strong>\( O(1) \) space</strong> using three strategic mirror
+                flips.
+            </p>
+
+            <div class="code-block" style="border-left: 4px solid var(--purple)">
+                <div class="code-header">
+                    <div class="code-lang">📝 Reversal Logic — Pseudo-code</div>
+                </div>
+                <pre><span class="cm">// Aim: Rotate arr by K positions to the right</span>
+K = K % N
+1. Reverse(arr, 0, N-1)     <span class="cm">// Entire array</span>
+2. Reverse(arr, 0, K-1)     <span class="cm">// First K elements</span>
+3. Reverse(arr, K, N-1)     <span class="cm">// Remaining elements</span></pre>
+            </div>
+
+            <div class="callout purple">
+                <span class="callout-icon">🔄</span>
+                <div class="callout-body">
+                    <strong>The Trick:</strong> To rotate <code>[1, 2, 3, 4, 5]</code> by \(K=2\):<br>
+                    1. Reverse whole: <code>[5, 4, 3, 2, 1]</code><br>
+                    2. Reverse first K: <code>[4, 5, 3, 2, 1]</code><br>
+                    3. Reverse rest: <code>[4, 5, 1, 2, 3]</code>. Done!
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · Optimal Rotation</div>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    <span class="kw">int</span> n = nums.length;
+    k %= n;
+    <span class="fn">reverse</span>(nums, <span class="num">0</span>, n - <span class="num">1</span>);
+    <span class="fn">reverse</span>(nums, <span class="num">0</span>, k - <span class="num">1</span>);
+    <span class="fn">reverse</span>(nums, k, n - <span class="num">1</span>);
+}
+
+<span class="kw">private void</span> <span class="fn">reverse</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> start, <span class="kw">int</span> end) {
+    <span class="kw">while</span> (start &lt; end) {
+        <span class="kw">int</span> temp = nums[start];
+        nums[start] = nums[end];
+        nums[end] = temp;
+        start++; end--;
+    }
+}</pre>
+            </div>
+
+            <hr>
+
+            <!-- ═══ SECTION 5: FREQUENCY ARRAYS ═════════════════════════════ -->
+            <h2 class="h1" id="freq">5️⃣ Frequency Arrays vs HashMaps</h2>
+            <p>When solving an Anagram substring string count problem, the instinct is to use <code>HashMap&lt;Character,
+                    Integer&gt;</code>. But what if you are strictly mapping lowercase english letters?</p>
             <p><strong>HashMaps are painfully slow.</strong> They require creating an Object for every Key/Value
                 pair,
-                suffer from hashing collisions, and cause Memory Fragmentation. If the character set is just `'a' -
-                'z'`, a flat <code>int[26]</code> array is the absolute fastest way to count in O(1) time!</p>
+                suffer from hashing collisions, and cause Memory Fragmentation. If the character set is just <code>'a' -
+                'z'</code>, a flat <code>int[26]</code> array is the absolute fastest way to count in \( O(1) \) time!
+            </p>
 
             <h3 class="h2" id="freq-chars">The Character Mapping Trick</h3>
             <p>In ASCII, `'a'` is 97, `'b'` is 98. <br>Therefore, <code>'c' - 'a' = 99 - 97 = 2</code>.</p>
+            <p>So, Map lowercase characters to \(0-25\) using ASCII subtraction: <code>'char' - 'a'</code>.</p>
+
 
             <div class="ascii-tree">
-                <span class="cm">Mapping 'a' to 'z' strictly into Indexes 0 through 25</span>
-                char: <span class="hl">'a' 'b' 'c' ... 'z'</span>
-                idx: [ <span class="nd">0 1 2 ... 25</span> ]
+                <span class="cm">// Example Mapping</span>
+                'a' - 'a' = <span class="nd">0</span>
+                'b' - 'a' = <span class="nd">1</span>
+                'z' - 'a' = <span class="nd">25</span>
             </div>
+
 
             <div class="code-block">
                 <div class="code-header">
@@ -1419,53 +1518,35 @@ P[<span class="num">0</span>] = arr[<span class="num">0</span>];
     
     <span class="cm">// If any count isn't exactly 0, they had different letter distributions.</span>
     <span class="kw">for</span> (<span class="kw">int</span> val : count) {
-        <span class="kw">if</span> (val != <span class="num">0</span>) <span class="ret">return false</span>;
+        <span class="kw">if</span> (val != <span class="num">0</span>) <span class="ret">return</span> <span class="ret">false</span>;
     }
-    <span class="ret">return true</span>;
-}</pre>
+    <span class="ret">return</span> <span class="ret">true</span>;
+}
+</pre>
             </div>
 
             <hr>
-
-            <!-- ═══ SECTION 5: THE REVERSAL ALGORITHM ═════════════════════════ -->
-            <h2 class="h1" id="rotate">5️⃣ The Reversal Algorithm (Rotate Array)</h2>
-            <p>How do we rotate an array by <code>k</code> steps using <strong>O(1) auxiliary space</strong>? Moving
-                elements one by one takes O(n*k). The math trick is three simple reversals.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Rotate by K</div>
-                </div>
-                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    k = k % nums.length;
-    <span class="cm">// Step 1: reverse the entire array</span>
-    reverse(nums, <span class="num">0</span>, nums.length - <span class="num">1</span>);
-    <span class="cm">// Step 2: reverse the first k elements</span>
-    reverse(nums, <span class="num">0</span>, k - <span class="num">1</span>);
-    <span class="cm">// Step 3: reverse the remaining rest</span>
-    reverse(nums, k, nums.length - <span class="num">1</span>);
-}</pre>
-            </div>
-
-            <hr>
-
             <!-- ═══ SECTION 6: STRING IMMUTABILITY ═════════════════════════ -->
-            <h2 class="h1" id="immutability">6️⃣ String Immutability & StringBuilder</h2>
-            <p>In Java, Python, and C#, Strings are <strong>immutable</strong>. Once created, they cannot be
-                changed.
+            <h2 class="h1" id="immutability">6️⃣ String Foundations & Immutability</h2>
+            <p>In Java, Python, and C#, <code>Strings</code> are <strong>immutable</strong>. Once created, they
+                cannot
+                be modified in-place.
                 This means `s += "a"` creates a brand-new string in memory and copies all existing characters over!
             </p>
 
             <div class="callout red">
                 <span class="callout-icon">⚠️</span>
                 <div class="callout-body">
-                    <strong>The O(N²) Trap:</strong> If you append N characters in a loop using <code>+=</code>, you
-                    perform $1 + 2 + 3 + ... + N = O(N^2)$ array copies. You will get TLE (Time Limit Exceeded) on
-                    LeetCode.
+                    <strong>The O(N²) Trap:</strong> Appending characters in a loop using <code>+=</code>
+                    creates a
+                    new String object every time, copying all existing characters. This leads to \(O(N^2)\) time
+                    complexity and TLE on large inputs.
                 </div>
             </div>
 
-            <p><strong>The Fix:</strong> Always use a dynamic resizing array buffer for loops.</p>
+            <p><strong>The Fix:</strong> Always use a dynamic resizing array buffer, <code>StringBuilder</code>, for
+                high-performance string
+                mutations.</p>
             <div class="code-block">
                 <div class="code-header">
                     <div class="code-lang">☕ Java · StringBuilder</div>
@@ -1482,25 +1563,49 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
 
             <!-- ═══ SECTION 7: RABIN-KARP & ROLLING HASH ═════════════════════════ -->
             <h2 class="h1" id="rabin-karp">7️⃣ Rabin-Karp & Rolling Hash Intro</h2>
-            <p>If you search for a substring of length M in a string of length N, the naive match is O(N × M).
-                Rabin-Karp converts the substring to a numerical <strong>hash</strong> to do this in O(N) overall
-                time.
-            </p>
-
-            <p><strong>The Mechanics:</strong> A "Rolling Hash" allows you to slide a window by conceptually
-                <em>subtracting</em> the old character dropping out, and <em>adding</em> the new character shifting
-                in,
-                doing this math in strictly <code>O(1)</code> time per shift instead of recomputing the M length
-                hash
-                from scratch.
+            <p>If you search for a substring of length \( M \) in a string of length \( N \), the naive match is \(
+                O(N \times M) \).
+                Rabin-Karp converts the substring to a numerical <strong>hash</strong> to do this in \( O(N) \)
+                overall time.
             </p>
 
             <div class="callout purple">
                 <span class="callout-icon">🧠</span>
                 <div class="callout-body">
-                    <strong>Rolling formula:</strong>
-                    <code>hash = (hash - (oldChar * base^(M-1))) * base + newChar</code>.
-                    <br>You will apply this heavily in finding duplicate substrings and pattern matching.
+                    <strong>Rolling Hash Mechanics:</strong> Instead of recomputing the hash for every window,
+                    A "Rolling Hash" allows you to slide a window by conceptually
+                    <em>subtracting</em> the old character dropping out, and <em>adding</em> the new character
+                    shifting
+                    in,
+                    doing this math in strictly <code>O(1)</code> time per shift instead of recomputing the \( M \)
+                    length
+                    hash
+                    from scratch.
+                    <ol>
+                        <li>Subtracting the leading character's contribution.</li>
+                        <li>Multiplying by the base (shift left).</li>
+                        <li>Adding the new trailing character.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="code-block" style="border-left: 4px solid var(--purple)">
+                <div class="code-header">
+                    <div class="code-lang">📝 Rabin-Karp — Pseudo-code</div>
+                </div>
+                <div style="padding:16px; background:var(--bg2);">
+                    <p style="font-family:var(--mono); font-size:13px; margin-bottom:12px;"><span class="cm">// P = Base
+                            (usually 31), M = pattern length</span><br>
+                        1. Compute \( H_{target} \) and \( H_{window} \) for \( s[0 \dots M-1] \)<br>
+                        2. Slide window through string \( S \):
+                    </p>
+                    <div
+                        style="background:var(--bg3); padding:12px; border-radius:6px; margin:8px 0; border:1px solid var(--border);">
+                        \[ H_{new} = (H_{old} - S[i-1] \cdot P^{M-1}) \cdot P + S[i+M-1] \]
+                    </div>
+                    <p style="font-family:var(--mono); font-size:13px; margin-top:12px;">
+                        3. If \( H_{window} == H_{target} \): Double-check (collision check)
+                    </p>
                 </div>
             </div>
 
@@ -1521,18 +1626,17 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                 other.</p>
 
             <div class="ascii-tree">
-                <span class="cm">Matrix:</span>
-                [ 1, 2, 3 ] <span class="hl">T</span> = 0 (Top Wall Row)
-                [ 4, 5, 6 ] <span class="ret">B</span> = 2 (Bottom Wall Row)
+                <span class="cm">// Matrix Visual (The Shrinking Walls)</span>
+                [ 1, 2, 3 ] <span class="hl">T</span>=0 (Top Boundary)
+                [ 4, 5, 6 ] <span class="ret">B</span>=2 (Bottom Boundary)
                 [ 7, 8, 9 ]
                 ↑ ↑
-                <span class="nd">L</span>=0 <span class="nd">R</span>=2 <span class="cm">(Left/Right Cols)</span>
+                <span class="nd">L</span>=0 <span class="nd">R</span>=2 (Left/Right Boundaries)
 
-                <span class="cm">Step 1 (Paint Top):</span> [1, 2, 3] -> Move <span class="hl">T</span> down.
-                <span class="cm">Step 2 (Paint Right):</span> [6, 9] -> Move <span class="nd">R</span> left.
-                <span class="cm">Step 3 (Paint Bot):</span> [8, 7] -> Move <span class="ret">B</span> up.
-                <span class="cm">Step 4 (Paint Left):</span> [4] -> Move <span class="nd">L</span> right.
-
+                <span class="cm">1. Traverse Top Layer:</span> [1, 2, 3] -> <span class="kw">top++</span>
+                <span class="cm">2. Traverse Right Wall:</span> [6, 9] -> <span class="kw">right--</span>
+                <span class="cm">3. Traverse Bottom Wall:</span> [8, 7] -> <span class="kw">bot--</span>
+                <span class="cm">4. Traverse Left Wall:</span> [4] -> <span class="kw">left++</span>
                 <span class="cm">New Walls:</span> T=1, B=1, L=1, R=1. (Only '5' is unpainted, loop repeats and gets
                 it!)
             </div>
@@ -1575,9 +1679,10 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
 
             <!-- ═══ IN-LECTURE PRACTICE ════════════════════════════════ -->
             <h2 class="h1" id="practice">💪 In-Lecture Practice Problems</h2>
-            <p>Implement these core manipulations directly in code. These form the base for advanced windowing
-                techniques.</p>
-            <p>Work through these in order. These core algorithm patterns are the foundation for FAANG interviews.</p>
+            <p>These 10 problems are designed to solidify your understanding of the core patterns taught in this
+                lecture.</p>
+            <p>Work through these in order. These core algorithm patterns are the foundation for FAANG interviews.
+            </p>
 
             <!-- P1 -->
             <div class="prob-card">
@@ -1598,7 +1703,9 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                 <div class="prob-body" style="display:none">
                     <div class="prob-section">
                         <div class="prob-section-label">Problem</div>
-                        <p>You are given an <code>n x n</code> 2D matrix representing an image, rotate the image by 90
+                        <p>You are given an <code>n x n</code> 2D matrix representing an image, rotate the image
+                            by
+                            90
                             degrees (clockwise) <strong>in-place</strong>.</p>
                     </div>
                     <details>
@@ -1659,7 +1766,8 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                 <div class="prob-body" style="display:none">
                     <div class="prob-section">
                         <div class="prob-section-label">Problem</div>
-                        <p>Given an integer array <code>nums</code>, find the subarray with the largest sum and return
+                        <p>Given an integer array <code>nums</code>, find the subarray with the largest sum and
+                            return
                             its sum.</p>
                     </div>
                     <details>
@@ -1748,7 +1856,44 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
             <div class="prob-card">
                 <div class="prob-header" onclick="toggleProb(this)">
                     <div class="prob-left">
-                        <div class="prob-num">Problem 04 · Prefix Sum + HashMap</div>
+                        <div class="prob-num">Problem 04 · Reversal Algorithm</div>
+                        <div class="prob-title">Rotate Array</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/rotate-array/"
+                                target="_blank" style="font-size:12px">🔗 LC 189 - Rotate Array</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span>
+                            <span class="tag tag-pat">Reverse Modulo</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Rotate an array \( k \) steps using \( O(1) \) extra space.</p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    k %= nums.length;
+    <span class="fn">reverse</span>(nums, <span class="num">0</span>, nums.length - <span class="num">1</span>);
+    <span class="fn">reverse</span>(nums, <span class="num">0</span>, k - <span class="num">1</span>);
+    <span class="fn">reverse</span>(nums, k, nums.length - <span class="num">1</span>);
+}</pre>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P5 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 05 · Prefix Sum + HashMap</div>
                         <div class="prob-title">Subarray Sum Equals K</div>
                         <div style="margin-top:4px"><a href="https://leetcode.com/problems/subarray-sum-equals-k/"
                                 target="_blank" style="font-size:12px">🔗 LC 560 - Subarray Sum K</a></div>
@@ -1796,117 +1941,11 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                 </div>
             </div>
 
-            <!-- P5 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 05 · Frequency Array</div>
-                        <div class="prob-title">Valid Anagram</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/valid-anagram/"
-                                target="_blank" style="font-size:12px">🔗 LC 242 - Valid Anagram</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Uber</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">O(26) Space</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given two strings <code>s</code> and <code>t</code>, return <code>true</code> if
-                            <code>t</code> is an anagram of <code>s</code>.
-                        </p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public boolean</span> <span class="fn">isAnagram</span>(String s, String t) {
-    <span class="kw">if</span> (s.length() != t.length()) <span class="ret">return false</span>;
-    <span class="kw">int</span>[] counts = <span class="kw">new int</span>[<span class="num">26</span>];
-    <span class="kw">for</span> (char c : s.toCharArray()) counts[c - 'a']++;
-    <span class="kw">for</span> (char c : t.toCharArray()) {
-        <span class="kw">if</span> (--counts[c - 'a'] < <span class="num">0</span>) <span class="ret">return false</span>;
-    }
-    <span class="ret">return true</span>;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
             <!-- P6 -->
             <div class="prob-card">
                 <div class="prob-header" onclick="toggleProb(this)">
                     <div class="prob-left">
-                        <div class="prob-num">Problem 06 · Prefix/Suffix Product</div>
-                        <div class="prob-title">Product of Array Except Self</div>
-                        <div style="margin-top:4px"><a
-                                href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank"
-                                style="font-size:12px">🔗 LC 238 - Product Except Self</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Apple</span>
-                            <span class="tag tag-pat">Two Pass</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Calculate the product of all elements except the current one without using division.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span>[] <span class="fn">productExceptSelf</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> n = nums.length;
-    <span class="kw">int</span>[] res = <span class="kw">new int</span>[n];
-    res[<span class="num">0</span>] = <span class="num">1</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i < n; i++) res[i] = res[i - <span class="num">1</span>] * nums[i - <span class="num">1</span>];
-    <span class="kw">int</span> right = <span class="num">1</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = n - <span class="num">1</span>; i >= <span class="num">0</span>; i--) {
-        res[i] *= right;
-        right *= nums[i];
-    }
-    <span class="ret">return</span> res;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P7 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 07 · Boundary Traversal</div>
+                        <div class="prob-num">Problem 06 · Boundary Traversal</div>
                         <div class="prob-title">Spiral Matrix</div>
                         <div style="margin-top:4px"><a href="https://leetcode.com/problems/spiral-matrix/"
                                 target="_blank" style="font-size:12px">🔗 LC 54 - Spiral Matrix</a></div>
@@ -1952,20 +1991,20 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                             </div>
                             <div class="complexity-row">
                                 <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(M*N)</span></div>
+                                        class="cx-val green">\( O(M \times N) \)</span></div>
                                 <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
+                                        class="cx-val green">\( O(1) \)</span></div>
                             </div>
                         </div>
                     </details>
                 </div>
             </div>
 
-            <!-- P8 -->
+            <!-- P7 -->
             <div class="prob-card">
                 <div class="prob-header" onclick="toggleProb(this)">
                     <div class="prob-left">
-                        <div class="prob-num">Problem 08 · Sliding Window</div>
+                        <div class="prob-num">Problem 07 · Sliding Window</div>
                         <div class="prob-title">Longest Substring Without Repeating</div>
                         <div style="margin-top:4px"><a
                                 href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
@@ -2006,27 +2045,27 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                             </div>
                             <div class="complexity-row">
                                 <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
+                                        class="cx-val green">\( O(N) \)</span></div>
                                 <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                                        class="cx-val yellow">O(min(M, N))</span></div>
+                                        class="cx-val yellow">\( O(\min(M, N)) \)</span></div>
                             </div>
                         </div>
                     </details>
                 </div>
             </div>
 
-            <!-- P9 -->
+            <!-- P8 -->
             <div class="prob-card">
                 <div class="prob-header" onclick="toggleProb(this)">
                     <div class="prob-left">
-                        <div class="prob-num">Problem 09 · Grouping / Hashing</div>
-                        <div class="prob-title">Group Anagrams</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/"
-                                target="_blank" style="font-size:12px">🔗 LC 49 - Group Anagrams</a></div>
+                        <div class="prob-num">Problem 08 · Rotation & Symmetry</div>
+                        <div class="prob-title">Reverse Words in a String</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/reverse-words-in-a-string/"
+                                target="_blank" style="font-size:12px">🔗 LC 151 - Reverse Words</a></div>
                         <div class="prob-tags">
                             <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Yelp</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">Frequency Map</span>
+                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Apple</span>
+                            <span class="tag tag-pat">Two Pass / Reverse</span>
                         </div>
                     </div>
                     <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
@@ -2034,36 +2073,32 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                 <div class="prob-body" style="display:none">
                     <div class="prob-section">
                         <div class="prob-section-label">Problem</div>
-                        <p>Group together internal strings that are anagrams of each other.</p>
+                        <p>Reverse the order of words in a string, ensuring no leading/trailing spaces.</p>
                     </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public</span> List&lt;List&lt;String&gt;&gt; <span class="fn">groupAnagrams</span>(String[] strs) {
-    Map&lt;String, List&lt;String&gt;&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
-    <span class="kw">for</span> (String s : strs) {
-        <span class="kw">char</span>[] ca = s.toCharArray();
-        Arrays.sort(ca);
-        String key = String.valueOf(ca);
-        <span class="kw">if</span> (!map.containsKey(key)) map.put(key, <span class="kw">new</span> ArrayList&lt;&gt;());
-        map.get(key).add(s);
-    }
-    <span class="ret">return new</span> ArrayList&lt;&gt;(map.values());
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N * K log K)</span></div>
-                                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                                        class="cx-val yellow">O(N * K)</span></div>
-                            </div>
+                </div>
+            </div>
+
+            <!-- P9 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 09 · 2D Traversals</div>
+                        <div class="prob-title">Zigzag Conversion</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/zigzag-conversion/"
+                                target="_blank" style="font-size:12px">🔗 LC 6 - Zigzag Pattern</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Meta</span><span class="tag tag-co">Yelp</span>
+                            <span class="tag tag-pat">Row Simulation</span>
                         </div>
-                    </details>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Write a string in a zigzag pattern on a given number of rows.</p>
+                    </div>
                 </div>
             </div>
 
@@ -2071,10 +2106,10 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
             <div class="prob-card">
                 <div class="prob-header" onclick="toggleProb(this)">
                     <div class="prob-left">
-                        <div class="prob-num">Problem 10 · Two Pointers</div>
+                        <div class="prob-num">Problem 10 · String Logic</div>
                         <div class="prob-title">String Compression</div>
                         <div style="margin-top:4px"><a href="https://leetcode.com/problems/string-compression/"
-                                target="_blank" style="font-size:12px">🔗 LC 443 - String Compression</a></div>
+                                target="_blank" style="font-size:12px">🔗 LC 443 - Compression</a></div>
                         <div class="prob-tags">
                             <span class="tag tag-med">Medium</span>
                             <span class="tag tag-co">Microsoft</span><span class="tag tag-co">Amazon</span>
@@ -2088,60 +2123,32 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                         <div class="prob-section-label">Problem</div>
                         <p>Compress an array of characters in-place using constant extra space.</p>
                     </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">compress</span>(<span class="kw">char</span>[] chars) {
-    <span class="kw">int</span> index = <span class="num">0</span>, i = <span class="num">0</span>;
-    <span class="kw">while</span> (i < chars.length) {
-        <span class="kw">int</span> j = i;
-        <span class="kw">while</span> (j < chars.length && chars[j] == chars[i]) j++;
-        chars[index++] = chars[i];
-        <span class="kw">if</span> (j - i > <span class="num">1</span>) {
-            <span class="kw">for</span> (char c : String.valueOf(j - i).toCharArray()) chars[index++] = c;
-        }
-        i = j;
-    }
-    <span class="ret">return</span> index;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
                 </div>
             </div>
 
             <hr>
+
+            <!-- ══ SECTION 9: ASSIGNMENT LINK ═══════════════════════ -->
             <h2 class="h1" id="assignment">📝 Assignment</h2>
-            <div class="callout orange" style="margin-top:40px">
-                <span class="callout-icon">📝</span>
+            <div class="callout orange" style="margin:14px 0">
+                <span class="callout-icon">📋</span>
                 <div class="callout-body">
                     <strong>Lecture 4 Assignment — 35 Problems</strong><br>
-                    Includes 6 Easy, 17 Medium, 5 Hard problems, and complexity analysis puzzles on prefix sums and
-                    Kadane's algorithm.
-                    <div style="margin-top:12px">
-                        <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
-                            class="res-btn assignment" target="_blank"
-                            style="display:inline-block;padding:8px 16px;background:var(--orange);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:13px">Open
-                            Assignment →</a>
-                    </div>
+                    Complete the assignment before moving to Lecture 5. It includes 6 Easy, 21 Medium, 7 Hard problems,
+                    4
+                    complexity exercises, and 5 bonus problems — all with LeetCode links.<br><br>
+                    <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
+                        style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
+                        Open Assignment →</a>
                 </div>
             </div>
+
+            <hr>
 
             <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
             <p>Ensure you've mastered these array manipulation mechanics before moving to Sorting.</p>
 
-            <div style="margin:20px 0; display:flex; flex-direction:column; gap:8px;">
+            <div style="margin:20px 0; display:flex; flex-direction:column; gap:10px;">
                 <div class="checklist-item" onclick="toggleCheck(this)"
                     style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
                     <div class="cb-box"
@@ -2149,24 +2156,7 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                         ✓</div>
                     <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
                         understand
-                        how to query a 2D Prefix Sum matrix in O(1) time</span>
-                </div>
-                <div class="checklist-item" onclick="toggleCheck(this)"
-                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
-                    <div class="cb-box"
-                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
-                        ✓</div>
-                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I can
-                        implement Kadane's algorithm tracking both running max and global max</span>
-                </div>
-                <div class="checklist-item" onclick="toggleCheck(this)"
-                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
-                    <div class="cb-box"
-                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
-                        ✓</div>
-                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I can
-                        sort
-                        0s, 1s, and 2s in one pass using the Dutch National Flag approach</span>
+                        the Reversal Algorithm for \(O(1)\) rotations.</span>
                 </div>
                 <div class="checklist-item" onclick="toggleCheck(this)"
                     style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
@@ -2174,8 +2164,16 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
                         style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
                         ✓</div>
                     <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
-                        completed
-                        at least 20 problems from the Assignment file</span>
+                        can
+                        implement Kadane's algorithm for max subarrays.</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)"
+                    style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                    <div class="cb-box"
+                        style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                        ✓</div>
+                    <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I've
+                        completed at least 25 problems from the Assignment.</span>
                 </div>
             </div>
 
@@ -2196,21 +2194,18 @@ StringBuilder sb = <span class="kw">new</span> StringBuilder();
             }
         }
 
-        // Universal Progress & TOC Tracker inside #main scroll boundary
+        // Universal Progress & TOC Tracker
         document.getElementById('main').addEventListener('scroll', function () {
             const el = this;
-
-            // 1. Progress Bar calculation
             if (document.getElementById('progressFill')) {
                 const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
                 document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
             }
-
-            // 2. Active TOC Highlighting
-            const sections = document.querySelectorAll('[id]');
+            // Active TOC Highlighting - Improved selector
+            const sections = document.querySelectorAll('h2[id], h3[id]');
             let current = '';
             sections.forEach(s => {
-                if (s.getBoundingClientRect().top < 150) current = s.id;
+                if (s.getBoundingClientRect().top < 200) current = s.id;
             });
             document.querySelectorAll('.toc-item').forEach(a => {
                 a.classList.toggle('active', a.getAttribute('href') === '#' + current);

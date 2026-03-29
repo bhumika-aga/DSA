@@ -356,11 +356,76 @@ Given an array and integer `k`, return the `k` most frequent elements in `O(n)` 
 
 ---
 
+### Problem 24 — Rotate String
+
+> 🔗 **LeetCode:** [796. Rotate String](https://leetcode.com/problems/rotate-string/)
+
+**`[LinkedIn] [Easy]`**  
+**Pattern: String Concatenation Trick**
+
+Check if string `s` can become `t` after some number of shifts.  
+**Hint:** If `t` is a rotation of `s`, then `t` MUST be a substring of `s + s`.  
+**Expected:** Time O(N).
+
+---
+
+### Problem 25 — 3Sum
+
+> 🔗 **LeetCode:** [15. 3Sum](https://leetcode.com/problems/3sum/)
+
+**`[Amazon] [Facebook] [Medium]`**  
+**Pattern: Two Pointers (Post-Sorting)**
+
+Find all unique triplets in an array that sum to zero.  
+**Hint:** Sort first, then fix one element `i` and use two pointers for the rest. Skip duplicates!  
+**Expected:** Time O(N²).
+
+---
+
+### Problem 26 — Container With Most Water
+
+> 🔗 **LeetCode:** [11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
+
+**`[Meta] [Amazon] [Medium]`**  
+**Pattern: Two Pointers (Converging)**
+
+Find two lines that together with the x-axis forms a container that contains the most water.  
+**Hint:** Start pointers at both ends. Always move the pointer pointing to the shorter line.  
+**Expected:** Time O(N).
+
+---
+
+### Problem 27 — Game of Life
+
+> 🔗 **LeetCode:** [289. Game of Life](https://leetcode.com/problems/game-of-life/)
+
+**`[Dropbox] [Medium]`**  
+**Pattern: In-Place State Transformation**
+
+Update the next state of a grid based on neighbors.  
+**Hint:** Use bit manipulation or special values (e.g., 2 = was dead, now alive) to store the next state without losing the current state during the iteration.  
+**Expected:** O(1) extra space.
+
+---
+
+### Problem 28 — Majority Element
+
+> 🔗 **LeetCode:** [169. Majority Element](https://leetcode.com/problems/majority-element/)
+
+**`[Amazon] [Easy]`**  
+**Pattern: Boyer-Moore Voting Algorithm**
+
+Find the element that appears more than `n/2` times.  
+**Hint:** Maintain a candidate and a count. If count hits 0, pick current as new candidate.  
+**Expected:** O(N) Time, O(1) Space.
+
+---
+
 ## 🔴 Hard — FAANG Level
 
 ---
 
-### Problem 24 — Trapping Rain Water
+### Problem 29 — Trapping Rain Water
 
 > 🔗 **LeetCode:** [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
 
@@ -374,7 +439,7 @@ _(Two Pointer O(1) space will be taught in Lecture 6, but master the prefix arra
 
 ---
 
-### Problem 25 — First Missing Positive
+### Problem 30 — First Missing Positive
 
 > 🔗 **LeetCode:** [41. First Missing Positive](https://leetcode.com/problems/first-missing-positive/)
 
@@ -387,7 +452,7 @@ Given an unsorted integer array `nums`, return the smallest missing positive int
 
 ---
 
-### Problem 26 — Submatrix Sum Queries (Maximum Sum Rectangle)
+### Problem 31 — Submatrix Sum Queries (Maximum Sum Rectangle)
 
 > 🔗 **Practice:** [Maximum Sum Rectangle in a 2D Matrix (GFG)](https://www.geeksforgeeks.org/maximum-sum-rectangle-in-a-2d-matrix-dp-27/)
 
@@ -401,7 +466,7 @@ Given a 2D matrix, find the maximum sum submatrix.
 
 ---
 
-### Problem 27 — Shortest Palindrome
+### Problem 32 — Shortest Palindrome
 
 > 🔗 **LeetCode:** [214. Shortest Palindrome](https://leetcode.com/problems/shortest-palindrome/)
 
@@ -414,7 +479,7 @@ You are given a string `s`. You can convert `s` to a palindrome by adding charac
 
 ---
 
-### Problem 28 — String Transforms Into Another String
+### Problem 33 — String Transforms Into Another String
 
 > 🔗 **LeetCode:** [1153. String Transforms Into Another String](https://leetcode.com/problems/string-transforms-into-another-string/) _(Premium)_
 
@@ -429,7 +494,7 @@ Determine if you can transform `str1` into `str2` by simultaneously replacing on
 
 ## 📊 Complexity Analysis — Spot the Tradeoffs
 
-### Problem 29 — Analyze Kadane's modifications
+### Problem 34 — Analyze Kadane's modifications
 
 ```java
 int maxProd = nums[0], minProd = nums[0], res = nums[0];
@@ -446,7 +511,7 @@ for (int i = 1; i < nums.length; i++) {
 
 ---
 
-### Problem 30 — Memory Tracing Frequency Maps
+### Problem 35 — Memory Tracing Frequency Maps
 
 ```java
 boolean check(String s) {
