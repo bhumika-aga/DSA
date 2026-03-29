@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 5 — Sorting & Searching</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- KaTeX for Premium Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body);"></script>
+    <style>
+        /* ─── Reset & Base ─────────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f7f6f3;
+            --bg3: #efede9;
+            --border: #e3e0d9;
+            --border2: #d0ccc4;
+            --text: #37352f;
+            --text2: #6b6860;
+            --text3: #9b9790;
+            --accent: #2383e2;
+            --accent-bg: #e8f1fc;
+            --green: #0f7b6c;
+            --green-bg: #e9f5f3;
+            --red: #c0392b;
+            --red-bg: #fdf0ee;
+            --yellow: #8a6d00;
+            --yellow-bg: #fdf6e3;
+            --purple: #6940a5;
+            --purple-bg: #f0ecf9;
+            --orange: #c75b0e;
+            --orange-bg: #fef0e7;
+            --pink: #ad1a72;
+            --pink-bg: #fce8f3;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Merriweather', serif;
+            --sidebar-w: 260px;
+            --content-max: 860px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #191919;
+            --bg2: #212121;
+            --bg3: #2d2d2d;
+            --border: #333;
+            --border2: #444;
+            --text: #e8e6e1;
+            --text2: #9b9790;
+            --text3: #6b6860;
+            --accent: #5ba4f5;
+            --accent-bg: #1a2d42;
+            --green: #4db6a8;
+            --green-bg: #0e2420;
+            --red: #e07070;
+            --red-bg: #2e1414;
+            --yellow: #d4a42a;
+            --yellow-bg: #2a1f06;
+            --purple: #a07dd4;
+            --purple-bg: #1e1530;
+            --orange: #e0893a;
+            --orange-bg: #2a1608;
+            --pink: #e06aac;
+            --pink-bg: #2a1020;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+            display: flex;
+            min-height: 100vh;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* ─── Sidebar ──────────────────────────────────────────────────── */
+        #sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .lecture-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .sidebar-meta {
+            color: var(--text3);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .toc-label {
+            padding: 0 16px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text3);
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px;
+            cursor: pointer;
+            border-radius: 0;
+            color: var(--text2);
+            transition: background .12s, color .12s;
+            text-decoration: none;
+        }
+
+        .toc-item:hover,
+        .toc-item.active {
+            background: var(--bg3);
+            color: var(--text);
+        }
+
+        .toc-item.active {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .toc-item .toc-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .toc-sub {
+            padding-left: 36px;
+            font-size: 12px;
+            color: var(--text3);
+        }
+
+        .toc-sub:hover {
+            color: var(--text2);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 16px;
+        }
+
+        /* ─── Main Content ─────────────────────────────────────────────── */
+        #main {
+            flex: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        #content {
+            max-width: var(--content-max);
+            margin: 0 auto;
+            padding: 48px 64px 120px;
+        }
+
+        /* ─── Page Header ──────────────────────────────────────────────── */
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .page-title {
+            font-family: var(--serif);
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text2);
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            background: var(--bg2);
+        }
+
+        .meta-chip.accent {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: var(--accent-bg);
+        }
+
+        .meta-chip.green {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green-bg);
+        }
+
+        .meta-chip.yellow {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border-color: var(--yellow-bg);
+        }
+
+        /* ─── Notion Blocks ────────────────────────────────────────────── */
+        .section {
+            margin-bottom: 8px;
+            scroll-margin-top: 20px;
+        }
+
+        .h1 {
+            font-family: var(--serif);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 40px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+            scroll-margin-top: 20px;
+        }
+
+        .h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 6px;
+        }
+
+        p {
+            color: var(--text);
+            margin: 0 0 10px;
+            line-height: 1.75;
+        }
+
+        /* ─── Callout Blocks ───────────────────────────────────────────── */
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 14px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-body {
+            flex: 1;
+        }
+
+        .callout-body strong {
+            font-weight: 600;
+        }
+
+        .callout.blue {
+            background: var(--accent-bg);
+            color: var(--text);
+        }
+
+        .callout.green {
+            background: var(--green-bg);
+            color: var(--text);
+        }
+
+        .callout.yellow {
+            background: var(--yellow-bg);
+            color: var(--text);
+        }
+
+        .callout.red {
+            background: var(--red-bg);
+            color: var(--text);
+        }
+
+        .callout.purple {
+            background: var(--purple-bg);
+            color: var(--text);
+        }
+
+        .callout.orange {
+            background: var(--orange-bg);
+            color: var(--text);
+        }
+
+        /* ─── Code Blocks ──────────────────────────────────────────────── */
+        .code-block {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text2);
+            gap: 10px;
+        }
+
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg);
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 13.5px;
+            line-height: 1.75;
+            tab-size: 4;
+        }
+
+        .kw {
+            color: #0550ae;
+            font-weight: 500;
+        }
+
+        .cm {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .str {
+            color: #0a8043;
+        }
+
+        .num {
+            color: #953800;
+        }
+
+        .fn {
+            color: #8250df;
+        }
+
+        .cls {
+            color: #1a7f37;
+        }
+
+        .ret {
+            color: #0550ae;
+        }
+
+        [data-theme="dark"] .kw {
+            color: #79c0ff;
+        }
+
+        [data-theme="dark"] .cm {
+            color: #8b949e;
+        }
+
+        [data-theme="dark"] .str {
+            color: #a5d6ff;
+        }
+
+        [data-theme="dark"] .num {
+            color: #ff9150;
+        }
+
+        [data-theme="dark"] .fn {
+            color: #d2a8ff;
+        }
+
+        [data-theme="dark"] .cls {
+            color: #7ee787;
+        }
+
+        [data-theme="dark"] .ret {
+            color: #79c0ff;
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: var(--red);
+        }
+
+        [data-theme="dark"] code {
+            color: var(--orange);
+        }
+
+        /* ─── Toggles / Collapsibles ───────────────────────────────────── */
+        details {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg2);
+            list-style: none;
+            transition: background .12s;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary:hover {
+            background: var(--bg3);
+        }
+
+        summary .toggle-arrow {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .2s;
+            color: var(--text3);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        details[open] summary .toggle-arrow {
+            transform: rotate(90deg);
+        }
+
+        .details-body {
+            padding: 14px 16px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ─── Tables ───────────────────────────────────────────────────── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 14px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        thead th {
+            background: var(--bg2);
+            padding: 9px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: .03em;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover td {
+            background: var(--bg2);
+        }
+
+        /* ─── Bullet / Numbered Lists ──────────────────────────────────── */
+        ul,
+        ol {
+            padding-left: 24px;
+            margin: 8px 0 12px;
+        }
+
+        li {
+            margin: 4px 0;
+            line-height: 1.7;
+        }
+
+        li::marker {
+            color: var(--text3);
+        }
+
+        /* ─── Divider ──────────────────────────────────────────────────── */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0;
+        }
+
+        /* ─── Practice Problem Cards ───────────────────────────────────── */
+        .prob-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+
+        .prob-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .12s;
+        }
+
+        .prob-header:hover {
+            background: var(--bg3);
+        }
+
+        .prob-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .prob-num {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 4px;
+        }
+
+        .prob-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .prob-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-family: var(--sans);
+        }
+
+        .tag-easy {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .tag-med {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+
+        .tag-hard {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .tag-co {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .tag-pat {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+
+        .tag-lc {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+
+        .prob-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .prob-body {
+            padding: 16px;
+            background: var(--bg);
+        }
+
+        .prob-section {
+            margin-bottom: 14px;
+        }
+
+        .prob-section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text3);
+            margin-bottom: 6px;
+        }
+
+        .iobox {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text2);
+            white-space: pre-wrap;
+        }
+
+        /* ─── Tree / Recursion Diagrams (ASCII-style) ─────────────────── */
+        .ascii-tree {
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text2);
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .ascii-tree .hl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ascii-tree .ret {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .ascii-tree .nd {
+            color: var(--orange);
+        }
+
+        /* ─── Visual Stack Diagram ─────────────────────────────────────── */
+        .stack-vis {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2px;
+            width: 220px;
+            margin: 12px 0;
+        }
+
+        .stack-frame {
+            padding: 8px 14px;
+            border-radius: 5px;
+            font-family: var(--mono);
+            font-size: 13px;
+            border: 1.5px solid var(--border2);
+            background: var(--bg2);
+            color: var(--text);
+            transition: all .3s;
+        }
+
+        .stack-frame.active {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .stack-frame.ret-frame {
+            background: var(--green-bg);
+            border-color: var(--green);
+            color: var(--green);
+            opacity: .7;
+        }
+
+        /* ─── Complexity Badge ─────────────────────────────────────────── */
+        .complexity-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .cx-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: var(--mono);
+            border: 1px solid var(--border);
+            background: var(--bg2);
+        }
+
+        .cx-badge .cx-label {
+            font-size: 11px;
+            font-family: var(--sans);
+            color: var(--text3);
+        }
+
+        .cx-badge .cx-val {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cx-badge.green {
+            background: var(--green-bg);
+            border-color: var(--green);
+        }
+
+        .cx-badge.yellow {
+            background: var(--yellow-bg);
+            border-color: var(--yellow);
+        }
+
+        .cx-badge.red {
+            background: var(--red-bg);
+            border-color: var(--red);
+        }
+
+        .cx-badge .cx-val.green {
+            color: var(--green);
+        }
+
+        .cx-badge .cx-val.yellow {
+            color: var(--yellow);
+        }
+
+        .cx-badge .cx-val.red {
+            color: var(--red);
+        }
+
+        /* ─── Pattern Banner ───────────────────────────────────────────── */
+        .pattern-banner {
+            background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .pattern-banner h4 {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+
+        .pattern-banner p {
+            font-size: 14px;
+            font-family: var(--mono);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.8;
+        }
+
+        /* ─── Top Bar ──────────────────────────────────────────────────── */
+        #topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px 10px 28px;
+            font-size: 13px;
+            color: var(--text2);
+            gap: 12px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb a {
+            color: var(--text3);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width .3s;
+        }
+
+        #darkToggle {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s;
+        }
+
+        #darkToggle:hover {
+            background: var(--bg3);
+        }
+
+        /* ─── Checklist ─────────────────────────────────────────────────── */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .cb-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border2);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            font-size: 11px;
+        }
+
+        .checklist-item.done .cb-box {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+        .checklist-item.done .cb-text {
+            text-decoration: line-through;
+            color: var(--text3);
+        }
+
+        /* ─── Hover highlight links ────────────────────────────────────── */
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── Scrollbar ─────────────────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text3);
+        }
+
+        /* ─── Responsive ─────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            #sidebar {
+                display: none;
+            }
+
+            #content {
+                padding: 24px 20px 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ─── Top Bar ────────────────────────────────────────────────── -->
+    <div
+        style="position:fixed;top:0;left:var(--sidebar-w);right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:6px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;height:36px">
+        <div style="color:var(--text3)">DSA Course › Phase 2 › <strong style="color:var(--text)">Lecture 5</strong>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+            <span style="color:var(--text3)">Reading progress</span>
+            <div style="width:120px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+                <div id="progressFill"
+                    style="width:0%;height:100%;background:var(--accent);border-radius:2px;transition:width .1s"></div>
+            </div>
+            <button onclick="toggleDark()" id="darkToggle"
+                style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:var(--sans)">🌙
+                Dark</button>
+        </div>
+    </div>
+
+    <!-- ─── Sidebar ────────────────────────────────────────────────── -->
+    <div id="sidebar" style="padding-top:46px">
+        <div class="sidebar-header">
+            <span class="lecture-badge">🎯 DSA Course</span>
+            <div class="sidebar-title">Sorting & Searching</div>
+            <div class="sidebar-meta">Lecture 5 of 24 · Phase 2</div>
+        </div>
+
+        <div class="toc-label" style="margin-top:12px">ON THIS PAGE</div>
+
+        <a class="toc-item" href="#sort-foundations">
+            <span class="toc-icon">📊</span> Sorting Foundations
+        </a>
+        <a class="toc-item toc-sub" href="#bubble-sort">Bubble Sort</a>
+        <a class="toc-item toc-sub" href="#selection-sort">Selection Sort</a>
+        <a class="toc-item toc-sub" href="#insertion-sort">Insertion Sort</a>
+        <a class="toc-item toc-sub" href="#insertion-sort">Counting Sort</a>
+
+        <a class="toc-item" href="#divide-conquer">
+            <span class="toc-icon">✂️</span> Divide & Conquer
+        </a>
+        <a class="toc-item toc-sub" href="#merge-sort">Merge Sort (D&C)</a>
+        <a class="toc-item toc-sub" href="#quick-sort">Quick Sort (Pivot)</a>
+        <a class="toc-item toc-sub" href="#linear-sort-2">Sorting in Linear Time
+        </a>
+        <a class="toc-item" href="#cyclic-sort">
+            <span class="toc-icon">🔄</span> Cyclic Sort Pattern
+        </a>
+
+        <a class="toc-item" href="#search-analytics">
+            <span class="toc-icon">📊</span> Searching Analytics
+        </a>
+
+        <a class="toc-item" href="#non-binary-searching">
+            <span class="toc-icon">🔎</span> Searching Algorithms
+        </a>
+        <a class="toc-item toc-sub" href="#linear-search">Linear Search</a>
+        <a class="toc-item toc-sub" href="#jump-search">Jump Search</a>
+        <a class="toc-item toc-sub" href="#interpolation-search">Interpolation Search</a>
+
+        <a class="toc-item" href="#binary-masterclass">
+            <span class="toc-icon">🔍</span> Binary Search
+        </a>
+        <a class="toc-item toc-sub" href="#bs-templates">Standard Templates</a>
+        <a class="toc-item toc-sub" href="#rotated-infinite">Modified Variations</a>
+        <a class="toc-item toc-sub" href="#bs-answer">Search on Answer</a>
+
+        <a class="toc-item" href="#comparators">
+            <span class="toc-icon">⚖️</span> Custom Comparators
+        </a>
+
+        <a class="toc-item" href="#practice">
+            <span class="toc-icon">💪</span> Practice Problems
+        </a>
+        <a class="toc-item" href="#assignment">
+            <span class="toc-icon">📝</span> Assignment
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a class="toc-item" href="#checklist">
+            <span class="toc-icon">✅</span> Completion Checklist
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <div style="padding: 8px 16px;">
+            <a class="toc-item" href="../Lecture4/lecture4_notes.html"
+                style="padding:5px 0;font-size:13px;color:var(--text3);">← Lecture 4: Arrays & Strings</a>
+            <a class="toc-item" href="../Lecture6/lecture6_notes.html"
+                style="padding:5px 0;font-size:13px;color:var(--text3);">→ Lecture 6: Linked Lists</a>
+        </div>
+    </div>
+
+    <!-- ─── Main content ───────────────────────────────────────────── -->
+    <div id="main" style="padding-top:36px">
+        <div id="content">
+
+            <!-- ── HEADER ── -->
+            <div class="page-header">
+                <span class="page-emoji">⚡</span>
+                <h1 class="page-title">Sorting & Searching — Patterns</h1>
+                <p class="page-subtitle">Mastering the art of ordering data and finding elements in logarithmic time
+                    using partitioning, cycles, and binary search space.</p>
+
+                <div class="meta-row">
+                    <span class="meta-chip accent">📖 Lecture 5</span>
+                    <span class="meta-chip accent">Phase 2 — Core Data Structures</span>
+                    <span class="meta-chip yellow">⏱ 5 days</span>
+                    <span class="meta-chip green">🎯 45 problems</span>
+                    <span class="meta-chip">💼 Google · Amazon · Meta · Microsoft · Apple</span>
+                </div>
+            </div>
+
+            <!-- ══ SECTION 1: FOUNDATIONS ═══════════════════════════ -->
+            <h2 class="h1" id="sort-foundations">1️⃣ Sorting Foundations: The \(O(N \log N)\) Barrier</h2>
+            <p>Sorting is often the "hidden" first step in solving complex interval, mapping, or greedy problems.
+                While \(O(N^2)\) sorts are easy to write, they fail at scale (\(N > 10^4\)). Interviewers expect you to
+                default to \(O(N \log N)\) stability.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Best</th>
+                            <th>Average</th>
+                            <th>Worst</th>
+                            <th>Memory</th>
+                            <th>Stable</th>
+                            <th>In-place</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="meta-chip">Bubble Sort</span></td>
+                            <td>\(O(N)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(1)\)</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip">Selection Sort</span></td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(1)\)</td>
+                            <td>No</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip">Insertion Sort</span></td>
+                            <td>\(O(N)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(1)\)</td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip blue">Counting Sort</span></td>
+                            <td>\(O(N+K)\)</td>
+                            <td>\(O(N+K)\)</td>
+                            <td>\(O(N+K)\)</td>
+                            <td>\(O(K)\)</td>
+                            <td>Yes</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip">Merge Sort</span></td>
+                            <td>\(O(N \log N)\)</td>
+                            <td>\(O(N \log N)\)</td>
+                            <td>\(O(N \log N)\)</td>
+                            <td>\(O(N)\)</td>
+                            <td>Yes</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip">Quick Sort</span></td>
+                            <td>\(O(N \log N)\)</td>
+                            <td>\(O(N \log N)\)</td>
+                            <td>\(O(N^2)\)</td>
+                            <td>\(O(\log N)\)</td>
+                            <td>No</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip green">Cyclic Sort</span></td>
+                            <td>\(O(N)\)</td>
+                            <td>\(O(N)\)</td>
+                            <td>\(O(N)\)</td>
+                            <td>\(O(1)\)</td>
+                            <td>No</td>
+                            <td>Yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout orange">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>Naive vs. Efficient:</strong> While \(O(N^2)\) sorts are rarely used for large datasets,
+                    they
+                    are foundational for learning <em>swap logic</em> and <em>nested loops</em>. Insertion Sort,
+                    specifically, is actually used inside Java's `Arrays.sort()` for very small arrays!
+                </div>
+            </div>
+
+            <h3 class="h2" id="bubble-sort">🫧 Bubble Sort: The Rising Bubbles</h3>
+            <p>Compare adjacent elements. If they are in the wrong order, swap them. In each pass, the largest element
+                "bubbles up" to its correct position at the end.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Bubble Sort (Optimized)</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">boolean</span> swapped;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        swapped = <span class="kw">false</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">1</span>; j < arr.length - i; j++) {
+            <span class="kw">if</span> (arr[j] < arr[j - <span class="num">1</span>]) {
+                <span class="fn">swap</span>(arr, j, j - <span class="num">1</span>);
+                swapped = <span class="kw">true</span>;
+            }
+        }
+        <span class="kw">if</span> (!swapped) <span class="kw">break</span>; <span class="cm">// Already sorted!</span>
+    }
+}</pre>
+            </div>
+
+            <h3 class="h2" id="selection-sort">🎯 Selection Sort: The Persistent Searcher</h3>
+            <p>Find the minimum element in the unsorted part and swap it with the first element of that part. Repeat for
+                the rest of the array.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Selection Sort</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        <span class="kw">int</span> last = arr.length - i - <span class="num">1</span>;
+        <span class="kw">int</span> maxIdx = <span class="fn">getMaxIndex</span>(arr, <span class="num">0</span>, last);
+        <span class="fn">swap</span>(arr, maxIdx, last);
+    }
+}</pre>
+            </div>
+
+            <h3 class="h2" id="insertion-sort">🃏 Insertion Sort: The Card Player</h3>
+            <p>Pick one element at a time and "insert" it into its correct position in the sorted part (like sorting
+                playing cards in your hand).</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Insertion Sort</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length - <span class="num">1</span>; i++) {
+        <span class="kw">for</span> (<span class="kw">int</span> j = i + <span class="num">1</span>; j > <span class="num">0</span>; j--) {
+            <span class="kw">if</span> (arr[j] < arr[j - <span class="num">1</span>]) <span class="fn">swap</span>(arr, j, j - <span class="num">1</span>);
+            <span class="kw">else break</span>;
+        }
+    }
+}</pre>
+            </div>
+
+            <h3 class="h2" id="counting-sort">🃏 Counting Sort: The Card Player</h3>
+            <p>Pick one element at a time and "insert" it into its correct position in the sorted part (like sorting
+                playing cards in your hand).</p>
+
+            <div class="callout blue" id="linear-sort">
+                <span class="callout-icon">💡</span>
+                <div class="callout-body">
+                    <strong>Newbie Tip:</strong> Use <em>Counting Sort</em> when you have a million exam scores (0-100).
+                    Instead of comparing, just count how many 0s, 1s, etc. exist. It's like sorting fruit into baskets!
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java Counting Sort</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public void</span> <span class="fn">countingSort</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> range) {
+    <span class="kw">int</span>[] count = <span class="kw">new int</span>[range + <span class="num">1</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> x : arr) count[x]++;
+    <span class="kw">int</span> idx = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i <= range; i++) {
+        <span class="kw">while</span> (count[i]-- > <span class="num">0</span>) arr[idx++] = i;
+    }
+}</pre>
+            </div>
+
+            <div class="callout orange" id="bubble-selection">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>"Manager" Analogy:</strong> A big task is hard. A manager splits the task between
+                    two seniors. The seniors split it between juniors. Once the juniors solve their tiny tasks, the
+                    manager <em>combines</em> the results. That is Divide & Conquer!
+                </div>
+            </div>
+
+            <h3 class="h2" id="merge-sort">Merge Sort — The Stable Giant</h3>
+            <p>Merge sort is the gold standard for <strong>stability</strong> and <strong>guaranteed
+                    performance</strong>. It always runs in \(O(N \log N)\) regardless of the input data.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Merge Sort Full Implementation</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">void</span> <span class="fn">sort</span>(<span class="kw">int</span> arr[], <span class="kw">int</span> l, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (l < r) {
+        <span class="kw">int</span> m = l + (r - l) / <span class="num">2</span>;
+        <span class="fn">sort</span>(arr, l, m);
+        <span class="fn">sort</span>(arr, m + <span class="num">1</span>, r);
+        <span class="fn">merge</span>(arr, l, m, r);
+    }
+}
+
+<span class="kw">void</span> <span class="fn">merge</span>(<span class="kw">int</span> arr[], <span class="kw">int</span> l, <span class="kw">int</span> m, <span class="kw">int</span> r) {
+    <span class="kw">int</span> n1 = m - l + <span class="num">1</span>, n2 = r - m;
+    <span class="kw">int</span> L[] = <span class="kw">new int</span>[n1], R[] = <span class="kw">new int</span>[n2];
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n1; i++) L[i] = arr[l + i];
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j < n2; j++) R[j] = arr[m + <span class="num">1</span> + j];
+
+    <span class="kw">int</span> i = <span class="num">0</span>, j = <span class="num">0</span>, k = l;
+    <span class="kw">while</span> (i < n1 && j < n2) {
+        <span class="kw">if</span> (L[i] <= R[j]) arr[k++] = L[i++];
+        <span class="kw">else</span> arr[k++] = R[j++];
+    }
+    <span class="kw">while</span> (i < n1) arr[k++] = L[i++];
+    <span class="kw">while</span> (j < n2) arr[k++] = R[j++];
+}
+</pre>
+            </div>
+
+            <h3 class="h2" id="quick-sort">Quick Sort — The In-Place Speedster</h3>
+            <p>Quick sort picks a <strong>pivot</strong> and partitions the array around it. All elements smaller
+                than the pivot go to the left, and larger ones to the right. It is widely used because it is
+                <strong>in-place</strong> (\(O(\log N)\) stack space) and generally faster than Merge Sort due to
+                cache locality.
+            </p>
+
+            <div class="code-block" style="border-left: 4px solid var(--orange)">
+                <div class="code-header">
+                    <div class="code-lang">📝 Quick Sort — Pseudo-code</div>
+                </div>
+                <pre><span class="cm">// Partitioning</span>
+Pivot = Pick_Element(arr)
+Move all < Pivot to Left
+Move all > Pivot to Right
+Return Pivot_Index
+
+<span class="cm">// Recursion</span>
+QuickSort(Left)
+QuickSort(Right)</pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Quick Sort (Lomuto Partition)</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">void</span> <span class="fn">quickSort</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">if</span> (low < high) {
+        <span class="kw">int</span> p = <span class="fn">partition</span>(arr, low, high);
+        <span class="fn">quickSort</span>(arr, low, p - <span class="num">1</span>);
+        <span class="fn">quickSort</span>(arr, p + <span class="num">1</span>, high);
+    }
+}
+
+<span class="kw">int</span> <span class="fn">partition</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">int</span> pivot = arr[high];
+    <span class="kw">int</span> i = (low - <span class="num">1</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> j = low; j < high; j++) {
+        <span class="kw">if</span> (arr[j] < pivot) {
+            i++;
+            <span class="fn">swap</span>(arr, i, j);
+        }
+    }
+    <span class="fn">swap</span>(arr, i + <span class="num">1</span>, high);
+    <span class="ret">return</span> i + <span class="num">1</span>;
+}</pre>
+            </div>
+
+            <div class="callout orange">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>The Randomized Pivot:</strong> If you always pick the first or last element as the
+                    pivot,
+                    QuickSort degrades to \(O(N^2)\) for already sorted arrays. In competitive programming,
+                    always use `swap(arr, low + random.nextInt(high - low), high)` before partitioning!
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ QuickSelect — Kth Largest in O(N)</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public int</span> <span class="fn">quickSelect</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> low, <span class="kw">int</span> high, <span class="kw">int</span> k) {
+    <span class="kw">int</span> p = <span class="fn">partition</span>(nums, low, high);
+    <span class="kw">if</span> (p == k) <span class="ret">return</span> nums[p];
+    <span class="kw">if</span> (p > k) <span class="ret">return</span> <span class="fn">quickSelect</span>(nums, low, p - <span class="num">1</span>, k);
+    <span class="ret">return</span> <span class="fn">quickSelect</span>(nums, p + <span class="num">1</span>, high, k);
+}</pre>
+            </div>
+
+            <hr>
+
+            <div class="prob-card" style="border-left-color:var(--accent)">
+                <div class="prob-header" style="cursor:default">
+                    <div class="prob-left">
+                        <div class="prob-num">INSIGHT</div>
+                        <div class="prob-title">QuickSelect: Finding Kth Smallest in O(N)</div>
+                        <p style="font-size:13px; color:var(--text2); margin-top:4px">By only recurring into the
+                            partition that contains our target index \(K\), we can find the Kth smallest element in
+                            \(O(N)\) average time instead of \(O(N \log N)\).</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="h2" id="linear-sort-2">📉 Sorting in Linear Time</h2>
+            <p>When we know the <strong>range</strong> of the input (e.g., scores from 0-100), we can skip
+                comparisons
+                entirely. Comparison-based sorts (Merge/Quick) are bounded by \(O(N \log N)\), but \(O(N)\) is possible
+                here.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Counting Sort (Standard)</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">void</span> <span class="fn">countingSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> max = Arrays.<span class="fn">stream</span>(arr).<span class="fn">max</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">int</span> min = Arrays.<span class="fn">stream</span>(arr).<span class="fn">min</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">int</span> range = max - min + <span class="num">1</span>;
+    <span class="kw">int</span>[] count = <span class="kw">new int</span>[range];
+    <span class="kw">for</span> (<span class="kw">int</span> x : arr) count[x - min]++;
+    <span class="kw">int</span> k = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < range; i++) {
+        <span class="kw">while</span> (count[i]-- > <span class="num">0</span>) arr[k++] = i + min;
+    }
+}</pre>
+            </div>
+
+            <div class="callout green">
+                <span class="callout-icon">🏗️</span>
+                <div class="callout-body">
+                    <strong>Radix & Bucket Sort:</strong> For large ranges, we sort digit by digit (Radix) or
+                    distribute elements into uniform bins (Bucket). Essential for sorting floating-point numbers in
+                    nearly-linear time.
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ══ SECTION 3: CYCLIC SORT ═══════════════════════════ -->
+            <h2 class="h1" id="cyclic-sort">3️⃣ 🔄 Cyclic Sort: The \(O(N)\) Interview Secret</h2>
+            <p>Whenever an array contains numbers in a range (e.g., \(1\) to \(N\)), use Cyclic Sort to place each
+                number at its matching index. This pattern solves 90% of "find missing/duplicate" problems.</p>
+
+            <div class="code-block" style="margin-bottom:0px; border-bottom:0">
+                <div class="code-header">
+                    <div class="code-lang">☕ Cyclic Sort Problem 01 · Find the Missing Number</div><button
+                        class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public int</span> <span class="fn">missingNumber</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (i < nums.length) {
+        <span class="kw">if</span> (nums[i] < nums.length && nums[i] != nums[nums[i]]) {
+            <span class="fn">swap</span>(nums, i, nums[i]);
+        } <span class="kw">else</span> i++;
+    }
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < nums.length; i++) {
+        <span class="kw">if</span> (nums[i] != i) <span class="ret">return</span> i;
+    }
+    <span class="ret">return</span> nums.length;
+}</pre>
+            </div>
+            <div class="code-block" style="border-top:0">
+                <div class="code-header">
+                    <div class="code-lang">☕ Cyclic Sort Problem 02 · Find All Duplicates</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public</span> List&lt;Integer&gt; <span class="fn">findDuplicates</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (i < nums.length) {
+        <span class="kw">int</span> correct = nums[i] - <span class="num">1</span>;
+        <span class="kw">if</span> (nums[i] != nums[correct]) <span class="fn">swap</span>(nums, i, correct);
+        <span class="kw">else</span> i++;
+    }
+    List&lt;Integer&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < nums.length; i++) {
+        <span class="kw">if</span> (nums[i] != i + <span class="num">1</span>) res.<span class="fn">add</span>(nums[i]);
+    }
+    <span class="ret">return</span> res;
+}
+</pre>
+            </div>
+
+            <div class="code-block" style="border-left: 4px solid var(--blue)">
+                <div class="code-header">
+                    <div class="code-lang">📝 Cyclic Sort — Pseudo-code</div>
+                </div>
+                <pre><span class="cm">// For numbers in range [1, N]</span>
+While i < N:
+   Correct_Index = arr[i] - 1
+   If arr[i] != arr[Correct_Index]:
+      Swap(arr[i], arr[Correct_Index])
+   Else:
+      i++</pre>
+            </div>
+
+            <div class="callout green">
+                <span class="callout-icon">💡</span>
+                <div class="callout-body">
+                    <strong>Cyclic Sort vs Floyd's:</strong> While Cyclic Sort is great for finding
+                    missing/duplicate members in \(1 \dots N\), Floyd’s Cycle Finding (Hare & Tortoise) is superior
+                    when you aren't allowed to <strong>modify</strong> the array.
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ══ SECTION 4: SEARCHING ANALYTICS ═════════════════════ -->
+            <h2 class="h1" id="search-analytics">4️⃣ 📊 Searching Roadmap</h2>
+            <p>Before diving into implementations, understand the landscape. Your choice of algorithm depends
+                entirely on the data's <strong>structure</strong>, <strong>distribution</strong>, and
+                <strong>access speed</strong>.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Complexity</th>
+                            <th>Pre-condition</th>
+                            <th>Best Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="meta-chip">Linear Search</span></td>
+                            <td>\(O(N)\)</td>
+                            <td>None</td>
+                            <td>Small / Unsorted Data</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip green">Jump Search</span></td>
+                            <td>\(O(\sqrt{N})\)</td>
+                            <td>Sorted</td>
+                            <td>Costly backward traversal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip">Binary Search</span></td>
+                            <td>\(O(\log N)\)</td>
+                            <td>Sorted / Monotonic</td>
+                            <td>Standard Large Datasets</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip blue">Interpolation Search</span></td>
+                            <td>\(O(\log \log N)\)</td>
+                            <td>Sorted + Uniform</td>
+                            <td>Telephone Directories / Uniform Numerical Data</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <!-- ══ SECTION 5: NON-BINARY SEARCHING PARADIGM ══════════════ -->
+            <h2 class="h1" id="non-binary-searching">5️⃣ 🔎 The Searching Paradigm (Non-Binary)</h2>
+            <p>Searching is the most fundamental operation in computation. For unsorted data or specific
+                distributions,
+                Binary Search is either impossible or sub-optimal.</p>
+
+            <h3 class="h2" id="linear-search">5.1 Linear Search — The Brute Force Baseline</h3>
+            <p>If the data is unsorted, you must check every element. It is \(O(N)\) because the target could be
+                anywhere.</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Standard Linear Search</div><button class="copy-btn"
+                        onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="kw">public int</span> <span class="fn">linearSearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        <span class="kw">if</span> (arr[i] == target) <span class="ret">return</span> i;
+    }
+    <span class="ret">return</span> <span class="num">-1</span>;
+}</pre>
+            </div>
+
+            <h3 class="h2" id="jump-search">5.2 Jump Search — The Square Root Optimization</h3>
+            <p>Instead of checking one-by-one, jump in blocks of size \(m = \sqrt{N}\). If `arr[m]` is greater than
+                target, you know the target lies in the current block. Perform a linear search within that block.
+            </p>
+
+            <div class="callout green">
+                <span class="callout-icon">💡</span>
+                <div class="callout-body">
+                    <strong>Why Jump?</strong> In systems where jumping back is expensive (e.g., tape drives or
+                    specific
+                    file streams), Jump Search is preferred over Binary Search as it only requires <strong>one jump
+                        back</strong>.
+                </div>
+            </div>
+
+            <h3 class="h2" id="interpolation-search">5.3 Interpolation Search — The Intelligent Guess</h3>
+            <p>If you look for "Zebra" in a dictionary, you don't start in the middle; you go to the end.
+                Interpolation
+                search calculates a probe position based on the <strong>values</strong> of the boundaries.</p>
+            <p><strong>Formula:</strong> \(pos = lo + \frac{(target - arr[lo]) \cdot (hi - lo)}{(arr[hi] - arr[lo])}\)
+            </p>
+
+            <div class="callout blue">
+                <span class="callout-icon">⚠</span>
+                <div class="callout-body">
+                    <strong>Warning:</strong> Interpolation search is only \(O(\log \log N)\) if the data is
+                    <strong>uniformly distributed</strong>. For skewed data, it can degrade to \(O(N)\).
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- ══ SECTION 6: BINARY SEARCH MASTERCLASS ════════════════ -->
+            <h2 class="h1" id="binary-masterclass">6️⃣ 🔍 Binary Search Masterclass</h2>
+            <p>Binary Search isn't just a code block; it's a <strong>law of nature</strong>. By halving the search
+                space, we find a needle in 4 billion items in just 32 steps (\(O(\log N)\)).</p>
+
+            <h3 class="h2" id="bs-foundations">6.1 Foundations & Overflow Trap</h3>
+            <div class="code-block" style="border-left: 4px solid var(--accent)">
+                <div class="code-header">
+                    <div class="code-lang">📝 Binary Search — Pseudo-code</div>
+                </div>
+                <pre><span class="cm">// The Immortal Pattern</span>
+While Low <= High:
+   Mid = Low + (High - Low) / 2 <span class="cm">// Avoid Overflow!</span>
+   If arr[Mid] == Target: Return Mid
+   Else if arr[Mid] < Target: Low = Mid + 1
+   Else: High = Mid - 1
+Return -1</pre>
+            </div>
+
+            <div class="callout orange">
+                <span class="callout-icon">🌋</span>
+                <div class="callout-body">
+                    <strong>The Integer Overflow Trap:</strong><br>
+                    Never use `mid = (low + high) / 2`. If `low` and `high` are \(10^9\), their sum will exceed
+                    the integer max (\(2^{31}-1\)). <strong>Always use:</strong><br>
+                    <code style="background:var(--bg3); padding:2px 6px">mid = low + (high - low) / 2</code>
+                </div>
+            </div>
+
+            <h3 class="h2" id="bs-templates">6.2 Master Templates (Standard & Boundary)</h3>
+            <p>Standard search finds <em>any</em> instance. Boundary search finds the <em>edge</em> instance.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>While Condition</th>
+                            <th>Success Logic</th>
+                            <th>Movement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="meta-chip">Exact Match</span></td>
+                            <td>`low <= high`</td>
+                            <td>`mid == target`</td>
+                            <td>Standard return</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip green">First Occurrence</span></td>
+                            <td>`low < high`</td>
+                            <td>Store index</td>
+                            <td>`high = mid - 1`</td>
+                        </tr>
+                        <tr>
+                            <td><span class="meta-chip blue">Last Occurrence</span></td>
+                            <td>`low < high`</td>
+                            <td>Store index</td>
+                            <td>`low = mid + 1`</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="h2" id="rotated-variations">6.3 Modified Variations (Rotated, Peak, 2D)</h3>
+            <p>BS works as long as there is a <strong>monotonic property</strong> (increasing/decreasing) or a
+                predictable gradient.</p>
+
+            <div class="callout blue" id="rotated-infinite">
+                <span class="callout-icon">🔄</span>
+                <div class="callout-body">
+                    <strong>Rotated Array:</strong> Even when rotated, one half (\(mid \rightarrow hi\) or \(lo
+                    \rightarrow mid\))
+                    <em>must</em> be sorted. Decision logic: Check if target lies within the boundaries of the
+                    sorted half.
+                </div>
+            </div>
+
+            <div class="callout orange" id="mountain-peak">
+                <span class="callout-icon">🌋</span>
+                <div class="callout-body">
+                    <strong>Find Peak Element (Gradients):</strong> Compare `mid` with `mid+1`. If `arr[mid] <
+                        arr[mid+1]`, the peak is to the right. You are using the slope to find the summit. </div>
+                </div>
+
+                <hr>
+
+                <!-- ══ SECTION 7: SEARCHING ON ANSWER SPACE ══════════════ -->
+                <h2 class="h1" id="bs-answer">7️⃣ Binary Search on Answer Space</h2>
+                <p>The most powerful form of BS. Instead of searching in an array, we search for a <strong>specific
+                        value</strong> in a range that satisfies a <strong>boolean predicate</strong>.</p>
+
+                <div class="code-block" style="border-left: 4px solid var(--red)">
+                    <div class="code-header">
+                        <div class="code-lang">📝 BS on Answer — Expert Template</div>
+                    </div>
+                    <pre><span class="kw">Low</span> = Min_Possible_Answer, <span class="kw">High</span> = Max_Possible_Answer
+<span class="kw">Result</span> = -1
+
+While Low <= High:
+   Mid = Low + (High - Low) / 2
+   If <span class="fn">isPossible</span>(Mid):
+      Result = Mid
+      High = Mid - 1 <span class="cm">// Try to find a smaller valid answer (Minimize)</span>
+   Else:
+      Low = Mid + 1 <span class="cm">// Answer must be larger</span></pre>
+                </div>
+
+                <div class="callout green">
+                    <span class="callout-icon">🎯</span>
+                    <div class="callout-body">
+                        <strong>Interview Pattern:</strong> If a problem asks to "Minimize the Maximum" or "Maximize the
+                        Minimum",
+                        it is almost always <strong>Binary Search on Answer</strong>.
+                        (e.g., Aggressive Cows, Book Allocation, Split Array Largest Sum).
+                    </div>
+                </div>
+
+                <h3 class="h2" id="advanced-bs">6.4 Advanced BS (Exponential, Ternary)</h3>
+                <div class="callout purple" id="exponential-search">
+                    <span class="toc-icon">♾️</span>
+                    <div class="callout-body">
+                        <strong>Exponential Search:</strong> For infinite streams or very large arrays where you
+                        don't know
+                        the end. Double your range (\(1, 2, 4, 8...\)) until you overshot the target, then BS the
+                        range.
+                    </div>
+                </div>
+
+                <div class="callout blue" id="ternary-search">
+                    <span class="callout-icon">📐</span>
+                    <div class="callout-body">
+                        <strong>Ternary Search:</strong> Splits space into <strong>three</strong> parts (\(m1, m2\)).
+                        Best for finding extreme points (peaks) in unimodal functions. \(O(\log_3 N)\).
+                    </div>
+                </div>
+
+                <h3 class="h2" id="bs-answer">6.5 Binary Search on Answer Space</h3>
+                <p>The "Master Tier". You aren't searching for a needle in a haystack; you are searching for the
+                    <strong>optimal value</strong> in a monotonic range of possibilities (e.g., minimum capacity,
+                    maximum distance).
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ BS on Answer Space · Example Pattern</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">while</span> (low <= high) {
+    <span class="kw">int</span> mid = low + (high - low) / <span class="num">2</span>;
+    <span class="kw">if</span> (<span class="fn">isPossible</span>(mid)) {
+        ans = mid; high = mid - <span class="num">1</span>; <span class="cm">// Try for more "optimal" (smaller)</span>
+    } <span class="kw">else</span> low = mid + <span class="num">1</span>;
+}</pre>
+                </div>
+
+                <hr>
+
+                <div class="callout blue">
+                    <span class="callout-icon">🍌</span>
+                    <div class="callout-body">
+                        <strong>Koko Eating Bananas Strategy:</strong><br>
+                        1. <strong>Range</strong>: \([1, \max(piles)]\).<br>
+                        2. <strong>Predicate</strong>: `canEatInTime(speed)`. If she can eat at speed \(S\), she can
+                        certainly eat at \(S+1\).
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Binary Search · Koko Eating Bananas</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public int</span> <span class="fn">minEatingSpeed</span>(<span class="kw">int</span>[] piles, <span class="kw">int</span> h) {
+    <span class="kw">int</span> low = <span class="num">1</span>, high = <span class="num">1000000000</span>;
+    <span class="kw">int</span> ans = high;
+    <span class="kw">while</span> (low <= high) {
+        <span class="kw">int</span> mid = low + (high - low) / <span class="num">2</span>;
+        <span class="kw">if</span> (<span class="fn">canFinish</span>(piles, h, mid)) {
+            ans = mid; high = mid - <span class="num">1</span>;
+        } <span class="kw">else</span> low = mid + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> ans;
+}</pre>
+                </div>
+
+                <hr>
+
+                <!-- ══ SECTION 7: CUSTOM COMPARATORS ════════════════════════ -->
+                <h2 class="h1" id="comparators">7️⃣ ⚖️ Custom Comparators</h2>
+                <p>In real-world DSA, we rarely sort simple integers. We sort <strong>objects</strong> (Students by
+                    Rank,
+                    Orders by Priority, Intervals by Start Time).</p>
+
+                <h3 class="h2" id="comparable-vs-comparator">7.1 Comparable vs Comparator</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Comparable</th>
+                                <th>Comparator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Location</td>
+                                <td>Defined <strong>inside</strong> the class</td>
+                                <td>External logic</td>
+                            </tr>
+                            <tr>
+                                <td>Control</td>
+                                <td>"Natural" sorting order</td>
+                                <td>Multiple sorting strategies</td>
+                            </tr>
+                            <tr>
+                                <td>Method</td>
+                                <td>`compareTo(T obj)`</td>
+                                <td>`compare(T o1, T o2)`</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="callout purple">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-body">
+                        <strong>The Subtract Trick:</strong> For integers `(a, b) -> a - b`. <br>
+                        If result is <strong>negative</strong>, `a` comes first. If <strong>positive</strong>, `b`
+                        comes first.
+                        Use `(a, b) -> b - a` for descending order.
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Modern Comparator Syntax (Java 8+)</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="cm">// 1. Sorting a 2D Array by the first column</span>
+Arrays.<span class="fn">sort</span>(intervals, (a, b) -> a[<span class="num">0</span>] - b[<span class="num">0</span>]);
+
+<span class="cm">// 2. Multi-Level Sorting: By Age, then by Name</span>
+Collections.<span class="fn">sort</span>(students, Comparator
+    .<span class="fn">comparingInt</span>(Student::getAge)
+    .<span class="fn">thenComparing</span>(Student::getName));</pre>
+                </div>
+
+                <hr>
+
+                <!-- ═══ IN-LECTURE PRACTICE ════════════════════════════════ -->
+                <h2 class="h1" id="practice">💪 In-Lecture Practice (Patterns)</h2>
+                <p>These 12 problems are designed to solidify your mastery over Sorting & Searching patterns. Solve
+                    them in order.</p>
+
+                <!-- P1 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 01 · Template Foundation</div>
+                            <div class="prob-title">Binary Search</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/binary-search/"
+                                    target="_blank" style="font-size:12px">🔗 LC 704 - Binary Search</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-easy">Easy</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Microsoft</span>
+                                <span class="tag tag-pat">Monotonic Search</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Search for target in sorted array. \(O(\log n)\) complexity required.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">search</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo <= hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
+        <span class="kw">if</span> (nums[mid] == target) <span class="ret">return</span> mid;
+        <span class="kw">if</span> (nums[mid] < target) lo = mid + <span class="num">1</span>;
+        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
+    }
+    <span class="ret">return</span> <span class="num">-1</span>;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(log N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P2 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 02 · Boundary Search</div>
+                            <div class="prob-title">Find First and Last Position</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 34 - Range Search</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Amazon</span><span class="tag tag-co">Meta</span>
+                                <span class="tag tag-pat">Double Pass</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Given a sorted array, find the starting and ending index of a given
+                                target value.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span>[] <span class="fn">searchRange</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+    <span class="kw">int</span> first = find(nums, target, <span class="ret">true</span>);
+    <span class="kw">int</span> last = find(nums, target, <span class="ret">false</span>);
+    <span class="ret">return new int</span>[]{first, last};
+}
+<span class="kw">private int</span> <span class="fn">find</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target, <span class="kw">boolean</span> isFirst) {
+    <span class="kw">int</span> res = <span class="num">-1</span>, lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo <= hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
+        <span class="kw">if</span> (nums[mid] == target) {
+            res = mid;
+            <span class="kw">if</span> (isFirst) hi = mid - <span class="num">1</span>;
+            <span class="kw">else</span> lo = mid + <span class="num">1</span>;
+        } <span class="kw">else if</span> (nums[mid] < target) lo = mid + <span class="num">1</span>;
+        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
+    }
+    <span class="ret">return</span> res;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(log N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P3 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 03 · Modified Binary Search</div>
+                            <div class="prob-title">Search in Rotated Sorted Array</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/search-in-rotated-sorted-array/" target="_blank"
+                                    style="font-size:12px">🔗 LC 33 - Rotated Search</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Microsoft</span>
+                                <span class="tag tag-pat">Partially Sorted</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Search target in a sorted array that has been rotated at some unknown
+                                pivot.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">search</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo <= hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
+        <span class="kw">if</span> (nums[mid] == target) <span class="ret">return</span> mid;
+        <span class="kw">if</span> (nums[lo] <= nums[mid]) { <span class="cm">// Left side is sorted</span>
+            <span class="kw">if</span> (target >= nums[lo] && target < nums[mid]) hi = mid - <span class="num">1</span>;
+            <span class="kw">else</span> lo = mid + <span class="num">1</span>;
+        } <span class="kw">else</span> { <span class="cm">// Right side is sorted</span>
+            <span class="kw">if</span> (target > nums[mid] && target <= nums[hi]) lo = mid + <span class="num">1</span>;
+            <span class="kw">else</span> hi = mid - <span class="num">1</span>;
+        }
+    }
+    <span class="ret">return</span> <span class="num">-1</span>;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(log N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P4 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 04 · Mountain Array logic</div>
+                            <div class="prob-title">Find Peak Element</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/find-peak-element/"
+                                    target="_blank" style="font-size:12px">🔗 LC 162 - Peak Search</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Uber</span><span class="tag tag-co">Amazon</span>
+                                <span class="tag tag-pat">Gradients</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find a peak element (greater than its neighbors). Array can have multiple
+                                peaks;
+                                return
+                                any.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">findPeakElement</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo < hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
+        <span class="kw">if</span> (nums[mid] < nums[mid + <span class="num">1</span>]) lo = mid + <span class="num">1</span>; <span class="cm">// Climbing up</span>
+        <span class="kw">else</span> hi = mid; <span class="cm">// Climbing down</span>
+    }
+    <span class="ret">return</span> lo;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(log N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P5 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 05 · Cycle Hashing</div>
+                            <div class="prob-title">Find All Numbers Disappeared</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 448 - Missing
+                                    Numbers</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-easy">Easy</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Microsoft</span>
+                                <span class="tag tag-pat">Cyclic Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find all elements in range [1, n] that do not appear in the array.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> List&lt;Integer&gt; <span class="fn">findDisappearedNumbers</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (i < nums.length) {
+        <span class="kw">int</span> correctIndex = nums[i] - <span class="num">1</span>;
+        <span class="kw">if</span> (nums[i] != nums[correctIndex]) {
+            <span class="fn">swap</span>(nums, i, correctIndex);
+        } <span class="kw">else</span> i++;
+    }
+    List&lt;Integer&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < nums.length; i++) {
+        <span class="kw">if</span> (nums[i] != i + <span class="num">1</span>) res.add(i + <span class="num">1</span>);
+    }
+    <span class="ret">return</span> res;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P6 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 06 · Standard Merge</div>
+                            <div class="prob-title">Merge Sorted Array (In-Place)</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/merge-sorted-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 88 - Merge In-Place</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-easy">Easy</span>
+                                <span class="tag tag-co">FB</span><span class="tag tag-co">Amazon</span>
+                                <span class="tag tag-pat">Backward Pointers</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Merge two sorted arrays into one sorted array <em>in-place</em> (nums1
+                                has extra
+                                space).
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public void</span> <span class="fn">merge</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span> m, <span class="kw">int</span>[] nums2, <span class="kw">int</span> n) {
+    <span class="kw">int</span> i = m - <span class="num">1</span>, j = n - <span class="num">1</span>, k = m + n - <span class="num">1</span>;
+    <span class="kw">while</span> (j >= <span class="num">0</span>) {
+        <span class="kw">if</span> (i >= <span class="num">0</span> && nums1[i] > nums2[j]) nums1[k--] = nums1[i--];
+        <span class="kw">else</span> nums1[k--] = nums2[j--];
+    }
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(M+N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P7 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 07 · Stable Sorting</div>
+                            <div class="prob-title">Sort List (Merge Sort on Nodes)</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/sort-list/"
+                                    target="_blank" style="font-size:12px">🔗 LC 148 - Merge Sort LL</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Adobe</span><span class="tag tag-co">Goldman</span>
+                                <span class="tag tag-pat">D&C</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Sort a linked list in \(O(n \log n)\) time using constant space complexity.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> ListNode <span class="fn">sortList</span>(ListNode head) {
+    <span class="kw">if</span> (head == <span class="kw">null</span> || head.next == <span class="kw">null</span>) <span class="ret">return</span> head;
+    ListNode prev = <span class="kw">null</span>, slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> && fast.next != <span class="kw">null</span>) {
+        prev = slow; slow = slow.next; fast = fast.next.next;
+    }
+    prev.next = <span class="kw">null</span>; <span class="cm">// Cut list</span>
+    ListNode l1 = <span class="fn">sortList</span>(head);
+    ListNode l2 = <span class="fn">sortList</span>(slow);
+    <span class="ret">return</span> <span class="fn">merge</span>(l1, l2);
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N
+                                            log N)</span></div>
+                                    <div class="cx-badge yellow"><span class="cx-label">Space</span><span
+                                            class="cx-val yellow">O(log N) stack</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P8 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 08 · BS on Answer Space</div>
+                            <div class="prob-title">Capacity To Ship Packages Within D Days</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/"
+                                    target="_blank" style="font-size:12px">🔗 LC 1011 - Ship
+                                    Capacity</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Apple</span>
+                                <span class="tag tag-pat">Min of Max</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the minimum weight capacity of a ship that will ship all packages
+                                within D
+                                days.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">shipWithinDays</span>(<span class="kw">int</span>[] weights, <span class="kw">int</span> days) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = <span class="num">0</span>;
+    <span class="kw">for</span> (int w : weights) { lo = Math.max(lo, w); hi += w; }
+    <span class="kw">while</span> (lo < hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
+        <span class="kw">if</span> (<span class="fn">check</span>(weights, days, mid)) hi = mid;
+        <span class="kw">else</span> lo = mid + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> lo;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N
+                                            log(Sum-Max))</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P9 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 09 · Average O(N) Selection</div>
+                            <div class="prob-title">Kth Largest Element in Array</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/kth-largest-element-in-an-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 215 - Kth Largest</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Amazon</span><span class="tag tag-co">Linkedin</span>
+                                <span class="tag tag-pat">QuickSelect</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the kth largest element in an unsorted array. \(O(N)\) average time
+                                required.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    k = nums.length - k; <span class="cm">// Find target index</span>
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo < hi) {
+        <span class="kw">int</span> j = <span class="fn">partition</span>(nums, lo, hi);
+        <span class="kw">if</span> (j < k) lo = j + <span class="num">1</span>;
+        <span class="kw">else if</span> (j > k) hi = j - <span class="num">1</span>;
+        <span class="kw">else break</span>;
+    }
+    <span class="ret">return</span> nums[k];
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">Avg
+                                            O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P10 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 10 · Cyclic Sort</div>
+                            <div class="prob-title">First Missing Positive</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/first-missing-positive/"
+                                    target="_blank" style="font-size:12px">🔗 LC 41 - Missing Positive</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-co">Amazon</span><span class="tag tag-co">Google</span>
+                                <span class="tag tag-pat">Cyclic Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the smallest missing positive integer in \(O(n)\) time and \(O(1)\) space.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">firstMissingPositive</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (i < nums.length) {
+        <span class="kw">int</span> correct = nums[i] - <span class="num">1</span>;
+        <span class="kw">if</span> (nums[i] > <span class="num">0</span> && nums[i] <= nums.length && nums[i] != nums[correct]) {
+            <span class="fn">swap</span>(nums, i, correct);
+        } <span class="kw">else</span> i++;
+    }
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < nums.length; i++) {
+        <span class="kw">if</span> (nums[i] != i + <span class="num">1</span>) <span class="ret">return</span> i + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> nums.length + <span class="num">1</span>;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P11 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 11 · The BS Boss</div>
+                            <div class="prob-title">Median of Two Sorted Arrays</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/median-of-two-sorted-arrays/" target="_blank"
+                                    style="font-size:12px">🔗 LC 4 - Visualizing Partitions</a>
+                            </div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-co">Apple</span><span class="tag tag-co">Adobe</span>
+                                <span class="tag tag-pat">Partitioning</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the median of two sorted arrays in Logarithmic time. Most difficult BS
+                                pattern.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Key Logic Insight</summary>
+                            <div class="details-body">
+                                <p>You must partition both arrays such that: <br>
+                                    1. `LeftHalfSize == RightHalfSize` <br>
+                                    2. `Max(Left) <= Min(Right)`</p>
+                                        <div class="complexity-row">
+                                            <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                                    class="cx-val green">O(log(min(M,N)))</span></div>
+                                        </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P12 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 12 · Staircase Search</div>
+                            <div class="prob-title">Search a 2D Matrix II</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/search-a-2d-matrix-ii/"
+                                    target="_blank" style="font-size:12px">🔗 LC 240 - Staircase Logic</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Amazon</span><span class="tag tag-co">Zillow</span>
+                                <span class="tag tag-pat">Pruning</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Search in a matrix where rows AND columns are sorted. \(O(M+N)\) required.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Solution Strategy</summary>
+                            <div class="details-body">
+                                <p>Start at top-right. If `target < current`, move left (entire column is gone). If
+                                        `target> current`, move down (entire row is gone).</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="callout orange" id="assignment" style="margin-top:40px">
+                    <span class="callout-icon">📝</span>
+                    <div class="callout-body">
+                        <strong>Lecture 5 Assignment — 50 Problems</strong><br>
+                        Includes 12 Easy, 28 Medium, 10 Hard problems, covering Cyclic Sort and Binary
+                        Search on
+                        Answer
+                        Space.
+                        <div style="margin-top:12px">
+                            <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture5/Assignment.md"
+                                class="res-btn assignment" target="_blank"
+                                style="display:inline-block;padding:8px 16px;background:var(--orange);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:13px">Open
+                                Assignment →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="h1" id="checklist">✅ Completion Checklist</h2>
+                <p>Ensure you've mastered these sorting and searching mechanics before moving to Phase 2
+                    (Advanced).
+                </p>
+
+                <div style="margin:20px 0; display:flex; flex-direction:column; gap:10px;">
+                    <div class="checklist-item" onclick="toggleCheck(this)"
+                        style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                        <div class="cb-box"
+                            style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                            ✓</div>
+                        <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
+                            can
+                            implement Merge Sort and explain its $O(N)$ auxiliary space.</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)"
+                        style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                        <div class="cb-box"
+                            style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                            ✓</div>
+                        <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
+                            understand the Cyclic Sort pattern for numbers in range [1, N].</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)"
+                        style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                        <div class="cb-box"
+                            style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                            ✓</div>
+                        <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
+                            can
+                            identify problems solvable by Binary Search on Answer Space.</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)"
+                        style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; cursor:pointer;">
+                        <div class="cb-box"
+                            style="width:20px; height:20px; border:2px solid var(--border2); border-radius:4px; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:bold; font-size:14px; transition:all .2s;">
+                            ✓</div>
+                        <span class="cb-text" style="font-weight:500; color:var(--text); transition:color .2s;">I
+                            have
+                            completed at least 20 problems from the Assignment file</span>
+                    </div>
+                </div>
+
+            </div><!-- #content -->
+        </div><!-- #main -->
+
+        <script>
+            // Universal Dark Mode Toggle
+            function toggleDark() {
+                const html = document.documentElement;
+                const btn = document.getElementById('darkToggle');
+                if (html.getAttribute('data-theme') === 'dark') {
+                    html.removeAttribute('data-theme');
+                    btn.innerText = '🌙 Dark';
+                } else {
+                    html.setAttribute('data-theme', 'dark');
+                    btn.innerText = '☀️ Light';
+                }
+            }
+
+            // Universal Progress & TOC Tracker inside #main scroll boundary
+            document.getElementById('main').addEventListener('scroll', function () {
+                const el = this;
+
+                // 1. Progress Bar calculation
+                if (document.getElementById('progressFill')) {
+                    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+                    document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+                }
+
+                // 2. Active TOC Highlighting
+                const sections = document.querySelectorAll('[id]');
+                let current = '';
+                sections.forEach(s => {
+                    if (s.getBoundingClientRect().top < 150) current = s.id;
+                });
+                document.querySelectorAll('.toc-item').forEach(a => {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+                });
+            });
+
+            // Universal Problem Visibility Toggle
+            function toggleProb(headerEl) {
+                const body = headerEl.nextElementSibling;
+                if (!body) return;
+                const open = body.style.display === 'block';
+                body.style.display = open ? 'none' : 'block';
+                headerEl.style.backgroundColor = open ? 'var(--bg2)' : 'var(--bg3)';
+
+                // If there's an arrow span dynamically toggle it
+                const arrow = headerEl.querySelector('span:last-child');
+                if (arrow && arrow.innerText.includes('▼')) {
+                    arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+                    arrow.style.color = open ? 'var(--text3)' : 'var(--accent)';
+                }
+            }
+
+            // Universal Copy Code To Clipboard
+            function copyCode(btn) {
+                const pre = btn.parentElement.nextElementSibling;
+                // Get text without the span tags if any syntax highlighting exists
+                const textToCopy = pre.innerText;
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const origText = btn.innerText;
+                    btn.innerText = 'Copied!';
+                    btn.style.background = 'var(--green-bg)';
+                    btn.style.color = 'var(--green)';
+                    btn.style.borderColor = 'var(--green)';
+
+                    setTimeout(() => {
+                        btn.innerText = origText;
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                    }, 2000);
+                });
+            }
+
+            // Universal Checklist Toggle logic
+            function toggleCheck(el) {
+                const box = el.querySelector('.cb-box');
+                const txt = el.querySelector('.cb-text');
+                if (!box || !txt) return;
+
+                if (box.style.color === 'transparent' || !box.style.color) {
+                    box.style.color = '#fff';
+                    box.style.backgroundColor = 'var(--green)';
+                    box.style.borderColor = 'var(--green)';
+                    txt.style.color = 'var(--text3)';
+                    txt.style.textDecoration = 'line-through';
+                } else {
+                    box.style.color = 'transparent';
+                    box.style.backgroundColor = 'transparent';
+                    box.style.borderColor = 'var(--border2)';
+                    txt.style.color = 'var(--text)';
+                    txt.style.textDecoration = 'none';
+                }
+            }
+
+            // Final fallback: details arrows
+            document.querySelectorAll('details').forEach(det => {
+                det.addEventListener('toggle', function () {
+                    const arrow = this.querySelector('.toggle-arrow');
+                    if (arrow) {
+                        if (this.open) arrow.style.transform = 'rotate(90deg)';
+                        else arrow.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+        </script>
+</body>
+
+</html>
