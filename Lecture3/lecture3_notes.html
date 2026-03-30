@@ -74,7 +74,10 @@
             --pink-bg: #2a1020;
         }
 
-        html {
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
             scroll-behavior: smooth;
         }
 
@@ -85,7 +88,7 @@
             font-size: 15px;
             line-height: 1.7;
             display: flex;
-            min-height: 100vh;
+            flex-direction: row;
             transition: background 0.2s, color 0.2s;
         }
 
@@ -729,28 +732,98 @@
 
         .iobox {
             background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px 12px;
+            border-left: 3px solid var(--border2);
+            padding: 10px 14px;
             font-family: var(--mono);
             font-size: 13px;
             color: var(--text2);
+            margin: 8px 0;
             white-space: pre-wrap;
         }
 
-        /* ─── Tree / Recursion Diagrams (ASCII-style) ─────────────────── */
+        /* ── Progress Bar ── */
+        .progress-bar {
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Checklist Component ── */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg2);
+            border-color: var(--border);
+        }
+
+        .cb-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: transparent;
+            font-size: 12px;
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        .cb-text {
+            font-size: 14.5px;
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .checklist-item.done .cb-box {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .checklist-item.done .cb-text {
+            color: var(--text3);
+            text-decoration: line-through;
+        }
+
+        /* ── ASCII Tree Dry Runs ── */
         .ascii-tree {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 8px;
             font-family: var(--mono);
             font-size: 13px;
             line-height: 1.6;
             color: var(--text2);
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            margin: 10px 0;
-            overflow-x: auto;
+            margin: 14px 0;
             white-space: pre;
+            overflow-x: auto;
         }
 
         .ascii-tree .hl {
@@ -758,13 +831,14 @@
             font-weight: 600;
         }
 
-        .ascii-tree .ret {
-            color: var(--green);
+        .ascii-tree .nd {
+            color: var(--orange);
             font-weight: 600;
         }
 
-        .ascii-tree .nd {
-            color: var(--orange);
+        .ascii-tree .ret {
+            color: var(--purple);
+            font-weight: 600;
         }
 
         /* ─── Visual Stack Diagram ─────────────────────────────────────── */
@@ -2241,7 +2315,7 @@ n = n & mask2;</pre>
             <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
             <p>Check each item off as you master it. Don't proceed to Lecture 4 until all are checked.</p>
 
-            <div class="checklist">
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
                 <div class="checklist-item" onclick="this.classList.toggle('done')">
                     <div class="cb-box">✓</div>
                     <div class="cb-text">I can set, clear, toggle, and check the kth bit correctly without googling
@@ -2273,7 +2347,7 @@ n = n & mask2;</pre>
     </div><!-- /main -->
 
     <script>
-        // Universal Dark Mode Toggle
+        // 1. Dark Mode Toggle
         function toggleDark() {
             const html = document.documentElement;
             const btn = document.getElementById('darkToggle');
@@ -2286,58 +2360,53 @@ n = n & mask2;</pre>
             }
         }
 
-        // Universal Progress & TOC Tracker inside #main scroll boundary
+        // 2. Progress Tracker & TOC Highlighting
         document.getElementById('main').addEventListener('scroll', function () {
             const el = this;
+            const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
 
-            // 1. Progress Bar calculation
+            // Progress bar fill logic with threshold
             if (document.getElementById('progressFill')) {
-                const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-                document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+                const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+                document.getElementById('progressFill').style.width = fillPct + '%';
             }
 
-            // 2. Active TOC Highlighting
-            const sections = document.querySelectorAll('[id]');
-            let current = '';
+            // Active TOC Highlighting
+            const sections = document.querySelectorAll('h1, h2, h3');
+            let current = "";
             sections.forEach(s => {
-                if (s.getBoundingClientRect().top < 150) current = s.id;
+                const top = s.getBoundingClientRect().top;
+                if (top < 150) current = s.id;
             });
-            document.querySelectorAll('.toc-item').forEach(a => {
-                a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === "#" + current) {
+                    item.classList.add('active');
+                }
             });
         });
 
-        // Universal Problem Visibility Toggle
+        // 3. Problem Visibility Toggle
         function toggleProb(headerEl) {
             const body = headerEl.nextElementSibling;
             if (!body) return;
-            const open = body.style.display === 'block';
-            body.style.display = open ? 'none' : 'block';
-            headerEl.style.backgroundColor = open ? 'var(--bg2)' : 'var(--bg3)';
-
-            // If there's an arrow span dynamically toggle it
-            const arrow = headerEl.querySelector('span:last-child');
-            if (arrow && arrow.innerText.includes('▼')) {
-                arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
-                arrow.style.color = open ? 'var(--text3)' : 'var(--accent)';
-            }
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            headerEl.classList.toggle('active', !isOpen);
         }
 
-        // Universal Copy Code To Clipboard
+        // 4. Copy Code Logic
         function copyCode(btn) {
-            const pre = btn.parentElement.nextElementSibling;
-            // Get text without the span tags if any syntax highlighting exists
-            const textToCopy = pre.innerText;
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const origText = btn.innerText;
+            const code = btn.closest('.code-block').querySelector('pre').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
                 btn.innerText = 'Copied!';
                 btn.style.background = 'var(--green-bg)';
                 btn.style.color = 'var(--green)';
                 btn.style.borderColor = 'var(--green)';
-
                 setTimeout(() => {
-                    btn.innerText = origText;
+                    btn.innerText = originalText;
                     btn.style.background = '';
                     btn.style.color = '';
                     btn.style.borderColor = '';
@@ -2345,34 +2414,12 @@ n = n & mask2;</pre>
             });
         }
 
-        // Universal Checklist Toggle logic
-        function toggleCheck(el) {
-            const box = el.querySelector('.cb-box');
-            const txt = el.querySelector('.cb-text');
-            if (!box || !txt) return;
-
-            if (box.style.color === 'transparent' || !box.style.color) {
-                box.style.color = '#fff';
-                box.style.backgroundColor = 'var(--green)';
-                box.style.borderColor = 'var(--green)';
-                txt.style.color = 'var(--text3)';
-                txt.style.textDecoration = 'line-through';
-            } else {
-                box.style.color = 'transparent';
-                box.style.backgroundColor = 'transparent';
-                box.style.borderColor = 'var(--border2)';
-                txt.style.color = 'var(--text)';
-                txt.style.textDecoration = 'none';
-            }
-        }
-
-        // Final fallback: details arrows
+        // 5. Details Arrows
         document.querySelectorAll('details').forEach(det => {
-            det.addEventListener('toggle', function () {
-                const arrow = this.querySelector('.toggle-arrow');
+            det.addEventListener('toggle', () => {
+                const arrow = det.querySelector('.toggle-arrow');
                 if (arrow) {
-                    if (this.open) arrow.style.transform = 'rotate(90deg)';
-                    else arrow.style.transform = 'rotate(0deg)';
+                    arrow.style.transform = det.open ? 'rotate(90deg)' : 'rotate(0deg)';
                 }
             });
         });
