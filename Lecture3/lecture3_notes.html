@@ -2,2428 +2,1568 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lecture 3 — Bit Manipulation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-        rel="stylesheet">
-    <style>
-        /* ─── Reset & Base ─────────────────────────────────────────────── */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #ffffff;
-            --bg2: #f7f6f3;
-            --bg3: #efede9;
-            --border: #e3e0d9;
-            --border2: #d0ccc4;
-            --text: #37352f;
-            --text2: #6b6860;
-            --text3: #9b9790;
-            --accent: #2383e2;
-            --accent-bg: #e8f1fc;
-            --green: #0f7b6c;
-            --green-bg: #e9f5f3;
-            --red: #c0392b;
-            --red-bg: #fdf0ee;
-            --yellow: #8a6d00;
-            --yellow-bg: #fdf6e3;
-            --purple: #6940a5;
-            --purple-bg: #f0ecf9;
-            --orange: #c75b0e;
-            --orange-bg: #fef0e7;
-            --pink: #ad1a72;
-            --pink-bg: #fce8f3;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Inter', sans-serif;
-            --serif: 'Merriweather', serif;
-            --sidebar-w: 260px;
-            --content-max: 860px;
-        }
-
-        [data-theme="dark"] {
-            --bg: #191919;
-            --bg2: #212121;
-            --bg3: #2d2d2d;
-            --border: #333;
-            --border2: #444;
-            --text: #e8e6e1;
-            --text2: #9b9790;
-            --text3: #6b6860;
-            --accent: #5ba4f5;
-            --accent-bg: #1a2d42;
-            --green: #4db6a8;
-            --green-bg: #0e2420;
-            --red: #e07070;
-            --red-bg: #2e1414;
-            --yellow: #d4a42a;
-            --yellow-bg: #2a1f06;
-            --purple: #a07dd4;
-            --purple-bg: #1e1530;
-            --orange: #e0893a;
-            --orange-bg: #2a1608;
-            --pink: #e06aac;
-            --pink-bg: #2a1020;
-        }
-
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--sans);
-            background: var(--bg);
-            color: var(--text);
-            font-size: 15px;
-            line-height: 1.7;
-            display: flex;
-            flex-direction: row;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        /* ─── Sidebar ──────────────────────────────────────────────────── */
-        #sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
-            background: var(--bg2);
-            border-right: 1px solid var(--border);
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            padding: 20px 0;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 0 16px 16px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 12px;
-        }
-
-        .lecture-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            margin-bottom: 10px;
-        }
-
-        .sidebar-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .sidebar-meta {
-            color: var(--text3);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .toc-label {
-            padding: 0 16px 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--text3);
-        }
-
-        .toc-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 16px;
-            cursor: pointer;
-            border-radius: 0;
-            color: var(--text2);
-            transition: background .12s, color .12s;
-            text-decoration: none;
-        }
-
-        .toc-item:hover,
-        .toc-item.active {
-            background: var(--bg3);
-            color: var(--text);
-        }
-
-        .toc-item.active {
-            font-weight: 500;
-            color: var(--accent);
-        }
-
-        .toc-item .toc-icon {
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .toc-sub {
-            padding-left: 36px;
-            font-size: 12px;
-            color: var(--text3);
-        }
-
-        .toc-sub:hover {
-            color: var(--text2);
-        }
-
-        .sidebar-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 10px 16px;
-        }
-
-        /* ─── Main Content ─────────────────────────────────────────────── */
-        #main {
-            flex: 1;
-            overflow-y: auto;
-            height: 100vh;
-        }
-
-        #content {
-            max-width: var(--content-max);
-            margin: 0 auto;
-            padding: 48px 64px 120px;
-        }
-
-        /* ─── Page Header ──────────────────────────────────────────────── */
-        .page-header {
-            margin-bottom: 40px;
-            padding-bottom: 28px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .page-emoji {
-            font-size: 48px;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .page-title {
-            font-family: var(--serif);
-            font-size: 38px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.2;
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            font-size: 16px;
-            color: var(--text2);
-            font-style: italic;
-            margin-bottom: 16px;
-        }
-
-        .meta-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .meta-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1px solid var(--border2);
-            color: var(--text2);
-            background: var(--bg2);
-        }
-
-        .meta-chip.accent {
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-color: var(--accent-bg);
-        }
-
-        .meta-chip.green {
-            background: var(--green-bg);
-            color: var(--green);
-            border-color: var(--green-bg);
-        }
-
-        .meta-chip.yellow {
-            background: var(--yellow-bg);
-            color: var(--yellow);
-            border-color: var(--yellow-bg);
-        }
-
-        /* ─── Notion Blocks ────────────────────────────────────────────── */
-        .section {
-            margin-bottom: 8px;
-            scroll-margin-top: 20px;
-        }
-
-        .h1 {
-            font-family: var(--serif);
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text);
-            margin: 40px 0 12px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid var(--border);
-            scroll-margin-top: 20px;
-        }
-
-        .h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text);
-            margin: 28px 0 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin: 20px 0 6px;
-        }
-
-        p {
-            color: var(--text);
-            margin: 0 0 10px;
-            line-height: 1.75;
-        }
-
-        /* ─── Callout Blocks ───────────────────────────────────────────── */
-        .callout {
-            display: flex;
-            gap: 12px;
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin: 14px 0;
-            font-size: 14px;
-            line-height: 1.65;
-        }
-
-        .callout-icon {
-            font-size: 18px;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .callout-body {
-            flex: 1;
-        }
-
-        .callout-body strong {
-            font-weight: 600;
-        }
-
-        .callout.blue {
-            background: var(--accent-bg);
-            color: var(--text);
-        }
-
-        .callout.green {
-            background: var(--green-bg);
-            color: var(--text);
-        }
-
-        .callout.yellow {
-            background: var(--yellow-bg);
-            color: var(--text);
-        }
-
-        .callout.red {
-            background: var(--red-bg);
-            color: var(--text);
-        }
-
-        .callout.purple {
-            background: var(--purple-bg);
-            color: var(--text);
-        }
-
-        .callout.orange {
-            background: var(--orange-bg);
-            color: var(--text);
-        }
-
-        /* ─── Code Blocks ──────────────────────────────────────────────── */
-        .code-block {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin: 14px 0;
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            background: var(--bg3);
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text2);
-            gap: 10px;
-        }
-
-        .code-lang {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--text3);
-        }
-
-        .copy-btn {
-            background: none;
-            border: 1px solid var(--border2);
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 11px;
-            cursor: pointer;
-            color: var(--text2);
-            font-family: var(--sans);
-            transition: background .12s;
-        }
-
-        .copy-btn:hover {
-            background: var(--bg);
-        }
-
-        pre {
-            padding: 16px;
-            overflow-x: auto;
-            margin: 0;
-            font-family: var(--mono);
-            font-size: 13.5px;
-            line-height: 1.75;
-            tab-size: 4;
-        }
-
-        .kw {
-            color: #0550ae;
-            font-weight: 500;
-        }
-
-        .cm {
-            color: #6a737d;
-            font-style: italic;
-        }
-
-        .str {
-            color: #0a8043;
-        }
-
-        .num {
-            color: #953800;
-        }
-
-        .fn {
-            color: #8250df;
-        }
-
-        .cls {
-            color: #1a7f37;
-        }
-
-        .ret {
-            color: #0550ae;
-        }
-
-        [data-theme="dark"] .kw {
-            color: #79c0ff;
-        }
-
-        [data-theme="dark"] .cm {
-            color: #8b949e;
-        }
-
-        [data-theme="dark"] .str {
-            color: #a5d6ff;
-        }
-
-        [data-theme="dark"] .num {
-            color: #ff9150;
-        }
-
-        [data-theme="dark"] .fn {
-            color: #d2a8ff;
-        }
-
-        [data-theme="dark"] .cls {
-            color: #7ee787;
-        }
-
-        [data-theme="dark"] .ret {
-            color: #79c0ff;
-        }
-
-        code {
-            font-family: var(--mono);
-            font-size: 13px;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1px 6px;
-            color: var(--red);
-        }
-
-        [data-theme="dark"] code {
-            color: var(--orange);
-        }
-
-        /* ─── Toggles / Collapsibles ───────────────────────────────────── */
-        details {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        summary {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text);
-            background: var(--bg2);
-            list-style: none;
-            transition: background .12s;
-            user-select: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        summary:hover {
-            background: var(--bg3);
-        }
-
-        summary .toggle-arrow {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform .2s;
-            color: var(--text3);
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        details[open] summary .toggle-arrow {
-            transform: rotate(90deg);
-        }
-
-        .details-body {
-            padding: 14px 16px;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-        }
-
-        /* ─── Tables ───────────────────────────────────────────────────── */
-        .table-wrap {
-            overflow-x: auto;
-            margin: 14px 0;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-
-        thead th {
-            background: var(--bg2);
-            padding: 9px 14px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: .03em;
-            color: var(--text2);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        tbody td {
-            padding: 9px 14px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: top;
-            line-height: 1.5;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr:hover td {
-            background: var(--bg2);
-        }
-
-        /* ─── Bullet / Numbered Lists ──────────────────────────────────── */
-        ul,
-        ol {
-            padding-left: 24px;
-            margin: 8px 0 12px;
-        }
-
-        li {
-            margin: 4px 0;
-            line-height: 1.7;
-        }
-
-        li::marker {
-            color: var(--text3);
-        }
-
-        /* ─── Divider ──────────────────────────────────────────────────── */
-        hr {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 32px 0;
-        }
-
-        /* ─── Practice Problem Cards ───────────────────────────────────── */
-        .prob-card {
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin: 14px 0;
-            overflow: hidden;
-        }
-
-        .prob-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--bg2);
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background .12s;
-        }
-
-        .prob-header:hover {
-            background: var(--bg3);
-        }
-
-        .prob-left {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .prob-num {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--text3);
-            margin-bottom: 4px;
-        }
-
-        .prob-title {
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .prob-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .tag {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-family: var(--sans);
-        }
-
-        .tag-easy {
-            background: var(--green-bg);
-            color: var(--green);
-        }
-
-        .tag-med {
-            background: var(--yellow-bg);
-            color: var(--yellow);
-        }
-
-        .tag-hard {
-            background: var(--red-bg);
-            color: var(--red);
-        }
-
-        .tag-co {
-            background: var(--accent-bg);
-            color: var(--accent);
-        }
-
-        .tag-pat {
-            background: var(--purple-bg);
-            color: var(--purple);
-        }
-
-        .tag-lc {
-            background: var(--orange-bg);
-            color: var(--orange);
-        }
-
-        .prob-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-
-        .prob-body {
-            padding: 16px;
-            background: var(--bg);
-        }
-
-        .prob-section {
-            margin-bottom: 14px;
-        }
-
-        .prob-section-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            color: var(--text3);
-            margin-bottom: 6px;
-        }
-
-        .iobox {
-            background: var(--bg2);
-            border-left: 3px solid var(--border2);
-            padding: 10px 14px;
-            font-family: var(--mono);
-            font-size: 13px;
-            color: var(--text2);
-            margin: 8px 0;
-            white-space: pre-wrap;
-        }
-
-        /* ── Progress Bar ── */
-        .progress-bar {
-            width: 120px;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #60a5fa);
-            width: 0%;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ── Checklist Component ── */
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            margin: 8px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            user-select: none;
-        }
-
-        .checklist-item:hover {
-            background: var(--bg2);
-            border-color: var(--border);
-        }
-
-        .cb-box {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border2);
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            color: transparent;
-            font-size: 12px;
-            flex-shrink: 0;
-            background: var(--bg);
-        }
-
-        .cb-text {
-            font-size: 14.5px;
-            color: var(--text);
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-
-        .checklist-item.done .cb-box {
-            background: var(--green);
-            border-color: var(--green);
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .checklist-item.done .cb-text {
-            color: var(--text3);
-            text-decoration: line-through;
-        }
-
-        /* ── ASCII Tree Dry Runs ── */
-        .ascii-tree {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 8px;
-            font-family: var(--mono);
-            font-size: 13px;
-            line-height: 1.6;
-            color: var(--text2);
-            margin: 14px 0;
-            white-space: pre;
-            overflow-x: auto;
-        }
-
-        .ascii-tree .hl {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .ascii-tree .nd {
-            color: var(--orange);
-            font-weight: 600;
-        }
-
-        .ascii-tree .ret {
-            color: var(--purple);
-            font-weight: 600;
-        }
-
-        /* ─── Visual Stack Diagram ─────────────────────────────────────── */
-        .stack-vis {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 2px;
-            width: 220px;
-            margin: 12px 0;
-        }
-
-        .stack-frame {
-            padding: 8px 14px;
-            border-radius: 5px;
-            font-family: var(--mono);
-            font-size: 13px;
-            border: 1.5px solid var(--border2);
-            background: var(--bg2);
-            color: var(--text);
-            transition: all .3s;
-        }
-
-        .stack-frame.active {
-            background: var(--accent-bg);
-            border-color: var(--accent);
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .stack-frame.ret-frame {
-            background: var(--green-bg);
-            border-color: var(--green);
-            color: var(--green);
-            opacity: .7;
-        }
-
-        /* ─── Complexity Badge ─────────────────────────────────────────── */
-        .complexity-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .cx-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-family: var(--mono);
-            border: 1px solid var(--border);
-            background: var(--bg2);
-        }
-
-        .cx-badge .cx-label {
-            font-size: 11px;
-            font-family: var(--sans);
-            color: var(--text3);
-        }
-
-        .cx-badge .cx-val {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .cx-badge.green {
-            background: var(--green-bg);
-            border-color: var(--green);
-        }
-
-        .cx-badge.yellow {
-            background: var(--yellow-bg);
-            border-color: var(--yellow);
-        }
-
-        .cx-badge.red {
-            background: var(--red-bg);
-            border-color: var(--red);
-        }
-
-        .cx-badge .cx-val.green {
-            color: var(--green);
-        }
-
-        .cx-badge .cx-val.yellow {
-            color: var(--yellow);
-        }
-
-        .cx-badge .cx-val.red {
-            color: var(--red);
-        }
-
-        /* ─── Pattern Banner ───────────────────────────────────────────── */
-        .pattern-banner {
-            background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-            border: 1px solid var(--border2);
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
-
-        .pattern-banner h4 {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--purple);
-            margin-bottom: 8px;
-        }
-
-        .pattern-banner p {
-            font-size: 14px;
-            font-family: var(--mono);
-            color: var(--text);
-            margin: 0;
-            line-height: 1.8;
-        }
-
-        /* ─── Top Bar ──────────────────────────────────────────────────── */
-        #topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 24px 10px 28px;
-            font-size: 13px;
-            color: var(--text2);
-            gap: 12px;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .breadcrumb a {
-            color: var(--text3);
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--text);
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .progress-bar {
-            width: 120px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            transition: width .3s;
-        }
-
-        #darkToggle {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text2);
-            font-family: var(--sans);
-            transition: background .12s;
-        }
-
-        #darkToggle:hover {
-            background: var(--bg3);
-        }
-
-        /* ─── Checklist ─────────────────────────────────────────────────── */
-        .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .checklist-item:last-child {
-            border-bottom: none;
-        }
-
-        .cb-box {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border2);
-            border-radius: 4px;
-            flex-shrink: 0;
-            margin-top: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .15s;
-            font-size: 11px;
-        }
-
-        .checklist-item.done .cb-box {
-            background: var(--green);
-            border-color: var(--green);
-            color: #fff;
-        }
-
-        .checklist-item.done .cb-text {
-            text-decoration: line-through;
-            color: var(--text3);
-        }
-
-        /* ─── Hover highlight links ────────────────────────────────────── */
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* ─── Scrollbar ─────────────────────────────────────────────────── */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border2);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text3);
-        }
-
-        /* ─── Responsive ─────────────────────────────────────────────────── */
-        @media (max-width: 768px) {
-            #sidebar {
-                display: none;
-            }
-
-            #content {
-                padding: 24px 20px 80px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture 3 — OOP & Collections Deep Dive</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f7f6f3;
+      --bg3: #efede9;
+      --bg4: #e8e5df;
+      --border: #e3e0d9;
+      --border2: #d0ccc4;
+      --text: #37352f;
+      --text2: #6b6860;
+      --text3: #9b9790;
+      --accent: #2383e2;
+      --accent-bg: #e8f1fc;
+      --green: #0f7b6c;
+      --green-bg: #e9f5f3;
+      --red: #c0392b;
+      --red-bg: #fdf0ee;
+      --yellow: #8a6d00;
+      --yellow-bg: #fdf6e3;
+      --purple: #6940a5;
+      --purple-bg: #f0ecf9;
+      --orange: #c75b0e;
+      --orange-bg: #fef0e7;
+      --pink: #ad1a72;
+      --pink-bg: #fce8f3;
+      --teal: #0d7d6e;
+      --teal-bg: #e4f4f1;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --serif: 'Merriweather', serif;
+      --sidebar-w: 260px
+    }
+
+    [data-theme="dark"] {
+      --bg: #191919;
+      --bg2: #212121;
+      --bg3: #2d2d2d;
+      --bg4: #383838;
+      --border: #333;
+      --border2: #444;
+      --text: #e8e6e1;
+      --text2: #9b9790;
+      --text3: #6b6860;
+      --accent: #5ba4f5;
+      --accent-bg: #1a2d42;
+      --green: #4db6a8;
+      --green-bg: #0e2420;
+      --red: #e07070;
+      --red-bg: #2e1414;
+      --yellow: #d4a42a;
+      --yellow-bg: #2a1f06;
+      --purple: #a07dd4;
+      --purple-bg: #1e1530;
+      --orange: #e0893a;
+      --orange-bg: #2a1608;
+      --pink: #e06aac;
+      --pink-bg: #2a1020;
+      --teal: #38c9b8;
+      --teal-bg: #0d2420
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: row;
+      transition: background .2s, color .2s;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 20px 0;
+      font-size: 13px;
+      flex-shrink: 0
+    }
+
+    .sb-header {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px
+    }
+
+    .sb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 10px
+    }
+
+    .sb-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.3
+    }
+
+    .sb-meta {
+      color: var(--text3);
+      font-size: 11px;
+      margin-top: 4px
+    }
+
+    .toc-label {
+      padding: 0 16px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--text3)
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 16px;
+      cursor: pointer;
+      color: var(--text2);
+      transition: background .12s, color .12s;
+      text-decoration: none
+    }
+
+    .toc-item:hover,
+    .toc-item.active {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .toc-item.active {
+      font-weight: 500;
+      color: var(--accent)
+    }
+
+    .toc-icon {
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .toc-sub {
+      padding-left: 36px;
+      font-size: 12px;
+      color: var(--text3)
+    }
+
+    .toc-sub:hover {
+      color: var(--text2)
+    }
+
+    .sb-div {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 16px
+    }
+
+    /* ── Main ── */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh
+    }
+
+    #content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 64px 120px
+    }
+
+    /* ── Topbar ── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px 10px 28px;
+      font-size: 13px;
+      color: var(--text2);
+      gap: 12px;
+      backdrop-filter: blur(8px)
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .breadcrumb a {
+      color: var(--text3);
+      text-decoration: none
+    }
+
+    .breadcrumb a:hover {
+      color: var(--text)
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width .3s
+    }
+
+    #darkToggle {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text2);
+      font-family: var(--sans);
+      transition: background .12s
+    }
+
+    #darkToggle:hover {
+      background: var(--bg3)
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      margin-bottom: 40px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .page-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block
+    }
+
+    .page-title {
+      font-family: var(--serif);
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 10px
+    }
+
+    .page-sub {
+      font-size: 16px;
+      color: var(--text2);
+      font-style: italic;
+      margin-bottom: 16px
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      background: var(--bg2)
+    }
+
+    .meta-chip.accent {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-color: var(--accent-bg)
+    }
+
+    .meta-chip.green {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: var(--green-bg)
+    }
+
+    .meta-chip.yellow {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: var(--yellow-bg)
+    }
+
+    /* ── Headings ── */
+    .h1 {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 40px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--border);
+      scroll-margin-top: 20px
+    }
+
+    .h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      scroll-margin-top: 20px
+    }
+
+    .h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 20px 0 6px
+    }
+
+    p {
+      color: var(--text);
+      margin: 0 0 10px;
+      line-height: 1.75
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0
+    }
+
+    /* ── Callouts ── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+      font-size: 14px;
+      line-height: 1.65
+    }
+
+    .callout-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .callout-body {
+      flex: 1
+    }
+
+    .callout-body strong {
+      font-weight: 600
+    }
+
+    .callout.blue {
+      background: var(--accent-bg);
+      color: var(--text)
+    }
+
+    .callout.green {
+      background: var(--green-bg);
+      color: var(--text)
+    }
+
+    .callout.yellow {
+      background: var(--yellow-bg);
+      color: var(--text)
+    }
+
+    .callout.red {
+      background: var(--red-bg);
+      color: var(--text)
+    }
+
+    .callout.purple {
+      background: var(--purple-bg);
+      color: var(--text)
+    }
+
+    .callout.orange {
+      background: var(--orange-bg);
+      color: var(--text)
+    }
+
+    .callout.teal {
+      background: var(--teal-bg);
+      color: var(--text)
+    }
+
+    /* ── Code Blocks ── */
+    .code-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 14px 0;
+      overflow: hidden
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      gap: 10px
+    }
+
+    .code-lang {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text2);
+      font-family: var(--sans);
+      transition: background .12s
+    }
+
+    .copy-btn:hover {
+      background: var(--bg)
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.75;
+      tab-size: 4
+    }
+
+    .kw {
+      color: #0550ae;
+      font-weight: 500
+    }
+
+    .cm {
+      color: #6a737d;
+      font-style: italic
+    }
+
+    .str {
+      color: #0a8043
+    }
+
+    .num {
+      color: #953800
+    }
+
+    .fn {
+      color: #8250df
+    }
+
+    .cls {
+      color: #1a7f37
+    }
+
+    .ret {
+      color: #0550ae
+    }
+
+    [data-theme="dark"] .kw {
+      color: #79c0ff
+    }
+
+    [data-theme="dark"] .cm {
+      color: #8b949e
+    }
+
+    [data-theme="dark"] .str {
+      color: #a5d6ff
+    }
+
+    [data-theme="dark"] .num {
+      color: #ff9150
+    }
+
+    [data-theme="dark"] .fn {
+      color: #d2a8ff
+    }
+
+    [data-theme="dark"] .cls {
+      color: #7ee787
+    }
+
+    [data-theme="dark"] .ret {
+      color: #79c0ff
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--red)
+    }
+
+    [data-theme="dark"] code {
+      color: var(--orange)
+    }
+
+    /* ── Tables ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 14px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px
+    }
+
+    thead th {
+      background: var(--bg2);
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: .03em;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    tbody tr:hover td {
+      background: var(--bg2)
+    }
+
+    /* ── Lists ── */
+    ul,
+    ol {
+      padding-left: 24px;
+      margin: 8px 0 12px
+    }
+
+    li {
+      margin: 4px 0;
+      line-height: 1.7
+    }
+
+    li::marker {
+      color: var(--text3)
+    }
+
+    /* ── Toggles ── */
+    details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow: hidden
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg2);
+      list-style: none;
+      transition: background .12s;
+      user-select: none
+    }
+
+    summary::-webkit-details-marker {
+      display: none
+    }
+
+    summary:hover {
+      background: var(--bg3)
+    }
+
+    .toggle-arrow {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .2s;
+      color: var(--text3);
+      font-size: 12px;
+      flex-shrink: 0
+    }
+
+    details[open] summary .toggle-arrow {
+      transform: rotate(90deg)
+    }
+
+    .details-body {
+      padding: 14px 16px;
+      background: var(--bg);
+      border-top: 1px solid var(--border)
+    }
+
+    /* ── Practice problem cards ── */
+    .prob-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 14px 0;
+      overflow: hidden
+    }
+
+    .prob-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .12s
+    }
+
+    .prob-header:hover {
+      background: var(--bg3)
+    }
+
+    .prob-left {
+      flex: 1;
+      min-width: 0
+    }
+
+    .prob-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 4px
+    }
+
+    .prob-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.3
+    }
+
+    .prob-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500
+    }
+
+    .tag-easy {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .tag-med {
+      background: var(--yellow-bg);
+      color: var(--yellow)
+    }
+
+    .tag-hard {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .tag-co {
+      background: var(--accent-bg);
+      color: var(--accent)
+    }
+
+    .tag-pat {
+      background: var(--purple-bg);
+      color: var(--purple)
+    }
+
+    .tag-lc {
+      background: var(--orange-bg);
+      color: var(--orange)
+    }
+
+    .prob-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0
+    }
+
+    .prob-body {
+      padding: 16px;
+      background: var(--bg)
+    }
+
+    .prob-section {
+      margin-bottom: 14px
+    }
+
+    .prob-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text3);
+      margin-bottom: 6px
+    }
+
+    .iobox {
+      background: var(--bg2);
+      border-left: 3px solid var(--border2);
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text2);
+      margin: 8px 0;
+      white-space: pre-wrap
+    }
+
+    /* ── Progress Bar ── */
+    .progress-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      width: 0%;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Checklist Component ── */
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .checklist-item:hover {
+      background: var(--bg2);
+      border-color: var(--border);
+    }
+
+    .cb-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border2);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: transparent;
+      font-size: 12px;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    .cb-text {
+      font-size: 14.5px;
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .checklist-item.done .cb-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .checklist-item.done .cb-text {
+      color: var(--text3);
+      text-decoration: line-through;
+    }
+
+    /* ── ASCII Tree Dry Runs ── */
+    .ascii-tree {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text2);
+      margin: 14px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .ascii-tree .hl {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .ascii-tree .nd {
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    .ascii-tree .ret {
+      color: var(--purple);
+      font-weight: 600;
+    }
+
+    .iobox {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text2);
+      white-space: pre-wrap;
+    }
+
+    /* ── Complexity ── */
+    .complexity-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0
+    }
+
+    .cx-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--mono);
+      border: 1px solid var(--border);
+      background: var(--bg2)
+    }
+
+    .cx-badge .cx-label {
+      font-size: 11px;
+      font-family: var(--sans);
+      color: var(--text3)
+    }
+
+    .cx-badge .cx-val {
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .cx-badge.green {
+      background: var(--green-bg);
+      border-color: var(--green)
+    }
+
+    .cx-badge.yellow {
+      background: var(--yellow-bg);
+      border-color: var(--yellow)
+    }
+
+    .cx-badge.red {
+      background: var(--red-bg);
+      border-color: var(--red)
+    }
+
+    .cx-badge .cx-val.green {
+      color: var(--green)
+    }
+
+    .cx-badge .cx-val.yellow {
+      color: var(--yellow)
+    }
+
+    .cx-badge .cx-val.red {
+      color: var(--red)
+    }
+
+    /* ── Pattern banner ── */
+    .pattern-banner {
+      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0
+    }
+
+    .pattern-banner h4 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 8px
+    }
+
+    .pattern-banner p {
+      font-size: 14px;
+      font-family: var(--mono);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.8
+    }
+
+    /* ── Big-O chart ── */
+    .bigo-chart-wrap {
+      margin: 14px 0 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg2);
+      padding: 16px
+    }
+
+    /* ── Checklist ── */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .checklist-item:last-child {
+      border-bottom: none
+    }
+
+    .cb-box {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border2);
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-size: 11px
+    }
+
+    .checklist-item.done .cb-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff
+    }
+
+    .checklist-item.done .cb-text {
+      text-decoration: line-through;
+      color: var(--text3)
+    }
+
+    /* ── Inline highlight ── */
+    mark {
+      background: var(--yellow-bg);
+      color: var(--text);
+      padding: 0 3px;
+      border-radius: 3px
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    a:hover {
+      text-decoration: underline
+    }
+
+    @media(max-width:768px) {
+      #sidebar {
+        display: none
+      }
+
+      #content {
+        padding: 24px 20px 80px
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <!-- ─── Top Bar ────────────────────────────────────────────────── -->
-    <div
-        style="position:fixed;top:0;left:var(--sidebar-w);right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:6px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;height:36px">
-        <div style="color:var(--text3)">DSA Course › Phase 1 › <strong style="color:var(--text)">Lecture 3</strong>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px">
-            <span style="color:var(--text3)">Reading progress</span>
-            <div style="width:120px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
-                <div id="progressFill"
-                    style="width:0%;height:100%;background:var(--accent);border-radius:2px;transition:width .1s"></div>
-            </div>
-            <button onclick="toggleDark()" id="darkToggle"
-                style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:var(--sans)">🌙
-                Dark</button>
-        </div>
+  <nav id="sidebar">
+    <div class="sb-header">
+      <div class="sb-badge">📚 DSA Course</div>
+      <div class="sb-title">OOP & Collections</div>
+      <div class="sb-meta">Lecture 3 of 30 · Phase 1 — Foundations</div>
     </div>
-
-    <!-- ─── Sidebar ────────────────────────────────────────────────── -->
-    <div id="sidebar" style="padding-top:46px">
-        <div class="sidebar-header">
-            <span class="lecture-badge">🎯 DSA Course</span>
-            <div class="sidebar-title">Bit Manipulation</div>
-            <div class="sidebar-meta">Lecture 3 of 24 · Phase 1</div>
-        </div>
-
-        <div class="toc-label" style="margin-top:12px">ON THIS PAGE</div>
-
-        <a class="toc-item" href="#intro">
-            <span class="toc-icon">⚡</span> Why Bits Matter
-        </a>
-        <a class="toc-item toc-sub" href="#operators">Operators Cheatsheet</a>
-        <a class="toc-item toc-sub" href="#twos-complement">Two's Complement</a>
-
-        <a class="toc-item" href="#tricks">
-            <span class="toc-icon">🔧</span> Core Bit Tricks
-        </a>
-        <a class="toc-item toc-sub" href="#get-set-clear">Get/Set/Clear/Toggle</a>
-        <a class="toc-item toc-sub" href="#brian-k">Brian Kernighan</a>
-        <a class="toc-item toc-sub" href="#power-of-2">Power of 2 Check</a>
-
-        <a class="toc-item" href="#xor">
-            <span class="toc-icon">🎯</span> XOR Patterns
-        </a>
-        <a class="toc-item toc-sub" href="#xor-cancel">Cancellation</a>
-        <a class="toc-item toc-sub" href="#xor-partition">Partitioning</a>
-
-        <a class="toc-item" href="#bitmask">
-            <span class="toc-icon">🎭</span> Bitmask Techniques
-        </a>
-        <a class="toc-item toc-sub" href="#subset-mask">Subset Generation</a>
-        <a class="toc-item toc-sub" href="#shift-tricks">Shift Tricks</a>
-
-        <a class="toc-item" href="#complexity">
-            <span class="toc-icon">⏱</span> Complexity Patterns
-        </a>
-
-        <a class="toc-item" href="#practice">
-            <span class="toc-icon">💪</span> Practice Problems
-        </a>
-        <a class="toc-item" href="#assignment">
-            <span class="toc-icon">📝</span> Assignment
-        </a>
-
-        <div class="sidebar-divider"></div>
-
-        <a class="toc-item" href="#checklist">
-            <span class="toc-icon">✅</span> Completion Checklist
-        </a>
-
-        <div class="sidebar-divider"></div>
-
-        <div style="padding:8px 16px">
-            <a class="toc-item" href="../Lecture2/lecture2_notes.html"
-                style="padding:5px 0;font-size:13px;color:var(--text3)">← Lecture 2: Recursion</a>
-            <a class="toc-item" href="../Lecture4/lecture4_notes.html"
-                style="padding:5px 0;font-size:13px;color:var(--text3);">→ Lecture 4: Arrays & Strings</a>
-        </div>
+    <div class="toc-label">On this page</div>
+    <a class="toc-item" href="#pillars"><span class="toc-icon">🏗</span>Four Pillars of OOP</a>
+    <a class="toc-item toc-sub" href="#encapsulation">Encapsulation</a>
+    <a class="toc-item toc-sub" href="#inheritance">Inheritance</a>
+    <a class="toc-item toc-sub" href="#polymorphism">Polymorphism</a>
+    <a class="toc-item toc-sub" href="#abstraction">Abstract vs Interface</a>
+    <a class="toc-item" href="#comparable"><span class="toc-icon">📊</span>Comparable vs Comparator</a>
+    <a class="toc-item" href="#generics"><span class="toc-icon">🧬</span>Generics Deep Dive</a>
+    <a class="toc-item" href="#arraylist-internals"><span class="toc-icon">📋</span>ArrayList Internals</a>
+    <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
+    <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
+    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
+    <div class="sb-div"></div>
+    <div style="padding:8px 16px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
+      <a class="toc-item" href="../Lecture2/lecture2_notes.html"
+        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 2: Memory</a>
+      <a class="toc-item" href="../Lecture4/lecture4_notes.html"
+        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 4: Java 8+</a>
     </div>
+  </nav>
+  <div id="main">
+    <div id="topbar">
+      <div class="breadcrumb">
+        <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
+        <a href="#">Phase 1</a><span>›</span>
+        <span>Lecture 3</span>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:12px;color:var(--text3)">Progress</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+      </div>
+    </div>
+    <div id="content">
+      <div class="page-header">
+        <span class="page-emoji">🏗</span>
+        <h1 class="page-title">OOP & Collections Deep Dive</h1>
+        <p class="page-sub">"First, learn the rules. Then break them intelligently. OOP gives you the rules for building
+          scalable systems."</p>
+        <div class="meta-row"><span class="meta-chip accent">📖 Lecture 3</span><span class="meta-chip accent">Phase 1 —
+            Foundations</span><span class="meta-chip yellow">⏱ 4 days</span><span class="meta-chip green">🎯 20+
+            problems</span><span class="meta-chip ">💼 Amazon · Microsoft · Oracle</span></div>
+      </div>
+      <h2 class="h1" id="pillars">🏗 The Four Pillars of OOP</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pillar</th>
+              <th>What it means</th>
+              <th>DSA Example</th>
+              <th>Key mechanism</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Encapsulation</strong></td>
+              <td>Bundle data + methods; hide internals via access modifiers</td>
+              <td>LinkedList: private head, public add/remove</td>
+              <td>private fields + public getters/setters</td>
+            </tr>
+            <tr>
+              <td><strong>Abstraction</strong></td>
+              <td>Expose <em>what</em> to do; hide <em>how</em></td>
+              <td>PriorityQueue: you call offer/poll, not heapifyUp</td>
+              <td>abstract classes, interfaces</td>
+            </tr>
+            <tr>
+              <td><strong>Inheritance</strong></td>
+              <td>Subclass reuses + extends superclass</td>
+              <td>TreeNode extends Node; DFS methods inherited</td>
+              <td>extends keyword, super()</td>
+            </tr>
+            <tr>
+              <td><strong>Polymorphism</strong></td>
+              <td>Same interface, different behaviour per type</td>
+              <td>Comparator: sort by salary vs name without changing sort logic</td>
+              <td>@Override, method overloading</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="h2" id="encapsulation">1. Encapsulation</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · BankAccount</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">class</span> <span class="cls">BankAccount</span> {
+    <span class="kw">private double</span> balance;  <span class="cm">// hidden — cannot access directly</span>
+    <span class="cls">BankAccount</span>(<span class="kw">double</span> init) { balance = init; }
 
-    <!-- ─── Main content ───────────────────────────────────────────── -->
-    <div id="main" style="padding-top:36px">
-        <div id="content">
-
-            <!-- Page Header -->
-            <div class="page-header">
-                <span class="page-emoji">⚡</span>
-                <h1 class="page-title">Bit Manipulation</h1>
-                <p class="page-subtitle">The fastest operations your CPU can perform — master them to unlock O(1) tricks
-                    that impress interviewers.</p>
-                <div class="meta-row">
-                    <span class="meta-chip accent">📖 Lecture 3</span>
-                    <span class="meta-chip accent">Phase 1 — Foundations</span>
-                    <span class="meta-chip yellow">⏱ 3 days</span>
-                    <span class="meta-chip green">🎯 30 problems</span>
-                    <span class="meta-chip">💼 Google · Amazon · Microsoft · Apple</span>
-                </div>
-            </div>
-
-            <!-- ═══ SECTION 1: WHY BITS MATTER ══════════════════════════ -->
-            <h2 class="h1" id="intro">⚡ Why Bits Matter in DSA</h2>
-
-            <p>Every number in your computer is stored as a sequence of <strong>bits</strong> (0s and 1s). Bit
-                manipulation lets you operate on these bits directly — and these operations are the <strong>fastest
-                    thing your CPU can do</strong>.</p>
-
-            <div class="callout blue">
-                <span class="callout-icon">💡</span>
-                <div class="callout-body"><strong>Why should you care?</strong><br>
-                    • Many interview problems have elegant O(1) solutions using bit tricks<br>
-                    • XOR alone solves "find the unique element" in O(n) time, O(1) space — no HashMap needed<br>
-                    • Understanding bits is essential for understanding how Java stores <code>int</code>,
-                    <code>long</code>, negative numbers<br>
-                    • Bit manipulation is a favorite topic at <strong>Amazon, Google, Apple, Microsoft</strong>
-                </div>
-            </div>
-
-            <h3 class="h2" id="operators">🔢 Bitwise Operators — Your Toolkit</h3>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Operator</th>
-                            <th>Symbol</th>
-                            <th>What it Does</th>
-                            <th>Example (5 = 101, 3 = 011)</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>AND</td>
-                            <td><code>&</code></td>
-                            <td>1 only if BOTH bits are 1</td>
-                            <td>101 & 011</td>
-                            <td>001 (1)</td>
-                        </tr>
-                        <tr>
-                            <td>OR</td>
-                            <td><code>|</code></td>
-                            <td>1 if EITHER bit is 1</td>
-                            <td>101 | 011</td>
-                            <td>111 (7)</td>
-                        </tr>
-                        <tr>
-                            <td>XOR</td>
-                            <td><code>^</code></td>
-                            <td>1 if bits are DIFFERENT</td>
-                            <td>101 ^ 011</td>
-                            <td>110 (6)</td>
-                        </tr>
-                        <tr>
-                            <td>NOT</td>
-                            <td><code>~</code></td>
-                            <td>Flip every bit</td>
-                            <td>~101</td>
-                            <td>...010 (-6)</td>
-                        </tr>
-                        <tr>
-                            <td>Left Shift</td>
-                            <td><code>&lt;&lt;</code></td>
-                            <td>Shift bits left (multiply by 2)</td>
-                            <td>101 &lt;&lt; 1</td>
-                            <td>1010 (10)</td>
-                        </tr>
-                        <tr>
-                            <td>Right Shift</td>
-                            <td><code>&gt;&gt;</code></td>
-                            <td>Shift bits right (divide by 2)</td>
-                            <td>101 &gt;&gt; 1</td>
-                            <td>10 (2)</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h4 class="h3" style="margin-top:24px">🔥 Java Built-in Bit Methods</h4>
-            <p>Interviewers know these exist. You can often use them if the question isn't specifically about
-                implementing them from scratch.</p>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Method</th>
-                            <th>What it does</th>
-                            <th>Equivalent To</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>Integer.bitCount(n)</code></td>
-                            <td>Counts number of 1s in binary representation</td>
-                            <td>Brian Kernighan's</td>
-                        </tr>
-                        <tr>
-                            <td><code>Integer.highestOneBit(n)</code></td>
-                            <td>Returns an int with only the MSB set</td>
-                            <td>Finding highest power of 2 &le; n</td>
-                        </tr>
-                        <tr>
-                            <td><code>Integer.lowestOneBit(n)</code></td>
-                            <td>Returns an int with only the LSB set</td>
-                            <td><code>n & (-n)</code></td>
-                        </tr>
-                        <tr>
-                            <td><code>Integer.toBinaryString(n)</code></td>
-                            <td>Returns binary string of n</td>
-                            <td>Awesome for debugging</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="callout red">
-                <span class="callout-icon">🚨</span>
-                <div class="callout-body"><strong>DANGER: Operator Precedence!</strong><br>
-                    In Java, <code>==</code> has higher precedence than <code>&</code>, <code>^</code>, <code>|</code>.
-                    This means:<br>
-                    <code>if (n & 1 == 1)</code> is parsed as <code>if (n & (1 == 1))</code> → WRONG!<br>
-                    <strong>Always use parentheses:</strong> <code>if ((n & 1) == 1)</code>
-                </div>
-            </div>
-
-            <h3 class="h2" id="twos-complement">🔄 Two's Complement — How Negatives Work</h3>
-
-            <p>Java uses <strong>two's complement</strong> to store negative numbers. To negate a number: flip all bits,
-                then add 1.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">Binary · Two's Complement</div>
-                </div>
-                <pre> 5 in binary:  00000101
-~5 (flip):    11111010
-+1:           11111011  →  this is -5
-
-<span class="cm">// Key insight: -n == ~n + 1
-// So: n & (-n) gives you the LOWEST SET BIT of n
-// Example: 12 = 1100, -12 = 0100 → 12 & (-12) = 0100 = 4</span></pre>
-            </div>
-
-            <p>This <code>n & (-n)</code> trick (isolating the lowest set bit) appears constantly in advanced problems
-                like Binary Indexed Trees (Lecture 23).</p>
-
-            <hr>
-
-            <!-- ═══ SECTION 2: CORE BIT TRICKS ══════════════════════════ -->
-            <h2 class="h1" id="tricks">🔧 Core Bit Tricks — The 6 Operations You Must Memorize</h2>
-
-            <h3 class="h2" id="get-set-clear">Get / Set / Clear / Toggle — The Big Four</h3>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Operation</th>
-                            <th>Code</th>
-                            <th>How it Works</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Check</strong> if bit k is set</td>
-                            <td><code>(n >> k) & 1</code></td>
-                            <td>Shift bit k to position 0, AND with 1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Set</strong> bit k to 1</td>
-                            <td><code>n | (1 &lt;&lt; k)</code></td>
-                            <td>OR with a mask that has only bit k set</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Clear</strong> bit k to 0</td>
-                            <td><code>n & ~(1 &lt;&lt; k)</code></td>
-                            <td>AND with a mask that has every bit EXCEPT k</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Toggle</strong> bit k</td>
-                            <td><code>n ^ (1 &lt;&lt; k)</code></td>
-                            <td>XOR flips: 0→1, 1→0</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · All Four Operations</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cm">// n = 13 = 1101 (binary), k = 1</span>
-
-<span class="cm">// CHECK bit 1:</span>  (13 >> 1) & 1 = (110) & 1 = <span class="num">0</span> <span class="cm">// bit 1 is NOT set</span>
-
-<span class="cm">// SET bit 1:</span>    13 | (1 << 1) = 1101 | 0010 = <span class="num">1111</span> = <span class="num">15</span>
-
-<span class="cm">// CLEAR bit 2:</span>  13 & ~(1 << 2) = 1101 & 1011 = <span class="num">1001</span> = <span class="num">9</span>
-
-<span class="cm">// TOGGLE bit 0:</span> 13 ^ (1 << 0) = 1101 ^ 0001 = <span class="num">1100</span> = <span class="num">12</span></pre>
-            </div>
-
-            <h4 class="h3">Advanced: Clearing a Range of Bits</h4>
-            <p>Sometimes you need to clear all bits from the Most Significant Bit (MSB) down to index <code>i</code>, or
-                from index <code>i</code> down to 0.</p>
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Range Masking</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cm">// 1. Clear all bits from MSB down to index i (inclusive)</span>
-<span class="kw">int</span> mask1 = (<span class="num">1</span> &lt;&lt; i) - <span class="num">1</span>;
-n = n & mask1;
-
-<span class="cm">// 2. Clear all bits from index i down to 0 (inclusive)</span>
-<span class="kw">int</span> mask2 = ~((<span class="num">1</span> &lt;&lt; (i + <span class="num">1</span>)) - <span class="num">1</span>);
-n = n & mask2;</pre>
-            </div>
-
-            <h3 class="h2" id="brian-k">🧮 Brian Kernighan's Algorithm — Count Set Bits in O(k)</h3>
-
-            <p><strong>The trick:</strong> <code>n & (n-1)</code> removes the lowest set bit of n. Repeat until n
-                becomes 0. The number of iterations = number of set bits.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Brian Kernighan</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">countSetBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">while</span> (n != <span class="num">0</span>) {
-        n = n & (n - <span class="num">1</span>);  <span class="cm">// remove lowest set bit</span>
-        count++;
+    <span class="kw">public void</span> <span class="fn">deposit</span>(<span class="kw">double</span> amt) {
+        <span class="kw">if</span> (amt &lt;= 0) <span class="kw">throw new</span> <span class="cls">IllegalArgumentException</span>(<span class="str">"Amount must be positive"</span>);
+        balance += amt;
     }
-    <span class="ret">return</span> count;
+    <span class="kw">public double</span> <span class="fn">getBalance</span>() { <span class="ret">return</span> balance; } <span class="cm">// read-only access</span>
+}
+<span class="cm">// Cannot do: account.balance = -1000; (compile error!)</span>
+<span class="cm">// Must go through deposit/withdraw which enforce business rules</span></pre>
+      </div>
+      <h3 class="h2" id="inheritance">2. Inheritance</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Inheritance Chain</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">abstract class</span> <span class="cls">Shape</span> {
+    <span class="kw">abstract double</span> <span class="fn">area</span>();
+    <span class="kw">void</span> <span class="fn">print</span>() { System.out.println(<span class="str">"Area: "</span> + area()); } <span class="cm">// inherited</span>
 }
 
-<span class="cm">// Dry run: n = 13 (1101)
-// Iteration 1: n = 1101 & 1100 = 1100 (12), count = 1
-// Iteration 2: n = 1100 & 1011 = 1000 (8),  count = 2
-// Iteration 3: n = 1000 & 0111 = 0000 (0),  count = 3
-// Return 3 ✓</span></pre>
-            </div>
-
-            <div class="callout green">
-                <span class="callout-icon">🧠</span>
-                <div class="callout-body"><strong>Why n & (n-1) works:</strong> Subtracting 1 from n flips all bits from
-                    the lowest set bit to the right. AND-ing with n clears the lowest set bit and everything below it.
-                    Example: <code>1100 & 1011 = 1000</code></div>
-            </div>
-
-            <h3 class="h2" id="power-of-2">⚡ Power of 2 Check — The One-Liner</h3>
-
-            <p>A number is a power of 2 if and only if it has <strong>exactly one set bit</strong>.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Power of 2</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">boolean</span> <span class="fn">isPowerOfTwo</span>(<span class="kw">int</span> n) {
-    <span class="ret">return</span> n > <span class="num">0</span> && (n & (n - <span class="num">1</span>)) == <span class="num">0</span>;
+<span class="kw">class</span> <span class="cls">Circle</span> <span class="kw">extends</span> <span class="cls">Shape</span> {
+    <span class="kw">double</span> r;
+    <span class="cls">Circle</span>(<span class="kw">double</span> r) { <span class="kw">this</span>.r = r; }
+    @Override <span class="kw">double</span> <span class="fn">area</span>() { <span class="ret">return</span> Math.PI * r * r; }
 }
 
-<span class="cm">// 16 = 10000 → 16 & 15 = 10000 & 01111 = 00000 → true ✓
-//  6 = 00110 →  6 &  5 = 00110 & 00101 = 00100 → false ✓
-// EDGE CASE: n must be > 0! (0 is NOT a power of 2)</span></pre>
-            </div>
-
-            <hr>
-            <!-- ═══ SECTION 3: XOR PATTERNS ══════════════════════════ -->
-            <h2 class="h1" id="xor">🎯 XOR Patterns — The Interview Favorite</h2>
-
-            <p>XOR (<code>^</code>) has three magical properties that make it the most useful bitwise operator in
-                interviews:</p>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Property</th>
-                            <th>Expression</th>
-                            <th>Why it's useful</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Self-inverse</td>
-                            <td><code>a ^ a = 0</code></td>
-                            <td>Pairs cancel out — find unique elements!</td>
-                        </tr>
-                        <tr>
-                            <td>Identity</td>
-                            <td><code>a ^ 0 = a</code></td>
-                            <td>XOR with 0 does nothing</td>
-                        </tr>
-                        <tr>
-                            <td>Commutative</td>
-                            <td><code>a ^ b = b ^ a</code></td>
-                            <td>Order doesn't matter — XOR all elements freely</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <h3 class="h2" id="xor-cancel">🔄 XOR Cancellation — Find the Unique Element</h3>
-
-            <p><strong>Problem:</strong> Every element in an array appears twice except one. Find the unique one in O(1)
-                space.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Single Number</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> result = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) result ^= n;
-    <span class="ret">return</span> result;
+<span class="kw">class</span> <span class="cls">Rectangle</span> <span class="kw">extends</span> <span class="cls">Shape</span> {
+    <span class="kw">double</span> w, h;
+    <span class="cls">Rectangle</span>(<span class="kw">double</span> w, <span class="kw">double</span> h) { <span class="kw">this</span>.w=w; <span class="kw">this</span>.h=h; }
+    @Override <span class="kw">double</span> <span class="fn">area</span>() { <span class="ret">return</span> w * h; }
 }
 
-<span class="cm">// Dry run: [4, 1, 2, 1, 2]
-// 0 ^ 4 = 4
-// 4 ^ 1 = 5
-// 5 ^ 2 = 7
-// 7 ^ 1 = 6  (1 cancelled)
-// 6 ^ 2 = 4  (2 cancelled)
-// Return 4 ✓ — only the unique number survives!</span></pre>
-            </div>
-
-            <h4 class="h3" style="margin-top:24px">The "Missing Number" Extension</h4>
-            <p>What if you have an array containing <code>n</code> distinct numbers in the range <code>[0, n]</code>,
-                and you need to find the missing one? (LeetCode 268)</p>
-            <p>Instead of summing everything (which risks integer overflow), you can <strong>XOR all the array
-                    values</strong> AND <strong>XOR all the numbers from 0 to n</strong>. Every number will appear twice
-                (once in the array, once in the 0..n range) except the missing number. They all cancel out, leaving just
-                the missing number!</p>
-
-            <h3 class="h2" id="xor-partition">🔀 XOR Partitioning — Find TWO Unique Elements</h3>
-
-            <p>When TWO elements are unique, XOR gives us their combined XOR. We then split the array using any
-                differing bit:</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Two Unique Numbers</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span>[] <span class="fn">twoUnique</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> xor = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) xor ^= n;  <span class="cm">// xor = a ^ b</span>
-
-    <span class="kw">int</span> rightmostBit = xor & (-xor);  <span class="cm">// isolate lowest differing bit</span>
-
-    <span class="kw">int</span> a = <span class="num">0</span>, b = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> ((n & rightmostBit) != <span class="num">0</span>) a ^= n;  <span class="cm">// group 1</span>
-        <span class="kw">else</span> b ^= n;                          <span class="cm">// group 2</span>
+<span class="cm">// Polymorphism in action:</span>
+<span class="cls">Shape</span>[] shapes = {<span class="kw">new</span> <span class="cls">Circle</span>(5), <span class="kw">new</span> <span class="cls">Rectangle</span>(3,4)};
+<span class="kw">for</span> (<span class="cls">Shape</span> s : shapes) s.print(); <span class="cm">// calls correct area() per type</span></pre>
+      </div>
+      <h3 class="h2" id="polymorphism">3. Polymorphism — Runtime vs Compile-time</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>When resolved</th>
+              <th>Mechanism</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Runtime (Dynamic)</strong></td>
+              <td>At runtime</td>
+              <td>@Override — subclass overrides parent method</td>
+              <td>Shape.area() calls Circle.area() or Rectangle.area()</td>
+            </tr>
+            <tr>
+              <td><strong>Compile-time (Static)</strong></td>
+              <td>At compile time</td>
+              <td>Method overloading — same name, different params</td>
+              <td>print(int) vs print(String) vs print(double)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="h2" id="abstraction">4. Abstract Class vs Interface — The Critical Comparison</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Abstract Class</th>
+              <th>Interface</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Instantiation</strong></td>
+              <td>Cannot instantiate</td>
+              <td>Cannot instantiate</td>
+            </tr>
+            <tr>
+              <td><strong>Constructor</strong></td>
+              <td>✅ Can have</td>
+              <td>❌ Cannot have</td>
+            </tr>
+            <tr>
+              <td><strong>Fields</strong></td>
+              <td>Any access modifier</td>
+              <td>Only <code>public static final</code> (constants)</td>
+            </tr>
+            <tr>
+              <td><strong>Methods</strong></td>
+              <td>Abstract + concrete</td>
+              <td>Abstract + <code>default</code> + <code>static</code> (Java 8+)</td>
+            </tr>
+            <tr>
+              <td><strong>Multiple inheritance</strong></td>
+              <td>❌ One parent only</td>
+              <td>✅ A class can implement many</td>
+            </tr>
+            <tr>
+              <td><strong>When to use</strong></td>
+              <td>"Is-a" with shared state/code (Template Method pattern)</td>
+              <td>"Can-do" (Comparable, Runnable, Serializable)</td>
+            </tr>
+            <tr>
+              <td><strong>DSA Example</strong></td>
+              <td>AbstractList providing default iterator</td>
+              <td>Comparable for natural ordering in TreeSet/PQ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h2 class="h1" id="comparable">📊 Comparable vs Comparator</h2>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Both Patterns</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">class</span> <span class="cls">Employee</span> <span class="kw">implements</span> <span class="cls">Comparable</span>&lt;<span class="cls">Employee</span>&gt; {
+    <span class="cls">String</span> name; <span class="kw">int</span> salary;
+    @Override
+    <span class="kw">public int</span> <span class="fn">compareTo</span>(<span class="cls">Employee</span> o) {
+        <span class="ret">return</span> <span class="cls">Integer</span>.compare(<span class="kw">this</span>.salary, o.salary); <span class="cm">// natural order = by salary</span>
     }
-    <span class="ret">return new int</span>[]{a, b};
 }
 
-<span class="cm">// Why this works:
-// Step 1: XOR all → get a^b (some bits are set where a,b differ)
-// Step 2: Pick any set bit → this bit is 1 in one number, 0 in the other
-// Step 3: Split into two groups by this bit → each group has ONE unique
-// Step 4: XOR each group → pairs cancel, unique survives</span></pre>
-            </div>
+<span class="cm">// Comparable: used when ONE natural ordering makes sense</span>
+<span class="cm">// TreeSet&lt;Employee&gt; automatically uses compareTo()</span>
 
-            <hr>
+<span class="cm">// Comparator: used when you need MULTIPLE orderings or can't modify class</span>
+<span class="cls">Comparator</span>&lt;<span class="cls">Employee</span>&gt; byName = <span class="cls">Comparator</span>.comparing(e -> e.name);
+<span class="cls">Comparator</span>&lt;<span class="cls">Employee</span>&gt; bySalaryDesc = (<span class="kw">a</span>,<span class="kw">b</span>) -> <span class="kw">b</span>.salary - <span class="kw">a</span>.salary;
 
-            <!-- ═══ SECTION 4: BITMASK TECHNIQUES ════════════════════ -->
-            <h2 class="h1" id="bitmask">🎭 Bitmask Techniques</h2>
+<span class="cm">// Chaining comparators (sort by salary desc, then by name asc)</span>
+<span class="cls">Comparator</span>&lt;<span class="cls">Employee</span>&gt; combined =
+    <span class="cls">Comparator</span>.comparingInt((<span class="cls">Employee</span> e) -> e.salary).reversed()
+              .thenComparing(e -> e.name);
 
-            <h3 class="h2" id="subset-mask">📦 Subset Generation Using Bitmask</h3>
-
-            <p>For an array of n elements, each subset corresponds to an n-bit number (0 to 2ⁿ-1). If bit j is set,
-                include element j.</p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Subsets via Bitmask</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">List</span>&lt;List&lt;Integer&gt;&gt; <span class="fn">subsets</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> n = nums.length;
-    List&lt;List&lt;Integer&gt;&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
-
-    <span class="kw">for</span> (<span class="kw">int</span> mask = <span class="num">0</span>; mask &lt; (<span class="num">1</span> &lt;&lt; n); mask++) {
-        List&lt;Integer&gt; subset = <span class="kw">new</span> ArrayList&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++) {
-            <span class="kw">if</span> ((mask & (<span class="num">1</span> &lt;&lt; j)) != <span class="num">0</span>) {
-                subset.add(nums[j]);
-            }
-        }
-        result.add(subset);
-    }
-    <span class="ret">return</span> result;
+list.sort(combined);
+<span class="cls">Arrays</span>.sort(arr, combined);
+<span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(combined); <span class="cm">// custom-ordered heap</span></pre>
+      </div>
+      <h2 class="h1" id="generics">🧬 Generics Deep Dive</h2>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Generic Methods & Bounded Wildcards</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// Generic method — works for any Comparable type</span>
+<span class="kw">public static</span> &lt;T <span class="kw">extends</span> <span class="cls">Comparable</span>&lt;T&gt;&gt; T <span class="fn">findMax</span>(<span class="cls">List</span>&lt;T&gt; list) {
+    T max = list.get(0);
+    <span class="kw">for</span> (T item : list) <span class="kw">if</span> (item.compareTo(max) &gt; 0) max = item;
+    <span class="ret">return</span> max;
 }
 
-<span class="cm">// For nums = [a, b, c], n=3, masks 0..7:
-// mask=0 (000): []
-// mask=1 (001): [a]
-// mask=2 (010): [b]
-// mask=3 (011): [a, b]
-// mask=4 (100): [c]
-// mask=5 (101): [a, c]
-// mask=6 (110): [b, c]
-// mask=7 (111): [a, b, c]</span></pre>
-            </div>
+<span class="cm">// Bounded wildcards</span>
+<span class="cm">// ? extends T — can READ (covariant): upper bound</span>
+<span class="kw">double</span> <span class="fn">sumOfList</span>(<span class="cls">List</span>&lt;? <span class="kw">extends</span> <span class="cls">Number</span>&gt; list) {
+    <span class="kw">double</span> sum = 0;
+    <span class="kw">for</span> (<span class="cls">Number</span> n : list) sum += n.doubleValue();
+    <span class="ret">return</span> sum;
+} <span class="cm">// works for List&lt;Integer&gt;, List&lt;Double&gt;, List&lt;Long&gt;</span>
 
-            <div class="callout purple">
-                <span class="callout-icon">🔮</span>
-                <div class="callout-body"><strong>Recursion vs Bitmask for subsets:</strong> Both produce 2ⁿ subsets.
-                    Bitmask is <em>iterative</em> (no stack overflow risk) and often faster in practice. Use bitmask
-                    when n ≤ 20. For larger n, use recursion with pruning.</div>
-            </div>
+<span class="cm">// ? super T — can WRITE (contravariant): lower bound</span>
+<span class="kw">void</span> <span class="fn">addNumbers</span>(<span class="cls">List</span>&lt;? <span class="kw">super</span> <span class="cls">Integer</span>&gt; list) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= 10; i++) list.add(i);
+} <span class="cm">// works for List&lt;Integer&gt;, List&lt;Number&gt;, List&lt;Object&gt;</span>
 
-            <h3 class="h2" id="shift-tricks">⚡ Useful Shift Tricks</h3>
+<span class="cm">// PECS: Producer Extends, Consumer Super</span></pre>
+      </div>
+      <h2 class="h1" id="arraylist-internals">📋 ArrayList Internals</h2>
+      <div class="callout blue"><span class="callout-icon">📌</span>
+        <div class="callout-body"><strong>ArrayList is backed by a plain Object[] array.</strong> When you call
+          <code>new ArrayList&lt;&gt;()</code> it creates an Object[10] internally. When full, it allocates a NEW array
+          of size 1.5× and copies everything over. This copy is O(n) but happens rarely, so add() is O(1) amortised.
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · ArrayList resize simulation</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// Pseudocode approximation of ArrayList internals</span>
+<span class="kw">class</span> <span class="cls">SimpleArrayList</span>&lt;T&gt; {
+    <span class="cls">Object</span>[] data = <span class="kw">new</span> <span class="cls">Object</span>[10]; <span class="cm">// default capacity</span>
+    <span class="kw">int</span> size = 0;
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Trick</th>
-                            <th>Code</th>
-                            <th>Why</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Multiply by 2</td>
-                            <td><code>n &lt;&lt; 1</code></td>
-                            <td>Shift left = ×2</td>
-                        </tr>
-                        <tr>
-                            <td>Divide by 2</td>
-                            <td><code>n &gt;&gt; 1</code></td>
-                            <td>Shift right = ÷2 (rounds down)</td>
-                        </tr>
-                        <tr>
-                            <td>Check odd/even</td>
-                            <td><code>(n & 1)</code></td>
-                            <td>Last bit: 0=even, 1=odd</td>
-                        </tr>
-                        <tr>
-                            <td>Swap without temp</td>
-                            <td><code>a^=b; b^=a; a^=b;</code></td>
-                            <td>XOR swap</td>
-                        </tr>
-                        <tr>
-                            <td>Lowest set bit</td>
-                            <td><code>n & (-n)</code></td>
-                            <td>Isolates rightmost 1-bit</td>
-                        </tr>
-                        <tr>
-                            <td>Turn off lowest set bit</td>
-                            <td><code>n & (n-1)</code></td>
-                            <td>Brian Kernighan's trick</td>
-                        </tr>
-                        <tr>
-                            <td>All 1s mask of length k</td>
-                            <td><code>(1 &lt;&lt; k) - 1</code></td>
-                            <td>e.g. k=4 → 1111</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <span class="kw">void</span> <span class="fn">add</span>(T item) {
+        <span class="kw">if</span> (size == data.length) {               <span class="cm">// capacity hit</span>
+            <span class="kw">int</span> newCap = (size * 3) / 2 + 1;      <span class="cm">// ~1.5× growth</span>
+            data = <span class="cls">Arrays</span>.copyOf(data, newCap);   <span class="cm">// O(n) copy!</span>
+        }
+        data[size++] = item;                      <span class="cm">// O(1)</span>
+    }
 
-            <h3 class="h2" id="half-adder">🧮 The Half-Adder Pattern (Addition without `+`)</h3>
-            <p>This is a universally asked FAANG question (LeetCode 371). How do you add two numbers without using the
-                <code>+</code> operator?
-            </p>
-            <p>Think about how binary addition works: 1+0=1, 0+1=1, 0+0=0, 1+1=0 (with a carry of 1). Does that look
-                familiar? <strong>It's exactly an XOR operation!</strong></p>
-            <ul style="margin-bottom:16px">
-                <li><code>a ^ b</code> computes the <strong>sum</strong> without any carry.</li>
-                <li><code>(a & b) &lt;&lt; 1</code> computes the <strong>carry</strong> bits (and shifts them left so
-                    they add to the next column).</li>
-            </ul>
-            <div class="code-block">
+    <span class="kw">void</span> <span class="fn">remove</span>(<span class="kw">int</span> idx) {                       <span class="cm">// O(n) — shifts elements left</span>
+        <span class="cls">System</span>.arraycopy(data, idx+1, data, idx, size-idx-1);
+        data[--size] = <span class="kw">null</span>;                   <span class="cm">// prevent memory leak</span>
+    }
+}
+<span class="cm">// Tip: new ArrayList&lt;&gt;(expectedSize) avoids all resizing overhead</span></pre>
+      </div>
+      <h2 class="h1" id="practice">💪 Practice Problems</h2>
+      <div class="prob-card">
+        <div class="prob-header" onclick="toggleProb(this)">
+          <div class="prob-left">
+            <div class="prob-num">Problem 01 · Design</div>
+            <div class="prob-title">Design a Stack Using ArrayList</div>
+            <div style="margin-top:4px"><a href="https://leetcode.com/problems/implement-stack-using-queues/"
+                target="_blank" style="font-size:12px">🔗 LC 225 (concept)</a></div>
+            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
+                class="tag tag-pat">OOP Design</span></div>
+          </div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="prob-body" style="display:none">
+          <div class="prob-section">
+            <div class="prob-section-label">Problem</div>
+            <p>Implement a generic Stack class using ArrayList with push, pop, peek, isEmpty, size — all O(1).</p>
+          </div>
+          <details>
+            <summary><span class="toggle-arrow">►</span>Solution</summary>
+            <div class="details-body">
+              <div class="code-block">
                 <div class="code-header">
-                    <div class="code-lang">☕ Java · Sum of Two Integers</div><button class="copy-btn"
-                        onclick="copyCode(this)">Copy</button>
+                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 </div>
-                <pre><span class="kw">public int</span> <span class="fn">getSum</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
-    <span class="kw">while</span> (b != <span class="num">0</span>) {
-        <span class="kw">int</span> sum = a ^ b;            <span class="cm">// step 1: sum without carry</span>
-        <span class="kw">int</span> carry = (a & b) &lt;&lt; <span class="num">1</span>;    <span class="cm">// step 2: find carry and shift</span>
-        a = sum;
-        b = carry;                  <span class="cm">// repeat until carry is zero</span>
-    }
-    <span class="ret">return</span> a;
+                <pre><span class="kw">class</span> <span class="cls">Stack</span>&lt;T&gt; {
+    <span class="kw">private</span> <span class="cls">List</span>&lt;T&gt; data = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="kw">void</span> <span class="fn">push</span>(T val) { data.add(val); }      <span class="cm">// append to END = O(1)</span>
+    T <span class="fn">pop</span>() { <span class="ret">return</span> data.remove(data.size()-1); } <span class="cm">// remove last = O(1)</span>
+    T <span class="fn">peek</span>() { <span class="ret">return</span> data.get(data.size()-1); }
+    <span class="kw">boolean</span> <span class="fn">isEmpty</span>() { <span class="ret">return</span> data.isEmpty(); }
+    <span class="kw">int</span> <span class="fn">size</span>() { <span class="ret">return</span> data.size(); }
 }</pre>
+              </div>
+              <div class="complexity-row">
+                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(1) all
+                    ops</span></div>
+                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
+                </div>
+              </div>
             </div>
+          </details>
+        </div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-header" onclick="toggleProb(this)">
+          <div class="prob-left">
+            <div class="prob-num">Problem 02 · Sorting</div>
+            <div class="prob-title">Sort Employees by Salary then Name</div>
 
-            <hr>
+            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Microsoft</span><span
+                class="tag tag-pat">Comparator Chain</span></div>
+          </div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="prob-body" style="display:none">
+          <div class="prob-section">
+            <div class="prob-section-label">Problem</div>
+            <p>Sort a list of Employee objects: primary by salary descending, secondary by name ascending. Do not modify
+              the Employee class.</p>
+          </div>
+          <details>
+            <summary><span class="toggle-arrow">►</span>Solution</summary>
+            <div class="details-body">
+              <div class="code-block">
+                <div class="code-header">
+                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt; employees = ...;
+employees.sort(
+    <span class="cls">Comparator</span>.comparingInt((<span class="cls">Employee</span> e) -> e.salary).reversed()
+              .thenComparing(e -> e.name)
+);
 
-            <!-- ═══ SECTION 5: COMPLEXITY ═════════════════════════════ -->
-            <h2 class="h1" id="complexity">⏱ Complexity Patterns in Bit Manipulation</h2>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Algorithm</th>
-                            <th>Time</th>
-                            <th>Space</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Check/Set/Clear bit</td>
-                            <td>O(1)</td>
-                            <td>O(1)</td>
-                            <td>Single operation</td>
-                        </tr>
-                        <tr>
-                            <td>Count set bits (naive)</td>
-                            <td>O(32)</td>
-                            <td>O(1)</td>
-                            <td>Check each bit</td>
-                        </tr>
-                        <tr>
-                            <td>Count set bits (Kernighan)</td>
-                            <td>O(k)</td>
-                            <td>O(1)</td>
-                            <td>k = number of set bits</td>
-                        </tr>
-                        <tr>
-                            <td>Single Number (XOR)</td>
-                            <td>O(n)</td>
-                            <td>O(1)</td>
-                            <td>One pass</td>
-                        </tr>
-                        <tr>
-                            <td>Two Unique (XOR partition)</td>
-                            <td>O(n)</td>
-                            <td>O(1)</td>
-                            <td>Two passes</td>
-                        </tr>
-                        <tr>
-                            <td>Generate subsets (bitmask)</td>
-                            <td>O(2ⁿ × n)</td>
-                            <td>O(1) extra</td>
-                            <td>Iterative, no recursion</td>
-                        </tr>
-                        <tr>
-                            <td>Counting Bits 0..n (DP)</td>
-                            <td>O(n)</td>
-                            <td>O(n)</td>
-                            <td>bits[i] = bits[i&(i-1)] + 1</td>
-                        </tr>
-                    </tbody>
-                </table>
+<span class="cm">// Or with lambda:</span>
+employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
+    <span class="kw">if</span> (<span class="kw">a</span>.salary != <span class="kw">b</span>.salary) <span class="ret">return</span> <span class="kw">b</span>.salary - <span class="kw">a</span>.salary; <span class="cm">// desc salary</span>
+    <span class="ret">return</span> <span class="kw">a</span>.name.compareTo(<span class="kw">b</span>.name);              <span class="cm">// asc name</span>
+});</pre>
+              </div>
+              <div class="complexity-row">
+                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
+                    n)</span></div>
+                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(1)</span>
+                </div>
+              </div>
             </div>
+          </details>
+        </div>
+      </div>
+      <h2 class="h1" id="assignment">📝 Assignment</h2>
+      <div class="callout orange" style="margin:14px 0">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body"><strong>Lecture 3 Assignment</strong><br>20+ company-tagged OOP & collections problems
+          including LRU Cache, Design HashMap, Group Anagrams, and inheritance design exercises.<br><br>
+          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture3/Assignment.md"
+            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
+            Open Assignment →</a>
+        </div>
+      </div>
+      <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
+      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can name all 4 OOP pillars and give a DSA example for each</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I know when to use Abstract Class vs Interface (5+ criteria)</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can implement a custom Comparator using lambda and Comparator.comparing()</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I understand Comparable for natural ordering (TreeSet/PriorityQueue)</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I know why ArrayList.remove(int index) is O(n) but get(index) is O(1)</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can write a generic method with bounded type parameters</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can explain what PECS (Producer Extends, Consumer Super) means</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I understand ArrayList resizing: when it happens and what the new capacity is</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can solve Group Anagrams using HashMap in under 5 minutes</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can explain the difference between method overriding and overloading</div>
+        </div>
+      </div>
 
-            <hr>
-
-            <!-- ═══ SECTION 6: PRACTICE PROBLEMS ══════════════════════ -->
-            <h2 class="h1" id="practice">💪 In-Lecture Practice Problems</h2>
-
-            <p>Work through these in order. Don't look at the solution before attempting!</p>
-
-            <!-- P1 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 01 · Brian Kernighan's Algorithm</div>
-                        <div class="prob-title">Number of 1 Bits (Hamming Weight)</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/number-of-1-bits/"
-                                target="_blank" style="font-size:12px">🔗 LC 191 - Number of 1 Bits</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span><span
-                                class="tag tag-co">Apple</span>
-                            <span class="tag tag-pat">Brian Kernighan</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Write a function that takes an unsigned integer and returns the number of '1' bits it has
-                            (also known as the Hamming weight).</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">hammingWeight</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">while</span> (n != <span class="num">0</span>) {
-        n &= (n - <span class="num">1</span>);  <span class="cm">// drops the lowest set bit</span>
-        count++;
-    }
-    <span class="ret">return</span> count;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(k)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P2 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 02 · XOR Cancellation</div>
-                        <div class="prob-title">Single Number</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/single-number/"
-                                target="_blank" style="font-size:12px">🔗 LC 136 - Single Number</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">XOR Cancellation</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given a non-empty array of integers nums, every element appears twice except for one. Find
-                            that single one.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> res = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) res ^= n;
-    <span class="ret">return</span> res;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(n)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P3 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 03 · XOR Partitioning</div>
-                        <div class="prob-title">Single Number III</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/single-number-iii/"
-                                target="_blank" style="font-size:12px">🔗 LC 260 - Single Number III</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">XOR Partition</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer array nums, in which exactly two elements appear only once and all the other
-                            elements appear exactly twice. Find the two elements that appear only once.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span>[] <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> xor = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) xor ^= n;
-    
-    <span class="kw">int</span> diffBit = xor & (-xor);
-    
-    <span class="kw">int</span> a = <span class="num">0</span>, b = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> ((n & diffBit) == <span class="num">0</span>) a ^= n;
-        <span class="kw">else</span> b ^= n;
-    }
-    
-    <span class="ret">return new int</span>[]{a, b};
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(n)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P4 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 04 · Bitmask Iteration</div>
-                        <div class="prob-title">Subsets</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/subsets/" target="_blank"
-                                style="font-size:12px">🔗 LC 78 - Subsets</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Meta</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">Bitmask Generation</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer array nums of unique elements, return all possible subsets (the power set).
-                        </p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public</span> List&lt;List&lt;Integer&gt;&gt; <span class="fn">subsets</span>(<span class="kw">int</span>[] nums) {
-    List&lt;List&lt;Integer&gt;&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">int</span> n = nums.length;
-    <span class="kw">int</span> total = <span class="num">1</span> << n;
-    
-    <span class="kw">for</span> (<span class="kw">int</span> mask = <span class="num">0</span>; mask < total; mask++) {
-        List&lt;Integer&gt; curr = <span class="kw">new</span> ArrayList&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j < n; j++) {
-            <span class="kw">if</span> ((mask & (<span class="num">1</span> << j)) != <span class="num">0</span>) {
-                curr.add(nums[j]);
-            }
-        }
-        res.add(curr);
-    }
-    <span class="ret">return</span> res;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val yellow">O(n * 2^n)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P5 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 05 · XOR Cancellation</div>
-                        <div class="prob-title">Missing Number</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/missing-number/"
-                                target="_blank" style="font-size:12px">🔗 LC 268 - Missing Number</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span>
-                            <span class="tag tag-pat">XOR</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an array <code>nums</code> containing <code>n</code> distinct numbers in the range
-                            <code>[0, n]</code>, return the only number in the range that is missing from the array.
-                        </p>
-                        <p><strong>Goal:</strong> O(1) extra space complexity and O(n) runtime.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">missingNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> res = nums.length;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < nums.length; i++) {
-        res ^= i;
-        res ^= nums[i];
-    }
-    <span class="ret">return</span> res;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(n)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P6 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 06 · Brian Kernighan</div>
-                        <div class="prob-title">Power of Two</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/power-of-two/"
-                                target="_blank" style="font-size:12px">🔗 LC 231 - Power of Two</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">Bitmasking</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer <code>n</code>, return <code>true</code> if it is a power of two. Otherwise,
-                            return <code>false</code>.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public boolean</span> <span class="fn">isPowerOfTwo</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= <span class="num">0</span>) <span class="ret">return false</span>;
-    <span class="cm">// A power of 2 has exactly one '1' bit</span>
-    <span class="ret">return</span> (n & (n - <span class="num">1</span>)) == <span class="num">0</span>;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(1)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P7 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 07 · DP + Bit Manipulation</div>
-                        <div class="prob-title">Counting Bits</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/counting-bits/"
-                                target="_blank" style="font-size:12px">🔗 LC 338 - Counting Bits</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Apple</span><span class="tag tag-co">Microsoft</span>
-                            <span class="tag tag-pat">DP Build Arrays</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer <code>n</code>, return an array <code>ans</code> of length
-                            <code>n + 1</code> such that for each <code>i</code> (0 <= i <=n), <code>ans[i]</code> is
-                                the number of <code>1</code>'s in the binary representation of <code>i</code>.
-                        </p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span>[] <span class="fn">countBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span>[] ans = <span class="kw">new int</span>[n + <span class="num">1</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i <= n; i++) {
-        ans[i] = ans[i >> <span class="num">1</span>] + (i & <span class="num">1</span>); 
-    }
-    <span class="ret">return</span> ans;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(n)</span></div>
-                                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                                        class="cx-val yellow">O(n)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P8 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 08 · Shifting Tricks</div>
-                        <div class="prob-title">Reverse Bits</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/reverse-bits/"
-                                target="_blank" style="font-size:12px">🔗 LC 190 - Reverse Bits</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Apple</span>
-                            <span class="tag tag-pat">Right/Left Shifts</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Reverse bits of a given 32 bits unsigned integer.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">reverseBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> result = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">32</span>; i++) {
-        <span class="kw">int</span> bit = (n >> i) & <span class="num">1</span>;
-        result = result | (bit << (<span class="num">31</span> - i));
-    }
-    <span class="ret">return</span> result;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(1)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P9 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 09 · String XOR</div>
-                        <div class="prob-title">Find the Difference</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/find-the-difference/"
-                                target="_blank" style="font-size:12px">🔗 LC 389 - Find the Difference</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-easy">Easy</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">Cancellation</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>You are given two strings <code>s</code> and <code>t</code>. <code>t</code> is generated by
-                            random shuffling string <code>s</code> and then add one more letter at a random position.
-                            Find the letter that was added in <code>t</code>.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public char</span> <span class="fn">findTheDifference</span>(String s, String t) {
-    <span class="kw">char</span> ans = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">char</span> c : s.toCharArray()) ans ^= c;
-    <span class="kw">for</span> (<span class="kw">char</span> c : t.toCharArray()) ans ^= c;
-    <span class="ret">return</span> ans;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P10 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 10 · Advanced Math Masking</div>
-                        <div class="prob-title">Single Number II</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/single-number-ii/"
-                                target="_blank" style="font-size:12px">🔗 LC 137 - Single Number II</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">Buckets</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer array <code>nums</code> where every element appears exactly three times
-                            except for one, which appears exactly once. Find the single element.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> ans = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">32</span>; i++) {
-        <span class="kw">int</span> sum = <span class="num">0</span>;
-        <span class="kw">for</span> (<span class="kw">int</span> num : nums) {
-            <span class="kw">if</span> (((num >> i) & <span class="num">1</span>) == <span class="num">1</span>) sum++;
-        }
-        <span class="kw">if</span> (sum % <span class="num">3</span> != <span class="num">0</span>) {
-            ans = ans | (<span class="num">1</span> << i);
-        }
-    }
-    <span class="ret">return</span> ans;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(32 * N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <hr>
-
-            <hr>
-
-            <!-- ═══ ASSIGNMENT ═════════════════════════════════════════ -->
-            <h2 class="h1" id="assignment">📝 Assignment</h2>
-            <div class="callout orange" style="margin:14px 0">
-                <span class="callout-icon">📋</span>
-                <div class="callout-body">
-                    <strong>Lecture 3 Assignment — 30 Problems</strong><br>
-                    Complete the assignment before moving to Lecture 4. It covers basic operations, XOR tricks, masks,
-                    and Brian Kernighan.<br><br>
-                    <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture3/Assignment.md"
-                        style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
-                        Open Assignment →</a>
-                </div>
-            </div>
-
-            <hr>
-
-            <!-- ═══ CHECKLIST ════════════════════════════════════════════ -->
-            <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
-            <p>Check each item off as you master it. Don't proceed to Lecture 4 until all are checked.</p>
-
-            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can set, clear, toggle, and check the kth bit correctly without googling
-                    </div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I understand how n & (n-1) drops the lowest set bit (Brian Kernighan)</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I know why n & (-n) isolates the lowest set bit</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I have solved the "Two unique numbers" problem using XOR partitioning</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can generate the power set of an array using bitmask iteration</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I have completed at least 15 problems from the assignment</div>
-                </div>
-            </div>
-
-        </div><!-- /content -->
-    </div><!-- /main -->
-
-    <script>
-        // 1. Dark Mode Toggle
-        function toggleDark() {
-            const html = document.documentElement;
-            const btn = document.getElementById('darkToggle');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.removeAttribute('data-theme');
-                btn.innerText = '🌙 Dark';
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                btn.innerText = '☀️ Light';
-            }
-        }
-
-        // 2. Progress Tracker & TOC Highlighting
-        document.getElementById('main').addEventListener('scroll', function () {
-            const el = this;
-            const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-
-            // Progress bar fill logic with threshold
-            if (document.getElementById('progressFill')) {
-                const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
-                document.getElementById('progressFill').style.width = fillPct + '%';
-            }
-
-            // Active TOC Highlighting
-            const sections = document.querySelectorAll('h1, h2, h3');
-            let current = "";
-            sections.forEach(s => {
-                const top = s.getBoundingClientRect().top;
-                if (top < 150) current = s.id;
-            });
-
-            document.querySelectorAll('.toc-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('href') === "#" + current) {
-                    item.classList.add('active');
-                }
-            });
-        });
-
-        // 3. Problem Visibility Toggle
-        function toggleProb(headerEl) {
-            const body = headerEl.nextElementSibling;
-            if (!body) return;
-            const isOpen = body.style.display === 'block';
-            body.style.display = isOpen ? 'none' : 'block';
-            headerEl.classList.toggle('active', !isOpen);
-        }
-
-        // 4. Copy Code Logic
-        function copyCode(btn) {
-            const code = btn.closest('.code-block').querySelector('pre').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.style.background = 'var(--green-bg)';
-                btn.style.color = 'var(--green)';
-                btn.style.borderColor = 'var(--green)';
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.background = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }, 2000);
-            });
-        }
-
-        // 5. Details Arrows
-        document.querySelectorAll('details').forEach(det => {
-            det.addEventListener('toggle', () => {
-                const arrow = det.querySelector('.toggle-arrow');
-                if (arrow) {
-                    arrow.style.transform = det.open ? 'rotate(90deg)' : 'rotate(0deg)';
-                }
-            });
-        });
-    </script>
-</body>
-
-</html>
+      <div class="callout green" style="margin-top:24px">
+        <span class="callout-icon">🧠</span>
+        <div class="callout-body">
+          <strong>You're ready for Topic 4: Java 8+ &amp; Streams</strong><br>
+          You've nailed OOP — inheritance, polymorphism, and Java Collections. Java 8 brought the biggest syntax
+          revolution in the language: lambdas, streams, and Optional. Master these and your code becomes concise and
+          interview-ready.
+        </div>
+      </div>
+      <div
+        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+        <a href="../Lecture2/lecture2_notes.html"
+          style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Topic 2: Java Memory</a><a
+          href="../Lecture4/lecture4_notes.html" style="color:var(--accent);font-weight:600;text-decoration:none">Topic
+          4: Java 8+ &amp; Streams &rarr;</a>
+      </div>
+    </div>
+  </div>

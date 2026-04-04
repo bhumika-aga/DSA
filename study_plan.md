@@ -9,10 +9,10 @@
 
 | Metric             | Value                    |
 | ------------------ | ------------------------ |
-| **Total Topics**   | 27                       |
+| **Total Topics**   | 30 (Updated)             |
 | **Phases**         | 4                        |
-| **Duration**       | 20–24 Weeks              |
-| **Total Problems** | 450+                     |
+| **Duration**       | 22–26 Weeks              |
+| **Total Problems** | 600+                     |
 | **Approach**       | Pattern-based, bottom-up |
 
 ### How to Use This Plan
@@ -25,7 +25,7 @@
 
 ---
 
-## 🟣 Phase 1 — Foundations (Weeks 1–4)
+## 🟣 Phase 1 — Foundations (Weeks 1–5)
 
 > Build the mental models. Learn to think recursively. Understand how the computer thinks.
 
@@ -71,7 +71,43 @@
 
 ---
 
-### Topic 2: 🏗️ OOP & Java Collections Deep Dive
+### Topic 2: 🧠 Java Memory Management
+
+| Detail               | Value              |
+| -------------------- | ------------------ |
+| **Duration**         | 2 days             |
+| **Problems**         | 5 (Conceptual)     |
+| **Difficulty Split** | 5 Easy             |
+| **Prerequisites**    | Programming Basics |
+
+#### 🎓 Learning Objectives
+
+- Master the difference between Stack (static) and Heap (dynamic) memory
+- Understand how Java handles primitive vs. object references
+- Grasp Garbage Collection as a background process and why it matters
+- Identify and prevent common memory leaks in Java applications
+
+#### 🔑 Key Patterns
+
+| Pattern                 | Description                                | Example Problem                   |
+| ----------------------- | ------------------------------------------ | --------------------------------- |
+| **Pass-by-value/ref**   | Understand what exactly is copied in Java  | Value vs Object reference swap    |
+| **Scope understanding** | Visualize stack frames during method calls | Method call stack visualization   |
+| **GC trigger thinking** | Recognize when objects become GC-eligible  | Object dereferencing scenarios    |
+| **Object lifecycle**    | Track instantiation to destruction         | Visualize object creation in heap |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Stack vs. Heap architecture, stack frames, primitive vs. reference types, pass-by-value in Java
+2. **Day 2:** Garbage Collection algorithms (basics), Young vs. Old gen, finalization, detecting memory leaks
+
+#### 🏢 Companies That Ask These
+
+`Google` `Oracle` `Goldman Sachs`
+
+---
+
+### Topic 3: 🏗️ OOP & Java Collections Deep Dive
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -111,7 +147,44 @@
 
 ---
 
-### Topic 3: 🔁 Recursion & Backtracking
+### Topic 4: ⚡ Java 8+ Modern Features
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 3 days                     |
+| **Problems**         | 10                         |
+| **Difficulty Split** | 4 Easy · 4 Medium · 2 Hard |
+| **Prerequisites**    | OOP & Collections          |
+
+#### 🎓 Learning Objectives
+
+- Master Lambda expressions for concise and readable interview code
+- Understand functional interfaces (Predicate, Consumer, Supplier, Function)
+- Use the Streams API to process collections like a pro (filter, map, reduce)
+- Learn Optional<T> to handle null-safety without bulky if-statements
+
+#### 🔑 Key Patterns
+
+| Pattern                  | Description                              | Example Problem                    |
+| ------------------------ | ---------------------------------------- | ---------------------------------- |
+| **Stream Filtering**     | Filter collections using Predicate       | Filter strings by length or starts |
+| **Map-Reduce**           | Transform then aggregate data            | Sum squares of even numbers        |
+| **Lambda Sorting**       | Use lambda as Comparator in sort()       | Sort objects by multiple fields    |
+| **Functional Interface** | Pass behavior as data to generic methods | Custom functional processor        |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Lambda expressions syntax, functional interfaces Basics, `@FunctionalInterface` annotation
+2. **Day 2:** Streams API deep dive — filter, map, flatMap, findFirst, collectors (toList, groupingBy)
+3. **Day 3:** Advanced Streams — reduce, parallel streams, Optional<T> for null safety, method references
+
+#### 🏢 Companies That Ask These
+
+`Amazon` `LinkedIn` `Salesforce`
+
+---
+
+### Topic 5: 🔁 Recursion & Backtracking
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -154,7 +227,7 @@
 
 ---
 
-### Topic 4: 📊 Bit Manipulation
+### Topic 6: 📊 Bit Manipulation
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -192,7 +265,7 @@
 
 ---
 
-### Topic 5: 🏆 Math & Number Theory
+### Topic 7: 🏆 Math & Number Theory
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -231,13 +304,13 @@
 
 ---
 
-## 🟢 Phase 2 — Core Data Structures (Weeks 5–11)
+## 🟢 Phase 2 — Core Data Structures (Weeks 6–13)
 
 > The bread and butter. These topics make up 60–70% of coding interviews.
 
 ---
 
-### Topic 6: 📋 Arrays & Strings
+### Topic 8: 📋 Arrays & Strings
 
 | Detail               | Value                        |
 | -------------------- | ---------------------------- |
@@ -282,7 +355,7 @@
 
 ---
 
-### Topic 7: ⚡ Sorting Algorithms
+### Topic 9: ⚡ Sorting Algorithms
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -321,7 +394,7 @@
 
 ---
 
-### Topic 8: 🔎 Binary Search (Deep Dive)
+### Topic 10: 🔎 Binary Search (Deep Dive)
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -362,7 +435,7 @@
 
 ---
 
-### Topic 9: 🗂️ Linked Lists
+### Topic 11: 🗂️ Linked Lists
 
 | Detail               | Value                        |
 | -------------------- | ---------------------------- |
@@ -404,7 +477,7 @@
 
 ---
 
-### Topic 10: 📚 Stacks & Queues
+### Topic 12: 📚 Stacks & Queues
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -444,7 +517,7 @@
 
 ---
 
-### Topic 11: 🗃️ HashMap & HashSet
+### Topic 13: 🗃️ HashMap & HashSet
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -483,7 +556,7 @@
 
 ---
 
-### Topic 12: 🧮 Matrix Problems
+### Topic 14: 🧮 Matrix Problems
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -522,7 +595,7 @@
 
 ---
 
-### Topic 13: 🌳 Trees (Binary Trees & BST)
+### Topic 15: 🌳 Trees (Binary Trees & BST)
 
 | Detail               | Value                         |
 | -------------------- | ----------------------------- |
@@ -568,7 +641,7 @@
 
 ---
 
-### Topic 14: ⛰️ Heaps & Priority Queues
+### Topic 16: ⛰️ Heaps & Priority Queues
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -608,13 +681,13 @@
 
 ---
 
-## 🟠 Phase 3 — Advanced Structures & Algorithms (Weeks 12–17)
+## 🟠 Phase 3 — Advanced Structures & Algorithms (Weeks 14–20)
 
 > The differentiators. These topics separate good from great in interviews.
 
 ---
 
-### Topic 15: 🕸️ Graphs
+### Topic 17: 🕸️ Graphs
 
 | Detail               | Value                                  |
 | -------------------- | -------------------------------------- |
@@ -663,7 +736,7 @@
 
 ---
 
-### Topic 16: 🔗 Union-Find (Disjoint Set Union)
+### Topic 18: 🔗 Union-Find (Disjoint Set Union)
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -701,7 +774,7 @@
 
 ---
 
-### Topic 17: 💡 Greedy Algorithms
+### Topic 19: 💡 Greedy Algorithms
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -741,7 +814,7 @@
 
 ---
 
-### Topic 18: 📐 Intervals & Sweep Line
+### Topic 20: 📐 Intervals & Sweep Line
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -779,7 +852,7 @@
 
 ---
 
-### Topic 19: 🧩 Dynamic Programming
+### Topic 21: 🧩 Dynamic Programming
 
 | Detail               | Value                                 |
 | -------------------- | ------------------------------------- |
@@ -832,7 +905,7 @@
 
 ---
 
-### Topic 20: 🔤 Tries
+### Topic 22: 🔤 Tries
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -871,7 +944,7 @@
 
 ---
 
-### Topic 21: 📐 Segment Trees & Binary Indexed Trees
+### Topic 23: 📐 Segment Trees & Binary Indexed Trees
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -909,15 +982,50 @@
 
 `Google` `Amazon` `Microsoft`
 
+### Topic 24: 🪵 Square Root Decomposition (NEW)
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 3 days                     |
+| **Problems**         | 10                         |
+| **Difficulty Split** | 2 Easy · 5 Medium · 3 Hard |
+| **Prerequisites**    | Segment Trees, Arrays      |
+
+#### 🎓 Learning Objectives
+
+- Understand the "block-based" strategy to optimize range queries when full trees are overkill
+- Master the O(√N) query and O(1) or O(√N) update trade-offs
+- Learn Mo’s Algorithm for offline range queries
+- Handle problems involving frequency counting in specific ranges
+
+#### 🔑 Key Patterns
+
+| Pattern                 | Description                                      | Example Problem                        |
+| ----------------------- | ------------------------------------------------ | -------------------------------------- |
+| **Mo's Algorithm**      | Sort queries by block to reach O((N+Q)√N)        | Range Distinct Elements                |
+| **Block Decomposition** | Precompute values for blocks of size √N          | Range Sum Query (SQRT)                 |
+| **Block-based Updates** | Update element and its corresponding block value | SQRT Point Update                      |
+| **Frequency Frequency** | Use two arrays to track freq of freqs with Mo's  | Mo's on most frequent element problems |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** SQRT fundamentals — partitioning array into blocks, Range Sum/Min query in O(√N)
+2. **Day 2:** Update operations — point update O(1) vs. range query O(√N), block-based optimizations
+3. **Day 3:** Mo’s Algorithm — query sorting basics, offline range processing, solving Range Distinct Elements
+
+#### 🏢 Companies That Ask These
+
+`CodeChef` `HackerRank` `Directi` `Uber`
+
 ---
 
-## 🔴 Phase 4 — Interview Patterns & Mock Prep (Weeks 18–24)
+## 🔴 Phase 4 — Interview Patterns & Mock Prep (Weeks 21–26)
 
 > Consolidate, speed up, and simulate real FAANG-style interviews.
 
 ---
 
-### Topic 22: 🔍 Advanced Recursion & Divide and Conquer
+### Topic 25: 🔍 Advanced Recursion & Divide and Conquer
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -955,7 +1063,7 @@
 
 ---
 
-### Topic 23: 🎯 Two Pointers & Sliding Window (Deep Dive)
+### Topic 26: 🎯 Two Pointers & Sliding Window (Deep Dive)
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
@@ -993,7 +1101,7 @@
 
 ---
 
-### Topic 24: 🔗 String Algorithms
+### Topic 27: 🔗 String Algorithms (KMP/Z-Algo)
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -1031,7 +1139,7 @@
 
 ---
 
-### Topic 25: 📊 Monotonic Patterns (Deep Dive)
+### Topic 28: 📊 Monotonic Patterns (Deep Dive)
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -1069,7 +1177,7 @@
 
 ---
 
-### Topic 26: 🏗️ Design Data Structures
+### Topic 29: 🏗️ Design Data Structures
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
@@ -1109,7 +1217,7 @@
 
 ---
 
-### Topic 27: 🧠 Mock Interviews & System Thinking
+### Topic 30: 🧠 Mock Interviews & System Thinking
 
 | Detail            | Value               |
 | ----------------- | ------------------- |
@@ -1160,8 +1268,8 @@
 
 | Phase                   | Topics                                                                   | Weeks           | Key Focus               | Problems          |
 | ----------------------- | ------------------------------------------------------------------------ | --------------- | ----------------------- | ----------------- |
-| **1 — Foundations**     | Java, OOP, Recursion, Bit Manipulation, Math                             | 1–4             | Build thinking patterns | ~95               |
-| **2 — Core DS**         | Arrays, Sorting, Binary Search, LL, Stack, HashMap, Matrix, Trees, Heaps | 5–11            | Core interview topics   | ~243              |
-| **3 — Advanced**        | Graphs, Union-Find, Greedy, Intervals, DP, Tries, Segment Trees          | 12–17           | Differentiators         | ~177              |
-| **4 — Patterns & Prep** | D&C, Two Pointers, String Algos, Monotonic, Design DS, Mocks             | 18–24           | Speed + Polish          | ~80               |
-| **Total**               | **27 topics**                                                            | **20–24 weeks** |                         | **595+ problems** |
+| **1 — Foundations**     | Java, OOP, Recursion, Bit Manipulation, Math                             | 1–5             | Build thinking patterns | ~110              |
+| **2 — Core DS**         | Arrays, Sorting, Binary Search, LL, Stack, HashMap, Matrix, Trees, Heaps | 6–13            | Core interview topics   | ~243              |
+| **3 — Advanced**        | Graphs, Union-Find, Greedy, Intervals, DP, Tries, Segment Trees, SQRT    | 14–20           | Differentiators         | ~187              |
+| **4 — Patterns & Prep** | D&C, Two Pointers, String Algos, Monotonic, Design DS, Mocks             | 21–26           | Speed + Polish          | ~80               |
+| **Total**               | **30 topics**                                                            | **21–26 weeks** |                         | **620+ problems** |

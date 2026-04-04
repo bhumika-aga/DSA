@@ -1108,7 +1108,7 @@
     <div class="sb-header">
       <div class="sb-badge">📚 DSA Course</div>
       <div class="sb-title">Java & Programming Fundamentals</div>
-      <div class="sb-meta">Lecture 1 of 24 · Phase 1 — Foundations</div>
+      <div class="sb-meta">Lecture 1 of 30 · Phase 1 — Foundations</div>
     </div>
 
     <div class="toc-label">On this page</div>
@@ -1141,7 +1141,7 @@
     <div style="padding:8px 16px">
       <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
       <a class="toc-item" href="../Lecture2/lecture2_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Lecture 2: Recursion</a>
+        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 2: Memory Mgmt</a>
     </div>
   </nav>
 
@@ -1174,7 +1174,7 @@
           <span class="meta-chip accent">📖 Lecture 1</span>
           <span class="meta-chip accent">Phase 1 — Foundations</span>
           <span class="meta-chip yellow">⏱ 5 days</span>
-          <span class="meta-chip green">🎯 27 problems</span>
+          <span class="meta-chip green">🎯 20+ problems</span>
           <span class="meta-chip">💼 Google · Amazon · Microsoft</span>
         </div>
       </div>
@@ -1324,6 +1324,20 @@ System.out.println(a.equals(b));  <span class="cm">// true   (same content) ← 
 <span class="kw">char</span> c = (<span class="kw">char</span>)(<span class="str">'a'</span> + 3);       <span class="cm">// → 'd'</span>
 <span class="kw">boolean</span> isLower = (ch >= <span class="str">'a'</span> && ch <= <span class="str">'z'</span>); <span class="cm">// char range check</span>
 <span class="kw">char</span> upper = (<span class="kw">char</span>)(ch - 32);   <span class="cm">// lowercase → uppercase</span></pre>
+      </div>
+
+      <div class="callout yellow">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Autoboxing / Unboxing Trap — Common Interview Gotcha!</strong><br>
+          Java caches <code>Integer</code> values from −128 to 127 (the <em>Integer cache</em>). Outside this range each
+          auto-boxing creates a new heap object.<br><br>
+          <code>Integer a = 127, b = 127; a == b</code> → <strong>true</strong> (same cached object)<br>
+          <code>Integer c = 128, d = 128; c == d</code> → <strong>false</strong> (two different heap objects!)<br><br>
+          <strong>Rule:</strong> ALWAYS use <code>.equals()</code> to compare wrapper types — never <code>==</code>.<br>
+          Additional trap: Unboxing a <code>null</code> <code>Integer</code> to <code>int</code> silently throws
+          <code>NullPointerException</code>!
+        </div>
       </div>
 
       <hr>
@@ -1631,6 +1645,73 @@ mat[0].length                   <span class="cm">// number of cols in row 0</spa
 <span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; visited = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();</pre>
       </div>
 
+      <h3 class="h2" id="static-final">4.3 — <code>static</code> &amp; <code>final</code> Keywords</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · static &amp; final</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// static — belongs to the CLASS, shared across all instances</span>
+<span class="kw">class</span> <span class="cls">Counter</span> {
+    <span class="kw">static int</span> count = 0;   <span class="cm">// shared across ALL instances</span>
+    <span class="kw">int</span> id;                  <span class="cm">// unique per instance</span>
+    <span class="cls">Counter</span>() { id = ++count; }
+}
+
+<span class="cm">// static methods can't access instance fields (no 'this')</span>
+<span class="cm">// Why main() is static: JVM calls it without creating an object</span>
+
+<span class="cm">// final — prevents reassignment / inheritance / override</span>
+<span class="kw">final int</span> MAX = 100;        <span class="cm">// constant; convention: ALL_CAPS</span>
+<span class="kw">final</span> <span class="cls">String</span> s = <span class="str">"hi"</span>; s = <span class="str">"bye"</span>;  <span class="cm">// ✗ COMPILE ERROR</span>
+
+<span class="cm">// DSA constants you'll use constantly:</span>
+<span class="kw">static final int</span> INF = <span class="cls">Integer</span>.MAX_VALUE;  <span class="cm">// Dijkstra, DP</span>
+<span class="kw">static final int</span> MOD = 1_000_000_007;       <span class="cm">// modular arithmetic</span></pre>
+      </div>
+
+      <h3 class="h2" id="equals-hashcode">4.4 — The <code>equals()</code> + <code>hashCode()</code> Contract</h3>
+
+      <div class="callout red">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>The Contract:</strong> If <code>a.equals(b)</code> is <code>true</code>, then
+          <code>a.hashCode() == b.hashCode()</code> MUST also be <code>true</code>.<br>
+          Breaking this contract causes silent bugs in <code>HashMap</code>, <code>HashSet</code>, and every hash-based
+          structure.<br>
+          When using a custom object as a <code>HashMap</code> key, you MUST override <strong>both</strong> methods
+          together.
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Custom HashMap Key</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">class</span> <span class="cls">Point</span> {
+    <span class="kw">int</span> x, y;
+    <span class="cls">Point</span>(<span class="kw">int</span> x, <span class="kw">int</span> y) { <span class="kw">this</span>.x = x; <span class="kw">this</span>.y = y; }
+
+    @Override
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="cls">Object</span> o) {
+        <span class="kw">if</span> (!(o <span class="kw">instanceof</span> <span class="cls">Point</span>)) <span class="ret">return false</span>;
+        <span class="cls">Point</span> p = (<span class="cls">Point</span>) o;
+        <span class="ret">return</span> x == p.x &amp;&amp; y == p.y;
+    }
+
+    @Override
+    <span class="kw">public int</span> <span class="fn">hashCode</span>() {
+        <span class="ret">return</span> 31 * x + y;  <span class="cm">// must be consistent with equals()</span>
+    }
+}
+<span class="cm">// Without overriding: map.get(new Point(1,2)) → null even after put!</span>
+<span class="cls">Map</span>&lt;<span class="cls">Point</span>, <span class="cls">String</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+map.put(<span class="kw">new</span> <span class="cls">Point</span>(1,2), <span class="str">"origin"</span>);
+map.get(<span class="kw">new</span> <span class="cls">Point</span>(1,2));  <span class="cm">// → "origin" ✓ (with both overrides)</span></pre>
+      </div>
+
       <hr>
 
       <!-- ══ SECTION 5: BIG-O ═════════════════════════════════ -->
@@ -1806,6 +1887,70 @@ pq.peek();                       <span class="cm">// heap peek</span>
         </table>
       </div>
 
+      <h3 class="h2" id="constraint-guide">5.2.5 — Input Constraints → Expected Complexity</h3>
+
+      <div class="callout purple">
+        <span class="callout-icon">🎯</span>
+        <div class="callout-body">
+          <strong>The #1 Interview Meta-Skill:</strong> Read the constraint <em>before</em> writing code. Problem
+          setters design the limits to hint at the expected algorithm's complexity.
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Input Size (n)</th>
+              <th>Max Complexity</th>
+              <th>Typical Algorithms</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>n ≤ 10</strong></td>
+              <td>O(n!) or O(nⁿ)</td>
+              <td>Permutations, brute-force</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 20</strong></td>
+              <td>O(2ⁿ)</td>
+              <td>Backtracking, bitmask DP</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 500</strong></td>
+              <td>O(n³)</td>
+              <td>3D DP, Floyd-Warshall</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 5,000</strong></td>
+              <td>O(n²)</td>
+              <td>DP tables, O(n²) sorts</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 10⁵</strong></td>
+              <td>O(n log n)</td>
+              <td>Merge sort, heap, segment tree</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 10⁶</strong></td>
+              <td>O(n)</td>
+              <td>Linear scan, two pointers, hashing</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 10⁸</strong></td>
+              <td>O(n) tight constant</td>
+              <td>Optimised linear, bitwise ops</td>
+            </tr>
+            <tr>
+              <td><strong>n ≤ 10¹⁸</strong></td>
+              <td>O(log n)</td>
+              <td>Binary search, fast exponentiation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3 class="h2" id="space">5.3 — Space Complexity</h3>
 
       <div class="callout orange">
@@ -1929,6 +2074,22 @@ pq.peek();                       <span class="cm">// heap peek</span>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="callout blue">
+        <span class="callout-icon">🌲</span>
+        <div class="callout-body">
+          <strong>TreeMap — Missing from Most Courses:</strong> When you need range or nearest-key queries in O(log
+          n).<br>
+          <code>tm.floorKey(x)</code> — largest key ≤ x &nbsp;|&nbsp; <code>tm.ceilingKey(x)</code> — smallest key ≥
+          x<br>
+          <code>tm.lowerKey(x)</code> — largest key &lt; x &nbsp;|&nbsp; <code>tm.higherKey(x)</code> — smallest key
+          &gt; x<br>
+          <code>tm.firstKey()</code> / <code>tm.lastKey()</code> — min / max key<br>
+          <code>tm.headMap(x)</code> — submap with all keys &lt; x &nbsp;|&nbsp; <code>tm.tailMap(x)</code> — all keys ≥
+          x<br>
+          <strong>Use for:</strong> Calendar events, sliding window problems, frequency-range queries.
+        </div>
       </div>
 
       <div class="code-block">
@@ -2922,13 +3083,20 @@ queue.peek();    <span class="cm">// view front</span></pre>
       </div>
 
       <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">🚀</span>
+        <span class="callout-icon">🧠</span>
         <div class="callout-body">
-          <strong>You're ready for Lecture 2: Recursion &amp; Backtracking</strong><br>
-          Recursion is the most important concept in all of DSA. It underpins trees, graphs, DP, divide &amp; conquer,
-          and backtracking. Give it your full focus — the Think-Trust-Induct model will change how you approach
-          problems.
+          <strong>You're ready for Topic 2: Java Memory Management</strong><br>
+          Don't just write code; command memory. Understanding the JVM Stack and Heap is the difference between a
+          senior engineer and a hobbyist. Master this foundation before we move to OOP and complex data structures.
         </div>
+      </div>
+
+      <div class="footer"
+        style="margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--text3); font-size: 13px;">Topic 1 of 30 — Phase 1 Foundations</span>
+        <a href="../Lecture2/lecture2_notes.html"
+          style="text-decoration: none; color: var(--accent); font-weight: 600; font-size: 14px;">Topic 2: Java Memory
+          Management →</a>
       </div>
 
     </div><!-- #content -->

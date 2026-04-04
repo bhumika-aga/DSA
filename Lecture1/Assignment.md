@@ -1,681 +1,324 @@
 # 📝 Assignment 01 — Java Fundamentals & Big-O Analysis
 
-> **Lecture:** Java & Programming Fundamentals  
-> **Complete before:** Lecture 2 (Recursion & Backtracking)  
-> **Goal:** Cement control flow, array manipulation, and complexity analysis.  
-> **How to use:** Solve each problem from scratch. Write the brute force first, then optimize. Always state Time + Space complexity before submitting.
+> **Lecture:** Topic 1 — Java & Programming Fundamentals
+> **Topic Count:** 1 of 30 — Phase 1 Foundations
+> **Duration:** 5 Days
+> **Core Problems:** 30 (20 Easy · 10 Medium) + 10 Challenge + 8 Complexity Exercises
+> **Goal:** Cement control flow, array manipulation, type system mastery, and complexity analysis.
 
 ---
 
-## 🟢 Easy — Do ALL of these (Foundation building)
+## 🟢 Easy Tier — 20 Problems (Build the Foundation)
 
 ---
 
-### Problem 01 — Count Digits
+### Problem 01 — FizzBuzz (The Universal Warm-Up)
+
+> 🔗 **LeetCode:** [412. FizzBuzz](https://leetcode.com/problems/fizz-buzz/)
+> **`[Pattern: Conditionals]` `[Every Company]` `[Easy]`**
+> For numbers 1 to n: print "FizzBuzz" if divisible by both 3 and 5, "Fizz" if by 3, "Buzz" if by 5, else the number itself. **Check the combined case first.**
+
+### Problem 02 — Count Digits
 
 > 🔗 **Practice:** [Count Digits (GFG)](https://www.geeksforgeeks.org/problems/count-digits5716/1)
+> **`[Pattern: Digit Extraction]` `[Amazon] [TCS]` `[Easy]`**
+> Given a positive integer `n`, return the number of digits in it. Solve using loop (while n > 0, n /= 10) and verify with `String.valueOf(n).length()`.
 
-**`[Amazon] [TCS] [Infosys] [Easy]`**
-
-Given a positive integer `n`, return the number of digits in it.
-
-```txt
-Input:  n = 12345
-Output: 5
-
-Input:  n = 1000000
-Output: 7
-```
-
-**Constraints:** 1 ≤ n ≤ 10⁹  
-**Hint:** Think about what happens when you repeatedly divide by 10.  
-**Expected Complexity:** Time O(log n), Space O(1)  
-**Follow-up:** Can you solve it without a loop using Math?
-
----
-
-### Problem 02 — Reverse a Number
+### Problem 03 — Reverse a Number
 
 > 🔗 **LeetCode:** [7. Reverse Integer](https://leetcode.com/problems/reverse-integer/)
+> **`[Pattern: Digit Extraction]` `[Amazon] [Microsoft]` `[Easy]`**
+> Given an integer `n`, return its digits reversed. If the reversed number overflows a 32-bit integer, return 0. **Use `long` to detect overflow.**
 
-**`[Amazon] [Microsoft] [Adobe] [Easy]`**
-
-Given an integer `n`, return its digits reversed. If the reversed number overflows a 32-bit integer, return 0.
-
-```txt
-Input:  n = 1534236469
-Output: 0   (overflow)
-
-Input:  n = 123
-Output: 321
-
-Input:  n = -120
-Output: -21
-```
-
-**Constraints:** -2³¹ ≤ n ≤ 2³¹ - 1  
-**Hint:** Extract digits using `% 10` and build the result. Check overflow before multiplying.  
-**Expected Complexity:** Time O(log n), Space O(1)
-
----
-
-### Problem 03 — Armstrong Number
+### Problem 04 — Armstrong Number
 
 > 🔗 **Practice:** [Armstrong Number (GFG)](https://www.geeksforgeeks.org/problems/armstrong-numbers2727/1)
+> **`[Pattern: Digit Extraction]` `[TCS] [Infosys]` `[Easy]`**
+> A number is Armstrong if the sum of its digits each raised to the power of the digit count equals the number. E.g., 153 = 1³ + 5³ + 3³.
 
-**`[TCS] [Infosys] [Wipro] [Easy]`**
-
-A number is an Armstrong number if the sum of its digits each raised to the power of the number of digits equals the number itself.
-
-```txt
-Input:  n = 153
-Output: true    (1³ + 5³ + 3³ = 153)
-
-Input:  n = 370
-Output: true    (3³ + 7³ + 0³ = 370)
-
-Input:  n = 100
-Output: false
-```
-
-**Hint:** First count the digits (call this `k`), then compute sum of digit^k.  
-**Expected Complexity:** Time O(log n), Space O(1)
-
----
-
-### Problem 04 — GCD and LCM
-
-> 🔗 **Practice:** [GCD of Two Numbers (GFG)](https://www.geeksforgeeks.org/problems/gcd-of-two-numbers3459/1)
-
-**`[Amazon] [Google] [Microsoft] [Easy]`**
-
-Given two integers `a` and `b`, find their GCD and LCM.
-
-```txt
-Input:  a = 12, b = 18
-Output: GCD = 6, LCM = 36
-```
-
-**Hint:** Use Euclidean algorithm: `gcd(a, b) = gcd(b, a % b)`. LCM = (a × b) / GCD.  
-**Expected Complexity:** Time O(log(min(a,b))), Space O(1)  
-**Why this matters:** GCD appears in fraction simplification, music rhythm problems, and number theory questions at FAANG.
-
----
-
-### Problem 05 — Sum of All Divisors from 1 to N
-
-> 🔗 **Practice:** [Sum of All Divisors (GFG)](https://www.geeksforgeeks.org/problems/sum-of-all-divisors-from-1-to-n4738/1)
-
-**`[Amazon] [Microsoft] [Easy]`**
-
-For each number from 1 to N, print the count of its divisors.
-
-```txt
-Input:  N = 5
-Output:
-1 → 1 divisor
-2 → 2 divisors
-3 → 2 divisors
-4 → 3 divisors
-5 → 2 divisors
-```
-
-**Approach 1 (Brute):** For each number, check all factors up to √n → O(N√N)  
-**Approach 2 (Smart):** For each divisor d from 1 to N, add 1 to all multiples of d → O(N log N) — like a sieve!  
-**Expected Complexity:** Aim for O(N log N), Space O(N)
-
----
-
-### Problem 06 — Print All Prime Numbers up to N (Sieve of Eratosthenes)
-
-> 🔗 **LeetCode:** [204. Count Primes](https://leetcode.com/problems/count-primes/)
-
-**`[Google] [Amazon] [Microsoft] [Adobe] [Easy-Medium]`**
-
-Print all prime numbers from 2 to N.
-
-```txt
-Input:  N = 20
-Output: 2 3 5 7 11 13 17 19
-```
-
-**Brute force:** Check each number with isPrime() → O(N√N)  
-**Optimal:** Sieve of Eratosthenes → O(N log log N)  
-**Hint for Sieve:** Start with boolean array `isPrime[0..N] = true`. For each prime p starting from 2, mark all multiples of p (p², p²+p, ...) as false.  
-**Expected Complexity:** Time O(N log log N), Space O(N)
-
----
-
-### Problem 07 — Check Palindrome (Number)
+### Problem 05 — Palindrome Number
 
 > 🔗 **LeetCode:** [9. Palindrome Number](https://leetcode.com/problems/palindrome-number/)
+> **`[Pattern: Digit Extraction]` `[Amazon] [Google]` `[Easy]`**
+> Check if a number reads the same backward without string conversion. Negative numbers are never palindromes.
 
-**`[Amazon] [Microsoft] [Facebook] [Easy]`**
+### Problem 06 — Fibonacci Sequence (Iterative)
 
-Given an integer `x`, return `true` if it is a palindrome.
+> 🔗 **Practice:** [Fibonacci (GFG)](https://www.geeksforgeeks.org/programs/fibonacci-series-in-java/)
+> **`[Pattern: Iteration / DP Preview]` `[Amazon] [Microsoft] [Apple]` `[Easy]`**
+> Return the n-th Fibonacci number iteratively — O(n) time, **O(1) space** using just two variables. Also implement the naïve recursive O(2ⁿ) version and compare.
 
-```txt
-Input:  x = 121    → Output: true
-Input:  x = -121   → Output: false  (reads -121 backwards = 121-)
-Input:  x = 10     → Output: false
-```
+### Problem 07 — GCD and LCM
 
-**Constraint:** Solve without converting to string (use digit reversal!).  
-**Hint:** Negative numbers are never palindromes. Reverse only the second half of the number.  
-**Expected Complexity:** Time O(log n), Space O(1)
+> 🔗 **Practice:** [GCD of Two Numbers (GFG)](https://www.geeksforgeeks.org/problems/gcd-of-two-numbers3459/1)
+> **`[Pattern: Euclidean Algorithm]` `[Amazon] [Google]` `[Easy]`**
+> Find GCD using `gcd(a,b) = gcd(b, a%b)` recursively. Derive LCM via `lcm = a / gcd(a,b) * b` (divide first to avoid overflow).
 
----
+### Problem 08 — Check Palindrome String
 
-### Problem 08 — Move Zeroes to End
+> 🔗 **Practice:** [Palindrome String (GFG)](https://www.geeksforgeeks.org/problems/palindrome-string0817/1)
+> **`[Pattern: Two Pointers]` `[Amazon] [Google]` `[Easy]`**
+> Given a string, check if it reads the same forwards and backwards using two pointers (left, right). O(n) time, O(1) space. Do NOT use `StringBuilder.reverse()`.
+
+### Problem 09 — Count Vowels in a String
+
+> 🔗 **Practice:** Write from scratch — no online link
+> **`[Pattern: Frequency Array / char arithmetic]` `[TCS] [Wipro]` `[Easy]`**
+> Count the number of vowels (a, e, i, o, u — both cases) in a string. Use a `HashSet` of vowels for O(1) lookup per character. O(n) overall.
+
+### Problem 10 — Power Without `Math.pow()`
+
+> 🔗 **LeetCode:** [50. Pow(x, n)](https://leetcode.com/problems/powx-n/) _(Medium on LC — today do the O(n) version)_
+> **`[Pattern: Iteration → Binary Exponentiation preview]` `[Google] [Amazon]` `[Easy]`**
+> Implement `power(base, exp)` iteratively in O(exp). Then think: how can you halve the number of multiplications when exp is even?
+
+### Problem 11 — Sum of Digits
+
+> 🔗 **Practice:** [Sum of Digits (GFG)](https://www.geeksforgeeks.org/programs/digital-root/)
+> **`[Pattern: Digit Extraction]` `[TCS] [Infosys]` `[Easy]`**
+> Return the sum of all digits of a number. Also find the **digital root**: keep summing until a single digit remains.
+
+### Problem 12 — Move Zeroes to End
 
 > 🔗 **LeetCode:** [283. Move Zeroes](https://leetcode.com/problems/move-zeroes/)
+> **`[Pattern: Two Pointers — slow/fast]` `[Facebook/Meta] [Microsoft]` `[Easy]`**
+> Move all zeroes to the end while maintaining the relative order of non-zero elements. O(n) time, O(1) space using a write-pointer.
 
-**`[Facebook] [Amazon] [Microsoft] [Bloomberg] [Easy]`**
-
-Given an array, move all zeroes to the end while maintaining the relative order of non-zero elements. Do it in-place with O(1) extra space.
-
-```txt
-Input:  [0, 1, 0, 3, 12]
-Output: [1, 3, 12, 0, 0]
-
-Input:  [0, 0, 1]
-Output: [1, 0, 0]
-```
-
-**Two-pointer approach:** Use a slow pointer (`insertPos`) that tracks where the next non-zero should go. Fast pointer scans ahead.  
-**Expected Complexity:** Time O(n), Space O(1)
-
----
-
-## 🟡 Medium — Attempt at least 5 of these
-
----
-
-### Problem 09 — Second Largest Element in Array
-
-> 🔗 **Practice:** [Second Largest (GFG)](https://www.geeksforgeeks.org/problems/second-largest3735/1)
-
-**`[Amazon] [Microsoft] [Flipkart] [Medium]`**
-
-Find the second largest distinct element in an array without sorting.
-
-```txt
-Input:  [12, 35, 1, 10, 34, 1]
-Output: 34
-
-Input:  [10, 10, 10]
-Output: -1  (no second largest distinct element)
-```
-
-**Hint:** Use two variables: `first` and `second`. Update both in a single pass.  
-**Expected Complexity:** Time O(n), Space O(1)  
-**Follow-up:** What if you need the Kth largest? (That uses a heap → O(n log K))
-
----
-
-### Problem 10 — Missing Number in Array
-
-> 🔗 **LeetCode:** [268. Missing Number](https://leetcode.com/problems/missing-number/)
-
-**`[Amazon] [Google] [Microsoft] [Apple] [Medium]`**
-
-Given an array containing n distinct numbers in the range [0, n], return the only missing number.
-
-```txt
-Input:  [3, 0, 1]    → Output: 2
-Input:  [9,6,4,2,3,5,7,0,1] → Output: 8
-```
-
-**Approach 1:** Sum formula: Expected sum = n\*(n+1)/2. Missing = expected - actual.  
-**Approach 2:** XOR trick: XOR all indices and all values → missing number remains.  
-**Expected Complexity:** Time O(n), Space O(1)  
-**Why XOR works:** `a XOR a = 0` and `a XOR 0 = a`. All paired values cancel out!
-
----
-
-### Problem 11 — Maximum Subarray Sum (Kadane's Algorithm)
-
-> 🔗 **LeetCode:** [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
-
-**`[Google] [Amazon] [Facebook] [Microsoft] [Apple] [Medium]`**
-
-Given an array of integers, find the contiguous subarray with the largest sum.
-
-```txt
-Input:  [-2, 1, -3, 4, -1, 2, 1, -5, 4]
-Output: 6   (subarray: [4, -1, 2, 1])
-
-Input:  [-1]
-Output: -1
-```
-
-**Brute force:** Check all O(n²) subarrays → O(n²) time.  
-**Kadane's key insight:** At each position, the maximum subarray ending here is either:
-
-- Just the current element alone (start fresh), OR
-- The current element + maximum subarray ending at previous position  
-  → `maxEndingHere = max(arr[i], maxEndingHere + arr[i])`  
-  **Expected Complexity:** Time O(n), Space O(1)  
-  **Follow-up:** Return the actual subarray (track start/end indices).
-
----
-
-### Problem 12 — Two Sum
-
-> 🔗 **LeetCode:** [1. Two Sum](https://leetcode.com/problems/two-sum/)
-
-**`[Amazon] [Google] [Facebook] [Microsoft] [Apple] [Uber] [Medium]`**
-
-Given an array and a target, return indices of the two numbers that add up to target. Each input has exactly one solution.
-
-```txt
-Input:  nums = [2,7,11,15], target = 9
-Output: [0, 1]   (nums[0] + nums[1] = 2 + 7 = 9)
-
-Input:  nums = [3,2,4], target = 6
-Output: [1, 2]
-```
-
-**Brute force:** Check all pairs → O(n²)  
-**Optimal:** HashMap stores `complement → index`. For each element x, check if `target - x` is in the map.  
-**Expected Complexity:** Time O(n), Space O(n)  
-**This is the most frequently asked interview question in the world. Know it cold.**
-
----
-
-### Problem 13 — Best Time to Buy and Sell Stock
-
-> 🔗 **LeetCode:** [121. Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
-
-**`[Amazon] [Facebook] [Google] [Goldman Sachs] [Medium]`**
-
-You have an array `prices[i]` = price on day i. You may buy one stock and sell it later. Find max profit.
-
-```txt
-Input:  [7, 1, 5, 3, 6, 4]
-Output: 5   (buy at 1, sell at 6)
-
-Input:  [7, 6, 4, 3, 1]
-Output: 0   (prices only fall — don't trade)
-```
-
-**Key insight:** Track `minPrice` seen so far. At each day, profit = `prices[i] - minPrice`. Track max profit.  
-**Expected Complexity:** Time O(n), Space O(1)
-
----
-
-### Problem 14 — Rotate Array by K Positions
-
-> 🔗 **LeetCode:** [189. Rotate Array](https://leetcode.com/problems/rotate-array/)
-
-**`[Microsoft] [Amazon] [Facebook] [Medium]`**
-
-Rotate an array to the right by k steps, in-place with O(1) extra space.
-
-```txt
-Input:  nums = [1,2,3,4,5,6,7], k = 3
-Output: [5,6,7,1,2,3,4]
-```
-
-**Naive approach:** Rotate one step k times → O(n×k)  
-**Extra array approach:** Place each element at correct position → O(n) time, O(n) space  
-**Optimal trick (Reversal Algorithm):**
-
-1. Reverse entire array
-2. Reverse first k elements
-3. Reverse remaining n-k elements  
-   → O(n) time, O(1) space  
-   **Trace through the example to verify this works!**
-
----
-
-### Problem 15 — Find Duplicate in Array
-
-> 🔗 **LeetCode:** [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
-
-**`[Amazon] [Google] [Microsoft] [Medium]`**
-
-Given an array of n+1 integers where each integer is between 1 and n (inclusive), find the one duplicate. Space must be O(1) and you cannot modify the array.
-
-```txt
-Input:  [1, 3, 4, 2, 2]   → Output: 2
-Input:  [3, 1, 3, 4, 2]   → Output: 3
-```
-
-**Approaches (from naive to brilliant):**
-
-1. Sort + check adjacent → O(n log n), O(1) space, but modifies array
-2. HashMap to track seen → O(n) time, O(n) space
-3. Floyd's Cycle Detection (Tortoise & Hare) — treats array as a linked list!  
-   → O(n) time, O(1) space — the elegant solution  
-   **Hint for Floyd's:** Index i "points to" value arr[i]. A duplicate creates a cycle.
-
----
-
-## 🔴 Hard — Challenge yourself (attempt at least 2)
-
----
-
-### Problem 16 — Trapping Rain Water
-
-> 🔗 **LeetCode:** [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
-
-**`[Google] [Amazon] [Facebook] [Microsoft] [Hard]`**
-
-Given an elevation map, compute how much water it can trap after raining.
-
-```txt
-Input:  height = [0,1,0,2,1,0,1,3,2,1,2,1]
-Output: 6
-```
-
-**Brute force:** For each position, find max height to its left and right → O(n²)  
-**Prefix arrays:** Precompute leftMax[] and rightMax[] → O(n) time, O(n) space  
-**Two pointers (optimal):** O(n) time, O(1) space.  
-**Key insight:** Water at position i = min(maxLeft, maxRight) - height[i].  
-Move the pointer on the side with the smaller max (it's the limiting factor).
-
----
-
-### Problem 17 — Maximum Product Subarray
-
-> 🔗 **LeetCode:** [152. Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
-
-**`[Amazon] [Google] [Facebook] [Microsoft] [Hard]`**
-
-Find the contiguous subarray with the largest product.
-
-```txt
-Input:  [2, 3, -2, 4]   → Output: 6  (subarray [2,3])
-Input:  [-2, 0, -1]     → Output: 0
-```
-
-**Why it's harder than max sum:** Negatives! A large negative × large negative = large positive.  
-**Key insight:** Track BOTH `maxSoFar` and `minSoFar` at each position. When you see a negative number, swap max and min.  
-**Expected Complexity:** Time O(n), Space O(1)
-
----
-
-### Problem 18 — Merge Intervals
-
-> 🔗 **LeetCode:** [56. Merge Intervals](https://leetcode.com/problems/merge-intervals/)
-
-**`[Google] [Facebook] [Amazon] [Microsoft] [Uber] [Hard]`**
-
-Given a collection of intervals, merge all overlapping intervals.
-
-```txt
-Input:  [[1,3],[2,6],[8,10],[15,18]]
-Output: [[1,6],[8,10],[15,18]]
-
-Input:  [[1,4],[4,5]]
-Output: [[1,5]]
-```
-
-**Key steps:**
-
-1. Sort intervals by start time → O(n log n)
-2. Iterate: if current interval overlaps with last merged, extend it. Else add new.  
-   → Two intervals overlap if `current.start <= last.end`  
-   **Expected Complexity:** Time O(n log n), Space O(n)
-
----
-
-### Problem 19 — Majority Element (Boyer-Moore Voting)
-
-> 🔗 **LeetCode:** [169. Majority Element](https://leetcode.com/problems/majority-element/)
-
-**`[Amazon] [Google] [Microsoft] [Apple] [Hard]`**
-
-Find the element appearing more than n/2 times in an array. Guaranteed to exist.
-
-```txt
-Input:  [3, 2, 3]     → Output: 3
-Input:  [2,2,1,1,1,2,2] → Output: 2
-```
-
-**O(n) space:** Use HashMap to count frequencies.  
-**O(1) space — Boyer-Moore Voting Algorithm:**  
-Maintain a `candidate` and `count`. If count = 0, set new candidate. If element equals candidate, increment count; else decrement.  
-**Why it works:** The majority element's votes can never be fully cancelled out.  
-**Expected Complexity:** Time O(n), Space O(1)
-
----
-
-### Problem 20 — Longest Consecutive Sequence
-
-> 🔗 **LeetCode:** [128. Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
-
-**`[Google] [Amazon] [Facebook] [Uber] [Hard]`**
-
-Given an unsorted array, find the length of the longest consecutive sequence. Must run in O(n).
-
-```txt
-Input:  [100, 4, 200, 1, 3, 2]
-Output: 4   (sequence: [1, 2, 3, 4])
-
-Input:  [0,3,7,2,5,8,4,6,0,1]
-Output: 9
-```
-
-**Brute force:** Sort then scan → O(n log n)  
-**Optimal (HashSet):**
-
-1. Put all numbers in a HashSet
-2. For each number n, only start counting if (n-1) is NOT in the set (it's a sequence start)
-3. Count consecutive from n upward  
-   → Each element is visited at most twice → O(n)  
-   **Expected Complexity:** Time O(n), Space O(n)
-
----
-
-## 🎁 Bonus — Extra Practice (Build Speed & Confidence)
-
----
-
-### Problem 21 — Contains Duplicate
+### Problem 13 — Contains Duplicate
 
 > 🔗 **LeetCode:** [217. Contains Duplicate](https://leetcode.com/problems/contains-duplicate/)
+> **`[Pattern: Hashing Fundamentals]` `[Amazon] [Google]` `[Easy]`**
+> Return true if any value appears at least twice in an array. Use `HashSet` — add while checking, return true on duplicate found.
 
-**`[Amazon] [Google] [Microsoft] [Easy]`**
-
-Given an integer array, return true if any value appears at least twice.
-
-```txt
-Input:  [1, 2, 3, 1]    → Output: true
-Input:  [1, 2, 3, 4]    → Output: false
-```
-
-**Approach 1 (Brute):** Check all pairs → O(n²)  
-**Approach 2 (Sort):** Sort, then check adjacent → O(n log n)  
-**Approach 3 (HashSet):** Add to set, return true if already present → O(n) time, O(n) space  
-**This teaches you the HashSet pattern — use it everywhere.**
-
----
-
-### Problem 22 — Valid Anagram
+### Problem 14 — Valid Anagram
 
 > 🔗 **LeetCode:** [242. Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+> **`[Pattern: Frequency Array]` `[Facebook] [Uber]` `[Easy]`**
+> Check if two strings contain the same characters with the same frequencies. Use `int[26]` freq array — increment for s, decrement for t, check all zeros.
 
-**`[Amazon] [Google] [Facebook] [Uber] [Easy]`**
+### Problem 15 — Running Sum of 1D Array
 
-Given two strings s and t, return true if t is an anagram of s.
+> 🔗 **LeetCode:** [1480. Running Sum](https://leetcode.com/problems/running-sum-of-1d-array/)
+> **`[Pattern: Prefix Sum Basics]` `[Amazon]` `[Easy]`**
+> Return the running (prefix) sum. `result[i] = result[i-1] + nums[i]`. The foundation of all range-query problems.
 
-```txt
-Input:  s = "anagram", t = "nagaram"  → Output: true
-Input:  s = "rat", t = "car"         → Output: false
-```
-
-**Approach 1:** Sort both strings, compare → O(n log n)  
-**Approach 2:** Frequency count array of size 26 → O(n) time, O(1) space  
-**Key insight:** Two strings are anagrams if and only if their character frequencies are identical.
-
----
-
-### Problem 23 — Running Sum of 1D Array
-
-> 🔗 **LeetCode:** [1480. Running Sum of 1d Array](https://leetcode.com/problems/running-sum-of-1d-array/)
-
-**`[Amazon] [Easy]`**
-
-Given an array, return the running sum (prefix sum).
-
-```txt
-Input:  [1, 2, 3, 4]    → Output: [1, 3, 6, 10]
-Input:  [3, 1, 2, 10, 1] → Output: [3, 4, 6, 16, 17]
-```
-
-**Approach:** Iterate and accumulate: `nums[i] += nums[i-1]` for i ≥ 1.  
-**Expected Complexity:** Time O(n), Space O(1) (in-place)  
-**Why this matters:** Prefix sums are foundational — they appear in range queries, subarray sums, and DP.
-
----
-
-### Problem 24 — Plus One
+### Problem 16 — Plus One
 
 > 🔗 **LeetCode:** [66. Plus One](https://leetcode.com/problems/plus-one/)
+> **`[Pattern: Carry Propagation]` `[Google] [Amazon]` `[Easy]`**
+> Add one to a number represented as a digit array. Traverse backwards, handle carry. Don't forget the all-9s edge case (e.g., [9,9,9] → [1,0,0,0]).
 
-**`[Google] [Facebook] [Amazon] [Easy]`**
-
-Given an array of digits representing a number, add one to the number.
-
-```txt
-Input:  [1, 2, 3]   → Output: [1, 2, 4]
-Input:  [9, 9, 9]   → Output: [1, 0, 0, 0]
-```
-
-**Key insight:** Walk backwards. If digit < 9, increment and return. If 9, set to 0 and carry.  
-**Edge case:** All 9s → create new array of size n+1 with 1 at front.  
-**Expected Complexity:** Time O(n), Space O(1) or O(n) for carry
-
----
-
-### Problem 25 — Single Number
+### Problem 17 — Single Number
 
 > 🔗 **LeetCode:** [136. Single Number](https://leetcode.com/problems/single-number/)
+> **`[Pattern: XOR Cancellation — Preview of L6]` `[Apple] [Amazon]` `[Easy]`**
+> Find the unique element where every other appears twice. XOR all elements — pairs cancel to 0. O(n) time, O(1) space.
 
-**`[Amazon] [Google] [Apple] [Easy]`**
+### Problem 18 — Richest Customer Wealth
 
-Every element appears twice except one. Find the single one. Use O(1) space.
+> 🔗 **LeetCode:** [1672. Richest Customer](https://leetcode.com/problems/richest-customer-wealth/)
+> **`[Pattern: 2D Array Traversal]` `[Easy]`**
+> Return the maximum row-sum in an m×n matrix. Nested loops are fine — O(m×n).
 
-```txt
-Input:  [2, 2, 1]       → Output: 1
-Input:  [4, 1, 2, 1, 2] → Output: 4
-```
-
-**XOR trick:** `a ^ a = 0` and `a ^ 0 = a`. XOR all elements — duplicates cancel, single remains.  
-**Expected Complexity:** Time O(n), Space O(1)  
-**This is a must-know bit manipulation pattern!**
-
----
-
-### Problem 26 — Richest Customer Wealth
-
-> 🔗 **LeetCode:** [1672. Richest Customer Wealth](https://leetcode.com/problems/richest-customer-wealth/)
-
-**`[Easy]`**
-
-Given an m×n grid where `accounts[i][j]` is money customer i has in bank j, return the wealth of the richest customer.
-
-```txt
-Input:  [[1,2,3],[3,2,1]] → Output: 6
-Input:  [[1,5],[7,3],[3,5]] → Output: 10
-```
-
-**Approach:** For each row, sum all values. Track max sum.  
-**Expected Complexity:** Time O(m×n), Space O(1)  
-**Good warm-up for 2D array traversal.**
-
----
-
-### Problem 27 — Shuffle the Array
+### Problem 19 — Shuffle the Array
 
 > 🔗 **LeetCode:** [1470. Shuffle the Array](https://leetcode.com/problems/shuffle-the-array/)
+> **`[Pattern: Index Arithmetic]` `[Easy]`**
+> Interleave [x1, x2, ..., xn, y1, y2, ..., yn] → [x1, y1, x2, y2, ...]. Access using `nums[i]` and `nums[i+n]`.
 
-**`[Easy]`**
+### Problem 20 — Sum of Natural Numbers (Gauss Formula)
 
-Given array [x1, x2, ..., xn, y1, y2, ..., yn], return [x1, y1, x2, y2, ..., xn, yn].
+> 🔗 **Practice:** Write from scratch
+> **`[Pattern: Math]` `[TCS] [Wipro]` `[Easy]`**
+> Return sum 1+2+...+n using `n*(n+1)/2`. Then verify with a loop. Key insight: always use `(long) n * (n+1) / 2` to avoid overflow when n can be up to 10⁵.
 
-```txt
-Input:  nums = [2,5,1,3,4,7], n = 3
-Output: [2,3,5,4,1,7]
-```
+---
 
-**Approach:** Create result array, use two pointers (one for x-half, one for y-half).  
-**Expected Complexity:** Time O(n), Space O(n)
+## 🟡 Medium Tier — 10 Problems (Interview Staples)
 
-## 📊 Complexity Analysis Exercises
+---
 
-For each code snippet below, determine the **Time** and **Space** complexity:
+### Problem 21 — Second Largest Element
+
+> 🔗 **Practice:** [Second Largest (GFG)](https://www.geeksforgeeks.org/problems/second-largest3735/1)
+> **`[Pattern: Single Pass State Machine]` `[Adobe] [Samsung]` `[Medium]`**
+> Find the second largest without sorting in O(n). Maintain `first` and `second` variables. Handle the case where all elements are equal.
+
+### Problem 22 — Missing Number
+
+> 🔗 **LeetCode:** [268. Missing Number](https://leetcode.com/problems/missing-number/)
+> **`[Pattern: Math / XOR]` `[Amazon] [Google]` `[Medium]`**
+> Find the missing number in range [0, n]. Two approaches: (1) `expected_sum - actual_sum`; (2) XOR all indices with all values. Both O(n), O(1) space.
+
+### Problem 23 — Maximum Subarray Sum (Kadane's)
+
+> 🔗 **LeetCode:** [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+> **`[Pattern: Dynamic Programming / Greedy]` `[All FAANG]` `[Medium]`**
+> Find the contiguous subarray with the largest sum. Kadane's key insight: `currentMax = max(num, currentMax + num)`. O(n) time, O(1) space. Also find the actual subarray indices.
+
+### Problem 24 — Two Sum
+
+> 🔗 **LeetCode:** [1. Two Sum](https://leetcode.com/problems/two-sum/)
+> **`[Pattern: Complement Lookup]` `[Literally Everyone]` `[Medium]`**
+> Return indices of two numbers summing to target in O(n). HashMap: store `value → index`, check `target - nums[i]` on each step. Store AFTER checking (prevents self-pair bug).
+
+### Problem 25 — Best Time to Buy and Sell Stock
+
+> 🔗 **LeetCode:** [121. Best Time to Buy/Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
+> **`[Pattern: Min-So-Far]` `[Amazon] [Goldman Sachs]` `[Medium]`**
+> One transaction — maximum profit. Track `minPrice` as you scan; at each step `profit = price - minPrice`. O(n) time. Follow-up: what changes for unlimited transactions? (LC 122)
+
+### Problem 26 — Max Sum Subarray of Size K (Sliding Window Preview)
+
+> 🔗 **Practice:** [Max Sum K-size (GFG)](https://www.geeksforgeeks.org/problems/max-sum-subarray-of-size-k5313/1)
+> **`[Pattern: Fixed Sliding Window]` `[Amazon] [Microsoft]` `[Medium]`**
+> Find the maximum sum among all subarrays of exactly size k. Build the first window in O(k), then slide: add right element, remove leftmost. O(n) total.
+
+### Problem 27 — Sort Array of 0s, 1s, and 2s
+
+> 🔗 **LeetCode:** [75. Sort Colors](https://leetcode.com/problems/sort-colors/)
+> **`[Pattern: Dutch National Flag — 3-way partition]` `[Google] [Microsoft]` `[Medium]`**
+> Sort in-place in O(n), O(1) space using three pointers: `lo`, `mid`, `hi`. This is the Dutch National Flag algorithm — a pattern that unlocks partition-based problems.
+
+### Problem 28 — Find Majority Element
+
+> 🔗 **LeetCode:** [169. Majority Element](https://leetcode.com/problems/majority-element/)
+> **`[Pattern: Boyer-Moore Voting]` `[Amazon] [Microsoft]` `[Medium]`**
+> Find the element appearing > n/2 times. Boyer-Moore: maintain `candidate` and `count`. When count hits 0, switch candidate. Proves itself final in one pass — fascinating algorithm!
+
+### Problem 29 — Product of Array Except Self
+
+> 🔗 **LeetCode:** [238. Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
+> **`[Pattern: Prefix × Suffix Product]` `[Amazon] [Facebook/Meta] [Apple]` `[Medium]`**
+> Return result[i] = product of all elements except nums[i] — without division, in O(n). Two passes: left products forward, right products backward, multiply in-place.
+
+### Problem 30 — Rotate Array by K
+
+> 🔗 **LeetCode:** [189. Rotate Array](https://leetcode.com/problems/rotate-array/)
+> **`[Pattern: Three Reversals]` `[Amazon] [Microsoft]` `[Medium]`**
+> Rotate right by k positions, O(1) space. Reversal trick: reverse all → reverse first k → reverse rest. Works because reversing reverses the shift direction.
+
+---
+
+## 🔴 Challenge Zone — 10 Advanced Problems
+
+---
+
+- **P31: Find Duplicate in Array** ([LC 287](https://leetcode.com/problems/find-the-duplicate-number/)) `[Pattern: Floyd's Cycle Detection]` — Only O(1) extra space allowed
+- **P32: Trapping Rain Water** ([LC 42](https://leetcode.com/problems/trapping-rain-water/)) `[Pattern: Two Pointers / Precomputation]` — Google/Amazon favourite
+- **P33: Max Product Subarray** ([LC 152](https://leetcode.com/problems/maximum-product-subarray/)) `[Pattern: Track min AND max]` — Sign-flip trick
+- **P34: Merge Intervals** ([LC 56](https://leetcode.com/problems/merge-intervals/)) `[Pattern: Sort + Greedy Merge]` — Sort by start, merge overlapping
+- **P35: Longest Consecutive Sequence** ([LC 128](https://leetcode.com/problems/longest-consecutive-sequence/)) `[Pattern: HashSet Lookup O(n)]`
+- **P36: 3Sum** ([LC 15](https://leetcode.com/problems/3sum/)) `[Pattern: Sort + Two Pointers]` — Handle duplicates carefully
+- **P37: Spiral Matrix** ([LC 54](https://leetcode.com/problems/spiral-matrix/)) `[Pattern: Layer-by-layer traversal]`
+- **P38: Set Matrix Zeroes** ([LC 73](https://leetcode.com/problems/set-matrix-zeroes/)) `[Pattern: In-place marking]` — O(1) space version
+- **P39: Jump Game** ([LC 55](https://leetcode.com/problems/jump-game/)) `[Pattern: Greedy reach tracking]` — Amazon/Google
+- **P40: Pascal's Triangle** ([LC 118](https://leetcode.com/problems/pascals-triangle/)) `[Pattern: 2D DP]`
+
+---
+
+## 📊 Complexity Analysis Exercises — 8 Snippets
+
+Determine **Time** and **Space** complexity for each. Answers below.
 
 ```java
 // Snippet A
 for (int i = 1; i < n; i *= 2)
     for (int j = 0; j < n; j++)
-        System.out.println(i + j);
-```
+        sum++;
 
-> **Your answer:** Time = \_\_\_\_, Space = \_\_\_\_
-
-```java
 // Snippet B
-int fibonacci(int n) {
+int fib(int n) {
     if (n <= 1) return n;
-    return fibonacci(n-1) + fibonacci(n-2);
+    return fib(n-1) + fib(n-2);
 }
-```
 
-> **Your answer:** Time = \_\_\_\_, Space = \_\_\_\_ (think about the call stack!)
-
-```java
 // Snippet C
+void merge(int[] arr, int l, int mid, int r) { /* O(n) work */ }
+void mergeSort(int[] arr, int l, int r) {
+    if (l >= r) return;
+    int mid = (l + r) / 2;
+    mergeSort(arr, l, mid);
+    mergeSort(arr, mid+1, r);
+    merge(arr, l, mid, r);
+}
+
+// Snippet D
 for (int i = 0; i < n; i++)
     for (int j = i; j < n; j++)
         for (int k = j; k < n; k++)
             count++;
-```
 
-> **Your answer:** Time = \_\_\_\_, Space = \_\_\_\_
+// Snippet E
+Map<Integer, Integer> memo = new HashMap<>();
+int fib(int n) {
+    if (n <= 1) return n;
+    if (memo.containsKey(n)) return memo.get(n);
+    int res = fib(n-1) + fib(n-2);
+    memo.put(n, res);
+    return res;
+}
 
-```java
-// Snippet D
-int[] result = new int[n];
+// Snippet F — What is the total number of operations?
+for (int i = n; i > 0; i /= 2)
+    for (int j = 0; j < i; j++)
+        process();
+
+// Snippet G
+boolean hasDuplicate(int[] arr) {
+    Set<Integer> seen = new HashSet<>();
+    for (int x : arr) {
+        if (seen.contains(x)) return true;
+        seen.add(x);
+    }
+    return false;
+}
+
+// Snippet H
+int binarySearch(int[] arr, int target) { /* standard impl */ }
 for (int i = 0; i < n; i++)
-    result[i] = binarySearch(arr, i);  // binarySearch is O(log n)
+    binarySearch(arr, arr[i]);  // arr is sorted
 ```
 
-> **Your answer:** Time = \_\_\_\_, Space = \_\_\_\_
+**Answers:**
+
+| Snippet       | Time       | Space | Key Insight                                    |
+| ------------- | ---------- | ----- | ---------------------------------------------- |
+| A             | O(n log n) | O(1)  | Outer: log₂n iters; inner: n iters             |
+| B             | O(2ⁿ)      | O(n)  | Two recursive calls: binary tree of height n   |
+| C (mergeSort) | O(n log n) | O(n)  | log n levels × O(n) merge; O(n) aux for merge  |
+| D             | O(n³)      | O(1)  | Triple nested — n(n+1)(n+2)/6 ≈ O(n³)          |
+| E (memo fib)  | O(n)       | O(n)  | Each subproblem computed once; O(n) call stack |
+| F             | O(n)       | O(1)  | Geometric series: n + n/2 + n/4 + ... = 2n     |
+| G             | O(n) avg   | O(n)  | HashMap O(1) per op × n ops; O(n) HashSet      |
+| H             | O(n log n) | O(1)  | n iterations × O(log n) binary search each     |
 
 ---
 
-## ✅ Self-Assessment Checklist
+## ✅ Self-Assessment — True / False
 
-Before moving to Lecture 2, confirm you can:
+Answer without running the code:
 
-- [ ] Explain the difference between primitive and reference types in Java
-- [ ] State what happens when you pass an int[] vs an int to a method
-- [ ] Write a for-loop, while-loop, and do-while loop from memory
-- [ ] Explain Big-O in one sentence without looking at notes
-- [ ] Apply all 4 Big-O simplification rules to any code snippet
-- [ ] Recognize O(log n) complexity just by seeing "divide by 2" in a loop
-- [ ] Solve Two Sum using a HashMap in under 5 minutes
-- [ ] Explain Kadane's Algorithm logic (not just the code) out loud
-- [ ] State Time AND Space complexity for Problems 1–10
-
----
-
-## 🎯 Complexity Answer Key (Snippets)
-
-<details>
-<summary>Click to reveal after attempting</summary>
-
-**Snippet A:** Time = O(n log n) — outer loop runs log n times (i doubles), inner runs n times.  
-**Snippet B:** Time = O(2ⁿ) — each call spawns 2 more. Space = O(n) — max recursion depth is n.  
-**Snippet C:** Time = O(n³) — three nested loops, each dependent on n.  
-**Snippet D:** Time = O(n log n) — n iterations × O(log n) each. Space = O(n) — the result array.
-
-</details>
+1. `5 / 2 == 2.5` in Java → **False** (integer division → 2; cast needed)
+2. `"hello" == "hello"` is always true → **False** (string literals CAN be cached, but `new String()` creates new object)
+3. `Arrays.sort(int[])` is O(n log n) → **True** (dual-pivot quicksort)
+4. `ArrayList.get(i)` is O(n) → **False** (O(1) — backed by array)
+5. A recursive factorial(n) uses O(n) stack space → **True** (n frames on call stack)
+6. `HashMap.get()` is always O(1) → **False** (O(1) average, O(n) worst case with collisions)
+7. `(int)(3.99)` evaluates to 4 → **False** (truncates to 3)
+8. Swapping two `int` primitives via a method changes the originals → **False** (pass-by-value)
 
 ---
 
-_Next lecture: Recursion & Backtracking — where the real DSA magic begins._
+## 🧠 Conceptual Questions
+
+1. Why does `swap(int a, int b)` fail in Java but `swap(int[] arr, int i, int j)` works?
+2. What is the difference between `==` and `.equals()` for `String`? Give an example where they differ.
+3. Derive why digit extraction (`while n > 0, n /= 10`) is O(log n).
+4. Kadane's algorithm vs brute force — what is the core performance win?
+5. Why should you use `lo + (hi - lo) / 2` instead of `(lo + hi) / 2` in binary search?
+6. What is the output of `Integer.MIN_VALUE * -1`? Why?
+
+---
+
+Next: Topic 2 — Java Memory Management & Collections Framework Deep Dive\_

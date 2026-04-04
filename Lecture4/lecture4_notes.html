@@ -2,2325 +2,1613 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lecture 4 — Arrays & Strings</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-        rel="stylesheet">
-    <!-- KaTeX for Premium Math Rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-        onload="renderMathInElement(document.body);"></script>
-    <style>
-        /* ─── Reset & Base ─────────────────────────────────────────────── */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #ffffff;
-            --bg2: #f7f6f3;
-            --bg3: #efede9;
-            --border: #e3e0d9;
-            --border2: #d0ccc4;
-            --text: #37352f;
-            --text2: #6b6860;
-            --text3: #9b9790;
-            --accent: #2383e2;
-            --accent-bg: #e8f1fc;
-            --green: #0f7b6c;
-            --green-bg: #e9f5f3;
-            --red: #c0392b;
-            --red-bg: #fdf0ee;
-            --yellow: #8a6d00;
-            --yellow-bg: #fdf6e3;
-            --purple: #6940a5;
-            --purple-bg: #f0ecf9;
-            --orange: #c75b0e;
-            --orange-bg: #fef0e7;
-            --pink: #ad1a72;
-            --pink-bg: #fce8f3;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Inter', sans-serif;
-            --serif: 'Merriweather', serif;
-            --sidebar-w: 260px;
-            --content-max: 860px;
-        }
-
-        [data-theme="dark"] {
-            --bg: #191919;
-            --bg2: #212121;
-            --bg3: #2d2d2d;
-            --border: #333;
-            --border2: #444;
-            --text: #e8e6e1;
-            --text2: #9b9790;
-            --text3: #6b6860;
-            --accent: #5ba4f5;
-            --accent-bg: #1a2d42;
-            --green: #4db6a8;
-            --green-bg: #0e2420;
-            --red: #e07070;
-            --red-bg: #2e1414;
-            --yellow: #d4a42a;
-            --yellow-bg: #2a1f06;
-            --purple: #a07dd4;
-            --purple-bg: #1e1530;
-            --orange: #e0893a;
-            --orange-bg: #2a1608;
-            --pink: #e06aac;
-            --pink-bg: #2a1020;
-        }
-
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: var(--sans);
-            background: var(--bg);
-            color: var(--text);
-            font-size: 15px;
-            line-height: 1.7;
-            display: flex;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        /* ─── Sidebar ──────────────────────────────────────────────────── */
-        #sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
-            background: var(--bg2);
-            border-right: 1px solid var(--border);
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            padding: 20px 0;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 0 16px 16px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 12px;
-        }
-
-        .lecture-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            margin-bottom: 10px;
-        }
-
-        .sidebar-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .sidebar-meta {
-            color: var(--text3);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .toc-label {
-            padding: 0 16px 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--text3);
-        }
-
-        .toc-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 16px;
-            cursor: pointer;
-            border-radius: 0;
-            color: var(--text2);
-            transition: background .12s, color .12s;
-            text-decoration: none;
-        }
-
-        .toc-item:hover,
-        .toc-item.active {
-            background: var(--bg3);
-            color: var(--text);
-        }
-
-        .toc-item.active {
-            font-weight: 500;
-            color: var(--accent);
-        }
-
-        .toc-item .toc-icon {
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .toc-sub {
-            padding-left: 36px;
-            font-size: 12px;
-            color: var(--text3);
-        }
-
-        .toc-sub:hover {
-            color: var(--text2);
-        }
-
-        .sidebar-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 10px 16px;
-        }
-
-        /* ─── Main Content ─────────────────────────────────────────────── */
-        #main {
-            flex: 1;
-            overflow-y: auto;
-            height: 100vh;
-        }
-
-        #content {
-            max-width: var(--content-max);
-            margin: 0 auto;
-            padding: 48px 64px 32px;
-        }
-
-        /* ─── Page Header ──────────────────────────────────────────────── */
-        .page-header {
-            margin-bottom: 40px;
-            padding-bottom: 28px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .page-emoji {
-            font-size: 48px;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .page-title {
-            font-family: var(--serif);
-            font-size: 38px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.2;
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            font-size: 16px;
-            color: var(--text2);
-            font-style: italic;
-            margin-bottom: 16px;
-        }
-
-        .meta-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .meta-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1px solid var(--border2);
-            color: var(--text2);
-            background: var(--bg2);
-        }
-
-        .meta-chip.accent {
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-color: var(--accent-bg);
-        }
-
-        .meta-chip.green {
-            background: var(--green-bg);
-            color: var(--green);
-            border-color: var(--green-bg);
-        }
-
-        .meta-chip.yellow {
-            background: var(--yellow-bg);
-            color: var(--yellow);
-            border-color: var(--yellow-bg);
-        }
-
-        /* ─── Notion Blocks ────────────────────────────────────────────── */
-        .section {
-            margin-bottom: 8px;
-            scroll-margin-top: 20px;
-        }
-
-        .h1 {
-            font-family: var(--serif);
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text);
-            margin: 40px 0 12px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid var(--border);
-            scroll-margin-top: 20px;
-        }
-
-        .h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text);
-            margin: 28px 0 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin: 20px 0 6px;
-        }
-
-        p {
-            color: var(--text);
-            margin: 0 0 10px;
-            line-height: 1.75;
-        }
-
-        /* ─── Callout Blocks ───────────────────────────────────────────── */
-        .callout {
-            display: flex;
-            gap: 12px;
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin: 14px 0;
-            font-size: 14px;
-            line-height: 1.65;
-        }
-
-        .callout-icon {
-            font-size: 18px;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .callout-body {
-            flex: 1;
-        }
-
-        .callout-body strong {
-            font-weight: 600;
-        }
-
-        .callout.blue {
-            background: var(--accent-bg);
-            color: var(--text);
-        }
-
-        .callout.green {
-            background: var(--green-bg);
-            color: var(--text);
-        }
-
-        .callout.yellow {
-            background: var(--yellow-bg);
-            color: var(--text);
-        }
-
-        .callout.red {
-            background: var(--red-bg);
-            color: var(--text);
-        }
-
-        .callout.purple {
-            background: var(--purple-bg);
-            color: var(--text);
-        }
-
-        .callout.orange {
-            background: var(--orange-bg);
-            color: var(--text);
-        }
-
-        /* ─── Code Blocks ──────────────────────────────────────────────── */
-        .code-block {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin: 14px 0;
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            background: var(--bg3);
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text2);
-            gap: 10px;
-        }
-
-        .code-lang {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--text3);
-        }
-
-        .copy-btn {
-            background: none;
-            border: 1px solid var(--border2);
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 11px;
-            cursor: pointer;
-            color: var(--text2);
-            font-family: var(--sans);
-            transition: background .12s;
-        }
-
-        .copy-btn:hover {
-            background: var(--bg);
-        }
-
-        pre {
-            padding: 16px;
-            overflow-x: auto;
-            margin: 0;
-            font-family: var(--mono);
-            font-size: 13.5px;
-            line-height: 1.75;
-            tab-size: 4;
-        }
-
-        .kw {
-            color: #0550ae;
-            font-weight: 500;
-        }
-
-        .cm {
-            color: #6a737d;
-            font-style: italic;
-        }
-
-        .str {
-            color: #0a8043;
-        }
-
-        .num {
-            color: #953800;
-        }
-
-        .fn {
-            color: #8250df;
-        }
-
-        .cls {
-            color: #1a7f37;
-        }
-
-        .ret {
-            color: #0550ae;
-        }
-
-        [data-theme="dark"] .kw {
-            color: #79c0ff;
-        }
-
-        [data-theme="dark"] .cm {
-            color: #8b949e;
-        }
-
-        [data-theme="dark"] .str {
-            color: #a5d6ff;
-        }
-
-        [data-theme="dark"] .num {
-            color: #ff9150;
-        }
-
-        [data-theme="dark"] .fn {
-            color: #d2a8ff;
-        }
-
-        [data-theme="dark"] .cls {
-            color: #7ee787;
-        }
-
-        [data-theme="dark"] .ret {
-            color: #79c0ff;
-        }
-
-        code {
-            font-family: var(--mono);
-            font-size: 13px;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1px 6px;
-            color: var(--red);
-        }
-
-        [data-theme="dark"] code {
-            color: var(--orange);
-        }
-
-        /* ─── Toggles / Collapsibles ───────────────────────────────────── */
-        details {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        summary {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text);
-            background: var(--bg2);
-            list-style: none;
-            transition: background .12s;
-            user-select: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        summary:hover {
-            background: var(--bg3);
-        }
-
-        summary .toggle-arrow {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform .2s;
-            color: var(--text3);
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        details[open] summary .toggle-arrow {
-            transform: rotate(90deg);
-        }
-
-        .details-body {
-            padding: 14px 16px;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-        }
-
-        /* ─── Tables ───────────────────────────────────────────────────── */
-        .table-wrap {
-            overflow-x: auto;
-            margin: 14px 0;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-
-        thead th {
-            background: var(--bg2);
-            padding: 9px 14px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: .03em;
-            color: var(--text2);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        tbody td {
-            padding: 9px 14px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: top;
-            line-height: 1.5;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr:hover td {
-            background: var(--bg2);
-        }
-
-        /* ─── Bullet / Numbered Lists ──────────────────────────────────── */
-        ul,
-        ol {
-            padding-left: 24px;
-            margin: 8px 0 12px;
-        }
-
-        li {
-            margin: 4px 0;
-            line-height: 1.7;
-        }
-
-        li::marker {
-            color: var(--text3);
-        }
-
-        /* ─── Divider ──────────────────────────────────────────────────── */
-        hr {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 32px 0;
-        }
-
-        /* ─── Practice Problem Cards ───────────────────────────────────── */
-        .prob-card {
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin: 14px 0;
-            overflow: hidden;
-        }
-
-        .prob-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--bg2);
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background .12s;
-        }
-
-        .prob-header:hover {
-            background: var(--bg3);
-        }
-
-        .prob-left {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .prob-num {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--text3);
-            margin-bottom: 4px;
-        }
-
-        .prob-title {
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--text);
-            line-height: 1.3;
-        }
-
-        .prob-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .tag {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-family: var(--sans);
-        }
-
-        .tag-easy {
-            background: var(--green-bg);
-            color: var(--green);
-        }
-
-        .tag-med {
-            background: var(--yellow-bg);
-            color: var(--yellow);
-        }
-
-        .tag-hard {
-            background: var(--red-bg);
-            color: var(--red);
-        }
-
-        .tag-co {
-            background: var(--accent-bg);
-            color: var(--accent);
-        }
-
-        .tag-pat {
-            background: var(--purple-bg);
-            color: var(--purple);
-        }
-
-        .tag-lc {
-            background: var(--orange-bg);
-            color: var(--orange);
-        }
-
-        .prob-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-
-        .prob-body {
-            padding: 16px;
-            background: var(--bg);
-        }
-
-        .prob-section {
-            margin-bottom: 14px;
-        }
-
-        .prob-section-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            color: var(--text3);
-            margin-bottom: 6px;
-        }
-
-        .iobox {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-family: var(--mono);
-            font-size: 13px;
-            color: var(--text2);
-            white-space: pre-wrap;
-        }
-
-        /* ─── Tree / Recursion Diagrams (ASCII-style) ─────────────────── */
-        .ascii-tree {
-            font-family: var(--mono);
-            font-size: 13px;
-            line-height: 1.6;
-            color: var(--text2);
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            margin: 10px 0;
-            overflow-x: auto;
-            white-space: pre;
-        }
-
-        .ascii-tree .hl {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .ascii-tree .ret {
-            color: var(--green);
-            font-weight: 600;
-        }
-
-        .ascii-tree .nd {
-            color: var(--orange);
-        }
-
-        /* ─── Visual Stack Diagram ─────────────────────────────────────── */
-        .stack-vis {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 2px;
-            width: 220px;
-            margin: 12px 0;
-        }
-
-        .stack-frame {
-            padding: 8px 14px;
-            border-radius: 5px;
-            font-family: var(--mono);
-            font-size: 13px;
-            border: 1.5px solid var(--border2);
-            background: var(--bg2);
-            color: var(--text);
-            transition: all .3s;
-        }
-
-        .stack-frame.active {
-            background: var(--accent-bg);
-            border-color: var(--accent);
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .stack-frame.ret-frame {
-            background: var(--green-bg);
-            border-color: var(--green);
-            color: var(--green);
-            opacity: .7;
-        }
-
-        /* ─── Checklist ─────────────────────────────────────────────────── */
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            margin: 8px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            user-select: none;
-        }
-
-        .checklist-item:hover {
-            background: var(--bg2);
-            border-color: var(--border);
-        }
-
-        .cb-box {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border2);
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            color: transparent;
-            font-size: 12px;
-            flex-shrink: 0;
-            background: var(--bg);
-        }
-
-        .cb-text {
-            font-size: 14.5px;
-            color: var(--text);
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-
-        .checklist-item.done .cb-box {
-            background: var(--green);
-            border-color: var(--green);
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .checklist-item.done .cb-text {
-            color: var(--text3);
-            text-decoration: line-through;
-        }
-
-        /* ─── Complexity Badge ─────────────────────────────────────────── */
-        .complexity-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .cx-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-family: var(--mono);
-            border: 1px solid var(--border);
-            background: var(--bg2);
-        }
-
-        .cx-badge .cx-label {
-            font-size: 11px;
-            font-family: var(--sans);
-            color: var(--text3);
-        }
-
-        .cx-badge .cx-val {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .cx-badge.green {
-            background: var(--green-bg);
-            border-color: var(--green);
-        }
-
-        .cx-badge.yellow {
-            background: var(--yellow-bg);
-            border-color: var(--yellow);
-        }
-
-        .cx-badge.red {
-            background: var(--red-bg);
-            border-color: var(--red);
-        }
-
-        .cx-badge .cx-val.green {
-            color: var(--green);
-        }
-
-        .cx-badge .cx-val.yellow {
-            color: var(--yellow);
-        }
-
-        .cx-badge .cx-val.red {
-            color: var(--red);
-        }
-
-        /* ─── Pattern Banner ───────────────────────────────────────────── */
-        .pattern-banner {
-            background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-            border: 1px solid var(--border2);
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
-
-        .pattern-banner h4 {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--purple);
-            margin-bottom: 8px;
-        }
-
-        .pattern-banner p {
-            font-size: 14px;
-            font-family: var(--mono);
-            color: var(--text);
-            margin: 0;
-            line-height: 1.8;
-        }
-
-        /* ─── Top Bar ──────────────────────────────────────────────────── */
-        #topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 24px 10px 28px;
-            font-size: 13px;
-            color: var(--text2);
-            gap: 12px;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .breadcrumb a {
-            color: var(--text3);
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--text);
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .progress-bar {
-            width: 120px;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            transition: width .3s;
-        }
-
-        #darkToggle {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text2);
-            font-family: var(--sans);
-            transition: background .12s;
-        }
-
-        #darkToggle:hover {
-            background: var(--bg3);
-        }
-
-
-        /* ─── Hover highlight links ────────────────────────────────────── */
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* ─── Scrollbar ─────────────────────────────────────────────────── */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border2);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text3);
-        }
-
-        /* ─── Responsive ─────────────────────────────────────────────────── */
-        @media (max-width: 768px) {
-            #sidebar {
-                display: none;
-            }
-
-            #content {
-                padding: 24px 20px 80px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture 4 — Java 8+ Modern Features</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f7f6f3;
+      --bg3: #efede9;
+      --bg4: #e8e5df;
+      --border: #e3e0d9;
+      --border2: #d0ccc4;
+      --text: #37352f;
+      --text2: #6b6860;
+      --text3: #9b9790;
+      --accent: #2383e2;
+      --accent-bg: #e8f1fc;
+      --green: #0f7b6c;
+      --green-bg: #e9f5f3;
+      --red: #c0392b;
+      --red-bg: #fdf0ee;
+      --yellow: #8a6d00;
+      --yellow-bg: #fdf6e3;
+      --purple: #6940a5;
+      --purple-bg: #f0ecf9;
+      --orange: #c75b0e;
+      --orange-bg: #fef0e7;
+      --pink: #ad1a72;
+      --pink-bg: #fce8f3;
+      --teal: #0d7d6e;
+      --teal-bg: #e4f4f1;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --serif: 'Merriweather', serif;
+      --sidebar-w: 260px
+    }
+
+    [data-theme="dark"] {
+      --bg: #191919;
+      --bg2: #212121;
+      --bg3: #2d2d2d;
+      --bg4: #383838;
+      --border: #333;
+      --border2: #444;
+      --text: #e8e6e1;
+      --text2: #9b9790;
+      --text3: #6b6860;
+      --accent: #5ba4f5;
+      --accent-bg: #1a2d42;
+      --green: #4db6a8;
+      --green-bg: #0e2420;
+      --red: #e07070;
+      --red-bg: #2e1414;
+      --yellow: #d4a42a;
+      --yellow-bg: #2a1f06;
+      --purple: #a07dd4;
+      --purple-bg: #1e1530;
+      --orange: #e0893a;
+      --orange-bg: #2a1608;
+      --pink: #e06aac;
+      --pink-bg: #2a1020;
+      --teal: #38c9b8;
+      --teal-bg: #0d2420
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: row;
+      transition: background .2s, color .2s;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 20px 0;
+      font-size: 13px;
+      flex-shrink: 0
+    }
+
+    .sb-header {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px
+    }
+
+    .sb-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 10px
+    }
+
+    .sb-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.3
+    }
+
+    .sb-meta {
+      color: var(--text3);
+      font-size: 11px;
+      margin-top: 4px
+    }
+
+    .toc-label {
+      padding: 0 16px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--text3)
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 16px;
+      cursor: pointer;
+      color: var(--text2);
+      transition: background .12s, color .12s;
+      text-decoration: none
+    }
+
+    .toc-item:hover,
+    .toc-item.active {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .toc-item.active {
+      font-weight: 500;
+      color: var(--accent)
+    }
+
+    .toc-icon {
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .toc-sub {
+      padding-left: 36px;
+      font-size: 12px;
+      color: var(--text3)
+    }
+
+    .toc-sub:hover {
+      color: var(--text2)
+    }
+
+    .sb-div {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 16px
+    }
+
+    /* ── Main ── */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh
+    }
+
+    #content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 64px 120px
+    }
+
+    /* ── Topbar ── */
+    #topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px 10px 28px;
+      font-size: 13px;
+      color: var(--text2);
+      gap: 12px;
+      backdrop-filter: blur(8px)
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .breadcrumb a {
+      color: var(--text3);
+      text-decoration: none
+    }
+
+    .breadcrumb a:hover {
+      color: var(--text)
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .progress-bar {
+      width: 120px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width .3s
+    }
+
+    #darkToggle {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text2);
+      font-family: var(--sans);
+      transition: background .12s
+    }
+
+    #darkToggle:hover {
+      background: var(--bg3)
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      margin-bottom: 40px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .page-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block
+    }
+
+    .page-title {
+      font-family: var(--serif);
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 10px
+    }
+
+    .page-sub {
+      font-size: 16px;
+      color: var(--text2);
+      font-style: italic;
+      margin-bottom: 16px
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      background: var(--bg2)
+    }
+
+    .meta-chip.accent {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-color: var(--accent-bg)
+    }
+
+    .meta-chip.green {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: var(--green-bg)
+    }
+
+    .meta-chip.yellow {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: var(--yellow-bg)
+    }
+
+    /* ── Headings ── */
+    .h1 {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 40px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--border);
+      scroll-margin-top: 20px
+    }
+
+    .h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      scroll-margin-top: 20px
+    }
+
+    .h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 20px 0 6px
+    }
+
+    p {
+      color: var(--text);
+      margin: 0 0 10px;
+      line-height: 1.75
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0
+    }
+
+    /* ── Callouts ── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+      font-size: 14px;
+      line-height: 1.65
+    }
+
+    .callout-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .callout-body {
+      flex: 1
+    }
+
+    .callout-body strong {
+      font-weight: 600
+    }
+
+    .callout.blue {
+      background: var(--accent-bg);
+      color: var(--text)
+    }
+
+    .callout.green {
+      background: var(--green-bg);
+      color: var(--text)
+    }
+
+    .callout.yellow {
+      background: var(--yellow-bg);
+      color: var(--text)
+    }
+
+    .callout.red {
+      background: var(--red-bg);
+      color: var(--text)
+    }
+
+    .callout.purple {
+      background: var(--purple-bg);
+      color: var(--text)
+    }
+
+    .callout.orange {
+      background: var(--orange-bg);
+      color: var(--text)
+    }
+
+    .callout.teal {
+      background: var(--teal-bg);
+      color: var(--text)
+    }
+
+    /* ── Code Blocks ── */
+    .code-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 14px 0;
+      overflow: hidden
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      gap: 10px
+    }
+
+    .code-lang {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text2);
+      font-family: var(--sans);
+      transition: background .12s
+    }
+
+    .copy-btn:hover {
+      background: var(--bg)
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.75;
+      tab-size: 4
+    }
+
+    .kw {
+      color: #0550ae;
+      font-weight: 500
+    }
+
+    .cm {
+      color: #6a737d;
+      font-style: italic
+    }
+
+    .str {
+      color: #0a8043
+    }
+
+    .num {
+      color: #953800
+    }
+
+    .fn {
+      color: #8250df
+    }
+
+    .cls {
+      color: #1a7f37
+    }
+
+    .ret {
+      color: #0550ae
+    }
+
+    [data-theme="dark"] .kw {
+      color: #79c0ff
+    }
+
+    [data-theme="dark"] .cm {
+      color: #8b949e
+    }
+
+    [data-theme="dark"] .str {
+      color: #a5d6ff
+    }
+
+    [data-theme="dark"] .num {
+      color: #ff9150
+    }
+
+    [data-theme="dark"] .fn {
+      color: #d2a8ff
+    }
+
+    [data-theme="dark"] .cls {
+      color: #7ee787
+    }
+
+    [data-theme="dark"] .ret {
+      color: #79c0ff
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--red)
+    }
+
+    [data-theme="dark"] code {
+      color: var(--orange)
+    }
+
+    /* ── Tables ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 14px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px
+    }
+
+    thead th {
+      background: var(--bg2);
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: .03em;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    tbody tr:hover td {
+      background: var(--bg2)
+    }
+
+    /* ── Lists ── */
+    ul,
+    ol {
+      padding-left: 24px;
+      margin: 8px 0 12px
+    }
+
+    li {
+      margin: 4px 0;
+      line-height: 1.7
+    }
+
+    li::marker {
+      color: var(--text3)
+    }
+
+    /* ── Toggles ── */
+    details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow: hidden
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg2);
+      list-style: none;
+      transition: background .12s;
+      user-select: none
+    }
+
+    summary::-webkit-details-marker {
+      display: none
+    }
+
+    summary:hover {
+      background: var(--bg3)
+    }
+
+    .toggle-arrow {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .2s;
+      color: var(--text3);
+      font-size: 12px;
+      flex-shrink: 0
+    }
+
+    details[open] summary .toggle-arrow {
+      transform: rotate(90deg)
+    }
+
+    .details-body {
+      padding: 14px 16px;
+      background: var(--bg);
+      border-top: 1px solid var(--border)
+    }
+
+    /* ── Practice problem cards ── */
+    .prob-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 14px 0;
+      overflow: hidden
+    }
+
+    .prob-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .12s
+    }
+
+    .prob-header:hover {
+      background: var(--bg3)
+    }
+
+    .prob-left {
+      flex: 1;
+      min-width: 0
+    }
+
+    .prob-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 4px
+    }
+
+    .prob-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.3
+    }
+
+    .prob-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500
+    }
+
+    .tag-easy {
+      background: var(--green-bg);
+      color: var(--green)
+    }
+
+    .tag-med {
+      background: var(--yellow-bg);
+      color: var(--yellow)
+    }
+
+    .tag-hard {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .tag-co {
+      background: var(--accent-bg);
+      color: var(--accent)
+    }
+
+    .tag-pat {
+      background: var(--purple-bg);
+      color: var(--purple)
+    }
+
+    .tag-lc {
+      background: var(--orange-bg);
+      color: var(--orange)
+    }
+
+    .prob-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0
+    }
+
+    .prob-body {
+      padding: 16px;
+      background: var(--bg)
+    }
+
+    .prob-section {
+      margin-bottom: 14px
+    }
+
+    .prob-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text3);
+      margin-bottom: 6px
+    }
+
+    .iobox {
+      background: var(--bg2);
+      border-left: 3px solid var(--border2);
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text2);
+      margin: 8px 0;
+      white-space: pre-wrap
+    }
+
+    /* ── Progress Bar ── */
+    .progress-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      width: 0%;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Checklist Component ── */
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .checklist-item:hover {
+      background: var(--bg2);
+      border-color: var(--border);
+    }
+
+    .cb-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border2);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: transparent;
+      font-size: 12px;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    .cb-text {
+      font-size: 14.5px;
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .checklist-item.done .cb-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .checklist-item.done .cb-text {
+      color: var(--text3);
+      text-decoration: line-through;
+    }
+
+    /* ── ASCII Tree Dry Runs ── */
+    .ascii-tree {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text2);
+      margin: 14px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .ascii-tree .hl {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .ascii-tree .nd {
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    .ascii-tree .ret {
+      color: var(--purple);
+      font-weight: 600;
+    }
+
+    .iobox {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text2);
+      white-space: pre-wrap;
+    }
+
+    /* ── Complexity ── */
+    .complexity-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0
+    }
+
+    .cx-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--mono);
+      border: 1px solid var(--border);
+      background: var(--bg2)
+    }
+
+    .cx-badge .cx-label {
+      font-size: 11px;
+      font-family: var(--sans);
+      color: var(--text3)
+    }
+
+    .cx-badge .cx-val {
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .cx-badge.green {
+      background: var(--green-bg);
+      border-color: var(--green)
+    }
+
+    .cx-badge.yellow {
+      background: var(--yellow-bg);
+      border-color: var(--yellow)
+    }
+
+    .cx-badge.red {
+      background: var(--red-bg);
+      border-color: var(--red)
+    }
+
+    .cx-badge .cx-val.green {
+      color: var(--green)
+    }
+
+    .cx-badge .cx-val.yellow {
+      color: var(--yellow)
+    }
+
+    .cx-badge .cx-val.red {
+      color: var(--red)
+    }
+
+    /* ── Pattern banner ── */
+    .pattern-banner {
+      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0
+    }
+
+    .pattern-banner h4 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 8px
+    }
+
+    .pattern-banner p {
+      font-size: 14px;
+      font-family: var(--mono);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.8
+    }
+
+    /* ── Big-O chart ── */
+    .bigo-chart-wrap {
+      margin: 14px 0 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg2);
+      padding: 16px
+    }
+
+    /* ── Checklist ── */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .checklist-item:last-child {
+      border-bottom: none
+    }
+
+    .cb-box {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border2);
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-size: 11px
+    }
+
+    .checklist-item.done .cb-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff
+    }
+
+    .checklist-item.done .cb-text {
+      text-decoration: line-through;
+      color: var(--text3)
+    }
+
+    /* ── Inline highlight ── */
+    mark {
+      background: var(--yellow-bg);
+      color: var(--text);
+      padding: 0 3px;
+      border-radius: 3px
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    a:hover {
+      text-decoration: underline
+    }
+
+    @media(max-width:768px) {
+      #sidebar {
+        display: none
+      }
+
+      #content {
+        padding: 24px 20px 80px
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <!-- ─── Top Bar ────────────────────────────────────────────────── -->
-    <div
-        style="position:fixed;top:0;left:var(--sidebar-w);right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:6px 24px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;height:36px">
-        <div style="color:var(--text3)">DSA Course › Phase 1 › <strong style="color:var(--text)">Lecture 4</strong>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px">
-            <span style="color:var(--text3)">Progress</span>
-            <div class="progress-bar">
-                <div id="progressFill" class="progress-fill" style="width:0%"></div>
-            </div>
-            <button onclick="toggleDark()" id="darkToggle"
-                style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:var(--sans)">🌙
-                Dark</button>
-        </div>
+  <nav id="sidebar">
+    <div class="sb-header">
+      <div class="sb-badge">📚 DSA Course</div>
+      <div class="sb-title">Java 8+ Modern Features</div>
+      <div class="sb-meta">Lecture 4 of 30 · Phase 1 — Foundations</div>
     </div>
-
-    <!-- ─── Sidebar ────────────────────────────────────────────────── -->
-    <div id="sidebar" style="padding-top:46px">
-        <div class="sidebar-header">
-            <span class="lecture-badge">🎯 DSA Course</span>
-            <div class="sidebar-title">Arrays & Strings</div>
-            <div class="sidebar-meta">Lecture 4 of 24 · Phase 1</div>
-        </div>
-
-        <div class="toc-label" style="margin-top:12px">ON THIS PAGE</div>
-
-        <a class="toc-item" href="#prefix-sum">
-            <span class="toc-icon">📊</span> Prefix Sums
-        </a>
-        <a class="toc-item toc-sub" href="#prefix-1d">1D Memory Logic</a>
-        <a class="toc-item toc-sub" href="#prefix-2d">2D Matrix Logic</a>
-
-        <a class="toc-item" href="#kadane">
-            <span class="toc-icon">🎒</span> Kadane's Algorithm
-        </a>
-
-        <a class="toc-item" href="#dutch">
-            <span class="toc-icon">🚩</span> Dutch National Flag
-        </a>
-
-        <a class="toc-item" href="#rotate">
-            <span class="toc-icon">🔄</span> Rotation Algorithm
-        </a>
-
-        <a class="toc-item" href="#freq">
-            <span class="toc-icon">🔤</span> Frequency Arrays
-        </a>
-
-        <a class="toc-item" href="#immutability">
-            <span class="toc-icon">🧵</span> String Foundations
-        </a>
-
-        <a class="toc-item" href="#rabin-karp">
-            <span class="toc-icon">🔑</span> Rolling Hash Intro
-        </a>
-
-        <a class="toc-item" href="#spiral">
-            <span class="toc-icon">🌀</span> 2D Traversals
-        </a>
-
-        <a class="toc-item" href="#practice">
-            <span class="toc-icon">💪</span> Practice Problems
-        </a>
-
-        <a class="toc-item" href="#assignment">
-            <span class="toc-icon">📝</span> Assignment
-        </a>
-
-        <div class="sidebar-divider"></div>
-
-        <a class="toc-item" href="#checklist">
-            <span class="toc-icon">✅</span> Completion Checklist
-        </a>
-
-        <div class="sidebar-divider"></div>
-
-        <div style="padding: 8px 16px;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-            <a class="toc-item" href="../Lecture3/lecture3_notes.html"
-                style="padding:5px 0;font-size:13px;color:var(--text3);">← Lecture 3: Bit
-                Manipulation</a>
-        </div>
+    <div class="toc-label">On this page</div>
+    <a class="toc-item" href="#lambdas"><span class="toc-icon">λ</span>Lambda Expressions</a>
+    <a class="toc-item toc-sub" href="#functional-interfaces">Functional Interfaces</a>
+    <a class="toc-item toc-sub" href="#method-refs">Method References</a>
+    <a class="toc-item" href="#streams"><span class="toc-icon">🌊</span>Streams API</a>
+    <a class="toc-item toc-sub" href="#intermediate">Intermediate Ops</a>
+    <a class="toc-item toc-sub" href="#terminal">Terminal Ops</a>
+    <a class="toc-item toc-sub" href="#collectors">Collectors</a>
+    <a class="toc-item" href="#optional"><span class="toc-icon">📦</span>Optional<T></a>
+    <a class="toc-item" href="#default-methods"><span class="toc-icon">🔧</span>Default Methods</a>
+    <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
+    <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
+    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
+    <div class="sb-div"></div>
+    <div style="padding:8px 16px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
+      <a class="toc-item" href="../Lecture3/lecture3_notes.html"
+        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 3: OOP</a>
+      <a class="toc-item" href="../Lecture5/lecture5_notes.html"
+        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 5: Recursion</a>
     </div>
+  </nav>
+  <div id="main">
+    <div id="topbar">
+      <div class="breadcrumb">
+        <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
+        <a href="#">Phase 1</a><span>›</span>
+        <span>Lecture 4</span>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:12px;color:var(--text3)">Progress</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+      </div>
+    </div>
+    <div id="content">
+      <div class="page-header">
+        <span class="page-emoji">⚡</span>
+        <h1 class="page-title">Java 8+ Modern Features</h1>
+        <p class="page-sub">"Lambdas didn't change what Java can do. They changed how beautifully you can do it."</p>
+        <div class="meta-row"><span class="meta-chip accent">📖 Lecture 4</span><span class="meta-chip accent">Phase 1 —
+            Foundations</span><span class="meta-chip yellow">⏱ 3 days</span><span class="meta-chip green">🎯 15+
+            problems</span><span class="meta-chip ">💼 Amazon · LinkedIn · Salesforce</span></div>
+      </div>
+      <h2 class="h1" id="lambdas">λ Lambda Expressions</h2>
+      <div class="callout blue"><span class="callout-icon">📌</span>
+        <div class="callout-body"><strong>What is a Lambda?</strong> A lambda is an anonymous function — a function
+          without a name, class, or explicit return type declaration. Java 8 introduced them to enable functional
+          programming patterns and eliminate boilerplate anonymous class syntax.</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Evolution: Anonymous Class → Lambda → Method Reference</div><button
+            class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// JAVA 7: Anonymous class (verbose, but explicit)</span>
+<span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt; c = <span class="kw">new</span> <span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt;() {
+    @Override
+    <span class="kw">public int</span> <span class="fn">compare</span>(<span class="cls">String</span> a, <span class="cls">String</span> b) { <span class="ret">return</span> a.length() - b.length(); }
+};
 
-    <!-- ─── Main content ───────────────────────────────────────────── -->
-    <div id="main" style="padding-top:36px">
-        <div id="content">
+<span class="cm">// JAVA 8: Lambda (concise)</span>
+<span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt; c = (a, b) -> a.length() - b.length();
 
-            <!-- ── HEADER ── -->
-            <div class="page-header">
-                <span class="page-emoji">🗄️</span>
-                <h1 class="page-title">Arrays & Strings Masterclass</h1>
-                <p class="page-subtitle">Mastering the foundation of contiguous memory: prefix calculations, greedy
-                    optimizations, and efficient string manipulations.</p>
+<span class="cm">// JAVA 8: Method reference (most concise when applicable)</span>
+<span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt; c = <span class="cls">Comparator</span>.comparingInt(<span class="cls">String</span>::length);
 
-                <div class="meta-row">
-                    <span class="meta-chip accent">📖 Lecture 4</span>
-                    <span class="meta-chip accent">Phase 1 — Foundations</span>
-                    <span class="meta-chip yellow">⏱ 8 days</span>
-                    <span class="meta-chip green">🎯 35 problems</span>
-                    <span class="meta-chip">💼 Google · Amazon · Meta · Apple · Netflix</span>
-                </div>
-            </div>
+<span class="cm">// Lambda syntax forms:</span>
+() -> expression                     <span class="cm">// no params, expression body</span>
+x -> x * 2                          <span class="cm">// one param (no parens needed)</span>
+(x, y) -> x + y                     <span class="cm">// two params</span>
+(int x, int y) -> { <span class="ret">return</span> x + y; } <span class="cm">// explicit types + block body</span></pre>
+      </div>
+      <h3 class="h2" id="functional-interfaces">1.1 — Built-in Functional Interfaces</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Interface</th>
+              <th>Method Signature</th>
+              <th>Use Case</th>
+              <th>Example Lambda</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Predicate&lt;T&gt;</code></td>
+              <td><code>boolean test(T t)</code></td>
+              <td>Filter / condition check</td>
+              <td><code>x -> x > 0</code></td>
+            </tr>
+            <tr>
+              <td><code>Function&lt;T,R&gt;</code></td>
+              <td><code>R apply(T t)</code></td>
+              <td>Transform / map</td>
+              <td><code>s -> s.length()</code></td>
+            </tr>
+            <tr>
+              <td><code>Consumer&lt;T&gt;</code></td>
+              <td><code>void accept(T t)</code></td>
+              <td>Side effect (print, save)</td>
+              <td><code>s -> System.out.println(s)</code></td>
+            </tr>
+            <tr>
+              <td><code>Supplier&lt;T&gt;</code></td>
+              <td><code>T get()</code></td>
+              <td>Factory / lazy init</td>
+              <td><code>() -> new ArrayList&lt;&gt;()</code></td>
+            </tr>
+            <tr>
+              <td><code>BiFunction&lt;T,U,R&gt;</code></td>
+              <td><code>R apply(T t, U u)</code></td>
+              <td>Two-input transform</td>
+              <td><code>(a,b) -> a + b</code></td>
+            </tr>
+            <tr>
+              <td><code>UnaryOperator&lt;T&gt;</code></td>
+              <td><code>T apply(T t)</code></td>
+              <td>Same-type transform</td>
+              <td><code>s -> s.toUpperCase()</code></td>
+            </tr>
+            <tr>
+              <td><code>BinaryOperator&lt;T&gt;</code></td>
+              <td><code>T apply(T t1, T t2)</code></td>
+              <td>Two same-type → one</td>
+              <td><code>(a,b) -> Math.max(a,b)</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="h2" id="method-refs">1.2 — Method References</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · 4 Types of Method References</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// 1. Static method reference</span>
+<span class="cls">Function</span>&lt;<span class="cls">String</span>,<span class="cls">Integer</span>&gt; parse = <span class="cls">Integer</span>::parseInt;   <span class="cm">// Class::staticMethod</span>
 
-            <div class="callout blue">
-                <span class="callout-icon">💡</span>
-                <div class="callout-body">
-                    <strong>Why Arrays matter at scale:</strong> Arrays are the single most cache-friendly data
-                    structure in computer science. Modern CPUs pull contiguous chunks of memory into the L1 cache. A
-                    linear scan of an array is orders of magnitude faster than traversing a Linked List, even if
-                    both are O(N).
-                </div>
-            </div>
+<span class="cm">// 2. Instance method reference (specific instance)</span>
+<span class="cls">String</span> prefix = <span class="str">"Hello"</span>;
+<span class="cls">Predicate</span>&lt;<span class="cls">String</span>&gt; starts = prefix::startsWith;        <span class="cm">// instance::method</span>
 
-            <hr>
+<span class="cm">// 3. Instance method reference (arbitrary instance of class)</span>
+<span class="cls">Function</span>&lt;<span class="cls">String</span>,<span class="cls">Integer</span>&gt; len = <span class="cls">String</span>::length;         <span class="cm">// Class::instanceMethod</span>
 
-            <!-- ═══ SECTION 1: PREFIX SUMS ═════════════════════════════ -->
-            <h2 class="h1" id="prefix-sum">📊 Prefix Sums (1D and 2D)</h2>
-            <p>Imagine your bank account. If you want to know exactly how much you spent between Wednesday and
-                Friday,
-                you don't need to manually add up Wednesday + Thursday + Friday's receipts. You can simply look at
-                your
-                total balance on Friday and subtract your total balance from Tuesday!</p>
+<span class="cm">// 4. Constructor reference</span>
+<span class="cls">Supplier</span>&lt;<span class="cls">ArrayList</span>&lt;<span class="cls">String</span>&gt;&gt; factory = <span class="cls">ArrayList</span>::<span class="kw">new</span>;   <span class="cm">// Class::new</span>
 
-            <p>This is the essence of <strong>Prefix Sums</strong>. They allow you to answer multiple Range Sum
-                Queries
-                in <strong>O(1) time</strong> after a single <strong>O(N) precomputation</strong> step.</p>
+<span class="cm">// Practical example — sort strings by length then alpha:</span>
+list.sort(<span class="cls">Comparator</span>.comparingInt(<span class="cls">String</span>::length).thenComparing(<span class="cls">String</span>::compareTo));</pre>
+      </div>
+      <h2 class="h1" id="streams">🌊 Streams API</h2>
+      <div class="callout purple"><span class="callout-icon">🎯</span>
+        <div class="callout-body"><strong>Streams Pipeline:</strong> SOURCE → [intermediate ops] → TERMINAL. Streams are
+          <em>lazy</em> — intermediate ops do nothing until a terminal op triggers evaluation. This means you can chain
+          many operations with only one pass through the data.
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Stream Pipeline</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// Classic stream pipeline:</span>
+<span class="cls">List</span>&lt;<span class="cls">String</span>&gt; result = employees.stream()          <span class="cm">// SOURCE</span>
+    .filter(e -> e.salary &gt; 50000)                 <span class="cm">// INTERMEDIATE: filter</span>
+    .map(<span class="cls">Employee</span>::getName)                       <span class="cm">// INTERMEDIATE: transform</span>
+    .sorted()                                      <span class="cm">// INTERMEDIATE: sort</span>
+    .distinct()                                    <span class="cm">// INTERMEDIATE: deduplicate</span>
+    .limit(10)                                     <span class="cm">// INTERMEDIATE: take first 10</span>
+    .collect(<span class="cls">Collectors</span>.toList());               <span class="cm">// TERMINAL: materialise</span>
 
-            <h3 class="h2" id="prefix-1d">1.1 The 1D Memory Logic</h3>
-            <p>We build a new array <code>P</code> where <code>P[i]</code> stores the sum of all elements from index
-                <code>0</code> up to <code>i</code>.
-            </p>
+<span class="cm">// Key insight: the filter/map/sorted DO NOTHING until collect() is called!</span>
+<span class="cm">// Lazy evaluation = no wasted work</span></pre>
+      </div>
+      <h3 class="h2" id="intermediate">2.1 — Intermediate Operations (lazy)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · All Intermediate Ops</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>stream.filter(x -> x > 0)              <span class="cm">// keep elements matching predicate</span>
+stream.map(x -> x * 2)                 <span class="cm">// transform each element</span>
+stream.flatMap(x -> x.stream())        <span class="cm">// flatten nested streams (List&lt;List&lt;T&gt;&gt; → Stream&lt;T&gt;)</span>
+stream.distinct()                      <span class="cm">// remove duplicates (uses equals/hashCode)</span>
+stream.sorted()                        <span class="cm">// sort by natural order</span>
+stream.sorted(Comparator.reverseOrder()) <span class="cm">// sort descending</span>
+stream.limit(n)                        <span class="cm">// take first n elements</span>
+stream.skip(n)                         <span class="cm">// skip first n</span>
+stream.peek(x -> log(x))               <span class="cm">// side effect without consuming (debugging!)</span>
+stream.mapToInt(String::length)         <span class="cm">// boxed → primitive stream (no autoboxing)</span></pre>
+      </div>
+      <h3 class="h2" id="terminal">2.2 — Terminal Operations (eager)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · All Terminal Ops</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>stream.collect(toList())                <span class="cm">// → List</span>
+stream.collect(toSet())                 <span class="cm">// → Set</span>
+stream.collect(joining(", ", "[", "]")) <span class="cm">// → "[a, b, c]"</span>
+stream.count()                          <span class="cm">// → long</span>
+stream.reduce(0, Integer::sum)          <span class="cm">// → single value</span>
+stream.forEach(System.out::println)     <span class="cm">// side effect on each</span>
+stream.findFirst()                      <span class="cm">// → Optional&lt;T&gt;</span>
+stream.anyMatch(x -> x &gt; 0)            <span class="cm">// → boolean (short-circuits)</span>
+stream.allMatch(x -> x &gt; 0)            <span class="cm">// → boolean</span>
+stream.noneMatch(x -> x &lt; 0)           <span class="cm">// → boolean</span>
+stream.min(Comparator.naturalOrder())   <span class="cm">// → Optional&lt;T&gt;</span>
+stream.toArray()                        <span class="cm">// → Object[]</span></pre>
+      </div>
+      <h3 class="h2" id="collectors">2.3 — Collectors (the power tools)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Key Collectors</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// groupingBy — partition into Map&lt;K, List&lt;V&gt;&gt;</span>
+<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt;&gt; byDept =
+    employees.stream().collect(<span class="cls">Collectors</span>.groupingBy(e -> e.department));
 
-            <div class="ascii-tree"><span class="cm">// Original Array (Daily Expenses):</span>
-                arr = [ <span class="nd">3</span>, <span class="nd">1</span>, <span class="nd">4</span>, <span
-                    class="nd">1</span>, <span class="nd">5</span> ]
+<span class="cm">// groupingBy + counting</span>
+<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Long</span>&gt; countByDept =
+    employees.stream().collect(<span class="cls">Collectors</span>.groupingBy(e -> e.dept, <span class="cls">Collectors</span>.counting()));
 
-                <span class="cm">// Prefix Sum Array (Cumulative Spending):</span>
-                P[0] = 3
-                P[1] = P[0] + 1 = 4
-                P[2] = P[1] + 4 = 8
-                P[3] = P[2] + 1 = 9
-                P[4] = P[3] + 5 = 14
+<span class="cm">// partitioningBy — Map&lt;Boolean, List&lt;T&gt;&gt;</span>
+<span class="cls">Map</span>&lt;<span class="cls">Boolean</span>, <span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt;&gt; seniors =
+    employees.stream().collect(<span class="cls">Collectors</span>.partitioningBy(e -> e.salary &gt; 100000));
+seniors.get(<span class="kw">true</span>);  <span class="cm">// high earners</span>
 
-                <span class="hl">P = [ 3, 4, 8, 9, 14 ]</span>
-            </div>
+<span class="cm">// joining</span>
+<span class="cls">String</span> names = employees.stream().map(e -> e.name).collect(<span class="cls">Collectors</span>.joining(", "));
 
-            <div class="code-block" style="border-left: 4px solid var(--accent)">
-                <div class="code-header">
-                    <div class="code-lang">📝 Prefix Sum — Pseudo-code</div>
-                </div>
-                <pre><span class="cm">// Step 1: Precompute (Build Prefix Array)</span>
-P[0] = A[0]
-For i from 1 to N-1: 
-   P[i] = P[i-1] + A[i]
+<span class="cm">// toMap</span>
+<span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Employee</span>&gt; byId =
+    employees.stream().collect(<span class="cls">Collectors</span>.toMap(e -> e.id, e -> e));
 
-<span class="cm">// Step 2: Query(L, R) in O(1)</span>
-Return P[R] - (L > 0 ? P[L-1] : 0)</pre>
-            </div>
+<span class="cm">// summarizingInt — stats in one pass</span>
+<span class="cls">IntSummaryStatistics</span> stats =
+    employees.stream().collect(<span class="cls">Collectors</span>.summarizingInt(e -> e.salary));
+stats.getAverage(); stats.getMax(); stats.getMin(); stats.getSum();</pre>
+      </div>
+      <h2 class="h1" id="optional">📦 Optional&lt;T&gt; — Null Safety</h2>
+      <div class="callout red"><span class="callout-icon">⚠️</span>
+        <div class="callout-body"><strong>The Billion Dollar Mistake:</strong> Tony Hoare introduced null in 1965 and
+          called it his "billion dollar mistake." Java's <code>Optional&lt;T&gt;</code> forces you to
+          <em>acknowledge</em> that a value might be absent, eliminating silent NullPointerExceptions.
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Optional Patterns</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="cm">// Creating</span>
+<span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; present = <span class="cls">Optional</span>.of(<span class="str">"hello"</span>);    <span class="cm">// throws NPE if null!</span>
+<span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; maybe  = <span class="cls">Optional</span>.ofNullable(str);  <span class="cm">// safe: null → empty</span>
+<span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; empty  = <span class="cls">Optional</span>.empty();
 
-            <h3 class="h2" id="prefix-2d">1.2 The 2D Submatrix Logic</h3>
-            <p>What if you have a 2D matrix (like a grid of numbers) and you want the sum of a specific
-                rectangle? Treat
-                the matrix as a series of rectangles. Doing
-                nested loops takes an incredibly slow O(N²M²). Using the <strong>Inclusion-Exclusion
-                    Principle</strong>,
-                you
-                can find the sum of any sub-rectangle in O(1) (think Venn Diagrams).</p>
+<span class="cm">// Accessing (NEVER use get() without isPresent check!)</span>
+present.isPresent()                   <span class="cm">// → true</span>
+present.get()                         <span class="cm">// → "hello"  ← DANGEROUS if empty</span>
+maybe.orElse(<span class="str">"default"</span>)              <span class="cm">// value or default</span>
+maybe.orElseGet(() -> compute())       <span class="cm">// lazy default (only called if empty)</span>
+maybe.orElseThrow(() -> <span class="kw">new</span> <span class="cls">RuntimeException</span>(<span class="str">"missing!"</span>))  <span class="cm">// throw if empty</span>
+maybe.ifPresent(val -> process(val))   <span class="cm">// run only if present</span>
 
-            <div class="callout green">
-                <span class="callout-icon">🚀</span>
-                <div class="callout-body">
-                    <strong>Optimization Hint:</strong> If you are updating values frequently and querying
-                    ranges, a
-                    vanilla Prefix Array is slow (\( O(N) \) updates). Instead, use a <strong>Fenwick Tree
-                        (BIT)</strong>
-                    to get \( O(\log N) \) updates and queries.
-                </div>
-            </div>
+<span class="cm">// Transforming (functional style)</span>
+<span class="cls">Optional</span>&lt;<span class="cls">Integer</span>&gt; len = maybe.map(<span class="cls">String</span>::length);    <span class="cm">// transform if present</span>
+maybe.filter(s -> s.length() &gt; 5);    <span class="cm">// keep only if condition met</span>
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Operation</th>
-                            <th>Formula Statement</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Precompute `P[i][j]`</strong></td>
-                            <td><code>arr[i][j] + P[i-1][j] + P[i][j-1] - P[i-1][j-1]</code>
-                                <br><span style="font-size:12px;color:var(--text3)">Add the cell itself + the
-                                    rectangle
-                                    ABOVE + the rectangle LEFT. Since the top-left corner was added twice,
-                                    subtract
-                                    it
-                                    once!</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Query `(r1,c1)` to `(r2,c2)`</strong></td>
-                            <td><code>P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</code>
-                                <br><span style="font-size:12px;color:var(--text3)">Take the giant rectangle
-                                    ending
-                                    at
-                                    (r2, c2). Cut off the top part. Cut off the left part. Since you cut out the
-                                    top-left corner TWICE, add it back once!</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<span class="cm">// Common pattern: chain of Optional operations</span>
+<span class="cls">String</span> city = findUser(id)
+    .flatMap(<span class="cls">User</span>::getAddress)
+    .map(<span class="cls">Address</span>::getCity)
+    .orElse(<span class="str">"Unknown"</span>);</pre>
+      </div>
+      <h2 class="h1" id="default-methods">🔧 Default & Static Interface Methods</h2>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java · Default Methods (Java 8+)</div><button class="copy-btn"
+            onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="kw">interface</span> <span class="cls">Printable</span> {
+    <span class="cls">String</span> <span class="fn">content</span>();   <span class="cm">// abstract — must implement</span>
 
-            <div class="code-block" style="border-left: 4px solid var(--green)">
-                <div class="code-header">
-                    <div class="code-lang">📝 2D Submatrix — Logic</div>
-                </div>
-                <pre><span class="cm">// To find sum from (r1, c1) to (r2, c2):</span>
-Sum = P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</pre>
-            </div>
-
-            <hr>
-
-            <!-- ═══ SECTION 2: KADANE'S ALGORITHM ═════════════════════════════ -->
-            <h2 class="h1" id="kadane">🎒 Kadane's Algorithm — Maximum Subarray</h2>
-            <p>If you're looking for the largest possible sum from a contiguous chunk of an array,checking every
-                chunk
-                takes O(n³). Kadane's algorithm
-                finds the answer in a blazingly fast
-                <strong>\( O(N) \) single pass!</strong>
-            </p>
-
-            <h3 class="h2" id="kadane-logic">2.1 The "Reset" Philosophy</h3>
-            <p>Kadane’s works on a simple intuition: <strong>If my past is dragging me down (negative sum), I
-                    must
-                    drop the baggage and start fresh!</strong></p>
-            <p>At every step, you must make a greedy choice: Do I append the current number to the existing
-                subarray
-                chain, OR do I cut ties and start a brand-new subarray at this exact number?</p>
-
-            <div class="ascii-tree"><span class="cm">Let's dry run the array: [-2, 1, -3, 4]</span>
-
-                [ <span class="nd">-2</span> ] -> currentMax = -2.
-                (It's terrible, but it's the only subarray so far.)
-
-                [ <span class="hl"> 1</span> ] -> Do I append 1 to -2 (gives -1)? Or start fresh at 1?
-                (Clearly, 1 > -1. Start fresh!)
-                <span class="ret">currentMax = 1</span>
-
-                [ <span class="nd">-3</span> ] -> Do I append -3 to 1 (gives -2)? Or start fresh at -3?
-                (-2 is technically better than -3. Keep the chain!)
-                <span class="ret">currentMax = -2</span>
-
-                [ <span class="hl"> 4</span> ] -> Do I append 4 to -2 (gives 2)? Or start fresh at 4?
-                (4 > 2. Drop the baggage!)
-                <span class="ret">currentMax = 4</span>
-
-                <span class="hl">Global Max recorded during this trip: 4</span>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Maximum Subarray</div>
-                </div>
-                <pre><span class="kw">public int</span> <span class="fn">maxSubArray</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> currentMax = nums[<span class="num">0</span>];
-    <span class="kw">int</span> globalMax = nums[<span class="num">0</span>];
-    
-    <span class="cm">// Start loop at index 1!</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {
-        <span class="cm">// The Core Philosophy: Do I accept the baggage or ditch it?</span>
-        currentMax = Math.max(nums[i], currentMax + nums[i]);
-        globalMax = Math.max(globalMax, currentMax);
+    <span class="kw">default void</span> <span class="fn">print</span>() {          <span class="cm">// default — can override</span>
+        System.out.println(content());
     }
-    <span class="ret">return</span> globalMax;
-}</pre>
-            </div>
 
-            <div class="callout green">
-                <span class="callout-icon">🌟</span>
-                <div class="callout-body">
-                    <strong>Extensions:</strong> You can apply Kadane's logic to find the <strong>Max Product
-                        Subarray</strong> (track both `minProduct` and `maxProduct` because a negative *
-                    negative =
-                    huge
-                    positive!) or the <strong>Best Time to Buy & Sell Stock</strong> (track the `minPrice`
-                    backwards).
-                </div>
-            </div>
-
-            <hr>
-
-            <!-- ═══ SECTION 3: DUTCH NATIONAL FLAG ═════════════════════════════ -->
-            <h2 class="h1" id="dutch">🚩 Dutch National Flag (Three-Way Partition)</h2>
-            <p>What if you are given an array of <code>0s, 1s, and 2s</code> and told to sort them in a
-                <strong>single pass</strong> in \( O(1) \) space? Invented by Edsger Dijkstra, the DNF approach
-                maintains 4
-                strictly
-                defined zones using 3 pointers: <code>low</code>, <code>mid</code>, and <code>high</code>.
-            </p>
-
-            <h3 class="h2" id="dutch-zones">Analyzing 3 Zones</h3>
-            <p>The array starts entirely in the "Unknown" zone. The goal is to shrink the Unknown zone until `mid`
-                passes `high`.</p>
-            <ul>
-                <li><code>0 to low - 1</code>: The confirmed <strong>0s zone</strong>.</li>
-                <li><code>low to mid - 1</code>: The confirmed <strong>1s zone</strong>.</li>
-                <li><code>mid to high</code>: The <strong>UNEXPLORED zone</strong>.</li>
-                <li><code>high + 1 to N - 1</code>: The confirmed <strong>2s zone</strong>.</li>
-            </ul>
-
-            <div class="ascii-tree"><span class="cm">// Before sorting: ALL elements are between mid and high
-                    (Unknown)</span>
-                [ <span class="nd">2</span>, <span class="nd">0</span>, <span class="nd">2</span>, <span
-                    class="nd">1</span>, <span class="nd">1</span>, <span class="nd">0</span> ]
-                ↑ ↑
-                <span class="hl">mid(low)</span> <span class="hl">high</span>
-
-                <span class="cm">// If nums[mid] == 0:</span> Swap(low, mid), increment BOTH.
-                <span class="cm">// If nums[mid] == 1:</span> Increment mid.
-                <span class="cm">// If nums[mid] == 2:</span> Swap(mid, high), decrement high. (DO NOT inc mid!)
-            </div>
-            <div class="callout blue">
-                <span class="callout-icon">🏗️</span>
-                <div class="callout-body">
-                    <strong>Why it works:</strong> DNF isn't just for Dutch flags. It's the basis for
-                    <strong>3-Way Partitioning</strong> in QuickSort. This reduces complexity from \(O(N \log
-                    N)\)
-                    to \(O(N)\) when the array contains many identical elements.
-                </div>
-            </div>
-
-
-            <div class="code-block" style="border-left: 4px solid var(--red)">
-                <div class="code-header">
-                    <div class="code-lang">📝 DNF — Pseudo-code</div>
-                </div>
-                <pre><span class="kw">While</span> mid <= high:
-   If arr[mid] == 0:
-      Swap(arr[low], arr[mid])
-      low++, mid++
-   Else if arr[mid] == 1:
-      mid++ 
-   Else if arr[mid] == 2:
-      Swap(arr[mid], arr[high])
-      high--</pre>
-            </div>
-
-            <div class="callout orange">
-                <span class="callout-icon">⚠️</span>
-                <div class="callout-body">
-                    <strong>Why don't we increment `mid` when swapping a `2` with `high`?</strong><br>
-                    Because when you pull an element from the `high` index into the `mid` index, that element came
-                    from
-                    the <strong>Unexplored Zone</strong>. You don't know if the number you just pulled is a 0, 1, or
-                    2!
-                    It must be processed again by the loop.
-                </div>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · DNF Implementation · Sort Colors</div>
-                </div>
-                <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (mid &lt;= high) {
-        <span class="kw">int</span> val = nums[mid];
-        <span class="kw">if</span> (val == <span class="num">0</span>) <span class="fn">swap</span>(nums, low++, mid++);
-        <span class="kw">else if</span> (val == <span class="num">1</span>) mid++;
-        <span class="kw">else</span> <span class="fn">swap</span>(nums, mid, high--);
+    <span class="kw">static</span> <span class="cls">Printable</span> <span class="fn">of</span>(<span class="cls">String</span> s) { <span class="cm">// static — called on interface</span>
+        <span class="ret">return</span> () -> s;              <span class="cm">// lambda as Printable impl (SAM)</span>
     }
-}</pre>
-            </div>
-
-            <hr>
-
-            <!-- ═══ SECTION 4: ROTATION ═════════════════════════════ -->
-            <h2 class="h1" id="rotate">🔄 The Reversal Algorithm (In-Place)</h2>
-            <p>Rotating an array by \( K \) steps can be done in secondary space \( O(N) \), but the
-                <strong>Reversal
-                    Trick</strong> does it in <strong>\( O(1) \) space</strong> using three strategic mirror
-                flips.
-            </p>
-
-            <div class="code-block" style="border-left: 4px solid var(--purple)">
-                <div class="code-header">
-                    <div class="code-lang">📝 Reversal Logic — Pseudo-code</div>
-                </div>
-                <pre><span class="cm">// Aim: Rotate arr by K positions to the right</span>
-K = K % N
-1. Reverse(arr, 0, N-1)     <span class="cm">// Entire array</span>
-2. Reverse(arr, 0, K-1)     <span class="cm">// First K elements</span>
-3. Reverse(arr, K, N-1)     <span class="cm">// Remaining elements</span></pre>
-            </div>
-
-            <div class="callout purple">
-                <span class="callout-icon">🔄</span>
-                <div class="callout-body">
-                    <strong>The Trick:</strong> To rotate <code>[1, 2, 3, 4, 5]</code> by \(K=2\):<br>
-                    1. Reverse whole: <code>[5, 4, 3, 2, 1]</code><br>
-                    2. Reverse first K: <code>[4, 5, 3, 2, 1]</code><br>
-                    3. Reverse rest: <code>[4, 5, 1, 2, 3]</code>. Done!
-                </div>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Optimal Rotation</div>
-                </div>
-                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="kw">int</span> n = nums.length;
-    k %= n;
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, n - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, k - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, k, n - <span class="num">1</span>);
 }
 
-<span class="kw">private void</span> <span class="fn">reverse</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> start, <span class="kw">int</span> end) {
-    <span class="kw">while</span> (start &lt; end) {
-        <span class="kw">int</span> temp = nums[start];
-        nums[start] = nums[end];
-        nums[end] = temp;
-        start++; end--;
-    }
-}</pre>
-            </div>
+<span class="cm">// Why default methods? Backward compatibility!</span>
+<span class="cm">// Java 8 added forEach, stream, removeIf to Collection without breaking existing implementations</span>
+<span class="cm">// Collection.forEach() is a default method calling Iterator internally</span></pre>
+      </div>
+      <h2 class="h1" id="practice">💪 Practice Problems</h2>
+      <div class="prob-card">
+        <div class="prob-header" onclick="toggleProb(this)">
+          <div class="prob-left">
+            <div class="prob-num">Problem 01 · Streams</div>
+            <div class="prob-title">Filter Students by GPA</div>
 
-            <hr>
-
-            <!-- ═══ SECTION 5: FREQUENCY ARRAYS ═════════════════════════════ -->
-            <h2 class="h1" id="freq">🔤 Frequency Arrays vs HashMaps</h2>
-            <p>When solving an Anagram substring string count problem, the instinct is to use <code>HashMap&lt;Character,
-                    Integer&gt;</code>. But what if you are strictly mapping lowercase english letters?</p>
-            <p><strong>HashMaps are painfully slow.</strong> They require creating an Object for every Key/Value
-                pair,
-                suffer from hashing collisions, and cause Memory Fragmentation. If the character set is just <code>'a' -
-                'z'</code>, a flat <code>int[26]</code> array is the absolute fastest way to count in \( O(1) \) time!
-            </p>
-
-            <h3 class="h2" id="freq-chars">The Character Mapping Trick</h3>
-            <p>In ASCII, `'a'` is 97, `'b'` is 98. <br>Therefore, <code>'c' - 'a' = 99 - 97 = 2</code>.</p>
-            <p>So, Map lowercase characters to \(0-25\) using ASCII subtraction: <code>'char' - 'a'</code>.</p>
-
-
-            <div class="ascii-tree"><span class="cm">// Example Mapping</span>
-                'a' - 'a' = <span class="nd">0</span>
-                'b' - 'a' = <span class="nd">1</span>
-                'z' - 'a' = <span class="nd">25</span></div>
-
-
-            <div class="code-block">
+            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
+                class="tag tag-pat">Stream filter+sort</span></div>
+          </div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="prob-body" style="display:none">
+          <div class="prob-section">
+            <div class="prob-section-label">Problem</div>
+            <p>Given a list of Student objects with name and gpa, return names of students with GPA &gt; 3.5, sorted
+              alphabetically.</p>
+            <div class="iobox">Input: [{Alice,3.8},{Bob,3.2},{Carol,3.9}] → ["Alice","Carol"]</div>
+          </div>
+          <details>
+            <summary><span class="toggle-arrow">►</span>Solution</summary>
+            <div class="details-body">
+              <div class="code-block">
                 <div class="code-header">
-                    <div class="code-lang">☕ Java · Valid Anagram O(N)</div>
+                  <div class="code-lang">☕ Java · Streams</div><button class="copy-btn"
+                    onclick="copyCode(this)">Copy</button>
                 </div>
-                <pre><span class="kw">public boolean</span> <span class="fn">isAnagram</span>(String s, String t) {
-    <span class="cm">// If lengths don't match, they trivially aren't anagrams!</span>
-    <span class="kw">if</span> (s.length() != t.length()) <span class="ret">return false</span>;
-    
-    <span class="cm">// Only 26 english letters!</span>
-    <span class="kw">int</span>[] count = <span class="kw">new int</span>[<span class="num">26</span>];
-    
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {
-        count[s.charAt(i) - <span class="str">'a'</span>]++;  <span class="cm">// 'c' maps to count[2]</span>
-        count[t.charAt(i) - <span class="str">'a'</span>]--;  <span class="cm">// Balance exactly on the opposite side</span>
-    }
-    
-    <span class="cm">// If any count isn't exactly 0, they had different letter distributions.</span>
-    <span class="kw">for</span> (<span class="kw">int</span> val : count) {
-        <span class="kw">if</span> (val != <span class="num">0</span>) <span class="ret">return</span> <span class="ret">false</span>;
-    }
-    <span class="ret">return</span> <span class="ret">true</span>;
-}
-</pre>
-            </div>
-
-            <hr>
-            <!-- ═══ SECTION 6: STRING IMMUTABILITY ═════════════════════════ -->
-            <h2 class="h1" id="immutability">🧵 String Foundations & Immutability</h2>
-            <p>In Java, Python, and C#, <code>Strings</code> are <strong>immutable</strong>. Once created, they
-                cannot
-                be modified in-place.
-                This means `s += "a"` creates a brand-new string in memory and copies all existing characters over!
-            </p>
-
-            <div class="callout red">
-                <span class="callout-icon">⚠️</span>
-                <div class="callout-body">
-                    <strong>The O(N²) Trap:</strong> Appending characters in a loop using <code>+=</code>
-                    creates a
-                    new String object every time, copying all existing characters. This leads to \(O(N^2)\) time
-                    complexity and TLE on large inputs.
+                <pre>students.stream()
+    .filter(s -> s.gpa &gt; 3.5)
+    .map(s -> s.name)
+    .sorted()
+    .collect(Collectors.toList());</pre>
+              </div>
+              <div class="complexity-row">
+                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
+                    n)</span></div>
+                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
                 </div>
+              </div>
             </div>
-
-            <p><strong>The Fix:</strong> Always use a dynamic resizing array buffer, <code>StringBuilder</code>, for
-                high-performance string
-                mutations.</p>
-            <div class="code-block">
+          </details>
+        </div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-header" onclick="toggleProb(this)">
+          <div class="prob-left">
+            <div class="prob-num">Problem 02 · Collectors</div>
+            <div class="prob-title">Group Words by First Letter</div>
+            <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/" target="_blank"
+                style="font-size:12px">🔗 Related: LC 49</a></div>
+            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
+                class="tag tag-pat">groupingBy</span></div>
+          </div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="prob-body" style="display:none">
+          <div class="prob-section">
+            <div class="prob-section-label">Problem</div>
+            <p>Given a list of words, group them by their first letter using streams.</p>
+          </div>
+          <details>
+            <summary><span class="toggle-arrow">►</span>Solution</summary>
+            <div class="details-body">
+              <div class="code-block">
                 <div class="code-header">
-                    <div class="code-lang">☕ Java · StringBuilder</div>
+                  <div class="code-lang">☕ Java · groupingBy</div><button class="copy-btn"
+                    onclick="copyCode(this)">Copy</button>
                 </div>
-                <pre><span class="cm">// O(N) Time - Amortized constant time appends</span>
-StringBuilder sb = <span class="kw">new</span> StringBuilder();
-<span class="kw">for</span> (<span class="kw">char</span> c : chars) {
-    sb.append(c);
-}
-<span class="ret">return</span> sb.toString();</pre>
+                <pre>Map&lt;Character, List&lt;String&gt;&gt; grouped = words.stream()
+    .collect(Collectors.groupingBy(w -> w.charAt(0)));
+
+// Count per group:
+Map&lt;Character, Long&gt; counts = words.stream()
+    .collect(Collectors.groupingBy(w -> w.charAt(0), Collectors.counting()));</pre>
+              </div>
+              <div class="complexity-row">
+                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n)</span>
+                </div>
+                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
+                </div>
+              </div>
             </div>
+          </details>
+        </div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-header" onclick="toggleProb(this)">
+          <div class="prob-left">
+            <div class="prob-num">Problem 03 · Optional</div>
+            <div class="prob-title">Safe User Lookup Chain</div>
 
-            <hr>
-
-            <!-- ═══ SECTION 7: RABIN-KARP & ROLLING HASH ═════════════════════════ -->
-            <h2 class="h1" id="rabin-karp">🔑 Rabin-Karp & Rolling Hash Intro</h2>
-            <p>If you search for a substring of length \( M \) in a string of length \( N \), the naive match is \(
-                O(N \times M) \).
-                Rabin-Karp converts the substring to a numerical <strong>hash</strong> to do this in \( O(N) \)
-                overall time.
+            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">LinkedIn</span><span
+                class="tag tag-pat">Optional flatMap</span></div>
+          </div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="prob-body" style="display:none">
+          <div class="prob-section">
+            <div class="prob-section-label">Problem</div>
+            <p>Given methods <code>Optional&lt;User&gt; findById(int id)</code> and
+              <code>Optional&lt;Address&gt; getAddress(User u)</code>, safely get the city or "Unknown" if anything is
+              absent.
             </p>
-
-            <div class="callout purple">
-                <span class="callout-icon">🧠</span>
-                <div class="callout-body">
-                    <strong>Rolling Hash Mechanics:</strong> Instead of recomputing the hash for every window,
-                    A "Rolling Hash" allows you to slide a window by conceptually
-                    <em>subtracting</em> the old character dropping out, and <em>adding</em> the new character
-                    shifting
-                    in,
-                    doing this math in strictly <code>O(1)</code> time per shift instead of recomputing the \( M \)
-                    length
-                    hash
-                    from scratch.
-                    <ol>
-                        <li>Subtracting the leading character's contribution.</li>
-                        <li>Multiplying by the base (shift left).</li>
-                        <li>Adding the new trailing character.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="code-block" style="border-left: 4px solid var(--purple)">
+          </div>
+          <details>
+            <summary><span class="toggle-arrow">►</span>Solution</summary>
+            <div class="details-body">
+              <div class="code-block">
                 <div class="code-header">
-                    <div class="code-lang">📝 Rabin-Karp — Pseudo-code</div>
+                  <div class="code-lang">☕ Java · Optional chain</div><button class="copy-btn"
+                    onclick="copyCode(this)">Copy</button>
                 </div>
-                <div style="padding:16px; background:var(--bg2);">
-                    <p style="font-family:var(--mono); font-size:13px; margin-bottom:12px;"><span class="cm">// P = Base
-                            (usually 31), M = pattern length</span><br>
-                        1. Compute \( H_{target} \) and \( H_{window} \) for \( s[0 \dots M-1] \)<br>
-                        2. Slide window through string \( S \):
-                    </p>
-                    <div
-                        style="background:var(--bg3); padding:12px; border-radius:6px; margin:8px 0; border:1px solid var(--border);">
-                        \[ H_{new} = (H_{old} - S[i-1] \cdot P^{M-1}) \cdot P + S[i+M-1] \]
-                    </div>
-                    <p style="font-family:var(--mono); font-size:13px; margin-top:12px;">
-                        3. If \( H_{window} == H_{target} \): Double-check (collision check)
-                    </p>
+                <pre>String city = findById(id)
+    .flatMap(u -> getAddress(u))
+    .map(addr -> addr.city)
+    .orElse("Unknown");
+
+// flatMap avoids Optional&lt;Optional&lt;Address&gt;&gt; — unwraps the inner Optional</pre>
+              </div>
+              <div class="complexity-row">
+                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(1)</span>
                 </div>
+                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(1)</span>
+                </div>
+              </div>
             </div>
+          </details>
+        </div>
+      </div>
+      <h2 class="h1" id="assignment">📝 Assignment</h2>
+      <div class="callout orange" style="margin:14px 0">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body"><strong>Lecture 4 Assignment</strong><br>15+ problems covering Streams, Optional,
+          lambda sorting, and functional interface composition.<br><br>
+          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
+            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
+            Open Assignment →</a>
+        </div>
+      </div>
+      <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
+      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can rewrite any anonymous Comparator as a lambda and then as a method reference</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I know all 7 core functional interfaces and their method signatures</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can build a complete stream pipeline: filter → map → sorted → collect</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I know the difference between intermediate (lazy) and terminal (eager) operations</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can use groupingBy, partitioningBy, and joining collectors</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I understand why flatMap is needed for nested structures</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I never use Optional.get() without isPresent() (or I use orElse/orElseThrow instead)
+          </div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I know when to use Optional.map() vs Optional.flatMap()</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I can write a custom @FunctionalInterface with a valid SAM</div>
+        </div>
+        <div class="checklist-item" onclick="this.classList.toggle('done')">
+          <div class="cb-box">✓</div>
+          <div class="cb-text">I understand why default methods were added to interfaces in Java 8</div>
+        </div>
+      </div>
 
-            <hr>
-
-            <!-- ═══ SECTION 8: 2D BOUNDARY TRAVERSALS ═════════════════════════ -->
-            <h2 class="h1" id="spiral">🌀 2D Boundary Traversals (Spiral & Zigzag)</h2>
-            <p>One of the most intimidating array problems in technical interviews is navigating a 2D matrix in
-                non-linear order, like spiraling inwards or zigzagging across diagonals. The trick is to stop
-                thinking
-                of loops going from <code>0 to N</code>, and instead think of 4 dynamic, shrinking walls.</p>
-
-            <h3 class="h2" id="spiral-logic">The Shrinking Wall Analogy</h3>
-            <p>Picture a physical room where you are painting the floor. You paint the Top wall, then the Right
-                wall,
-                then the Bottom wall, then the Left wall. After doing a full perimeter lap, the "unpainted" zone has
-                shrunk by 1 layer on all sides! You keep painting the new boundary until your walls crash into each
-                other.</p>
-
-            <div class="ascii-tree"><span class="cm">// Matrix Visual (The Shrinking Walls)</span>
-                [ 1, 2, 3 ] <span class="hl">T</span>=0 (Top Boundary)
-                [ 4, 5, 6 ] <span class="ret">B</span>=2 (Bottom Boundary)
-                [ 7, 8, 9 ]
-                ↑ ↑
-                <span class="nd">L</span>=0 <span class="nd">R</span>=2 (Left/Right Boundaries)
-
-                <span class="cm">1. Traverse Top Layer:</span> [1, 2, 3] -> <span class="kw">top++</span>
-                <span class="cm">2. Traverse Right Wall:</span> [6, 9] -> <span class="kw">right--</span>
-                <span class="cm">3. Traverse Bottom Wall:</span> [8, 7] -> <span class="kw">bot--</span>
-                <span class="cm">4. Traverse Left Wall:</span> [4] -> <span class="kw">left++</span>
-                <span class="cm">New Walls:</span> T=1, B=1, L=1, R=1. (Only '5' is unpainted!)
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <div class="code-lang">☕ Java · Spiral Matrix</div>
-                </div>
-                <pre><span class="kw">public</span> List&lt;Integer&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] matrix) {
-    List&lt;Integer&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">int</span> top = <span class="num">0</span>, bot = matrix.length - <span class="num">1</span>;
-    <span class="kw">int</span> left = <span class="num">0</span>, right = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
-    
-    <span class="kw">while</span> (top &lt;= bot && left &lt;= right) {
-        <span class="cm">// Paint Top Wall</span>
-        <span class="kw">for</span> (<span class="kw">int</span> i = left; i &lt;= right; i++) res.add(matrix[top][i]);
-        top++;
-        
-        <span class="cm">// Paint Right Wall</span>
-        <span class="kw">for</span> (<span class="kw">int</span> i = top; i &lt;= bot; i++) res.add(matrix[i][right]);
-        right--;
-        
-        <span class="cm">// Prevent duplicate painting if walls crossed!</span>
-        <span class="kw">if</span> (top &lt;= bot) {
-            <span class="cm">// Paint Bottom Wall</span>
-            <span class="kw">for</span> (<span class="kw">int</span> i = right; i &gt;= left; i--) res.add(matrix[bot][i]);
-            bot--;
-        }
-        <span class="kw">if</span> (left &lt;= right) {
-            <span class="cm">// Paint Left Wall</span>
-            <span class="kw">for</span> (<span class="kw">int</span> i = bot; i &gt;= top; i--) res.add(matrix[i][left]);
-            left++;
-        }
-    }
-    <span class="ret">return</span> res;
-}</pre>
-            </div>
-
-            <hr>
-
-            <!-- ═══ IN-LECTURE PRACTICE ════════════════════════════════ -->
-            <h2 class="h1" id="practice">💪 In-Lecture Practice Problems</h2>
-            <p>These 10 problems are designed to solidify your understanding of the core patterns taught in this
-                lecture.</p>
-            <p>Work through these in order. These core algorithm patterns are the foundation for FAANG interviews.
-            </p>
-
-            <!-- P1 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 01 · 2D In-Place</div>
-                        <div class="prob-title">Rotate Image</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/rotate-image/"
-                                target="_blank" style="font-size:12px">🔗 LC 48 - Rotate Image</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span>
-                            <span class="tag tag-pat">Matrix</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>You are given an <code>n x n</code> 2D matrix representing an image, rotate the image
-                            by
-                            90
-                            degrees (clockwise) <strong>in-place</strong>.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] matrix) {
-    <span class="kw">int</span> n = matrix.length;
-    <span class="cm">// 1. Transpose: Swap matrix[i][j] with matrix[j][i]</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++) {
-        <span class="kw">for</span> (<span class="kw">int</span> j = i + <span class="num">1</span>; j < n; j++) {
-            <span class="kw">int</span> tmp = matrix[i][j];
-            matrix[i][j] = matrix[j][i];
-            matrix[j][i] = tmp;
-        }
-    }
-    <span class="cm">// 2. Flip horizontally: Reverse each row</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++) {
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j < n / <span class="num">2</span>; j++) {
-            <span class="kw">int</span> tmp = matrix[i][j];
-            matrix[i][j] = matrix[i][n - <span class="num">1</span> - j];
-            matrix[i][n - <span class="num">1</span> - j] = tmp;
-        }
-    }
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N²)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P2 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 02 · Kadane's Algorithm</div>
-                        <div class="prob-title">Maximum Subarray</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/maximum-subarray/"
-                                target="_blank" style="font-size:12px">🔗 LC 53 - Maximum Subarray</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Microsoft</span>
-                            <span class="tag tag-pat">Baggage Reset</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an integer array <code>nums</code>, find the subarray with the largest sum and
-                            return
-                            its sum.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">maxSubArray</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> maxSoFar = nums[<span class="num">0</span>], currentMax = nums[<span class="num">0</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i < nums.length; i++) {
-        <span class="cm">// Decision: Extend existing subarray or start fresh?</span>
-        currentMax = Math.max(nums[i], currentMax + nums[i]);
-        maxSoFar = Math.max(maxSoFar, currentMax);
-    }
-    <span class="ret">return</span> maxSoFar;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P3 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 03 · Three-Way Partition</div>
-                        <div class="prob-title">Sort Colors</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/sort-colors/" target="_blank"
-                                style="font-size:12px">🔗 LC 75 - Sort Colors</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Meta</span>
-                            <span class="tag tag-pat">DNF</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Sort an array with 0s, 1s, and 2s in-place in a single pass.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (mid <= high) {
-        <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) {
-            swap(nums, low++, mid++);
-        } <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) {
-            mid++;
-        } <span class="kw">else</span> {
-            swap(nums, mid, high--);
-        }
-    }
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">O(1)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P4 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 04 · Reversal Algorithm</div>
-                        <div class="prob-title">Rotate Array</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/rotate-array/"
-                                target="_blank" style="font-size:12px">🔗 LC 189 - Rotate Array</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span>
-                            <span class="tag tag-pat">Reverse Modulo</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Rotate an array \( k \) steps using \( O(1) \) extra space.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    k %= nums.length;
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, nums.length - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, k - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, k, nums.length - <span class="num">1</span>);
-}</pre>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P5 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 05 · Prefix Sum + HashMap</div>
-                        <div class="prob-title">Subarray Sum Equals K</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/subarray-sum-equals-k/"
-                                target="_blank" style="font-size:12px">🔗 LC 560 - Subarray Sum K</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Google</span><span class="tag tag-co">Meta</span>
-                            <span class="tag tag-pat">Prefix Diff</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Find the total number of continuous subarrays whose sum equals <code>k</code>.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="kw">int</span> count = <span class="num">0</span>, sum = <span class="num">0</span>;
-    HashMap&lt;Integer, Integer&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
-    map.put(<span class="num">0</span>, <span class="num">1</span>);
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        sum += n;
-        <span class="kw">if</span> (map.containsKey(sum - k)) count += map.get(sum - k);
-        map.put(sum, map.getOrDefault(sum, <span class="num">0</span>) + <span class="num">1</span>);
-    }
-    <span class="ret">return</span> count;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">O(N)</span></div>
-                                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                                        class="cx-val yellow">O(N)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P6 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 06 · Boundary Traversal</div>
-                        <div class="prob-title">Spiral Matrix</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/spiral-matrix/"
-                                target="_blank" style="font-size:12px">🔗 LC 54 - Spiral Matrix</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Microsoft</span><span class="tag tag-co">Apple</span>
-                            <span class="tag tag-pat">Walls</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Given an <code>m x n</code> matrix, return all elements in spiral order.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public</span> List&lt;Integer&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] matrix) {
-    List&lt;Integer&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">int</span> top = <span class="num">0</span>, bottom = matrix.length - <span class="num">1</span>;
-    <span class="kw">int</span> left = <span class="num">0</span>, right = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
-    <span class="kw">while</span> (top <= bottom && left <= right) {
-        <span class="kw">for</span> (<span class="kw">int</span> j = left; j <= right; j++) res.add(matrix[top][j]);
-        top++;
-        <span class="kw">for</span> (<span class="kw">int</span> i = top; i <= bottom; i++) res.add(matrix[i][right]);
-        right--;
-        <span class="kw">if</span> (top <= bottom)
-            <span class="kw">for</span> (<span class="kw">int</span> j = right; j >= left; j--) res.add(matrix[bottom][j]);
-        bottom--;
-        <span class="kw">if</span> (left <= right)
-            <span class="kw">for</span> (<span class="kw">int</span> i = bottom; i >= top; i--) res.add(matrix[i][left]);
-        left++;
-    }
-    <span class="ret">return</span> res;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">\( O(M \times N) \)</span></div>
-                                <div class="cx-badge green"><span class="cx-label">Space</span><span
-                                        class="cx-val green">\( O(1) \)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P7 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 07 · Sliding Window</div>
-                        <div class="prob-title">Longest Substring Without Repeating</div>
-                        <div style="margin-top:4px"><a
-                                href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
-                                target="_blank" style="font-size:12px">🔗 LC 3 - Longest Non-Repeating</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Google</span>
-                            <span class="tag tag-pat">Two Pointers</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Find the length of the longest substring without repeating characters.</p>
-                    </div>
-                    <details>
-                        <summary><span class="toggle-arrow">▶</span>Full solution</summary>
-                        <div class="details-body">
-                            <div class="code-block">
-                                <div class="code-header">
-                                    <div class="code-lang">☕ Java</div><button class="copy-btn"
-                                        onclick="copyCode(this)">Copy</button>
-                                </div>
-                                <pre><span class="kw">public int</span> <span class="fn">lengthOfLongestSubstring</span>(String s) {
-    <span class="kw">int</span> maxLen = <span class="num">0</span>, left = <span class="num">0</span>;
-    HashSet&lt;Character&gt; set = <span class="kw">new</span> HashSet&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> right = <span class="num">0</span>; right < s.length(); right++) {
-        <span class="kw">while</span> (set.contains(s.charAt(right))) {
-            set.remove(s.charAt(left++));
-        }
-        set.add(s.charAt(right));
-        maxLen = Math.max(maxLen, right - left + <span class="num">1</span>);
-    }
-    <span class="ret">return</span> maxLen;
-}</pre>
-                            </div>
-                            <div class="complexity-row">
-                                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                                        class="cx-val green">\( O(N) \)</span></div>
-                                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                                        class="cx-val yellow">\( O(\min(M, N)) \)</span></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- P8 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 08 · Rotation & Symmetry</div>
-                        <div class="prob-title">Reverse Words in a String</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/reverse-words-in-a-string/"
-                                target="_blank" style="font-size:12px">🔗 LC 151 - Reverse Words</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Apple</span>
-                            <span class="tag tag-pat">Two Pass / Reverse</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Reverse the order of words in a string, ensuring no leading/trailing spaces.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- P9 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 09 · 2D Traversals</div>
-                        <div class="prob-title">Zigzag Conversion</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/zigzag-conversion/"
-                                target="_blank" style="font-size:12px">🔗 LC 6 - Zigzag Pattern</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Meta</span><span class="tag tag-co">Yelp</span>
-                            <span class="tag tag-pat">Row Simulation</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Write a string in a zigzag pattern on a given number of rows.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- P10 -->
-            <div class="prob-card">
-                <div class="prob-header" onclick="toggleProb(this)">
-                    <div class="prob-left">
-                        <div class="prob-num">Problem 10 · String Logic</div>
-                        <div class="prob-title">String Compression</div>
-                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/string-compression/"
-                                target="_blank" style="font-size:12px">🔗 LC 443 - Compression</a></div>
-                        <div class="prob-tags">
-                            <span class="tag tag-med">Medium</span>
-                            <span class="tag tag-co">Microsoft</span><span class="tag tag-co">Amazon</span>
-                            <span class="tag tag-pat">In-Place Array</span>
-                        </div>
-                    </div>
-                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-                </div>
-                <div class="prob-body" style="display:none">
-                    <div class="prob-section">
-                        <div class="prob-section-label">Problem</div>
-                        <p>Compress an array of characters in-place using constant extra space.</p>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-
-            <!-- ══ SECTION 9: ASSIGNMENT LINK ═══════════════════════ -->
-            <h2 class="h1" id="assignment">📝 Assignment</h2>
-            <div class="callout orange" style="margin:14px 0">
-                <span class="callout-icon">📋</span>
-                <div class="callout-body">
-                    <strong>Lecture 4 Assignment — 35 Problems</strong><br>
-                    Complete the assignment before moving to Lecture 5. It includes 6 Easy, 21 Medium, 7 Hard problems,
-                    4
-                    complexity exercises, and 5 bonus problems — all with LeetCode links.<br><br>
-                    <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
-                        style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
-                        Open Assignment →</a>
-                </div>
-            </div>
-
-            <hr>
-
-            <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
-            <p>Check each item before advancing to Lecture 5.</p>
-
-            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can derive a prefix sum array and answer range sum queries in \(O(1)\).</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can implement Kadane's algorithm to find the maximum subarray sum in
-                        \(O(n)\).</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can sort an array of 0s, 1s, and 2s in-place with a single pass using Three
-                        Pointers (DNF).</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I know how to use \(int[26]\) arrays for high-performance string frequency
-                        counting.</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can rotate an \(N \times N\) matrix by 90 degrees using Transposition and Row
-                        Reversal.</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can traverse a 2D matrix in spiral order by maintaining four boundary
-                        "walls".</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I understand the logic behind Rabin-Karp's rolling hash for string matching.
-                    </div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I can rotate an array by \(k\) steps in-place using the three-reversal trick.
-                    </div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I understand when to trade \(O(N)\) space for \(O(1)\) query time (Prefix
-                        Sums).</div>
-                </div>
-                <div class="checklist-item" onclick="this.classList.toggle('done')">
-                    <div class="cb-box">✓</div>
-                    <div class="cb-text">I've completed at least 25 problems from the Lecture 4 Assignment.</div>
-                </div>
-            </div>
-
-            <div class="callout green" style="margin-top:24px">
-                <span class="callout-icon">🚀</span>
-                <div class="callout-body">
-                    <strong>You're ready for Lecture 5: Binary Search Masterclass</strong><br>
-                    Binary Search is the first "real" algorithm that changes how you think about efficiency. It turns an
-                    exhausting \(O(N)\) search into a lightning-fast \(O(\log N)\) operation. We'll master not just the
-                    basic search, but Search Space optimization and the "BS on Answer" pattern!
-                </div>
-            </div>
-
-        </div><!-- #content -->
-    </div><!-- #main -->
-
-    <script>
-        // Universal Dark Mode Toggle
-        function toggleDark() {
-            const html = document.documentElement;
-            const btn = document.getElementById('darkToggle');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.removeAttribute('data-theme');
-                btn.innerText = '🌙 Dark';
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                btn.innerText = '☀️ Light';
-            }
-        }
-
-        // Universal Progress & TOC Tracker
-        document.getElementById('main').addEventListener('scroll', function () {
-            const el = this;
-            if (document.getElementById('progressFill')) {
-                const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-                document.getElementById('progressFill').style.width = (pct > 98.5) ? '100%' : Math.min(pct, 100) + '%';
-            }
-            // Active TOC Highlighting - Improved selector
-            const sections = document.querySelectorAll('h2[id], h3[id]');
-            let current = '';
-            sections.forEach(s => {
-                if (s.getBoundingClientRect().top < 200) current = s.id;
-            });
-            document.querySelectorAll('.toc-item').forEach(a => {
-                a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-            });
-        });
-
-        // Universal Problem Visibility Toggle
-        function toggleProb(headerEl) {
-            const body = headerEl.nextElementSibling;
-            if (!body) return;
-            const open = body.style.display === 'block';
-            body.style.display = open ? 'none' : 'block';
-            headerEl.style.backgroundColor = open ? 'var(--bg2)' : 'var(--bg3)';
-
-            // If there's an arrow span dynamically toggle it
-            const arrow = headerEl.querySelector('span:last-child');
-            if (arrow && arrow.innerText.includes('▼')) {
-                arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
-                arrow.style.color = open ? 'var(--text3)' : 'var(--accent)';
-            }
-        }
-
-        // Universal Copy Code To Clipboard
-        function copyCode(btn) {
-            const pre = btn.parentElement.nextElementSibling;
-            // Get text without the span tags if any syntax highlighting exists
-            const textToCopy = pre.innerText;
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const origText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.style.background = 'var(--green-bg)';
-                btn.style.color = 'var(--green)';
-                btn.style.borderColor = 'var(--green)';
-
-                setTimeout(() => {
-                    btn.innerText = origText;
-                    btn.style.background = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }, 2000);
-            });
-        }
-
-        // Universal Checklist Toggle logic
-        function toggleCheck(el) {
-            const box = el.querySelector('.cb-box');
-            const txt = el.querySelector('.cb-text');
-            if (!box || !txt) return;
-
-            if (box.style.color === 'transparent' || !box.style.color) {
-                box.style.color = '#fff';
-                box.style.backgroundColor = 'var(--green)';
-                box.style.borderColor = 'var(--green)';
-                txt.style.color = 'var(--text3)';
-                txt.style.textDecoration = 'line-through';
-            } else {
-                box.style.color = 'transparent';
-                box.style.backgroundColor = 'transparent';
-                box.style.borderColor = 'var(--border2)';
-                txt.style.color = 'var(--text)';
-                txt.style.textDecoration = 'none';
-            }
-        }
-
-        // Final fallback: details arrows
-        document.querySelectorAll('details').forEach(det => {
-            det.addEventListener('toggle', function () {
-                const arrow = this.querySelector('.toggle-arrow');
-                if (arrow) {
-                    if (this.open) arrow.style.transform = 'rotate(90deg)';
-                    else arrow.style.transform = 'rotate(0deg)';
-                }
-            });
-        });
-    </script>
-</body>
-
-</html>
+      <div class="callout green" style="margin-top:24px">
+        <span class="callout-icon">🧠</span>
+        <div class="callout-body">
+          <strong>You're ready for Topic 5: Recursion &amp; Backtracking</strong><br>
+          You've conquered Java 8+ — lambdas, streams, and functional interfaces. Recursion is the foundational
+          algorithm pattern that unlocks trees, graphs, DP, and backtracking. Every FAANG interview has it. Build the
+          mental model now.
+        </div>
+      </div>
+      <div
+        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+        <a href="../Lecture3/lecture3_notes.html"
+          style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Topic 3: OOP &amp; Collections</a><a
+          href="../Lecture5/lecture5_notes.html" style="color:var(--accent);font-weight:600;text-decoration:none">Topic
+          5: Recursion &amp; Backtracking &rarr;</a>
+      </div>
+    </div>
+  </div>
