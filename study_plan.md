@@ -357,12 +357,12 @@
 
 ### Topic 9: ⚡ Sorting Algorithms
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 5 Easy · 10 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Recursion           |
+| Detail               | Value                        |
+| -------------------- | ---------------------------- |
+| **Duration**         | 4 days                       |
+| **Problems**         | 25                           |
+| **Difficulty Split** | 10 Easy · 10 Medium · 5 Hard |
+| **Prerequisites**    | Arrays, Recursion            |
 
 #### 🎓 Learning Objectives
 
@@ -385,8 +385,8 @@
 
 1. **Day 1:** O(n²) sorts — Bubble Sort (stable), Selection Sort (unstable), Insertion Sort (adaptive, stable)
 2. **Day 2:** O(n log n) sorts — Merge Sort (stable, D&C), Quick Sort (partition, pivot selection, unstable)
-3. **Day 3:** Special sorts — Heap Sort, Counting Sort, Radix Sort, Bucket Sort — when and why each
-4. **Day 4:** Interview problems — Custom Comparator, Largest Number, Wiggle Sort, Maximum Gap
+3. **Day 3:** Non-comparison sorts — Counting Sort, Radix Sort, Bucket Sort. **Cyclic Sort** pattern for range-limited arrays.
+4. **Day 4:** Interview problems — Custom Comparators (Largest Number, Wiggle Sort), QuickSelect for Kth Largest, Merge Sort for Inversions.
 
 #### 🏢 Companies That Ask These
 
