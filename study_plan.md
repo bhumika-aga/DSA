@@ -394,40 +394,41 @@
 
 ---
 
-### Topic 10: 🔎 Binary Search (Deep Dive)
+### Topic 10: 🔎 Searching Algorithms
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
 | **Duration**         | 5 days                      |
-| **Problems**         | 25                          |
-| **Difficulty Split** | 6 Easy · 12 Medium · 7 Hard |
+| **Problems**         | 28                          |
+| **Difficulty Split** | 8 Easy · 13 Medium · 7 Hard |
 | **Prerequisites**    | Arrays, Sorting             |
 
 #### 🎓 Learning Objectives
 
-- Implement binary search perfectly — get boundaries right every single time
-- Recognize disguised binary search problems that aren't obviously binary search
-- Apply "binary search on answer" for monotonic optimization problems
-- Search in rotated arrays, 2D matrices, and infinite streams
-- Understand the loop invariant: what is always true in every iteration
+- Understand the limits of $O(N)$ Linear Search against $O(\log N)$ Binary Search scaling.
+- Implement Binary Search perfectly — get boundaries right every single time.
+- Recognize disguised binary search problems that aren't initially obvious.
+- Apply "binary search on answer space" for monotonic optimization scenarios.
+- Search in rotated arrays, 2D matrices, and infinite data streams.
 
 #### 🔑 Key Patterns
 
 | Pattern                     | Description                                  | Example Problem                              |
 | --------------------------- | -------------------------------------------- | -------------------------------------------- |
+| **Linear Search**           | Exhaustive $O(N)$ scanning on unsorted data  | Find Element in Array (Foundational)         |
 | **Classic Binary Search**   | lo/hi/mid framework, left vs right bias      | Search Insert Position, Find Peak Element    |
+| **First/Last Occurrence**   | Leftmost or rightmost bounded index limits   | Find First and Last Position in Array        |
+| **Rotated Array Search**    | Identify sorted halves to locate target      | Search in Rotated Sorted Array I/II          |
 | **Binary Search on Answer** | Search the optimal answer in monotonic space | Koko Eating Bananas, Split Array Largest Sum |
-| **Rotated Array Search**    | Identify which half is sorted, binary search | Search in Rotated Sorted Array I/II          |
-| **First/Last Occurrence**   | Leftmost or rightmost index of target        | Find First and Last Position in Array        |
-| **2D Matrix Binary Search** | Treat 2D matrix as flat sorted array         | Search a 2D Matrix I/II                      |
+| **2D Matrix Searching**     | Treating a 2D matrix as a sorted pipeline    | Search a 2D Matrix I/II                      |
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Classic template — lo/hi/mid, off-by-one bugs, when to use `<` vs `<=`, left vs right bias
-2. **Day 2:** Variants — first/last occurrence, count of target, search insert position, find peak element
-3. **Day 3:** Rotated array — Search in Rotated Sorted Array I/II, Find Minimum in Rotated Array
-4. **Day 4:** Binary search on answer — Koko Eating Bananas, Capacity to Ship, Min Days for Bouquets, Aggressive Cows
-5. **Day 5:** Hard — Median of Two Sorted Arrays, Split Array Largest Sum, Search a 2D Matrix II
+1. **Day 1:** Searching Basics — Linear Search ($O(N)$) vs Binary Search introduction, constraints and capabilities.
+2. **Day 2:** Classic Binary Strategy — The `lo/hi/mid` template, overflow bugs, when to safely use `<` vs `<=`.
+3. **Day 3:** Rotated Arrays & Bounds — Searching in Rotated Sorted Arrays, First/Last Occurrences, Find Peak.
+4. **Day 4:** Answer Space Optimization — "Binary Search on Answer" structure (Koko Eating Bananas, Capacity to Ship).
+5. **Day 5:** Matrix Traversal — Iterative Linear traversal versus recursive/flat Binary Search for 2D matrices.
 
 #### 🏢 Companies That Ask These
 

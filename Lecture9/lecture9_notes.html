@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 9 — Sorting Algorithms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- KaTeX for Premium Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}] });"></script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f7f6f3;
+            --bg3: #efede9;
+            --bg4: #e8e5df;
+            --border: #e3e0d9;
+            --border2: #d0ccc4;
+            --text: #37352f;
+            --text2: #6b6860;
+            --text3: #9b9790;
+            --accent: #2383e2;
+            --accent-bg: #e8f1fc;
+            --green: #0f7b6c;
+            --green-bg: #e9f5f3;
+            --red: #c0392b;
+            --red-bg: #fdf0ee;
+            --yellow: #8a6d00;
+            --yellow-bg: #fdf6e3;
+            --purple: #6940a5;
+            --purple-bg: #f0ecf9;
+            --orange: #c75b0e;
+            --orange-bg: #fef0e7;
+            --pink: #ad1a72;
+            --pink-bg: #fce8f3;
+            --teal: #0d7d6e;
+            --teal-bg: #e4f4f1;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Merriweather', serif;
+            --sidebar-w: 260px
+        }
+
+        [data-theme="dark"] {
+            --bg: #191919;
+            --bg2: #212121;
+            --bg3: #2d2d2d;
+            --bg4: #383838;
+            --border: #333;
+            --border2: #444;
+            --text: #e8e6e1;
+            --text2: #9b9790;
+            --text3: #6b6860;
+            --accent: #5ba4f5;
+            --accent-bg: #1a2d42;
+            --green: #4db6a8;
+            --green-bg: #0e2420;
+            --red: #e07070;
+            --red-bg: #2e1414;
+            --yellow: #d4a42a;
+            --yellow-bg: #2a1f06;
+            --purple: #a07dd4;
+            --purple-bg: #1e1530;
+            --orange: #e0893a;
+            --orange-bg: #2a1608;
+            --pink: #e06aac;
+            --pink-bg: #2a1020;
+            --teal: #38c9b8;
+            --teal-bg: #0d2420
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+            display: flex;
+            flex-direction: row;
+            transition: background .2s, color .2s;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            font-size: 13px;
+            flex-shrink: 0
+        }
+
+        .sb-header {
+            padding: 0 16px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px
+        }
+
+        .sb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            margin-bottom: 10px
+        }
+
+        .sb-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.3
+        }
+
+        .sb-meta {
+            color: var(--text3);
+            font-size: 11px;
+            margin-top: 4px
+        }
+
+        .toc-label {
+            padding: 0 16px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            color: var(--text3)
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px;
+            cursor: pointer;
+            color: var(--text2);
+            transition: background .12s, color .12s;
+            text-decoration: none
+        }
+
+        .toc-item:hover,
+        .toc-item.active {
+            background: var(--bg3);
+            color: var(--text)
+        }
+
+        .toc-item.active {
+            font-weight: 500;
+            color: var(--accent)
+        }
+
+        .toc-icon {
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .toc-sub {
+            padding-left: 36px;
+            font-size: 12px;
+            color: var(--text3)
+        }
+
+        .toc-sub:hover {
+            color: var(--text2)
+        }
+
+        .sb-div {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 16px
+        }
+
+        /* ── Main ── */
+        #main {
+            flex: 1;
+            overflow-y: auto;
+            height: 100vh
+        }
+
+        #content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 64px 120px
+        }
+
+        /* ── Topbar ── */
+        #topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px 10px 28px;
+            font-size: 13px;
+            color: var(--text2);
+            gap: 12px;
+            backdrop-filter: blur(8px)
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .breadcrumb a {
+            color: var(--text3);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text)
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #darkToggle {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s
+        }
+
+        #darkToggle:hover {
+            background: var(--bg3)
+        }
+
+        /* ── Page Header ── */
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .page-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block
+        }
+
+        .page-title {
+            font-family: var(--serif);
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 10px
+        }
+
+        .page-sub {
+            font-size: 16px;
+            color: var(--text2);
+            font-style: italic;
+            margin-bottom: 16px
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center
+        }
+
+        .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            background: var(--bg2)
+        }
+
+        .meta-chip.accent {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: var(--accent-bg)
+        }
+
+        .meta-chip.green {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green-bg)
+        }
+
+        .meta-chip.yellow {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border-color: var(--yellow-bg)
+        }
+
+        /* ── Headings ── */
+        .h1 {
+            font-family: var(--serif);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 40px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+            scroll-margin-top: 20px
+        }
+
+        .h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            scroll-margin-top: 20px
+        }
+
+        .h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 6px
+        }
+
+        p {
+            color: var(--text);
+            margin: 0 0 10px;
+            line-height: 1.75
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0
+        }
+
+        /* ── Callouts ── */
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 14px 0;
+            font-size: 14px;
+            line-height: 1.65
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .callout-body {
+            flex: 1
+        }
+
+        .callout.green {
+            background: var(--green-bg);
+            color: var(--text)
+        }
+
+        .callout.blue {
+            background: var(--accent-bg);
+            color: var(--text)
+        }
+
+        .callout.orange {
+            background: var(--orange-bg);
+            color: var(--text)
+        }
+
+        .callout.red {
+            background: var(--red-bg);
+            color: var(--text)
+        }
+
+        .callout.purple {
+            background: var(--purple-bg);
+            color: var(--text)
+        }
+
+        /* ── Code Blocks ── */
+        .code-block {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 14px 0;
+            overflow: hidden
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text2);
+            gap: 10px
+        }
+
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text3)
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s
+        }
+
+        .copy-btn:hover {
+            background: var(--bg)
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 13.5px;
+            line-height: 1.75;
+            tab-size: 4
+        }
+
+        .kw {
+            color: #0550ae;
+            font-weight: 500
+        }
+
+        .cm {
+            color: #6a737d;
+            font-style: italic
+        }
+
+        .str {
+            color: #0a8043
+        }
+
+        .num {
+            color: #953800
+        }
+
+        .fn {
+            color: #8250df
+        }
+
+        .cls {
+            color: #1a7f37
+        }
+
+        .ret {
+            color: #0550ae
+        }
+
+        [data-theme="dark"] .kw {
+            color: #79c0ff
+        }
+
+        [data-theme="dark"] .cm {
+            color: #8b949e
+        }
+
+        [data-theme="dark"] .str {
+            color: #a5d6ff
+        }
+
+        [data-theme="dark"] .num {
+            color: #ff9150
+        }
+
+        [data-theme="dark"] .fn {
+            color: #d2a8ff
+        }
+
+        [data-theme="dark"] .cls {
+            color: #7ee787
+        }
+
+        [data-theme="dark"] .ret {
+            color: #79c0ff
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: var(--red)
+        }
+
+        [data-theme="dark"] code {
+            color: var(--orange)
+        }
+
+        /* ── Tables ── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 14px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px
+        }
+
+        thead th {
+            background: var(--bg2);
+            padding: 9px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: .03em;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap
+        }
+
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5
+        }
+
+        tbody tr:hover td {
+            background: var(--bg2)
+        }
+
+        /* ── Lists ── */
+        ul,
+        ol {
+            padding-left: 24px;
+            margin: 8px 0 12px
+        }
+
+        li {
+            margin: 4px 0;
+            line-height: 1.7
+        }
+
+        /* ── Practice problem cards ── */
+        .prob-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin: 14px 0;
+            overflow: hidden
+        }
+
+        .prob-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .12s
+        }
+
+        .prob-header:hover {
+            background: var(--bg3)
+        }
+
+        .prob-left {
+            flex: 1;
+            min-width: 0
+        }
+
+        .prob-num {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 4px
+        }
+
+        .prob-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.3
+        }
+
+        .prob-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500
+        }
+
+        .tag-easy {
+            background: var(--green-bg);
+            color: var(--green)
+        }
+
+        .tag-med {
+            background: var(--yellow-bg);
+            color: var(--yellow)
+        }
+
+        .tag-hard {
+            background: var(--red-bg);
+            color: var(--red)
+        }
+
+        .tag-co {
+            background: var(--accent-bg);
+            color: var(--accent)
+        }
+
+        .tag-pat {
+            background: var(--purple-bg);
+            color: var(--purple)
+        }
+
+        .prob-body {
+            padding: 16px;
+            background: var(--bg)
+        }
+
+        .prob-section {
+            margin-bottom: 14px
+        }
+
+        .prob-section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text3);
+            margin-bottom: 6px
+        }
+
+        /* ── Checklist ── */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border);
+            user-select: none;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg2);
+        }
+
+        .cb-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: transparent;
+            font-size: 12px;
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        .cb-text {
+            font-size: 14.5px;
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .checklist-item.done .cb-box {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        .checklist-item.done .cb-text {
+            color: var(--text3);
+            text-decoration: line-through;
+        }
+
+        .ascii-tree {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text2);
+            margin: 14px 0;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .ascii-tree .hl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ascii-tree .nd {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .ascii-tree .ret {
+            color: var(--purple);
+            font-weight: 600;
+        }
+
+        .complexity-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px
+        }
+
+        .cx-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            border: 1px solid var(--border)
+        }
+
+        @media(max-width:768px) {
+            #sidebar {
+                display: none
+            }
+
+            #content {
+                padding: 24px 20px 80px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── SIDEBAR ── -->
+    <nav id="sidebar">
+        <div class="sb-header">
+            <div class="sb-badge">📚 DSA Course</div>
+            <div class="sb-title">Sorting Algorithms</div>
+            <div class="sb-meta">Topic 9 of 30 · Phase 2 — Data Structures</div>
+        </div>
+
+        <div class="toc-label">Sorting Patterns</div>
+        <a class="toc-item active" href="#foundations">
+            <span class="toc-icon">🏗️</span> Sorting Foundations
+        </a>
+        <a href="#deep-dive" class="toc-item">
+            <span class="toc-icon">🔬</span> Algorithms Deep Dive
+        </a>
+        <a href="#variations" class="toc-item">
+            <span class="toc-icon">🔄</span> Algorithm Variations
+        </a>
+        <a href="#complexity" class="toc-item">
+            <span class="toc-icon">⏱️</span> Complexity Analysis
+        </a>
+        <a href="#matrix" class="toc-item">
+            <span class="toc-icon">🗺️</span> 2D Sorting Constraints
+        </a>
+
+        <div class="sb-div"></div>
+        <div class="toc-label">Practice</div>
+        <a href="#practice" class="toc-item">
+            <span class="toc-icon">💪</span> Practice Problems
+        </a>
+        <a href="#assignment" class="toc-item">
+            <span class="toc-icon">📝</span> Assignment
+        </a>
+        <a href="#checklist" class="toc-item">
+            <span class="toc-icon">✅</span> Completion Checklist
+        </a>
+
+        <div class="sb-div"></div>
+        <div style="padding:8px 16px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
+            <a href="../Lecture8/lecture8_notes.html"
+                style="text-decoration:none;display:block;padding:4px 0;font-size:12px;color:var(--text3)">← Topic 8:
+                Arrays & Strings</a>
+            <a href="../Lecture10/lecture10_notes.html"
+                style="text-decoration:none;display:block;padding:4px 0;font-size:12px;color:var(--text3)">→ Topic 10:
+                Binary Search</a>
+        </div>
+    </nav>
+
+    <!-- ── MAIN ── -->
+    <div id="main">
+
+        <div id="topbar">
+            <div class="breadcrumb">
+                <a href="#">DSA Course</a><span>›</span>
+                <a href="#">Phase 2</a><span>›</span>
+                <span>Topic 9</span>
+            </div>
+            <div class="topbar-right">
+                <span style="font-size:12px;color:var(--text3)">Progress</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+                <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+            </div>
+        </div>
+
+        <div id="content">
+
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+                <span class="page-emoji">⚖️</span>
+                <h1 class="page-title">Sorting Algorithms</h1>
+                <p class="page-sub">"Sorting is the physics of search. Master the trade-offs between stability, memory,
+                    and raw
+                    speed."</p>
+                <div class="meta-row">
+                    <span class="meta-chip accent">📖 Topic 9 of 30</span>
+                    <span class="meta-chip accent">Phase 2 — Core DSA</span>
+                    <span class="meta-chip yellow">⏱ 5 days</span>
+                    <span class="meta-chip green">🎯 25+ problems</span>
+                    <span class="meta-chip">💼 Google · Amazon · Directi</span>
+                </div>
+            </div>
+
+            <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
+            <section id="overview" class="section">
+                <h2 class="h1">🌐 Sorting Overview</h2>
+                <p>Sorting mechanics generally divide into heavily nested loops for smaller caches ($O(N^2)$ bounds) and
+                    recursive Divide & Conquer structures ($O(N \log N)$ limits).</p>
+                <ul>
+                    <li><strong>$O(N^2)$ Baseline:</strong> Bubble, Selection, and Insertion Sorts. Best for tiny
+                        datasets or nearly perfectly sorted data.</li>
+                    <li><strong>$O(N \log N)$ Divide & Conquer:</strong> Merge Sort and Quick Sort. The industry
+                        standards for generalized scaling.</li>
+                    <li><strong>$O(N)$ Non-Comparison:</strong> Counting Sort and Radix Sort. Requires strict bounded
+                        constraints on dataset properties (like integers bounding).</li>
+                    <li><strong>$O(N \log N)$ Native:</strong> Heap Sort. In-place mapping without recursion.</li>
+                </ul>
+                <div class="callout blue">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-body">
+                        <strong>Stable Sort property</strong>: If two elements exhibit the same sorting key, their
+                        initial relative order is preserved. Essential for cascaded object sorting by multiple
+                        sequential criteria.
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
+            <section id="deep-dive" class="section">
+                <h2 class="h1">🔬 Algorithms Deep Dive</h2>
+
+                <h3 class="h2">O(N²) Baseline Sorts</h3>
+                <p><strong>Bubble Sort:</strong> Propagates maximum values to the end iteratively via pair swaps. Often
+                    optimized to break early if no swaps occur.</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Bubble Sort (Optimized)</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        <span class="kw">boolean</span> swapped = <span class="kw">false</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">1</span>; j < arr.length - i; j++) {
+            <span class="kw">if</span> (arr[j] < arr[j - <span class="num">1</span>]) {
+                <span class="fn">swap</span>(arr, j, j - <span class="num">1</span>);
+                swapped = <span class="kw">true</span>;
+            }
+        }
+        <span class="kw">if</span> (!swapped) <span class="kw">break</span>;
+    }
+}</pre>
+                </div>
+
+                <p><strong>Selection Sort:</strong> Locates absolute current minimum and injects it upfront. Always
+                    performs exact $O(N)$ swaps.</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Selection Sort</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < arr.length - <span class="num">1</span>; i++) {
+        <span class="kw">int</span> minIdx = i;
+        <span class="kw">for</span> (<span class="kw">int</span> j = i + <span class="num">1</span>; j < arr.length; j++) {
+            <span class="kw">if</span> (arr[j] < arr[minIdx]) minIdx = j;
+        }
+        <span class="fn">swap</span>(arr, i, minIdx);
+    }
+}</pre>
+                </div>
+
+                <p><strong>Insertion Sort:</strong> Builds the output string progressively. Highly adaptive and
+                    routinely utilized inside complex frameworks (like Timsort) natively for handling $N < 64$
+                        sub-chunks due to strict $O(N)$ speed on nearly sorted vectors.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · Insertion Sort</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i < arr.length; ++i) {
+        <span class="kw">int</span> key = arr[i], j = i - <span class="num">1</span>;
+        <span class="kw">while</span> (j >= <span class="num">0</span> && arr[j] > key) {
+            arr[j + <span class="num">1</span>] = arr[j];
+            j--;
+        }
+        arr[j + <span class="num">1</span>] = key;
+    }
+}</pre>
+                        </div>
+
+                        <h3 class="h2">Merge Sort (Divide & Conquer)</h3>
+                        <p>Splits cleanly down to base elements and merges components together recursively upward
+                            guaranteeing stable sorted arrays natively in $O(N \log N)$ constraints.</p>
+                        <div class="callout orange">
+                            <p><strong>Caveat - The $O(N)$ Space Limit:</strong> The merge phase strictly enforces
+                                allocating external memory to preserve stability cleanly. It is the gold standard for
+                                Native Objects and Linked Lists precisely due to this stability factor.</p>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · Standard Merge (Div/Conq)</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">void</span> <span class="fn">sort</span>(<span class="kw">int</span> arr[], <span class="kw">int</span> l, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (l < r) {
+        <span class="kw">int</span> m = l + (r - l) / <span class="num">2</span>;
+        <span class="fn">sort</span>(arr, l, m);
+        <span class="fn">sort</span>(arr, m + <span class="num">1</span>, r);
+        <span class="fn">merge</span>(arr, l, m, r); <span class="cm">// External $O(N)$ combination</span>
+    }
+}</pre>
+                        </div>
+
+                        <h3 class="h2">Quick Sort</h3>
+                        <p>An in-place paradigm separating the domain physically into domains left recursively smaller
+                            than a central Pivot and physically greater.</p>
+                        <div class="callout purple">
+                            <p><strong>The $O(N^2)$ Adversary Hazard:</strong> Standard Quick Sort choosing the exact
+                                highest element dynamically breaks out if data is aggressively inverse-sorted natively.
+                                We enforce randomized pivoting immediately to sustain average $O(N \log N)$ bounds
+                                strictly!</p>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · Quick Sort Pattern</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">quickSort</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">if</span> (low < high) {
+        <span class="kw">int</span> pi = <span class="fn">partition</span>(arr, low, high);
+        <span class="fn">quickSort</span>(arr, low, pi - <span class="num">1</span>);
+        <span class="fn">quickSort</span>(arr, pi + <span class="num">1</span>, high);
+    }
+}</pre>
+                        </div>
+
+                        <h3 class="h2">Non-Comparison Sorts & Heap</h3>
+                        <p>Algorithms mapping domains directly to index spaces or structural constraints.</p>
+
+                        <p><strong>Counting Sort</strong>: Hashes bounding integers optimally, heavily consuming memory
+                            dynamically proportional to the highest integer natively.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · Counting Sort Baseline</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">countingSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> max = Arrays.<span class="fn">stream</span>(arr).<span class="fn">max</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">int</span>[] count = <span class="kw">new int</span>[max + <span class="num">1</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> num : arr) count[num]++;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>, j = <span class="num">0</span>; i <= max; i++) {
+        <span class="kw">while</span> (count[i]-- > <span class="num">0</span>) arr[j++] = i;
+    }
+}</pre>
+                        </div>
+
+                        <p><strong>Radix Sort</strong>: Cascades Counting Sort digit by digit safely preventing space
+                            exhaustion reaching $O(d \cdot (N+K))$ outputs perfectly.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · Radix Sort Cascade</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">radixSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">if</span> (arr.length == <span class="num">0</span>) <span class="kw">return</span>;
+    <span class="kw">int</span> max = Arrays.<span class="fn">stream</span>(arr).<span class="fn">max</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">for</span> (<span class="kw">int</span> exp = <span class="num">1</span>; max / exp > <span class="num">0</span>; exp *= <span class="num">10</span>) {
+        <span class="fn">countSortByDigit</span>(arr, exp);
+    }
+}</pre>
+                        </div>
+
+                        <p><strong>Heap Sort</strong>: Forces elements into a Max/Min Binary Heap. Reaches strictly $O(N
+                            \log N)$ time natively with an optimal $O(1)$ embedded space boundary dynamically but lacks
+                            the sequential mapping speeds Merge Sort has.</p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-lang">☕ Java · In-Place Heap Sort</div>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><span class="kw">public void</span> <span class="fn">heapSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span> n = arr.length;
+    <span class="cm">// Build heap natively phase</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = n / <span class="num">2</span> - <span class="num">1</span>; i >= <span class="num">0</span>; i--) {
+        <span class="fn">heapify</span>(arr, n, i);
+    }
+    <span class="cm">// Extract elements globally</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = n - <span class="num">1</span>; i > <span class="num">0</span>; i--) {
+        <span class="fn">swap</span>(arr, <span class="num">0</span>, i);
+        <span class="fn">heapify</span>(arr, i, <span class="num">0</span>);
+    }
+}</pre>
+                        </div>
+            </section>
+
+            <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
+            <section id="variations" class="section">
+                <h2 class="h1">🔄 Algorithm Variations</h2>
+
+                <h3 class="h2">Cyclic Sort</h3>
+                <p>Given parameters constraining elements rigidly inside $1$ to $N$, you assign targets manually by
+                    calculating <code>targetIdx = nums[i] - 1</code> strictly bypassing comparison logic for direct
+                    index containment bounded strictly to $O(N)$.</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Cyclic Sorting Logic</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">int</span> i = <span class="num">0</span>;
+<span class="kw">while</span> (i < nums.length) {
+    <span class="kw">int</span> correct = nums[i] - <span class="num">1</span>; <span class="cm">// The index it SHOULD belong to</span>
+    <span class="kw">if</span> (nums[i] > <span class="num">0</span> && nums[i] <= nums.length && nums[i] != nums[correct]) {
+        <span class="fn">swap</span>(nums, i, correct);
+    } <span class="kw">else</span> {
+        i++;
+    }
+}</pre>
+                </div>
+
+                <h3 class="h2">Dutch National Flag (3-Way Partitioning)</h3>
+                <p>When domains heavily replicate properties (e.g. 0s, 1s, and 2s purely). Using 3 pivot limits natively
+                    organizes elements centrally without mapping auxiliary constraints natively dynamically sorting in a
+                    single $O(N)$ pass structurally.</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · 3-Way Partition Bounds</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
+<span class="kw">while</span> (mid <= high) {
+    <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) <span class="fn">swap</span>(nums, low++, mid++);
+    <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) mid++;
+    <span class="kw">else</span> <span class="fn">swap</span>(nums, mid, high--);
+}</pre>
+                </div>
+
+                <h3 class="h2">QuickSelect</h3>
+                <p>A Quick Sort recursion tree cut fundamentally in half. Instead of sorting both pivot sides, you
+                    analyze if the exact Kth pivot sits bounded dynamically processing strictly in amortized $O(N)$ time
+                    finding structural Medians optimally natively!</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · QuickSelect (Kth Largest)</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="cm">// Find k-th largest implies index (len - k)</span>
+<span class="kw">int</span> pivotIdx = <span class="fn">partition</span>(nums, left, right);
+<span class="kw">if</span> (pivotIdx == targetK) <span class="kw">return</span> nums[targetK];
+<span class="kw">else if</span> (pivotIdx < targetK) <span class="kw">return</span> <span class="fn">quickSelect</span>(nums, pivotIdx + <span class="num">1</span>, right, targetK);
+<span class="kw">else return</span> <span class="fn">quickSelect</span>(nums, left, pivotIdx - <span class="num">1</span>, targetK);</pre>
+                </div>
+            </section>
+
+            <!-- ══ 3. COMPLEXITY ANALYSIS ════════════════════════════ -->
+            <section id="complexity" class="section">
+                <h2 class="h1">⏱️ Complexity Analysis</h2>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Time (Best)</th>
+                                <th>Time (Avg / Worst)</th>
+                                <th>Space Constraints</th>
+                                <th>Stability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Insertion Sort</td>
+                                <td>$O(N)$</td>
+                                <td>$O(N^2)$</td>
+                                <td>$O(1)$</td>
+                                <td><span style="color:var(--green)">Stable</span></td>
+                            </tr>
+                            <tr>
+                                <td>Merge Sort</td>
+                                <td>$O(N \log N)$</td>
+                                <td>$O(N \log N)$</td>
+                                <td>$O(N)$</td>
+                                <td><span style="color:var(--green)">Stable</span></td>
+                            </tr>
+                            <tr>
+                                <td>Quick Sort</td>
+                                <td>$O(N \log N)$</td>
+                                <td>$O(N^2)$</td>
+                                <td>$O(\log N)$</td>
+                                <td><span style="color:var(--orange)">Unstable</span></td>
+                            </tr>
+                            <tr>
+                                <td>Heap Sort</td>
+                                <td>$O(N \log N)$</td>
+                                <td>$O(N \log N)$</td>
+                                <td>$O(1)$</td>
+                                <td><span style="color:var(--orange)">Unstable</span></td>
+                            </tr>
+                            <tr>
+                                <td>Counting Sort</td>
+                                <td>$O(N+K)$</td>
+                                <td>$O(N+K)$</td>
+                                <td>$O(K)$ Max</td>
+                                <td><span style="color:var(--green)">Stable</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ══ 4. 2D SORTING CONSTRAINTS ═════════════════════════ -->
+            <section id="matrix" class="section">
+                <h2 class="h1">🗺️ 2D Sorting Constraints</h2>
+                <p>Interviewers reliably ask candidates to organize unstructured 2D domains dynamically mapping arrays
+                    (e.g. Time Intervals).</p>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Interval Lambda Filtering</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="cm">// Given coordinates [[start, end], [start, end]]</span>
+<span class="cm">// Sort dynamically by Start Time rigorously, then break ties via End Time natively!</span>
+Arrays.<span class="fn">sort</span>(intervals, (a, b) -> {
+    <span class="kw">if</span> (a[<span class="num">0</span>] != b[<span class="num">0</span>]) {
+        <span class="ret">return</span> Integer.<span class="fn">compare</span>(a[<span class="num">0</span>], b[<span class="num">0</span>]);
+    } <span class="kw">else</span> {
+        <span class="ret">return</span> Integer.<span class="fn">compare</span>(a[<span class="num">1</span>], b[<span class="num">1</span>]);
+    }
+});</pre>
+                </div>
+            </section>
+
+            <!-- PRACTICE PROBLEMS -->
+            <section id="practice" class="section">
+                <h2 class="h1">💪 Practice Problems</h2>
+
+                <!-- P1: Merge Sorted Array -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 01 · In-Place Merge</div>
+                            <div class="prob-title">Merge Sorted Array</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/merge-sorted-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 88 - Merge Sorted Array</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-easy">Easy</span>
+                                <span class="tag tag-co">Amazon</span><span class="tag tag-co">Facebook</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Merge two sorted arrays <em>in-place</em> into the larger array. You must start merging
+                                from the back to avoid overwriting elements.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Backward Merge</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public void</span> <span class="fn">merge</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span> m, <span class="kw">int</span>[] nums2, <span class="kw">int</span> n) {
+    <span class="kw">int</span> p1 = m - <span class="num">1</span>;
+    <span class="kw">int</span> p2 = n - <span class="num">1</span>;
+    <span class="kw">int</span> p = m + n - <span class="num">1</span>;
+    
+    <span class="kw">while</span> (p2 >= <span class="num">0</span>) {
+        <span class="kw">if</span> (p1 >= <span class="num">0</span> && nums1[p1] > nums2[p2]) {
+            nums1[p--] = nums1[p1--];
+        } <span class="kw">else</span> {
+            nums1[p--] = nums2[p2--];
+        }
+    }
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(m+n)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P2: Sort Colors -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 02 · Three-Way Partition</div>
+                            <div class="prob-title">Sort Colors (Dutch National Flag)</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/sort-colors/"
+                                    target="_blank" style="font-size:12px">🔗 LC 75 - Sort Colors</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Microsoft</span><span class="tag tag-co">Adobe</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Sort an array of 0s, 1s, and 2s in-place in $O(N)$ time and $O(1)$ space using three
+                                pointers tracking bounds.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Dutch National Flag</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
+    <span class="kw">while</span> (mid <= high) {
+        <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) {
+            <span class="fn">swap</span>(nums, low++, mid++);
+        } <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) {
+            mid++;
+        } <span class="kw">else</span> {
+            <span class="fn">swap</span>(nums, mid, high--);
+        }
+    }
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P3: First Missing Positive -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 03 · Cyclic Sort Secret</div>
+                            <div class="prob-title">First Missing Positive</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/first-missing-positive/"
+                                    target="_blank" style="font-size:12px">🔗 LC 41 - First Missing Positive</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
+                                <span class="tag tag-pat">Cyclic Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the smallest positive integer missing from an unsorted array using $O(N)$ time and
+                                strict $O(1)$ space constraints.</p>
+                        </div>
+                        <div class="prob-section">
+                            <div class="prob-section-label">The Trick</div>
+                            <p>Treat the array as a hash set where a value <code>k</code> maps optimally to index
+                                <code>k-1</code>. Swap elements into their correct positions greedily, then execute a
+                                final linear scan to find the first position mismatch.
+                            </p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Cyclic Sort</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">firstMissingPositive</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (i < nums.length) {
+        <span class="kw">int</span> correct = nums[i] - <span class="num">1</span>;
+        <span class="kw">if</span> (nums[i] > <span class="num">0</span> && nums[i] <= nums.length && nums[i] != nums[correct]) {
+            <span class="fn">swap</span>(nums, i, correct);
+        } <span class="kw">else</span> {
+            i++;
+        }
+    }
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < nums.length; i++) {
+        <span class="kw">if</span> (nums[i] != i + <span class="num">1</span>) <span class="kw">return</span> i + <span class="num">1</span>;
+    }
+    <span class="kw">return</span> nums.length + <span class="num">1</span>;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P4: Kth Largest Element -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 04 · Optimization Variants</div>
+                            <div class="prob-title">Kth Largest Element in an Array</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/kth-largest-element-in-an-array/"
+                                    target="_blank" style="font-size:12px">🔗 LC 215 - Kth Largest Element</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Facebook</span>
+                                <span class="tag tag-pat">QuickSelect / Heap</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Find the $k$-th largest element in an unsorted array efficiently $O(N)$ average using
+                                QuickSelect partitioning, or optimally using Min-Heaps for stream capability.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Min Heap</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    PriorityQueue&lt;Integer&gt; minHeap = <span class="kw">new</span> PriorityQueue&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> num : nums) {
+        minHeap.<span class="fn">offer</span>(num);
+        <span class="kw">if</span> (minHeap.<span class="fn">size</span>() > k) {
+            minHeap.<span class="fn">poll</span>();
+        }
+    }
+    <span class="kw">return</span> minHeap.<span class="fn">peek</span>();
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge yellow"><span class="cx-label">Time</span><span
+                                            class="cx-val yellow">O(N log k)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(k)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P5: Maximum Gap -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 05 · Radical Performance</div>
+                            <div class="prob-title">Maximum Gap</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/maximum-gap/"
+                                    target="_blank" style="font-size:12px">🔗 LC 164 - Maximum Gap</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-co">Apple</span>
+                                <span class="tag tag-pat">Radix / Bucket Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Given an unsorted array, find the maximum difference between successive elements in
+                                sorted form. You must solve it in linear time and space $O(N)$ without deploying
+                                comparison bounds.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Pigeonhole Bucket Sort</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span> <span class="fn">maximumGap</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">if</span> (nums.length < <span class="num">2</span>) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">int</span> min = Arrays.<span class="fn">stream</span>(nums).<span class="fn">min</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">int</span> max = Arrays.<span class="fn">stream</span>(nums).<span class="fn">max</span>().<span class="fn">getAsInt</span>();
+    <span class="kw">int</span> gap = Math.<span class="fn">max</span>(<span class="num">1</span>, (max - min) / (nums.length - <span class="num">1</span>));
+    
+    <span class="cm">// The pigeonhole principle guarantees the maximum gap </span>
+    <span class="cm">// crosses bucket boundaries instead of being internal to a bucket.</span>
+    <span class="kw">return</span> <span class="fn">computeMaxGap</span>(nums, gap, min, max); <span class="cm">// abstracted</span>
+}</pre>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P6: Top K Frequent Elements -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 06 · Bucket Sort Approach</div>
+                            <div class="prob-title">Top K Frequent Elements</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/top-k-frequent-elements/"
+                                    target="_blank" style="font-size:12px">🔗 LC 347 - Top K Frequent Elements</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Amazon</span>
+                                <span class="tag tag-pat">Bucket Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Given an integer array nums and an integer k, return the k most frequent elements. The
+                                algorithm must be better than $O(N \log N)$.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Bucket Sort</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    Map&lt;Integer, Integer&gt; count = <span class="kw">new</span> HashMap&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> num : nums) count.<span class="fn">put</span>(num, count.<span class="fn">getOrDefault</span>(num, <span class="num">0</span>) + <span class="num">1</span>);
+    
+    List&lt;Integer&gt;[] bucket = <span class="kw">new</span> List[nums.length + <span class="num">1</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> key : count.<span class="fn">keySet</span>()) {
+        <span class="kw">int</span> freq = count.<span class="fn">get</span>(key);
+        <span class="kw">if</span> (bucket[freq] == <span class="kw">null</span>) bucket[freq] = <span class="kw">new</span> ArrayList&lt;&gt;();
+        bucket[freq].<span class="fn">add</span>(key);
+    }
+    
+    <span class="kw">int</span>[] res = <span class="kw">new int</span>[k];
+    <span class="kw">int</span> index = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = bucket.length - <span class="num">1</span>; i >= <span class="num">0</span> && index < k; i--) {
+        <span class="kw">if</span> (bucket[i] != <span class="kw">null</span>) {
+            <span class="kw">for</span> (<span class="kw">int</span> val : bucket[i]) {
+                res[index++] = val;
+                <span class="kw">if</span> (index == k) <span class="kw">break</span>;
+            }
+        }
+    }
+    <span class="kw">return</span> res;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- P7: Wiggle Sort -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 07 · Greedy Reordering</div>
+                            <div class="prob-title">Wiggle Sort</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/wiggle-sort/"
+                                    target="_blank" style="font-size:12px">🔗 LC 280 - Wiggle Sort</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-co">Google</span>
+                                <span class="tag tag-pat">Greedy Sort</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Given an integer array nums, reorder it such that $nums[0] \leq nums[1] \geq nums[2] \leq
+                                nums[3] \dots$ Optimal approach requires only a single $O(N)$ pass.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow">▶</span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Greedy Swap Array</div>
+                                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public void</span> <span class="fn">wiggleSort</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < nums.length - <span class="num">1</span>; i++) {
+        <span class="kw">if</span> (i % <span class="num">2</span> == <span class="num">0</span>) {
+            <span class="cm">// Even indices must be <= next</span>
+            <span class="kw">if</span> (nums[i] > nums[i + <span class="num">1</span>]) <span class="fn">swap</span>(nums, i, i + <span class="num">1</span>);
+        } <span class="kw">else</span> {
+            <span class="cm">// Odd indices must be >= next</span>
+            <span class="kw">if</span> (nums[i] < nums[i + <span class="num">1</span>]) <span class="fn">swap</span>(nums, i, i + <span class="num">1</span>);
+        }
+    }
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+
+            <hr>
+
+            <h2 class="h1" id="assignment">📝 Topic 9 Assignment</h2>
+            <div class="callout orange" style="margin:14px 0">
+                <span class="callout-icon">📋</span>
+                <div class="callout-body">
+                    <strong>Assignment — 25 Problems</strong><br>
+                    Complete the assignment before moving to Topic 10. It includes Easy, Medium, and Hard level problems
+                    covering O(N²) sorts, O(N log N) partitioned sorts, Linear Sorting variants, and Cyclic Sort
+                    patterns.<br><br>
+                    <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture9/Assignment.md"
+                        style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
+                        Open Assignment →</a>
+                </div>
+            </div>
+
+            <h2 class="h1" id="checklist">✅ Topic Completion Checklist</h2>
+            <p>Check each item before advancing to Topic 10.</p>
+
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
+                <div class="checklist-item" onclick="this.classList.toggle('done')">
+                    <div class="cb-box">✓</div>
+                    <div class="cb-text">I understand the mechanics of $O(N^2)$ sorts (Selection, Insertion, Bubble).
+                    </div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('done')">
+                    <div class="cb-box">✓</div>
+                    <div class="cb-text">I can implement Merge Sort and Quick Sort (Partitioning) from scratch.</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('done')">
+                    <div class="cb-box">✓</div>
+                    <div class="cb-text">I recognize when to apply $O(N)$ special sorts like Counting and Radix Sort.
+                    </div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('done')">
+                    <div class="cb-box">✓</div>
+                    <div class="cb-text">I know how to solve advanced interview problems using Custom Comparators
+                        (Largest Number, Wiggle Sort).</div>
+                </div>
+                <div class="checklist-item" onclick="this.classList.toggle('done')">
+                    <div class="cb-box">✓</div>
+                    <div class="cb-text">I have mastered the Cyclic Sort pattern for range problems.</div>
+                </div>
+            </div>
+
+            <div class="callout green" style="margin-top:24px">
+                <span class="callout-icon">🧠</span>
+                <div class="callout-body">
+                    <strong>You're ready for Topic 10: Binary Search</strong><br>
+                    Don't just write code; master the boundaries of algorithmic execution. Binary Search is the
+                    definitive key
+                    to navigating large, structured arrays efficiently.
+                </div>
+            </div>
+
+            <div class="footer"
+                style="margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <a href="../Lecture8/lecture8_notes.html"
+                    style="text-decoration: none; color: var(--text3); font-size: 14px;">← Topic 8: Arrays & Strings</a>
+                <span style="color: var(--text3); font-size: 13px;">Topic 9 of 30 — Phase 2 Core DSA</span>
+                <a href="../Lecture10/lecture10_notes.html"
+                    style="text-decoration: none; color: var(--accent); font-weight: 600; font-size: 14px;">Topic 10:
+                    Searching Algorithms →</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Dark Mode Toggle
+        function toggleDark() {
+            const html = document.documentElement;
+            const btn = document.getElementById('darkToggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                btn.innerText = '🌙 Dark';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.innerText = '☀️ Light';
+            }
+        }
+
+        // 2. Progress Tracker & TOC Highlighting
+        document.getElementById('main').addEventListener('scroll', function () {
+            const el = this;
+            const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+
+            if (document.getElementById('progressFill')) {
+                const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+                document.getElementById('progressFill').style.width = fillPct + '%';
+            }
+
+            const sections = document.querySelectorAll('h1, h2, h3');
+            let current = "";
+            sections.forEach(s => {
+                const top = s.getBoundingClientRect().top;
+                if (top < 150) current = s.id;
+            });
+
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === "#" + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Problem Visibility Toggle
+        function toggleProb(headerEl) {
+            const body = headerEl.nextElementSibling;
+            if (!body) return;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            headerEl.classList.toggle('active', !isOpen);
+
+            const arrow = headerEl.lastElementChild;
+            if (arrow && arrow.tagName.toLowerCase() === 'span') {
+                arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+                arrow.style.display = 'inline-block';
+                arrow.style.transition = 'transform 0.2s';
+            }
+        }
+
+        // 4. Copy Code Logic
+        function copyCode(btn) {
+            const parent = btn.closest('.code-header');
+            if (!parent) return;
+            const pre = parent.nextElementSibling;
+            if (!pre) return;
+            const code = pre.innerText;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = 'var(--green-bg)';
+                btn.style.color = 'var(--green)';
+                btn.style.borderColor = 'var(--green)';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
