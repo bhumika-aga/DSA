@@ -465,12 +465,12 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Singly LL — implementation, insertion (head/tail/middle), deletion, traversal
-2. **Day 2:** Doubly LL, circular LL — implementation and real-world use cases
+1. **Day 1:** Singly LL — implementation, insertion, deletion, Sentinel (Dummy Head) nodes
+2. **Day 2:** Doubly LL, circular LL — XOR Linked List (conceptual) and real-world use cases
 3. **Day 3:** Fast & slow pointers — find middle, detect cycle, find cycle start, nth from end
-4. **Day 4:** Reversal — reverse entire (iterative + recursive), between positions, in k-groups
-5. **Day 5:** Merge — merge two sorted lists, merge k sorted lists, sort list (merge sort on LL)
-6. **Day 6:** Advanced — LRU Cache, copy list with random pointer, intersection, palindrome LL
+4. **Day 4:** Advanced re-linking — Reverse in-place (iterative/recursive), Reverse in K-Groups
+5. **Day 5:** Specialized variations — Flattening multilevel lists, Copy with random pointer
+6. **Day 6:** Cache Design — LRU Cache & O(1) LFU Cache implementation logic
 
 #### 🏢 Companies That Ask These
 

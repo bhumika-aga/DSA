@@ -1,7 +1,7 @@
 # 📝 Assignment 08 — Arrays & Strings
 
 > **Lecture:** Topic 8 — Arrays & Strings
-> **Topic Count:** 8 of 30 — Phase 2 Data Structures
+> **Topic Count:** 8 of 30 — Phase 2 Core Data Structures
 > **Duration:** 6 Days
 > **Core Problems:** 35 (10 Easy · 15 Medium · 10 Challenge) + 5 Complexity Exercises
 > **Goal:** Master in-place modifications, Kadane's algorithm, prefix sums, and frequency mappings without resorting to O(n²) or heavy HashMaps.

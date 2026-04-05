@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 11 — Linked Lists Foundations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- KaTeX for Premium Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}] });"></script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg2: #f7f6f3;
+            --bg3: #efede9;
+            --bg4: #e8e5df;
+            --border: #e3e0d9;
+            --border2: #d0ccc4;
+            --text: #37352f;
+            --text2: #6b6860;
+            --text3: #9b9790;
+            --accent: #2383e2;
+            --accent-bg: #e8f1fc;
+            --green: #0f7b6c;
+            --green-bg: #e9f5f3;
+            --red: #c0392b;
+            --red-bg: #fdf0ee;
+            --yellow: #8a6d00;
+            --yellow-bg: #fdf6e3;
+            --purple: #6940a5;
+            --purple-bg: #f0ecf9;
+            --orange: #c75b0e;
+            --orange-bg: #fef0e7;
+            --pink: #ad1a72;
+            --pink-bg: #fce8f3;
+            --teal: #0d7d6e;
+            --teal-bg: #e4f4f1;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Merriweather', serif;
+            --sidebar-w: 260px
+        }
+
+        [data-theme="dark"] {
+            --bg: #191919;
+            --bg2: #212121;
+            --bg3: #2d2d2d;
+            --bg4: #383838;
+            --border: #333;
+            --border2: #444;
+            --text: #e8e6e1;
+            --text2: #9b9790;
+            --text3: #6b6860;
+            --accent: #5ba4f5;
+            --accent-bg: #1a2d42;
+            --green: #4db6a8;
+            --green-bg: #0e2420;
+            --red: #e07070;
+            --red-bg: #2e1414;
+            --yellow: #d4a42a;
+            --yellow-bg: #2a1f06;
+            --purple: #a07dd4;
+            --purple-bg: #1e1530;
+            --orange: #e0893a;
+            --orange-bg: #2a1608;
+            --pink: #e06aac;
+            --pink-bg: #2a1020;
+            --teal: #38c9b8;
+            --teal-bg: #0d2420
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+            display: flex;
+            flex-direction: row;
+            transition: background .2s, color .2s;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            font-size: 13px;
+            flex-shrink: 0
+        }
+
+        .sb-header {
+            padding: 0 16px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px
+        }
+
+        .sb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            margin-bottom: 10px
+        }
+
+        .sb-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.3
+        }
+
+        .sb-meta {
+            color: var(--text3);
+            font-size: 11px;
+            margin-top: 4px
+        }
+
+        .toc-label {
+            padding: 0 16px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            color: var(--text3)
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px;
+            cursor: pointer;
+            color: var(--text2);
+            transition: background .12s, color .12s;
+            text-decoration: none
+        }
+
+        .toc-item:hover,
+        .toc-item.active {
+            background: var(--bg3);
+            color: var(--text)
+        }
+
+        .toc-item.active {
+            font-weight: 500;
+            color: var(--accent)
+        }
+
+        .toc-icon {
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .toc-sub {
+            padding-left: 36px;
+            font-size: 12px;
+            color: var(--text3)
+        }
+
+        .toc-sub:hover {
+            color: var(--text2)
+        }
+
+        .sb-div {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 16px
+        }
+
+        /* ── Main ── */
+        #main {
+            flex: 1;
+            overflow-y: auto;
+            height: 100vh
+        }
+
+        #content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 64px 120px
+        }
+
+        /* ── Topbar ── */
+        #topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px 10px 28px;
+            font-size: 13px;
+            color: var(--text2);
+            gap: 12px;
+            backdrop-filter: blur(8px)
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .breadcrumb a {
+            color: var(--text3);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text)
+        }
+
+        .breadcrumb span {
+            color: var(--text3);
+            font-size: 12px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #60a5fa);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #darkToggle {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s
+        }
+
+        #darkToggle:hover {
+            background: var(--bg3)
+        }
+
+        /* ── Page Header ── */
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .page-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block
+        }
+
+        .page-title {
+            font-family: var(--serif);
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 10px
+        }
+
+        .page-sub {
+            font-size: 16px;
+            color: var(--text2);
+            font-style: italic;
+            margin-bottom: 16px
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center
+        }
+
+        .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            background: var(--bg2)
+        }
+
+        .meta-chip.accent {
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: var(--accent-bg)
+        }
+
+        .meta-chip.green {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green-bg)
+        }
+
+        .meta-chip.yellow {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            border-color: var(--yellow-bg)
+        }
+
+        /* ── Headings ── */
+        .h1 {
+            font-family: var(--serif);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 40px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+            scroll-margin-top: 20px
+        }
+
+        .h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            scroll-margin-top: 20px
+        }
+
+        .h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 6px
+        }
+
+        p {
+            color: var(--text);
+            margin: 0 0 10px;
+            line-height: 1.75
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0
+        }
+
+        /* ── Callouts ── */
+        .callout {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 14px 0;
+            font-size: 14px;
+            line-height: 1.65
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .callout-body {
+            flex: 1
+        }
+
+        .callout-body strong {
+            font-weight: 600
+        }
+
+        .callout.blue {
+            background: var(--accent-bg);
+            color: var(--text)
+        }
+
+        .callout.green {
+            background: var(--green-bg);
+            color: var(--text)
+        }
+
+        .callout.yellow {
+            background: var(--yellow-bg);
+            color: var(--text)
+        }
+
+        .callout.red {
+            background: var(--red-bg);
+            color: var(--text)
+        }
+
+        .callout.purple {
+            background: var(--purple-bg);
+            color: var(--text)
+        }
+
+        .callout.orange {
+            background: var(--orange-bg);
+            color: var(--text)
+        }
+
+        /* ── Code Blocks ── */
+        .code-block {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 14px 0;
+            overflow: hidden
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text2);
+            gap: 10px
+        }
+
+        .code-lang {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text3)
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            color: var(--text2);
+            font-family: var(--sans);
+            transition: background .12s
+        }
+
+        .copy-btn:hover {
+            background: var(--bg)
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 13.5px;
+            line-height: 1.75;
+            tab-size: 4
+        }
+
+        .kw {
+            color: #0550ae;
+            font-weight: 500
+        }
+
+        .cm {
+            color: #6a737d;
+            font-style: italic
+        }
+
+        .str {
+            color: #0a8043
+        }
+
+        .num {
+            color: #953800
+        }
+
+        .fn {
+            color: #8250df
+        }
+
+        .cls {
+            color: #1a7f37
+        }
+
+        .ret {
+            color: #0550ae
+        }
+
+        [data-theme="dark"] .kw {
+            color: #79c0ff
+        }
+
+        [data-theme="dark"] .cm {
+            color: #8b949e
+        }
+
+        [data-theme="dark"] .str {
+            color: #a5d6ff
+        }
+
+        [data-theme="dark"] .num {
+            color: #ff9150
+        }
+
+        [data-theme="dark"] .fn {
+            color: #d2a8ff
+        }
+
+        [data-theme="dark"] .cls {
+            color: #7ee787
+        }
+
+        [data-theme="dark"] .ret {
+            color: #79c0ff
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: 13px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: var(--red)
+        }
+
+        [data-theme="dark"] code {
+            color: var(--orange)
+        }
+
+        /* ── Tables ── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 14px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px
+        }
+
+        thead th {
+            background: var(--bg2);
+            padding: 9px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: .03em;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border)
+        }
+
+        tbody td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        /* ── Problems ── */
+        .prob-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 16px 0;
+            overflow: hidden;
+            background: var(--bg)
+        }
+
+        .prob-header {
+            padding: 14px 16px;
+            background: var(--bg2);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background .12s;
+            border-bottom: 1px solid transparent
+        }
+
+        .prob-header:hover {
+            background: var(--bg3)
+        }
+
+        .prob-header.active {
+            border-bottom-color: var(--border)
+        }
+
+        .prob-left {
+            flex: 1
+        }
+
+        .prob-num {
+            font-size: 11px;
+            color: var(--text3);
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .prob-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .prob-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500
+        }
+
+        .tag-easy {
+            background: var(--green-bg);
+            color: var(--green)
+        }
+
+        .tag-med {
+            background: var(--yellow-bg);
+            color: var(--yellow)
+        }
+
+        .tag-hard {
+            background: var(--red-bg);
+            color: var(--red)
+        }
+
+        .tag-co {
+            background: var(--accent-bg);
+            color: var(--accent)
+        }
+
+        .tag-pat {
+            background: var(--purple-bg);
+            color: var(--purple)
+        }
+
+        .prob-body {
+            padding: 16px;
+            display: none;
+            background: var(--bg)
+        }
+
+        .prob-section {
+            margin-bottom: 16px;
+        }
+
+        .prob-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 6px;
+            letter-spacing: .05em;
+        }
+
+        .iobox {
+            background: var(--bg2);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--text2);
+            border: 1px solid var(--border);
+            white-space: pre-line;
+            margin: 8px 0;
+        }
+
+        /* ── Checklist ── */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border);
+            user-select: none;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg2);
+        }
+
+        .cb-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: transparent;
+            font-size: 12px;
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        .cb-text {
+            font-size: 14.5px;
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .checklist-item.done .cb-box {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        .checklist-item.done .cb-text {
+            color: var(--text3);
+            text-decoration: line-through;
+        }
+
+        /* ── Complexity Badges ── */
+        .complexity-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0
+        }
+
+        .cx-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: var(--mono);
+            border: 1px solid var(--border);
+            background: var(--bg2)
+        }
+
+        .cx-badge .cx-label {
+            font-size: 10px;
+            font-family: var(--sans);
+            color: var(--text3);
+            text-transform: uppercase;
+            font-weight: 600
+        }
+
+        .cx-badge .cx-val {
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .cx-badge.green {
+            background: var(--green-bg);
+            border-color: var(--green)
+        }
+
+        /* Details & Arrows */
+        summary {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 0;
+        }
+
+        summary::-webkit-details-marker {
+            display: none
+        }
+
+        .toggle-arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid currentColor;
+            transform: rotate(-90deg);
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        details[open] .toggle-arrow {
+            transform: rotate(0deg);
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px
+        }
+
+        @media(max-width:768px) {
+            #sidebar {
+                display: none
+            }
+
+            #content {
+                padding: 24px 20px 80px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── SIDEBAR ── -->
+    <nav id="sidebar">
+        <div class="sb-header">
+            <div class="sb-badge">🏆 Phase 2</div>
+            <div class="sb-title">Core Data Structures</div>
+            <div class="sb-meta">Lecture 11 of 30 · DSA Mastery</div>
+        </div>
+
+        <div class="toc-label">On this page</div>
+        <a class="toc-item active" href="#overview"><span class="toc-icon">🏗️</span>Anatomy & Types</a>
+        <a class="toc-item" href="#algorithms"><span class="toc-icon">🧠</span>Algorithms</a>
+        <a class="toc-item toc-sub" href="#sentinel">Sentinel Strategy</a>
+        <a class="toc-item toc-sub" href="#reversal">In-place Reversal</a>
+        <a class="toc-item" href="#variations"><span class="toc-icon">🔄</span>Advanced Variations</a>
+        <a class="toc-item" href="#caches"><span class="toc-icon">⚡</span>Cache Design (O(1))</a>
+        <a class="toc-item" href="#complexity"><span class="toc-icon">⏱️</span>Complexity Analysis</a>
+        <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
+        <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
+        <div class="sb-div"></div>
+        <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Completion Checklist</a>
+
+        <div class="sb-div"></div>
+        <div style="padding:8px 16px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
+            <a class="toc-item" href="../Lecture10/lecture10_notes.html"
+                style="padding:5px 0;font-size:13px;color:var(--text3)">← Lecture 10: Searching</a>
+            <a class="toc-item" href="../Lecture12/lecture12_notes.html"
+                style="padding:5px 0;font-size:13px;color:var(--text3)">→ Lecture 12: Stacks & Queues</a>
+        </div>
+    </nav>
+
+    <!-- ── MAIN ── -->
+    <div id="main">
+        <div id="topbar">
+            <div class="breadcrumb">
+                <a href="../dsa_study_plan.html">DSA Course</a>
+                <span style="color:var(--text3)">/</span>
+                <a href="#">Phase 2</a>
+                <span style="color:var(--text3)">/</span>
+                <strong style="color:var(--text)">Linked Lists</strong>
+            </div>
+            <div class="topbar-right">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+            </div>
+        </div>
+
+        <div id="content">
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+                <span class="page-emoji">🔗</span>
+                <h1 class="page-title">Linked Lists</h1>
+                <p class="page-sub">"Linear logic with non-contiguous memory. Master pointers to master the universe."
+                </p>
+                <div class="meta-row">
+                    <span class="meta-chip accent">📖 Lecture 11</span>
+                    <span class="meta-chip accent">Phase 2 — Core Data Structures</span>
+                    <span class="meta-chip yellow">⏱ 6 days</span>
+                    <span class="meta-chip green">🎯 28 problems</span>
+                    <span class="meta-chip">💼 Google · Meta · Uber</span>
+                </div>
+            </div>
+
+            <!-- SECTION 1: ANATOMY -->
+            <section id="overview">
+                <h2 class="h1">🏗️ Anatomy & Types</h2>
+                <p>Unlike Arrays, which store elements in <strong>contiguous</strong> memory, a Linked List stores
+                    elements in
+                    <strong>scattered</strong> memory. Each element (<strong>Node</strong>) contains data and a
+                    <strong>Pointer</strong> (reference) to the next node.
+                </p>
+
+                <h3 class="h2" id="node-anatomy">1.1 — The ListNode blueprint</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">class</span> <span class="fn">ListNode</span> {
+    <span class="kw">int</span> val;
+    ListNode next;
+    ListNode prev; <span class="cm">// For Doubly Linked List only</span>
+
+    <span class="fn">ListNode</span>(<span class="kw">int</span> x) { 
+        <span class="kw">this</span>.val = x; 
+        <span class="kw">this</span>.next = <span class="kw">null</span>;
+    }
+}</pre>
+                </div>
+
+                <h3 class="h2" id="types">1.2 — The Three Fundamental Types</h3>
+                <ul>
+                    <li><strong>Singly Linked List:</strong> Forward only. Last node points to <code>null</code>.</li>
+                    <li><strong>Doubly Linked List (DLL):</strong> Forward & Backward. Allows $O(1)$ deletion if node is
+                        given.</li>
+                    <li><strong>Circular:</strong> Last node points to the Head. Essential for buffers and round-robin
+                        scheduling.</li>
+                </ul>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 2: ALGORITHMS -->
+            <section id="algorithms">
+                <h2 class="h1">🧠 Core Algorithms</h2>
+
+                <h3 class="h2" id="sentinel">2.1 — The Sentinel Strategy (Dummy Head)</h3>
+                <p>A "Sentinel" node is a dummy node that points to the actual head. It eliminates special `if (head ==
+                    null)`
+                    cases for insertion/deletion.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Delete Example</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public</span> ListNode <span class="fn">removeElements</span>(ListNode head, <span class="kw">int</span> val) {
+    ListNode dummy = <span class="kw">new</span> <span class="fn">ListNode</span>(<span class="num">0</span>);
+    dummy.next = head;
+    ListNode curr = dummy;
+    
+    <span class="kw">while</span> (curr.next != <span class="kw">null</span>) {
+        <span class="kw">if</span> (curr.next.val == val) curr.next = curr.next.next;
+        <span class="kw">else</span> curr = curr.next;
+    }
+    <span class="ret">return</span> dummy.next;
+}</pre>
+                </div>
+
+                <h3 class="h2" id="reversal">2.2 — In-place Reversal</h3>
+                <p>The bread and butter of interview questions. The trick is to maintain three pointers: `prev`, `curr`,
+                    and
+                    `nextNode`.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Classic Reversal</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public</span> ListNode <span class="fn">reverseList</span>(ListNode head) {
+    ListNode prev = <span class="kw">null</span>;
+    ListNode curr = head;
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        ListNode nextNode = curr.next; <span class="cm">// Step 1: Save future</span>
+        curr.next = prev;              <span class="cm">// Step 2: Reverse connection</span>
+        prev = curr;                   <span class="cm">// Step 3: Advance prev</span>
+        curr = nextNode;               <span class="cm">// Step 4: Advance curr</span>
+    }
+    <span class="ret">return</span> prev;
+}</pre>
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 3: VARIATIONS -->
+            <section id="variations">
+                <h2 class="h1">🔄 Advanced Variations</h2>
+
+                <h3 class="h2" id="copy-random">3.1 — Copy List with Random Pointers</h3>
+                <div class="callout purple">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-body">
+                        <strong>The Interweaving Pattern:</strong> Instead of using a HashMap for $O(N)$ space,
+                        interweave copy nodes
+                        between originals: `A -> A' -> B -> B'`. This allows random assignment in $O(1)$ space.
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Logic Flow</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="cm">// 1. Interweave copies: curr.next = new Node(curr.val, curr.next)</span>
+<span class="cm">// 2. Assign Randoms: curr.next.random = curr.random.next</span>
+<span class="cm">// 3. Detach: original.next = original.next.next</span></pre>
+                </div>
+
+                <h3 class="h2" id="flatten">3.2 — Flattening Multilevel DLL</h3>
+                <p>Treat the `child` pointer like a "branch". Use a recursive approach or an iterative stack to attach
+                    children
+                    between `curr` and `curr.next`.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · Recursive Blueprint</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">public</span> Node <span class="fn">flatten</span>(Node head) {
+    <span class="kw">if</span> (head == <span class="kw">null</span>) <span class="ret">return</span> head;
+    Node curr = head;
+    <span class="kw">while</span> (curr != <span class="kw">null</span>) {
+        <span class="kw">if</span> (curr.child != <span class="kw">null</span>) {
+            Node next = curr.next;
+            Node childHead = <span class="fn">flatten</span>(curr.child);
+            <span class="cm">// Link curr & child</span>
+            curr.next = childHead;
+            childHead.prev = curr;
+            curr.child = <span class="kw">null</span>;
+            <span class="cm">// Link child-tail & next</span>
+            Node tail = childHead;
+            <span class="kw">while</span> (tail.next != <span class="kw">null</span>) tail = tail.next;
+            <span class="kw">if</span> (next != <span class="kw">null</span>) { tail.next = next; next.prev = tail; }
+        }
+        curr = curr.next;
+    }
+    <span class="ret">return</span> head;
+}</pre>
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 4: CACHES -->
+            <section id="caches">
+                <h2 class="h1">⚡ Cache Design</h2>
+
+                <h3 class="h2" id="lru">4.1 — Least Recently Used (LRU) Cache</h3>
+                <p>Requires $O(1)$ operations for both `get` and `put`. Achieved by combining a <strong>HashMap</strong>
+                    (for
+                    lookups) and a <strong>Doubly Linked List</strong> (for ordering).</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · HashMap + DLL Logic</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="kw">class</span> <span class="fn">LRUCache</span> {
+    Map&lt;Integer, Node&gt; map; 
+    DoubleList list; <span class="cm">// move accessed nodes to Head</span>
+    
+    <span class="kw">public</span> <span class="kw">int</span> <span class="fn">get</span>(<span class="kw">int</span> key) {
+        <span class="kw">if</span> (!map.containsKey(key)) <span class="ret">return</span> -1;
+        Node n = map.get(key);
+        list.<span class="fn">moveToHead</span>(n); <span class="cm">// Mark as most recent</span>
+        <span class="ret">return</span> n.val;
+    }
+}</pre>
+                </div>
+
+                <h3 class="h2" id="lfu">4.2 — Least Frequently Used (LFU) Logic</h3>
+                <p>LFU is the "hard mode" variation. Instead of one list, it uses <strong>multiple lists</strong> mapped
+                    by
+                    frequency. If total capacity is reached, evict the LRU item from the <code>minFrequency</code> list.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">☕ Java · LFU Solution Architecture</div><button class="copy-btn"
+                            onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="cm">// 1. Use Frequency Map: freq -> DoublyLinkedList of nodes</span>
+<span class="cm">// 2. Use Cache Map: key -> Node (for O(1) lookup)</span>
+<span class="cm">// 3. Track minFrequency for O(1) eviction</span>
+
+<span class="fn">updateFreq</span>(node) {
+    freqMap.<span class="fn">get</span>(node.freq).<span class="fn">remove</span>(node);
+    <span class="kw">if</span> (node.freq == minFreq && empty) minFreq++;
+    node.freq++;
+    freqMap.<span class="fn">get</span>(node.freq).<span class="fn">add</span>(node);
+}</pre>
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 5: COMPLEXITY -->
+            <section id="complexity">
+                <h2 class="h1">⏱️ Complexity Analysis</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Singly List</th>
+                                <th>Doubly List</th>
+                                <th>Array (Standard)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Indexing</td>
+                                <td>$O(N)$</td>
+                                <td>$O(N)$</td>
+                                <td style="color:var(--green)">$O(1)$</td>
+                            </tr>
+                            <tr>
+                                <td>Prepend</td>
+                                <td style="color:var(--green)">$O(1)$</td>
+                                <td style="color:var(--green)">$O(1)$</td>
+                                <td>$O(N)$</td>
+                            </tr>
+                            <tr>
+                                <td>Append</td>
+                                <td>$O(1)^*$</td>
+                                <td style="color:var(--green)">$O(1)$</td>
+                                <td>$O(1)$ avg</td>
+                            </tr>
+                            <tr>
+                                <td>Deletion</td>
+                                <td>$O(N)$</td>
+                                <td style="color:var(--green)">$O(1)$</td>
+                                <td>$O(N)$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-size: 12px; color: var(--text3)">*Singular Append is $O(1)$ only if maintaining a tail
+                    pointer.</p>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 6: PRACTICE -->
+            <section id="practice">
+                <h2 class="h1">💪 Practice Library</h2>
+
+                <!-- Problem 1 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 01 · Recursion</div>
+                            <div class="prob-title">Reverse Nodes in k-Group</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/reverse-nodes-in-k-group/" target="_blank"
+                                    style="font-size:12px">🔗 LC 25 - Reverse Nodes in k-Group</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-pat">Recursion</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Reverse nodes of a linked list $k$ at a time and return the modified list. If the number
+                                of nodes is not a multiple of $k$, the left-out nodes at the end should remain as they
+                                are.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Recursive</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> ListNode <span class="fn">reverseKGroup</span>(ListNode head, <span class="kw">int</span> k) {
+    ListNode curr = head;
+    <span class="kw">int</span> count = <span class="num">0</span>;
+    <span class="kw">while</span> (curr != <span class="kw">null</span> && count != k) { curr = curr.next; count++; }
+    <span class="kw">if</span> (count == k) {
+        curr = <span class="fn">reverseKGroup</span>(curr, k);
+        <span class="kw">while</span> (count-- > <span class="num">0</span>) {
+            ListNode tmp = head.next;
+            head.next = curr;
+            curr = head;
+            head = tmp;
+        }
+        head = curr;
+    }
+    <span class="ret">return</span> head;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(N/k)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 02 · Two Pointers</div>
+                            <div class="prob-title">Palindrome Linked List</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/palindrome-linked-list/"
+                                    target="_blank" style="font-size:12px">🔗 LC 234 - Palindrome Linked List</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-easy">Easy</span>
+                                <span class="tag tag-pat">Fast & Slow</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Check if a linked list is a palindrome in $O(1)$ extra space. Requires finding the
+                                middle, reversing the second half, and comparing.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Mid + Reverse</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public boolean</span> <span class="fn">isPalindrome</span>(ListNode head) {
+    ListNode fast = head, slow = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> && fast.next != <span class="kw">null</span>) {
+        fast = fast.next.next; slow = slow.next;
+    }
+    <span class="kw">if</span> (fast != <span class="kw">null</span>) slow = slow.next; <span class="cm">// odd case</span>
+    slow = <span class="fn">reverse</span>(slow); fast = head;
+    <span class="kw">while</span> (slow != <span class="kw">null</span>) {
+        <span class="kw">if</span> (fast.val != slow.val) <span class="ret">return</span> <span class="kw">false</span>;
+        fast = fast.next; slow = slow.next;
+    }
+    <span class="ret">return</span> <span class="kw">true</span>;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 03 · Pointers</div>
+                            <div class="prob-title">Remove Nth Node From End</div>
+                            <div style="margin-top:4px"><a
+                                    href="https://leetcode.com/problems/remove-nth-node-from-end-of-list/"
+                                    target="_blank" style="font-size:12px">🔗 LC 19 - Remove Nth Node</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-pat">Gap Pointers</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Remove the $n$-th node from the end of the list and return its head. Solve in one pass
+                                using a dummy head and a constant gap.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · One Pass</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> ListNode <span class="fn">removeNthFromEnd</span>(ListNode head, <span class="kw">int</span> n) {
+    ListNode start = <span class="kw">new</span> <span class="fn">ListNode</span>(<span class="num">0</span>);
+    ListNode slow = start, fast = start;
+    slow.next = head;
+    <span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">1</span>; i<=n+<span class="num">1</span>; i++) fast = fast.next;
+    <span class="kw">while</span> (fast != <span class="kw">null</span>) {
+        slow = slow.next; fast = fast.next;
+    }
+    slow.next = slow.next.next;
+    <span class="ret">return</span> start.next;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 04 · Merge Sort</div>
+                            <div class="prob-title">Sort List</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/sort-list/"
+                                    target="_blank" style="font-size:12px">🔗 LC 148 - Sort List</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-med">Medium</span>
+                                <span class="tag tag-pat">Divide & Conquer</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Sort a linked list in $O(n \log n)$ time and $O(1)$ memory. Divide and conquer approach
+                                is best.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Merge Sort</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> ListNode <span class="fn">sortList</span>(ListNode head) {
+    <span class="kw">if</span> (head == <span class="kw">null</span> || head.next == <span class="kw">null</span>) <span class="ret">return</span> head;
+    ListNode prev = <span class="kw">null</span>, slow = head, fast = head;
+    <span class="kw">while</span> (fast != <span class="kw">null</span> && fast.next != <span class="kw">null</span>) {
+        prev = slow; slow = slow.next; fast = fast.next.next;
+    }
+    prev.next = <span class="kw">null</span>; <span class="cm">// Cut list</span>
+    ListNode l1 = <span class="fn">sortList</span>(head);
+    ListNode l2 = <span class="fn">sortList</span>(slow);
+    <span class="ret">return</span> <span class="fn">merge</span>(l1, l2);
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N log N)</span></div>
+                                    <div class="cx-badge yellow"><span class="cx-label">Space</span><span
+                                            class="cx-val">O(log N) stack</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Problem 5 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 05 · Heaps</div>
+                            <div class="prob-title">Merge k Sorted Lists</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/merge-k-sorted-lists/"
+                                    target="_blank" style="font-size:12px">🔗 LC 23 - Merge k Lists</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-pat">Min-Heap</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Merge $k$ sorted linked lists and return it as one sorted list. Use a PriorityQueue to
+                                maintain the smallest current head.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Priority Queue</div><button class="copy-btn"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">public</span> ListNode <span class="fn">mergeKLists</span>(ListNode[] lists) {
+    PriorityQueue&lt;ListNode&gt; pq = <span class="kw">new</span> <span class="fn">PriorityQueue</span>&lt;&gt;((a,b)->a.val-b.val);
+    <span class="kw">for</span> (ListNode node : lists) <span class="kw">if</span> (node != <span class="kw">null</span>) pq.<span class="fn">add</span>(node);
+    ListNode dummy = <span class="kw">new</span> <span class="fn">ListNode</span>(<span class="num">0</span>), tail = dummy;
+    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+        tail.next = pq.<span class="fn">poll</span>(); tail = tail.next;
+        <span class="kw">if</span> (tail.next != <span class="kw">null</span>) pq.<span class="fn">add</span>(tail.next);
+    }
+    <span class="ret">return</span> dummy.next;
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(N log k)</span></div>
+                                    <div class="cx-badge yellow"><span class="cx-label">Space</span><span
+                                            class="cx-val">O(k) for heap</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Problem 6 -->
+                <div class="prob-card">
+                    <div class="prob-header" onclick="toggleProb(this)">
+                        <div class="prob-left">
+                            <div class="prob-num">Problem 06 · Hard Cache</div>
+                            <div class="prob-title">LFU Cache</div>
+                            <div style="margin-top:4px"><a href="https://leetcode.com/problems/lfu-cache/"
+                                    target="_blank" style="font-size:12px">🔗 LC 460 - LFU Cache</a></div>
+                            <div class="prob-tags">
+                                <span class="tag tag-hard">Hard</span>
+                                <span class="tag tag-co">Google</span><span class="tag tag-co">Uber</span>
+                            </div>
+                        </div>
+                        <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                    </div>
+                    <div class="prob-body" style="display:none">
+                        <div class="prob-section">
+                            <div class="prob-section-label">Problem</div>
+                            <p>Design and implement a data structure for a Least Frequently Used (LFU) cache. It should
+                                support <code>get</code> and <code>put</code> operations in $O(1)$ time complexity.</p>
+                        </div>
+                        <details>
+                            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
+                            <div class="details-body">
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <div class="code-lang">☕ Java · Frequency Map + DLL</div><button
+                                            class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <pre><span class="kw">class</span> <span class="fn">LFUCache</span> {
+    Map&lt;Integer, Node&gt; cache;
+    Map&lt;Integer, DoubleLinkedList&gt; freqMap;
+    <span class="kw">int</span> size, capacity, minFreq;
+
+    <span class="kw">public</span> <span class="kw">int</span> <span class="fn">get</span>(<span class="kw">int</span> key) {
+        <span class="kw">if</span> (!cache.<span class="fn">containsKey</span>(key)) <span class="ret">return</span> -1;
+        Node node = cache.<span class="fn">get</span>(key);
+        <span class="fn">updateFreq</span>(node);
+        <span class="ret">return</span> node.val;
+    }
+
+    <span class="kw">private void</span> <span class="fn">updateFreq</span>(Node node) {
+        DoubleLinkedList oldList = freqMap.<span class="fn">get</span>(node.freq);
+        oldList.<span class="fn">remove</span>(node);
+        <span class="kw">if</span> (node.freq == minFreq && oldList.size == <span class="num">0</span>) minFreq++;
+        node.freq++;
+        freqMap.<span class="fn">computeIfAbsent</span>(node.freq, k -> <span class="kw">new</span> <span class="fn">DoubleLinkedList</span>()).<span class="fn">add</span>(node);
+    }
+}</pre>
+                                </div>
+                                <div class="complexity-row">
+                                    <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                            class="cx-val green">O(1)</span></div>
+                                    <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                            class="cx-val green">O(Capacity)</span></div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- SECTION 7: ASSIGNMENT -->
+            <section id="assignment">
+                <h2 class="h1">📝 Topic Assignment</h2>
+                <div class="callout orange" style="margin:14px 0">
+                    <span class="callout-icon">📋</span>
+                    <div class="callout-body">
+                        <strong>Topic 11 Assignment — 28 Problems</strong><br>
+                        Complete the assignment before moving to Stacks & Queues. Includes pointer rerouting, DLL logic,
+                        and
+                        Cache designs.<br><br>
+                        <a href="Assignment.md"
+                            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
+                            Open Assignment →</a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checklist">
+                <h2 class="h1">✅ Topic Completion Checklist</h2>
+                <p>Check each item before advancing to Topic 12.</p>
+                <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I can reverse a list iteratively in $O(N)$ time and $O(1)$ space</div>
+                    </div>
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I understand why Sentinels are used to avoid null-checks</div>
+                    </div>
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I can explain Floyd's Cycle detection logic (Tortoise-Hare)</div>
+                    </div>
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I know the 3-step Interweaving pattern for Copying Random Lists</div>
+                    </div>
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I understand the HashMap + DLL trade-off for $O(1)$ Cache design</div>
+                    </div>
+                    <div class="checklist-item" onclick="this.classList.toggle('done')">
+                        <div class="cb-box">✓</div>
+                        <div class="cb-text">I've completed successfully at least 20 problems from the Topic 11
+                            Assignment</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="callout green" style="margin-top:24px">
+                <span class="callout-icon">🧠</span>
+                <div class="callout-body">
+                    <strong>You're ready for Topic 12: Stacks & Queues</strong><br>
+                    Linked Lists were about pointers and memory. Stacks and Queues are about
+                    <strong>Constraints</strong>.
+                    Mastering these restricted data structures is key to Graph Algorithms (BFS/DFS).
+                </div>
+            </div>
+
+            <div class="footer"
+                style="margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <a href="../Lecture10/lecture10_notes.html"
+                    style="text-decoration: none; color: var(--text3); font-size: 14px;">← Topic 10: Linear & Binary
+                    Search</a>
+                <span style="color: var(--text3); font-size: 13px;">Topic 11 of 30 — Phase 2 Core Data Structures</span>
+                <a href="../Lecture12/lecture12_notes.html"
+                    style="text-decoration: none; color: var(--accent); font-weight: 600; font-size: 14px;">Topic 12:
+                    Stacks & Queues →</a>
+            </div>
+
+        </div><!-- #content -->
+    </div><!-- #main -->
+
+    <script>
+        function toggleDark() {
+            const html = document.documentElement;
+            const btn = document.getElementById('darkToggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                btn.innerText = '🌙 Dark';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.innerText = '☀️ Light';
+            }
+        }
+
+        document.getElementById('main').addEventListener('scroll', function () {
+            const el = this;
+            const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+            if (document.getElementById('progressFill')) {
+                const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+                document.getElementById('progressFill').style.width = fillPct + '%';
+            }
+            const sections = document.querySelectorAll('section[id]');
+            let current = "";
+            sections.forEach(s => {
+                const top = s.getBoundingClientRect().top;
+                if (top < 150) current = s.id;
+            });
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === "#" + current) item.classList.add('active');
+            });
+        });
+
+        function toggleProb(headerEl) {
+            const body = headerEl.nextElementSibling;
+            if (!body) return;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            headerEl.classList.toggle('active', !isOpen);
+
+            const arrow = headerEl.lastElementChild;
+            if (arrow && arrow.tagName.toLowerCase() === 'span') {
+                arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+                arrow.style.display = 'inline-block';
+                arrow.style.transition = 'transform 0.2s';
+            }
+        }
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('pre').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = 'var(--green-bg)';
+                btn.style.color = 'var(--green)';
+                btn.style.borderColor = 'var(--green)';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>

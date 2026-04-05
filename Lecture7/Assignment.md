@@ -248,4 +248,4 @@ for (int i = 0; i < n; i++) {
 
 ---
 
-Next: **Phase 2 — Data Structures & Arrays** (Topic 8)
+Next: **Phase 2 — Core Data Structures** (Topic 8)

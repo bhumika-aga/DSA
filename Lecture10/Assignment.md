@@ -1,7 +1,7 @@
 # 🔍 Assignment 10 — Searching Algorithms
 
 > **Lecture:** Topic 10 — Searching Algorithms
-> **Topic Count:** 10 of 30 — Phase 2 Core DSA
+> **Topic Count:** 10 of 30 — Phase 2 Core Data Structures
 > **Duration:** 5 Days
 > **Core Problems:** 28 (8 Easy · 13 Medium · 7 Hard)
 > **Goal:** Master unconditional Linear Searching, classic $O(\log N)$ Binary Search templates, **Binary Search on Answer Space** (Monotonic optimization), and matrix traversal boundaries.
