@@ -949,6 +949,191 @@
                 </div>
             </div>
 
+            <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
+            <div class="callout blue" style="margin-bottom:20px">
+                <span class="callout-icon">🌍</span>
+                <div class="callout-body">
+                    <strong>Why does this topic matter?</strong><br>
+                    Arrays and Strings are the most common interview topic at every FAANG company — by a significant
+                    margin. Virtually every other data structure (stack, queue, hash map, graph adjacency list) is
+                    implemented on top of an array internally. Mastering array patterns (prefix sums, two pointers,
+                    sliding window, Dutch National Flag) and string patterns (frequency arrays, rolling hash,
+                    StringBuilder) is non-negotiable. If you solve only one lecture deeply, make it this one.
+                </div>
+            </div>
+
+            <h3 class="h2" style="margin-top:0">📖 What is an Array?</h3>
+            <p>An <strong>array</strong> is a fixed-size, contiguous block of memory that holds elements of the same
+                type. When you write <code>int[] arr = new int[5]</code> in Java, the JVM reserves 5×4 = 20 bytes of
+                contiguous heap memory, all zeroed out. The address of <code>arr[0]</code> is some base address B, and
+                <code>arr[i]</code> is at <code>B + i×4</code>. This is why <strong>random access is O(1)</strong> — you
+                don't search; you calculate.
+            </p>
+
+            <div class="ascii-tree">Array: int[] arr = {10, 20, 30, 40, 50}
+                Memory layout (contiguous):
+                ┌──────┬──────┬──────┬──────┬──────┐
+                │ 10 │ 20 │ 30 │ 40 │ 50 │
+                └──────┴──────┴──────┴──────┴──────┘
+                [0] [1] [2] [3] [4]
+                ↑
+                Base address B
+                addr(arr[i]) = B + i × 4 → O(1) access!</div>
+
+            <h3 class="h2" style="margin-top:20px">📐 What are 2D Arrays?</h3>
+            <p>A <strong>2D array</strong> is an array of arrays — a table with rows and columns. In Java,
+                <code>int[][] matrix = new int[3][4]</code> creates 3 separate 1D arrays, each of size 4. The rows are
+                NOT necessarily contiguous in memory (unlike C's 2D arrays), because each row is an independent object
+                on the heap.
+            </p>
+
+            <div class="ascii-tree">int[][] grid = new int[3][4] → 3 rows, 4 columns
+
+                grid[0] → [ 0 | 0 | 0 | 0 ] ← one int[] object on heap
+                grid[1] → [ 0 | 0 | 0 | 0 ] ← another int[] object
+                grid[2] → [ 0 | 0 | 0 | 0 ] ← another int[] object
+
+                Accessing grid[r][c]:
+                • grid[r] → gets the r-th row array O(1)
+                • [c] → gets the c-th element O(1)
+                Traversal: row by row is cache-friendly ✓
+                column by column is NOT ✗</div>
+
+            <div class="callout blue" style="margin:14px 0">
+                <span class="callout-icon">💡</span>
+                <div class="callout-body">
+                    <strong>2D Array Patterns you must know:</strong><br>
+                    • <strong>Row/Column traversal</strong>: nested for loops<br>
+                    • <strong>Diagonal traversal</strong>: elements where <code>i == j</code> (main) or
+                    <code>i + j == n-1</code> (anti-diagonal)<br>
+                    • <strong>Transpose</strong>: swap <code>grid[i][j]</code> ↔ <code>grid[j][i]</code><br>
+                    • <strong>Spiral order</strong>: shrinking boundary: top/bottom/left/right<br>
+                    • <strong>2D Prefix Sum</strong>: O(1) submatrix sum queries (covered in this lecture)
+                </div>
+            </div>
+
+            <h3 class="h2" style="margin-top:20px">🧵 What is a String in Java? — The Deep Dive</h3>
+            <p>In Java, a <code>String</code> is an <strong>immutable</strong> sequence of <code>char</code> values.
+                Internally, it is backed by a <code>char[]</code> (before Java 9) or a <code>byte[]</code> with a coder
+                flag (Java 9+ compact strings). "Immutable" means once a <code>String</code> object is created, it
+                cannot be changed — ever. Any operation that appears to "modify" a string actually creates a brand new
+                String object.</p>
+
+            <div class="ascii-tree">String s = "hello";
+                s = s + " world"; // What ACTUALLY happens:
+
+                Step 1: Create new object "hello world" (new heap allocation)
+                Step 2: Point s to the new object
+                Step 3: "hello" is now UNREFERENCED → eligible for GC
+
+                If done 1000 times in a loop:
+                → 1000 new String objects created!
+                → O(1+2+3+...+N) = O(N²) time ← The String concatenation trap</div>
+
+            <div class="callout red" style="margin:14px 0">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-body">
+                    <strong>The StringBuilder Fix:</strong> <code>StringBuilder</code> is a <em>mutable</em> buffer. It
+                    holds a resizable <code>char[]</code> array internally and appends directly — no new objects. Use
+                    <code>StringBuilder</code> inside any loop that builds a string.<br><br>
+                    <strong>Complexity comparison:</strong><br>
+                    <code>String += char</code> in a loop → O(N²) time<br>
+                    <code>StringBuilder.append(char)</code> in a loop → O(N) time, O(1) amortized per append
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-lang">☕ Java · String vs StringBuilder Deep Dive</div>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><span class="cm">// String — immutable, stored in String Pool</span>
+<span class="cls">String</span> s1 = <span class="str">"hello"</span>;       <span class="cm">// String Pool object</span>
+<span class="cls">String</span> s2 = <span class="str">"hello"</span>;       <span class="cm">// SAME pool object! s1 == s2 is TRUE</span>
+<span class="cls">String</span> s3 = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hello"</span>); <span class="cm">// NEW heap object. s1 == s3 is FALSE</span>
+<span class="cm">// Always use .equals() not == to compare String content!</span>
+s1.equals(s2)  <span class="cm">// → true  ✓</span>
+s1.equals(s3)  <span class="cm">// → true  ✓</span>
+s1 == s3       <span class="cm">// → false ← TRAP! different heap objects</span>
+
+<span class="cm">// Key String methods (all return NEW String objects):</span>
+s.length()                  <span class="cm">// O(1) — stored as field</span>
+s.charAt(i)                 <span class="cm">// O(1) — array lookup</span>
+s.substring(l, r)           <span class="cm">// O(r-l) — copies chars</span>
+s.indexOf("sub")            <span class="cm">// O(N*M) naive search</span>
+s.toCharArray()             <span class="cm">// O(N) — creates new char[]</span>
+s.toLowerCase()             <span class="cm">// O(N) — new String</span>
+s.trim()                    <span class="cm">// O(N) — new String</span>
+<span class="cls">String</span>.valueOf(42)          <span class="cm">// Integer → String</span>
+<span class="cls">Integer</span>.parseInt(<span class="str">"42"</span>)     <span class="cm">// String → int</span>
+
+<span class="cm">// StringBuilder — mutable, heap-allocated buffer</span>
+<span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
+sb.append(<span class="str">"hello"</span>);          <span class="cm">// O(1) amortised</span>
+sb.append(<span class="str">' '</span>);
+sb.append(<span class="str">"world"</span>);
+sb.insert(<span class="num">5</span>, <span class="str">","</span>);            <span class="cm">// O(N) — shifts chars</span>
+sb.delete(<span class="num">5</span>, <span class="num">6</span>);             <span class="cm">// O(N) — shifts chars</span>
+sb.reverse();                  <span class="cm">// O(N) — in-place reverse</span>
+sb.toString();                 <span class="cm">// O(N) — creates final String</span></pre>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>String</th>
+                            <th>StringBuilder</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Access char at index</td>
+                            <td>O(1) <code>charAt(i)</code></td>
+                            <td>O(1) <code>charAt(i)</code></td>
+                        </tr>
+                        <tr>
+                            <td>Append single char</td>
+                            <td>O(N) — creates new String</td>
+                            <td>O(1) amortised</td>
+                        </tr>
+                        <tr>
+                            <td>Append N chars in loop</td>
+                            <td>O(N²) total</td>
+                            <td>O(N) total</td>
+                        </tr>
+                        <tr>
+                            <td>Reverse</td>
+                            <td>O(N) new String</td>
+                            <td>O(N) in-place</td>
+                        </tr>
+                        <tr>
+                            <td>Thread safety</td>
+                            <td>✅ Immutable = always safe</td>
+                            <td>❌ Not thread-safe (use StringBuffer)</td>
+                        </tr>
+                        <tr>
+                            <td>Memory</td>
+                            <td>String Pool deduplication</td>
+                            <td>Always new heap object</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout green" style="margin-bottom:32px">
+                <span class="callout-icon">🔗</span>
+                <div class="callout-body">
+                    <strong>How it connects:</strong> Everything you learned about Java's heap in Lecture 2 applies here
+                    — every <code>String</code> is a heap object. Lecture 7 (Math) uses numeric string parsing
+                    (<code>n % 10</code> to extract digits). The Hashing lecture (part of Phase 2) builds directly on
+                    frequency arrays introduced here.
+                </div>
+            </div>
+
+            <hr>
+
             <div class="callout blue">
                 <span class="callout-icon">💡</span>
                 <div class="callout-body">
