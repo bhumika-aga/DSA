@@ -1513,9 +1513,393 @@ Sum = P[r2][c2] - P[r1-<span class="num">1</span>][c2] - P[r2][c1-<span class="n
                 </div>
             </div>
 
+            <!-- P03 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 03 · Prefix Products</div>
+                        <div class="prob-title">Product of Array Except Self</div>
+                        <div style="margin-top:4px"><a
+                                href="https://leetcode.com/problems/product-of-array-except-self/" target="_blank"
+                                style="font-size:12px">🔗 LC 238</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Amazon</span><span class="tag tag-co">Meta</span>
+                            <span class="tag tag-pat">Prefix/Suffix</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Given an integer array <code>nums</code>, return an output array where <code>output[i]</code>
+                            equals the product of all elements <strong>except</strong> <code>nums[i]</code>. Solve
+                            without division in O(N) time.</p>
+                        <div class="ascii-tree">Input: [1, 2, 3, 4]
+                            Output: [24, 12, 8, 6]
+                            ↑ ↑ ↑ ↑
+                            2×3×4 1×3×4 1×2×4 1×2×3</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p><code>output[i]</code> = (product of everything LEFT of i) × (product of everything RIGHT of
+                            i). Make two passes: left-to-right to fill prefix products, then right-to-left multiplying
+                            in suffix products. No division needed, works even with zeros.</p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution + Dry Run</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · O(N) time O(1) extra</div><button class="copy-btn"
+                                        onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public int</span>[] <span class="fn">productExceptSelf</span>(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> n = nums.length;
+    <span class="kw">int</span>[] out = <span class="kw">new int</span>[n];
+    <span class="cm">// Pass 1: out[i] = product of nums[0..i-1]</span>
+    out[<span class="num">0</span>] = <span class="num">1</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; n; i++)
+        out[i] = out[i-<span class="num">1</span>] * nums[i-<span class="num">1</span>];
+    <span class="cm">// Pass 2: multiply by suffix product</span>
+    <span class="kw">int</span> right = <span class="num">1</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = n-<span class="num">1</span>; i &gt;= <span class="num">0</span>; i--) {
+        out[i] *= right;
+        right *= nums[i];
+    }
+    <span class="ret">return</span> out;
+}
+<span class="cm">// [1,2,3,4]: left=[1,1,2,6]
+// right scan: i=3→6×1=6, i=2→2×4=8, i=1→1×12=12, i=0→1×24=24 ✓</span></pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(N)</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(1) extra</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P04 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 04 · Two Pointers</div>
+                        <div class="prob-title">Container With Most Water</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/container-with-most-water/"
+                                target="_blank" style="font-size:12px">🔗 LC 11</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
+                            <span class="tag tag-pat">Two Pointers</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Given <code>height[]</code> where each value is a vertical line's height, find two lines
+                            forming a container that holds the most water.</p>
+                        <div class="ascii-tree">height = [1, 8, 6, 2, 5, 4, 8, 3, 7]
+                            lo=0 hi=8
+                            Area = min(1, 7) × 8 = 8
+
+                            Best: lo=1, hi=8 → min(8,7) × 7 = 49 ← answer</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p>Area = <code>min(H[lo], H[hi]) × (hi-lo)</code>. Start at widest (lo=0, hi=n-1). Moving the
+                            <em>taller</em> pointer can never help — it shrinks width AND can't increase height. So
+                            always move the <strong>shorter</strong> pointer.
+                        </p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · Greedy Two Pointers</div><button class="copy-btn"
+                                        onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public int</span> <span class="fn">maxArea</span>(<span class="kw">int</span>[] h) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = h.length - <span class="num">1</span>, max = <span class="num">0</span>;
+    <span class="kw">while</span> (lo &lt; hi) {
+        max = Math.<span class="fn">max</span>(max, Math.<span class="fn">min</span>(h[lo], h[hi]) * (hi - lo));
+        <span class="kw">if</span> (h[lo] &lt; h[hi]) lo++; <span class="kw">else</span> hi--;
+    }
+    <span class="ret">return</span> max;
+}</pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(N)</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(1)</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P05 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 05 · Prefix Sum + HashMap</div>
+                        <div class="prob-title">Subarray Sum Equals K</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/subarray-sum-equals-k/"
+                                target="_blank" style="font-size:12px">🔗 LC 560</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Facebook</span><span class="tag tag-co">Google</span>
+                            <span class="tag tag-pat">Prefix Sum</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Given array <code>nums</code> and integer <code>k</code>, return the total number of
+                            subarrays whose sum equals <code>k</code>.</p>
+                        <div class="ascii-tree">nums=[1,1,1], k=2
+                            Subarrays: [1,1] at 0-1 and [1,1] at 1-2 → Output: 2</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p>If <code>prefix[j] - prefix[i] = k</code>, then subarray <code>[i+1..j]</code> sums to k.
+                            Rearranged: we need <code>prefix[i] = prefix[j] - k</code>. As we build prefix sums, look up
+                            the count of <code>prefix - k</code> in a HashMap. Seed with <code>{0:1}</code> to handle
+                            subarrays starting at index 0.</p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution + Trace</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · Prefix Sum + HashMap</div><button class="copy-btn"
+                                        onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    Map&lt;Integer, Integer&gt; freq = <span class="kw">new</span> HashMap&lt;&gt;();
+    freq.<span class="fn">put</span>(<span class="num">0</span>, <span class="num">1</span>);
+    <span class="kw">int</span> prefix = <span class="num">0</span>, count = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> num : nums) {
+        prefix += num;
+        count += freq.<span class="fn">getOrDefault</span>(prefix - k, <span class="num">0</span>);
+        freq.<span class="fn">merge</span>(prefix, <span class="num">1</span>, Integer::sum);
+    }
+    <span class="ret">return</span> count;
+}
+<span class="cm">// k=2, [1,1,1]: prefix=1→2→3
+// p=2: look up 2-2=0 → {0:1} → count=1
+// p=3: look up 3-2=1 → {1:1} → count=2 ✓</span></pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(N)</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(N)</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P06 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 06 · Sliding Window</div>
+                        <div class="prob-title">Minimum Size Subarray Sum</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/minimum-size-subarray-sum/"
+                                target="_blank" style="font-size:12px">🔗 LC 209</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-med">Medium</span>
+                            <span class="tag tag-co">Amazon</span>
+                            <span class="tag tag-pat">Sliding Window</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Given a positive integer <code>target</code> and array of positive integers, find the
+                            <strong>minimum length</strong> contiguous subarray with sum ≥ target. Return 0 if none
+                            exists.
+                        </p>
+                        <div class="ascii-tree">target=7, nums=[2,3,1,2,4,3]
+                            Window [4,3]: sum=7, length=2 ← answer</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p>Variable sliding window: expand right until <code>sum ≥ target</code>, then shrink left to
+                            minimize length. Since all values are positive, shrinking always decreases sum — the window
+                            never "wraps around" in a problematic way.</p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · Variable Sliding Window</div><button
+                                        class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public int</span> <span class="fn">minSubArrayLen</span>(<span class="kw">int</span> target, <span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, sum = <span class="num">0</span>, min = Integer.MAX_VALUE;
+    <span class="kw">for</span> (<span class="kw">int</span> hi = <span class="num">0</span>; hi &lt; nums.length; hi++) {
+        sum += nums[hi];
+        <span class="kw">while</span> (sum &gt;= target) {
+            min = Math.<span class="fn">min</span>(min, hi - lo + <span class="num">1</span>);
+            sum -= nums[lo++];
+        }
+    }
+    <span class="ret">return</span> min == Integer.MAX_VALUE ? <span class="num">0</span> : min;
+}</pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(N)</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(1)</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P07 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 07 · Frequency Array</div>
+                        <div class="prob-title">Valid Anagram</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/valid-anagram/"
+                                target="_blank" style="font-size:12px">🔗 LC 242</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-easy">Easy</span>
+                            <span class="tag tag-co">Amazon</span>
+                            <span class="tag tag-pat">Freq Array</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Return <code>true</code> if string <code>t</code> is an anagram of <code>s</code> (same
+                            characters, same frequencies, any order).</p>
+                        <div class="ascii-tree">s="anagram", t="nagaram" → true
+                            s="rat", t="car" → false</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p>Use <code>int[26]</code>: increment on each char of <code>s</code>, decrement on
+                            <code>t</code>. If all entries are 0 at end → anagram. This is faster than HashMap since
+                            <code>char - 'a'</code> maps each letter to 0–25 in O(1).
+                        </p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · int[26] Counter</div><button class="copy-btn"
+                                        onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public boolean</span> <span class="fn">isAnagram</span>(String s, String t) {
+    <span class="kw">if</span> (s.length() != t.length()) <span class="ret">return false</span>;
+    <span class="kw">int</span>[] cnt = <span class="kw">new int</span>[<span class="num">26</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {
+        cnt[s.<span class="fn">charAt</span>(i) - <span class="str">'a'</span>]++;
+        cnt[t.<span class="fn">charAt</span>(i) - <span class="str">'a'</span>]--;
+    }
+    <span class="kw">for</span> (<span class="kw">int</span> c : cnt)
+        <span class="kw">if</span> (c != <span class="num">0</span>) <span class="ret">return false</span>;
+    <span class="ret">return true</span>;
+}</pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(N)</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(1) — int[26] constant</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- P08 -->
+            <div class="prob-card">
+                <div class="prob-header" onclick="toggleProb(this)">
+                    <div class="prob-left">
+                        <div class="prob-num">Problem 08 · String Column Scan</div>
+                        <div class="prob-title">Longest Common Prefix</div>
+                        <div style="margin-top:4px"><a href="https://leetcode.com/problems/longest-common-prefix/"
+                                target="_blank" style="font-size:12px">🔗 LC 14</a></div>
+                        <div class="prob-tags">
+                            <span class="tag tag-easy">Easy</span>
+                            <span class="tag tag-co">Google</span>
+                            <span class="tag tag-pat">String</span>
+                        </div>
+                    </div>
+                    <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
+                </div>
+                <div class="prob-body" style="display:none">
+                    <div class="prob-section">
+                        <div class="prob-section-label">Problem</div>
+                        <p>Find the longest common prefix string among an array of strings. Return <code>""</code> if
+                            none.</p>
+                        <div class="ascii-tree">["flower","flow","flight"] → "fl"
+                            ["dog","racecar","car"] → ""</div>
+                    </div>
+                    <div class="prob-section">
+                        <div class="prob-section-label">Think First</div>
+                        <p><strong>Vertical scan:</strong> for each column index <code>c</code>, check if all strings
+                            share the same character. The first mismatch (or a string that ends) is the answer boundary.
+                            Return <code>strs[0].substring(0, c)</code>.</p>
+                    </div>
+                    <details>
+                        <summary><span class="toggle-arrow">▶</span> Solution + Trace</summary>
+                        <div class="details-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <div class="code-lang">☕ Java · Vertical Scan</div><button class="copy-btn"
+                                        onclick="copyCode(this)">Copy</button>
+                                </div>
+                                <pre><span class="kw">public</span> String <span class="fn">longestCommonPrefix</span>(String[] strs) {
+    <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; strs[<span class="num">0</span>].length(); c++) {
+        <span class="kw">char</span> ch = strs[<span class="num">0</span>].<span class="fn">charAt</span>(c);
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; strs.length; i++)
+            <span class="kw">if</span> (c == strs[i].length() || strs[i].<span class="fn">charAt</span>(c) != ch)
+                <span class="ret">return</span> strs[<span class="num">0</span>].<span class="fn">substring</span>(<span class="num">0</span>, c);
+    }
+    <span class="ret">return</span> strs[<span class="num">0</span>];
+}
+<span class="cm">// ["flower","flow","flight"]:
+// c=0:'f' ✓ c=1:'l' ✓ c=2:'o'≠'i'(flight) → return "fl" ✓</span></pre>
+                            </div>
+                            <div class="complexity-row">
+                                <div class="cx-badge green"><span class="cx-label">Time</span><span
+                                        class="cx-val green">O(S) total chars</span></div>
+                                <div class="cx-badge green"><span class="cx-label">Space</span><span
+                                        class="cx-val green">O(1)</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
             <hr>
 
-            <!-- ══ SECTION 9: ASSIGNMENT ═══════════════════════════ -->
+
             <h2 class="h1" id="assignment">📝 Assignment</h2>
             <div class="callout green" style="margin:14px 0">
                 <span class="callout-icon">📋</span>
