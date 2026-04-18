@@ -107,7 +107,7 @@ Convert `int[] nums = {1, 2, 3, 4, 5}` into a stream. Use `.map(n -> n * n)` to 
 
 > 🔗 **Practice:** Use `.reduce(1, (a, b) -> a * b)` to find the factorial of a small number list. Explain the "Identity" parameter.
 
-### Problem 20 — Stream-based Filtering (LC 438)
+### Problem 20 — Stream-based Filtering ([LC 438](https://leetcode.com/problems/find-all-anagrams-in-a-string/))
 
 > 🔗 **LeetCode:** [438. Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
 > **`[Pattern: Sliding Window + Stream (optional)]` `[Medium]`**

@@ -15,13 +15,13 @@ _Focus on implementing pure logic, counting swaps, and in-place sorting._
 1. **Bubble Sort Implementation** — Optimized with `swapped` flag. `[Pattern: Basic]`
 2. **Selection Sort Implementation** — Find and swap min elements. `[Pattern: Basic]`
 3. **Insertion Sort Implementation** — Adaptive sorting for $N < 64$. `[Pattern: Basic]`
-4. **Merge Sorted Array (LC 88)** — Merge two arrays from the back. `[Company: Amazon] [LC Easy]`
-5. **Missing Number (LC 268)** — Solve using **Cyclic Sort** only. `[Pattern: Cyclic] [LC Easy]`
-6. **Find All Numbers Disappeared (LC 448)** — All missing. `[Pattern: Cyclic] [LC Easy]`
-7. **Set Mismatch (LC 645)** — Duplicate + Missing. `[Pattern: Cyclic] [LC Easy]`
-8. **Contains Duplicate (LC 217)** — Solve with $O(N \log N)$ sort first. `[LC Easy]`
-9. **Squares of a Sorted Array (LC 977)** — Two pointers or sort? `[LC Easy]`
-10. **Sort Array by Parity (LC 905)** — Fundamental partitioning. `[LC Easy]`
+4. **[Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/) (LC 88)** — Merge two arrays from the back. `[Company: Amazon] [LC Easy]`
+5. **[Missing Number](https://leetcode.com/problems/missing-number/) (LC 268)** — Solve using **Cyclic Sort** only. `[Pattern: Cyclic] [LC Easy]`
+6. **[Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/) (LC 448)** — All missing. `[Pattern: Cyclic] [LC Easy]`
+7. **[Set Mismatch](https://leetcode.com/problems/set-mismatch/) (LC 645)** — Duplicate + Missing. `[Pattern: Cyclic] [LC Easy]`
+8. **[Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) (LC 217)** — Solve with $O(N \log N)$ sort first. `[LC Easy]`
+9. **[Squares of a Sorted Array](https://leetcode.com/problems/squares-of-a-sorted-array/) (LC 977)** — Two pointers or sort? `[LC Easy]`
+10. **[Sort Array By Parity](https://leetcode.com/problems/sort-array-by-parity/) (LC 905)** — Fundamental partitioning. `[LC Easy]`
 
 ---
 
@@ -29,16 +29,16 @@ _Focus on implementing pure logic, counting swaps, and in-place sorting._
 
 _Focus on complexity, stable merging, and randomized pivoting._
 
-1. **Sort Colors (LC 75)** — **Dutch National Flag** (3-way partition). `[Pattern: Two Pointers] [LC Medium]`
-2. **Find the Duplicate Number (LC 287)** — Solve via Cyclic Sort. `[Pattern: Cyclic] [LC Medium]`
-3. **Find All Duplicates (LC 442)** — Use the Negative Marking trick. `[Pattern: Cyclic] [LC Medium]`
-4. **Kth Largest Element (LC 215)** — Solve using **QuickSelect** ($O(N)$ Avg). `[Pattern: Partitioning] [LC Medium]`
-5. **Largest Number (LC 179)** — Custom comparator logic for combined strings. `[Company: Google] [LC Medium]`
-6. **Merge Intervals (LC 56)** — Sort by start time then merge. `[Pattern: Intervals] [LC Medium]`
-7. **Top K Frequent Elements (LC 347)** — **Bucket Sort** or Priority Queue. `[Pattern: Bucket Sort] [LC Medium]`
-8. **Wiggle Sort (LC 280)** — $O(N)$ Greedy local-parity swapping. `[Pattern: Greedy] [LC Medium]`
-9. **Sort List (LC 148)** — Merge Sort on Linked Lists. `[Pattern: D&C] [LC Medium]`
-10. **Custom Sort String (LC 791)** — Frequency maps as custom order. `[LC Medium]`
+1. **[Sort Colors](https://leetcode.com/problems/sort-colors/) (LC 75)** — **Dutch National Flag** (3-way partition). `[Pattern: Two Pointers] [LC Medium]`
+2. **[Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (LC 287)** — Solve via Cyclic Sort. `[Pattern: Cyclic] [LC Medium]`
+3. **[Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/) (LC 442)** — Use the Negative Marking trick. `[Pattern: Cyclic] [LC Medium]`
+4. **[Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) (LC 215)** — Solve using **QuickSelect** ($O(N)$ Avg). `[Pattern: Partitioning] [LC Medium]`
+5. **[Largest Number](https://leetcode.com/problems/largest-number/) (LC 179)** — Custom comparator logic for combined strings. `[Company: Google] [LC Medium]`
+6. **[Merge Intervals](https://leetcode.com/problems/merge-intervals/) (LC 56)** — Sort by start time then merge. `[Pattern: Intervals] [LC Medium]`
+7. **[Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) (LC 347)** — **Bucket Sort** or Priority Queue. `[Pattern: Bucket Sort] [LC Medium]`
+8. **[Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/) (LC 280)** — $O(N)$ Greedy local-parity swapping. `[Pattern: Greedy] [LC Medium]`
+9. **[Sort List](https://leetcode.com/problems/sort-list/) (LC 148)** — Merge Sort on Linked Lists. `[Pattern: D&C] [LC Medium]`
+10. **[Custom Sort String](https://leetcode.com/problems/custom-sort-string/) (LC 791)** — Frequency maps as custom order. `[LC Medium]`
 
 ---
 
@@ -46,11 +46,11 @@ _Focus on complexity, stable merging, and randomized pivoting._
 
 _Focus on O(1) space constraints and optimal sorting pivots._
 
-1. **First Missing Positive (LC 41)** — Ultimate Cyclic Sort challenge. `[Pattern: Cyclic] [LC Hard]`
-2. **Maximum Gap (LC 164)** — Solve in $O(N)$ using **Bucket/Radix Sort**. `[LC Hard]`
-3. **Reverse Pairs (LC 493)** — Merge Sort "Modification" to count pairs. `[Pattern: D&C] [LC Hard]`
-4. **Count of Smaller Numbers After Self (LC 315)** — Merge Sort or BIT? `[LC Hard]`
-5. **Find K Pairs with Smallest Sums (LC 373)** — Sorting vs Multi-pointer. `[LC Hard]`
+1. **[First Missing Positive](https://leetcode.com/problems/first-missing-positive/) (LC 41)** — Ultimate Cyclic Sort challenge. `[Pattern: Cyclic] [LC Hard]`
+2. **[Maximum Gap](https://leetcode.com/problems/maximum-gap/) (LC 164)** — Solve in $O(N)$ using **Bucket/Radix Sort**. `[LC Hard]`
+3. **[Reverse Pairs](https://leetcode.com/problems/reverse-pairs/) (LC 493)** — Merge Sort "Modification" to count pairs. `[Pattern: D&C] [LC Hard]`
+4. **[Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/) (LC 315)** — Merge Sort or BIT? `[LC Hard]`
+5. **[Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) (LC 373)** — Sorting vs Multi-pointer. `[LC Hard]`
 
 ---
 

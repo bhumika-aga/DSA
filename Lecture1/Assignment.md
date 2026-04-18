@@ -166,7 +166,7 @@
 
 > 🔗 **LeetCode:** [121. Best Time to Buy/Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
 > **`[Pattern: Min-So-Far]` `[Amazon] [Goldman Sachs]` `[Medium]`**
-> One transaction — maximum profit. Track `minPrice` as you scan; at each step `profit = price - minPrice`. O(n) time. Follow-up: what changes for unlimited transactions? (LC 122)
+> One transaction — maximum profit. Track `minPrice` as you scan; at each step `profit = price - minPrice`. O(n) time. Follow-up: what changes for unlimited transactions? ([LC 122](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/))
 
 ### Problem 26 — Max Sum Subarray of Size K (Sliding Window Preview)
 
