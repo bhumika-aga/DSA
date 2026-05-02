@@ -1,1172 +1,1243 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 13 — HashMap &amp; HashSet Deep Dive</title>
+    <meta
+      name="description"
+      content="Master HashMap and HashSet for FAANG interviews: hashing internals, collision resolution, frequency maps, complement lookup, prefix sum with map, and LRU Cache design."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecture 13 — HashMap &amp; HashSet Deep Dive</title>
-  <meta name="description"
-    content="Master HashMap and HashSet for FAANG interviews: hashing internals, collision resolution, frequency maps, complement lookup, prefix sum with map, and LRU Cache design.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 260px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      flex-direction: row;
-      transition: background .2s, color .2s
-    }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 8px 16px 4px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      color: var(--text2);
-      text-decoration: none;
-      border-radius: 4px;
-      transition: all .15s;
-      font-weight: 500
-    }
-
-    .toc-item:hover {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .toc-sub {
-      padding-left: 32px;
-      font-size: 12px;
-      font-weight: 400
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      width: 18px;
-      text-align: center
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 12px 16px
-    }
-
-    /* ── Main + Topbar ── */
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text3)
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--accent)
-    }
-
-    .breadcrumb span {
-      color: var(--text3)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      width: 0%;
-      transition: width .3s cubic-bezier(.4, 0, .2, 1)
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: all .15s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    /* ── Content ── */
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    /* ── Page Header ── */
-    .page-header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      display: block;
-      margin-bottom: 12px
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.25;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--text2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green)
-    }
-
-    .meta-chip.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow)
-    }
-
-    /* ── Headings ── */
-    .h1 {
-      font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 32px 0 12px
-    }
-
-    .h2 {
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 24px 0 10px
-    }
-
-    .h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text2);
-      margin: 16px 0 8px
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 32px 0
-    }
-
-    /* ── Callouts ── */
-    .callout {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 16px 0;
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .callout.blue {
-      background: var(--accent-bg);
-      border-color: var(--accent)
-    }
-
-    .callout.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg);
-      border-color: var(--orange)
-    }
-
-    .callout.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg);
-      border-color: var(--purple)
-    }
-
-    .callout.teal {
-      background: var(--teal-bg);
-      border-color: var(--teal)
-    }
-
-    .callout.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .callout-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .callout-body {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.65
-    }
-
-    .callout-body strong {
-      color: var(--text)
-    }
-
-    /* ── Code blocks ── */
-    .code-block {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin: 14px 0
-    }
-
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text3);
-      font-family: var(--mono)
-    }
-
-    .code-lang {
-      color: var(--text3)
-    }
-
-    .copy-btn {
-      background: var(--bg4);
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: all .15s
-    }
-
-    .copy-btn:hover {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    pre {
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.7;
-      padding: 16px;
-      overflow-x: auto;
-      background: var(--bg2);
-      color: var(--text2)
-    }
-
-    /* Syntax highlighting spans */
-    .kw {
-      color: #6940a5;
-      font-weight: 600
-    }
-
-    .cls {
-      color: #0f7b6c;
-      font-weight: 500
-    }
-
-    .fn {
-      color: #2383e2;
-      font-weight: 500
-    }
-
-    .str {
-      color: #c75b0e
-    }
-
-    .num {
-      color: #c0392b
-    }
-
-    .cm {
-      color: #9b9790;
-      font-style: italic
-    }
-
-    .ret {
-      color: #ad1a72;
-      font-weight: 600
-    }
-
-    [data-theme="dark"] .kw {
-      color: #a07dd4
-    }
-
-    [data-theme="dark"] .cls {
-      color: #4db6a8
-    }
-
-    [data-theme="dark"] .fn {
-      color: #5ba4f5
-    }
-
-    [data-theme="dark"] .str {
-      color: #e0893a
-    }
-
-    [data-theme="dark"] .num {
-      color: #e07070
-    }
-
-    [data-theme="dark"] .cm {
-      color: #6b6860
-    }
-
-    [data-theme="dark"] .ret {
-      color: #e06aac
-    }
-
-    /* ── Complexity badges ── */
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0
-    }
-
-    .cx-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: var(--mono);
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .cx-badge .cx-label {
-      font-size: 11px;
-      font-family: var(--sans);
-      color: var(--text3)
-    }
-
-    .cx-badge .cx-val {
-      font-weight: 600;
-      color: var(--text)
-    }
-
-    .cx-badge.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .cx-badge.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .cx-badge.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .cx-badge .cx-val.green {
-      color: var(--green)
-    }
-
-    .cx-badge .cx-val.yellow {
-      color: var(--yellow)
-    }
-
-    .cx-badge .cx-val.red {
-      color: var(--red)
-    }
-
-    /* ── Table ── */
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    th {
-      background: var(--bg3);
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border)
-    }
-
-    td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text2)
-    }
-
-    tr:last-child td {
-      border-bottom: none
-    }
-
-    tr:hover td {
-      background: var(--bg2)
-    }
-
-    /* ── ASCII diagrams ── */
-    .ascii-tree {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text2);
-      margin: 14px 0;
-      white-space: pre;
-      overflow-x: auto
-    }
-
-    .ascii-tree .hl {
-      color: var(--accent);
-      font-weight: 600
-    }
-
-    .ascii-tree .nd {
-      color: var(--orange);
-      font-weight: 600
-    }
-
-    .ascii-tree .ret {
-      color: var(--purple);
-      font-weight: 600
-    }
-
-    /* ── IO box ── */
-    .iobox {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      white-space: pre-wrap
-    }
-
-    /* ── Prob cards ── */
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 16px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 16px 18px;
-      cursor: pointer;
-      transition: background .15s
-    }
-
-    .prob-header:hover {
-      background: var(--bg2)
-    }
-
-    .prob-header.active {
-      background: var(--accent-bg)
-    }
-
-    .prob-left {
-      flex: 1
-    }
-
-    .prob-num {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 3px
-    }
-
-    .prob-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 5px
-    }
-
-    .prob-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 6px
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      border: 1px solid transparent
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red);
-      border-color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--purple-bg);
-      color: var(--purple);
-      border-color: var(--purple)
-    }
-
-    .tag-pat {
-      background: var(--teal-bg);
-      color: var(--teal);
-      border-color: var(--teal)
-    }
-
-    .tag-lc {
-      background: var(--orange-bg);
-      color: var(--orange);
-      border-color: var(--orange)
-    }
-
-    .prob-body {
-      display: none;
-      border-top: 1px solid var(--border);
-      padding: 18px
-    }
-
-    .prob-section {
-      margin-bottom: 14px
-    }
-
-    .prob-section-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 6px
-    }
-
-    details summary {
-      cursor: pointer;
-      padding: 10px 14px;
-      background: var(--bg2);
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-      border: 1px solid var(--border);
-      transition: background .15s
-    }
-
-    details summary:hover {
-      background: var(--bg3)
-    }
-
-    details[open] summary {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    .toggle-arrow {
-      transition: transform .2s;
-      display: inline-block
-    }
-
-    details[open] .toggle-arrow {
-      transform: rotate(90deg)
-    }
-
-    .details-body {
-      padding: 4px 0 0
-    }
-
-    /* ── Checklist ── */
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none
-    }
-
-    .cb-box {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border2);
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      font-size: 11px
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff
-    }
-
-    .checklist-item.done .cb-text {
-      text-decoration: line-through;
-      color: var(--text3)
-    }
-
-    /* ── Misc ── */
-    mark {
-      background: var(--yellow-bg);
-      color: var(--text);
-      padding: 0 3px;
-      border-radius: 3px
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border2);
-      border-radius: 3px
-    }
-
-    @media(max-width:768px) {
+      /* ── Sidebar ── */
       #sidebar {
-        display: none
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
       }
 
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 8px 16px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        color: var(--text2);
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+
+      .toc-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .toc-sub {
+        padding-left: 32px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        width: 18px;
+        text-align: center;
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 16px;
+      }
+
+      /* ── Main + Topbar ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--accent);
+      }
+
+      .breadcrumb span {
+        color: var(--text3);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      /* ── Content ── */
       #content {
-        padding: 24px 20px 80px
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
       }
-    }
-  </style>
-</head>
 
-<body>
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
 
-  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">&#128218; DSA Course</div>
-      <div class="sb-title">HashMap &amp; HashSet</div>
-      <div class="sb-meta">Lecture 13 of 30 &middot; Phase 2 &mdash; Core Data Structures</div>
-    </div>
+      .page-emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 12px;
+      }
 
-    <div class="toc-label">On this page</div>
-    <a class="toc-item" href="#intro"><span class="toc-icon">&#128218;</span>Why HashMaps Win</a>
-    <a class="toc-item" href="#internals"><span class="toc-icon">&#9881;</span>How Hashing Works</a>
-    <a class="toc-item toc-sub" href="#collision">Collision Resolution</a>
-    <a class="toc-item toc-sub" href="#resize">Load Factor &amp; Resize</a>
-    <a class="toc-item" href="#patterns"><span class="toc-icon">&#127919;</span>The 5 Core Patterns</a>
-    <a class="toc-item toc-sub" href="#freq-map">Frequency Map</a>
-    <a class="toc-item toc-sub" href="#complement">Complement Lookup</a>
-    <a class="toc-item toc-sub" href="#prefix-map">Prefix Sum + Map</a>
-    <a class="toc-item toc-sub" href="#group-key">Group-by-Key</a>
-    <a class="toc-item toc-sub" href="#set-membership">Set Membership</a>
-    <a class="toc-item" href="#practice"><span class="toc-icon">&#128170;</span>Practice Problems</a>
-    <a class="toc-item" href="#assignment"><span class="toc-icon">&#128221;</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">&#9989;</span>Checklist</a>
+      .page-title {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+        margin-bottom: 10px;
+      }
 
-    <div class="sb-div"></div>
-    <div style="padding:8px 16px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-      <a class="toc-item" href="../Lecture12/lecture12_notes.html" style="font-size:13px;color:var(--text3)">&larr;
-        Topic 12: Stacks &amp; Queues</a>
-      <a class="toc-item" href="../Lecture14/lecture14_notes.html" style="font-size:13px;color:var(--text3)">&rarr;
-        Topic 14: Matrix Problems</a>
-    </div>
-  </nav>
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
 
-  <!-- ══ MAIN ════════════════════════════════════════════════ -->
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb">
-        <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-        <a href="#">Phase 2</a><span>&rsaquo;</span>
-        <span>Lecture 13</span>
-      </div>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3)">Progress</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 32px 0 12px;
+      }
+
+      .h2 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 24px 0 10px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text2);
+        margin: 16px 0 8px;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        border-color: var(--orange);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        border-color: var(--purple);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.65;
+      }
+
+      .callout-body strong {
+        color: var(--text);
+      }
+
+      /* ── Code blocks ── */
+      .code-block {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+
+      .code-lang {
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      .copy-btn:hover {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px;
+        overflow-x: auto;
+        background: var(--bg2);
+        color: var(--text2);
+      }
+
+      /* Syntax highlighting spans */
+      .kw {
+        color: #6940a5;
+        font-weight: 600;
+      }
+
+      .cls {
+        color: #0f7b6c;
+        font-weight: 500;
+      }
+
+      .fn {
+        color: #2383e2;
+        font-weight: 500;
+      }
+
+      .str {
+        color: #c75b0e;
+      }
+
+      .num {
+        color: #c0392b;
+      }
+
+      .cm {
+        color: #9b9790;
+        font-style: italic;
+      }
+
+      .ret {
+        color: #ad1a72;
+        font-weight: 600;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #a07dd4;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #4db6a8;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #5ba4f5;
+      }
+
+      [data-theme="dark"] .str {
+        color: #e0893a;
+      }
+
+      [data-theme="dark"] .num {
+        color: #e07070;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #6b6860;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #e06aac;
+      }
+
+      /* ── Complexity badges ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      th {
+        background: var(--bg3);
+        padding: 10px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+      }
+
+      td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── ASCII diagrams ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      /* ── IO box ── */
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Prob cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 16px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg2);
+      }
+
+      .prob-header.active {
+        background: var(--accent-bg);
+      }
+
+      .prob-left {
+        flex: 1;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 3px;
+      }
+
+      .prob-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--purple-bg);
+        color: var(--purple);
+        border-color: var(--purple);
+      }
+
+      .tag-pat {
+        background: var(--teal-bg);
+        color: var(--teal);
+        border-color: var(--teal);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+        border-color: var(--orange);
+      }
+
+      .prob-body {
+        display: none;
+        border-top: 1px solid var(--border);
+        padding: 18px;
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      details summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        background: var(--bg2);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text2);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+        border: 1px solid var(--border);
+        transition: background 0.15s;
+      }
+
+      details summary:hover {
+        background: var(--bg3);
+      }
+
+      details[open] summary {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .toggle-arrow {
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+
+      details[open] .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 4px 0 0;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Misc ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">HashMap &amp; HashSet</div>
+        <div class="sb-meta">
+          Lecture 13 of 30 &middot; Phase 2 &mdash; Core Data Structures
         </div>
-        <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
       </div>
-    </div>
 
-    <div id="content">
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#intro"
+        ><span class="toc-icon">&#128218;</span>Why HashMaps Win</a
+      >
+      <a class="toc-item" href="#internals"
+        ><span class="toc-icon">&#9881;</span>How Hashing Works</a
+      >
+      <a class="toc-item toc-sub" href="#collision">Collision Resolution</a>
+      <a class="toc-item toc-sub" href="#resize">Load Factor &amp; Resize</a>
+      <a class="toc-item" href="#patterns"
+        ><span class="toc-icon">&#127919;</span>The 5 Core Patterns</a
+      >
+      <a class="toc-item toc-sub" href="#freq-map">Frequency Map</a>
+      <a class="toc-item toc-sub" href="#complement">Complement Lookup</a>
+      <a class="toc-item toc-sub" href="#prefix-map">Prefix Sum + Map</a>
+      <a class="toc-item toc-sub" href="#group-key">Group-by-Key</a>
+      <a class="toc-item toc-sub" href="#set-membership">Set Membership</a>
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">&#128170;</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">&#128221;</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">&#9989;</span>Checklist</a
+      >
 
-      <!-- PAGE HEADER -->
-      <div class="page-header">
-        <span class="page-emoji">&#128218;</span>
-        <h1 class="page-title">HashMap &amp; HashSet — Deep Dive</h1>
-        <p class="page-sub">"The HashMap is not a trick — it is the most powerful O(1) tool in your interview toolkit."
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
+        </div>
+        <a
+          class="toc-item"
+          href="../Lecture12/lecture12_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&larr; Topic 12: Stacks &amp; Queues</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture14/lecture14_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&rarr; Topic 14: Matrix Problems</a
+        >
+      </div>
+    </nav>
+
+    <!-- ══ MAIN ════════════════════════════════════════════════ -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="#">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 13</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#128218;</span>
+          <h1 class="page-title">HashMap &amp; HashSet — Deep Dive</h1>
+          <p class="page-sub">
+            "The HashMap is not a trick — it is the most powerful O(1) tool in
+            your interview toolkit."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128214; Lecture 13</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 7 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Facebook &middot;
+              Microsoft</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            The HashMap is the single most frequently used data structure in
+            coding interviews. It powers Two Sum, Group Anagrams, Top K Frequent
+            elements, counting, caching, and dozens of other patterns. You will
+            use a HashMap in more than
+            <strong>60% of all medium-difficulty LeetCode problems</strong>.
+            Understanding <em>why</em> it's O(1) — and when it degrades to O(n)
+            — is what separates good candidates from great ones.
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">&#128279;</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 1 introduced HashMaps as
+            Java Collections. Lecture 8 used frequency arrays (int[26]) as an
+            O(1) alternative for character maps. This lecture formalises the
+            internals — hashing, collision resolution, load factor — and teaches
+            the 5 interview patterns that appear repeatedly across Google,
+            Amazon, Meta and Microsoft problems.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ══ SECTION 1: WHY HASHMAPS ═══════════════════════ -->
+        <h2 class="h1" id="intro">
+          &#128218; Why HashMaps Beat Every Other Structure
+        </h2>
+        <p>
+          Before HashMaps, solving "Does this element exist?" required O(n)
+          linear scan or O(log n) binary search in a sorted structure. HashMaps
+          provide <mark>O(1) average-case lookup, insert, and delete</mark> — an
+          extraordinary advantage.
         </p>
-        <div class="meta-row">
-          <span class="meta-chip accent">&#128214; Lecture 13</span>
-          <span class="meta-chip accent">Phase 2 &mdash; Core Data Structures</span>
-          <span class="meta-chip yellow">&#9201; 4 days</span>
-          <span class="meta-chip green">&#127919; 7 problems</span>
-          <span class="meta-chip">&#128188; Google &middot; Amazon &middot; Facebook &middot; Microsoft</span>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Array</th>
+                <th>Sorted Array</th>
+                <th>BST</th>
+                <th>HashMap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Search</td>
+                <td>O(n)</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td><strong>O(1) avg</strong></td>
+              </tr>
+              <tr>
+                <td>Insert</td>
+                <td>O(1) amortised</td>
+                <td>O(n)</td>
+                <td>O(log n)</td>
+                <td><strong>O(1) avg</strong></td>
+              </tr>
+              <tr>
+                <td>Delete</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>O(log n)</td>
+                <td><strong>O(1) avg</strong></td>
+              </tr>
+              <tr>
+                <td>Ordered?</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td><strong>No (use TreeMap)</strong></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <!-- WHY THIS MATTERS -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">&#128161;</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          The HashMap is the single most frequently used data structure in coding interviews. It powers Two Sum, Group
-          Anagrams,
-          Top K Frequent elements, counting, caching, and dozens of other patterns. You will use a HashMap in more than
-          <strong>60% of all medium-difficulty LeetCode problems</strong>. Understanding <em>why</em> it's O(1) — and
-          when it degrades to O(n) — is what separates good candidates from great ones.
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>When NOT to use HashMap:</strong> If you need sorted order →
+            use <code>TreeMap</code> (O(log n)). If keys are small integers →
+            use an <code>int[]</code> frequency array (faster in practice).
+            HashMaps have high constant factors due to hashing overhead.
+          </div>
         </div>
-      </div>
 
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">&#128279;</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 1 introduced HashMaps as Java Collections. Lecture 8 used frequency
-          arrays (int[26]) as an O(1) alternative for character maps. This lecture formalises the internals — hashing,
-          collision resolution, load factor — and teaches the 5 interview patterns that appear repeatedly across Google,
-          Amazon, Meta and Microsoft problems.
+        <hr />
+
+        <!-- ══ SECTION 2: HOW HASHING WORKS ═══════════════════ -->
+        <h2 class="h1" id="internals">
+          &#9881; How Hashing Works — The Internals
+        </h2>
+        <p>
+          A HashMap stores entries in an internal
+          <strong>array of buckets</strong>. To find where a key belongs:
+        </p>
+        <ol style="margin: 8px 0 8px 24px; line-height: 2">
+          <li>Compute <code>hash = key.hashCode()</code></li>
+          <li>
+            Map to bucket index: <code>index = hash &amp; (capacity - 1)</code>
+          </li>
+          <li>Store the (key, value) pair in that bucket</li>
+        </ol>
+
+        <div class="ascii-tree">
+          HashMap internals (capacity = 8, default): Key hashCode() index = hash
+          &amp; 7 Bucket ────────────────────────────────────────────── "cat"
+          98532 <span class="hl">4</span> bucket[<span class="hl">4</span>] →
+          ("cat", value) "dog" 99557 <span class="hl">5</span> bucket[<span
+            class="hl"
+            >5</span
+          >] → ("dog", value) "art" 96478 <span class="hl">6</span> bucket[<span
+            class="hl"
+            >6</span
+          >] → ("art", value) "rat" 113608
+          <span class="nd">0</span> bucket[<span class="nd">0</span>] → ("rat",
+          value) ← collision risk
         </div>
-      </div>
 
-      <hr>
+        <h3 class="h2" id="collision">
+          Collision Resolution — Separate Chaining vs Open Addressing
+        </h3>
+        <p>
+          When two keys hash to the same bucket, we have a
+          <strong>collision</strong>. Java's HashMap uses
+          <mark>Separate Chaining</mark> — each bucket holds a linked list (or a
+          red-black tree when the chain length &gt; 8).
+        </p>
 
-      <!-- ══ SECTION 1: WHY HASHMAPS ═══════════════════════ -->
-      <h2 class="h1" id="intro">&#128218; Why HashMaps Beat Every Other Structure</h2>
-      <p>Before HashMaps, solving "Does this element exist?" required O(n) linear scan or O(log n) binary search in a
-        sorted
-        structure. HashMaps provide <mark>O(1) average-case lookup, insert, and delete</mark> — an extraordinary
-        advantage.</p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Operation</th>
-              <th>Array</th>
-              <th>Sorted Array</th>
-              <th>BST</th>
-              <th>HashMap</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Search</td>
-              <td>O(n)</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td><strong>O(1) avg</strong></td>
-            </tr>
-            <tr>
-              <td>Insert</td>
-              <td>O(1) amortised</td>
-              <td>O(n)</td>
-              <td>O(log n)</td>
-              <td><strong>O(1) avg</strong></td>
-            </tr>
-            <tr>
-              <td>Delete</td>
-              <td>O(n)</td>
-              <td>O(n)</td>
-              <td>O(log n)</td>
-              <td><strong>O(1) avg</strong></td>
-            </tr>
-            <tr>
-              <td>Ordered?</td>
-              <td>No</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td><strong>No (use TreeMap)</strong></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout yellow">
-        <span class="callout-icon">&#9888;</span>
-        <div class="callout-body"><strong>When NOT to use HashMap:</strong> If you need sorted order → use
-          <code>TreeMap</code> (O(log n)). If keys are small integers → use an <code>int[]</code> frequency array
-          (faster in practice). HashMaps have high constant factors due to hashing overhead.
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Strategy</th>
+                <th>How It Works</th>
+                <th>Java Uses?</th>
+                <th>Worst Case</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Separate Chaining</strong></td>
+                <td>Each bucket = list/tree of entries</td>
+                <td>✅ Yes (HashMap)</td>
+                <td>O(n) — all into one bucket</td>
+              </tr>
+              <tr>
+                <td><strong>Open Addressing</strong></td>
+                <td>Linear/quadratic probing for next empty slot</td>
+                <td>No</td>
+                <td>O(n) with bad hash</td>
+              </tr>
+              <tr>
+                <td><strong>Robin Hood</strong></td>
+                <td>Steal from "rich" entries, give to "poor"</td>
+                <td>No</td>
+                <td>O(log n) expected</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <hr>
-
-      <!-- ══ SECTION 2: HOW HASHING WORKS ═══════════════════ -->
-      <h2 class="h1" id="internals">&#9881; How Hashing Works — The Internals</h2>
-      <p>A HashMap stores entries in an internal <strong>array of buckets</strong>. To find where a key belongs:</p>
-      <ol style="margin:8px 0 8px 24px;line-height:2">
-        <li>Compute <code>hash = key.hashCode()</code></li>
-        <li>Map to bucket index: <code>index = hash &amp; (capacity - 1)</code></li>
-        <li>Store the (key, value) pair in that bucket</li>
-      </ol>
-
-      <div class="ascii-tree">HashMap internals (capacity = 8, default):
-
-        Key hashCode() index = hash &amp; 7 Bucket
-        ──────────────────────────────────────────────
-        "cat" 98532 <span class="hl">4</span> bucket[<span class="hl">4</span>] → ("cat", value)
-        "dog" 99557 <span class="hl">5</span> bucket[<span class="hl">5</span>] → ("dog", value)
-        "art" 96478 <span class="hl">6</span> bucket[<span class="hl">6</span>] → ("art", value)
-        "rat" 113608 <span class="nd">0</span> bucket[<span class="nd">0</span>] → ("rat", value) ← collision risk</div>
-
-      <h3 class="h2" id="collision">Collision Resolution — Separate Chaining vs Open Addressing</h3>
-      <p>When two keys hash to the same bucket, we have a <strong>collision</strong>. Java's HashMap uses
-        <mark>Separate Chaining</mark> — each bucket holds a linked list (or a red-black tree when the chain
-        length &gt; 8).
-      </p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Strategy</th>
-              <th>How It Works</th>
-              <th>Java Uses?</th>
-              <th>Worst Case</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Separate Chaining</strong></td>
-              <td>Each bucket = list/tree of entries</td>
-              <td>✅ Yes (HashMap)</td>
-              <td>O(n) — all into one bucket</td>
-            </tr>
-            <tr>
-              <td><strong>Open Addressing</strong></td>
-              <td>Linear/quadratic probing for next empty slot</td>
-              <td>No</td>
-              <td>O(n) with bad hash</td>
-            </tr>
-            <tr>
-              <td><strong>Robin Hood</strong></td>
-              <td>Steal from "rich" entries, give to "poor"</td>
-              <td>No</td>
-              <td>O(log n) expected</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout purple">
-        <span class="callout-icon">&#128301;</span>
-        <div class="callout-body"><strong>Java HashMap's tree upgrade (Java 8+):</strong> When a bucket's chain length
-          exceeds <code>TREEIFY_THRESHOLD = 8</code>, the linked list is converted to a red-black tree. This makes
-          worst-case per-bucket lookup O(log n) instead of O(n). This is the "HashMap treeification" interview
-          question at Google.</div>
-      </div>
-
-      <h3 class="h2" id="resize">Load Factor &amp; Resizing</h3>
-      <p>Java's HashMap has a default <strong>load factor of 0.75</strong>. When <code>size / capacity &gt; 0.75</code>,
-        the map <strong>doubles capacity and rehashes all entries</strong> — an O(n) operation. This is why HashMap
-        insertions are O(1) <em>amortised</em>, not O(1) worst-case.</p>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Key HashMap API</div>
-          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <div class="callout purple">
+          <span class="callout-icon">&#128301;</span>
+          <div class="callout-body">
+            <strong>Java HashMap's tree upgrade (Java 8+):</strong> When a
+            bucket's chain length exceeds <code>TREEIFY_THRESHOLD = 8</code>,
+            the linked list is converted to a red-black tree. This makes
+            worst-case per-bucket lookup O(log n) instead of O(n). This is the
+            "HashMap treeification" interview question at Google.
+          </div>
         </div>
-        <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Integer</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+        <h3 class="h2" id="resize">Load Factor &amp; Resizing</h3>
+        <p>
+          Java's HashMap has a default <strong>load factor of 0.75</strong>.
+          When <code>size / capacity &gt; 0.75</code>, the map
+          <strong>doubles capacity and rehashes all entries</strong> — an O(n)
+          operation. This is why HashMap insertions are O(1) <em>amortised</em>,
+          not O(1) worst-case.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">&#9749; Java &middot; Key HashMap API</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Integer</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
 
 <span class="cm">// Core operations — all O(1) average</span>
 map.put(<span class="str">"apple"</span>, 3);                    <span class="cm">// insert / update</span>
@@ -1189,107 +1260,151 @@ map.merge(<span class="str">"apple"</span>, 1, <span class="cls">Integer</span>:
 seen.add(5);
 seen.contains(5);   <span class="cm">// O(1)</span>
 seen.remove(5);</pre>
-      </div>
-
-      <hr>
-
-      <!-- ══ SECTION 3: THE 5 PATTERNS ═══════════════════════ -->
-      <h2 class="h1" id="patterns">&#127919; The 5 Core HashMap Interview Patterns</h2>
-      <p>Every HashMap problem you will encounter in FAANG interviews is a variation of one of these five patterns.
-        Learn to recognise the pattern first — the code will follow naturally.</p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Pattern</th>
-              <th>Trigger phrase</th>
-              <th>Canonical Problem</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td><strong>Frequency Map</strong></td>
-              <td>"count occurrences", "most frequent"</td>
-              <td><a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank">Top K Frequent (LC
-                  347)</a></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><strong>Complement Lookup</strong></td>
-              <td>"find two that add to target"</td>
-              <td><a href="https://leetcode.com/problems/two-sum/" target="_blank">Two Sum (LC 1)</a></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td><strong>Prefix Sum + Map</strong></td>
-              <td>"subarray sum equals K"</td>
-              <td><a href="https://leetcode.com/problems/subarray-sum-equals-k/" target="_blank">Subarray Sum = K (LC
-                  560)</a></td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td><strong>Group-by-Key</strong></td>
-              <td>"group", "anagram", "same signature"</td>
-              <td><a href="https://leetcode.com/problems/group-anagrams/" target="_blank">Group Anagrams (LC 49)</a>
-              </td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td><strong>Set Membership</strong></td>
-              <td>"duplicate", "seen before", "longest sequence"</td>
-              <td><a href="https://leetcode.com/problems/longest-consecutive-sequence/" target="_blank">Longest
-                  Consecutive (LC 128)</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pattern deep-dives -->
-      <h3 class="h2" id="freq-map">Pattern 1: Frequency Map</h3>
-      <p>Count how many times each element appears. The result is a <code>Map&lt;T, Integer&gt;</code> where value =
-        count.</p>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Frequency Map template</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cm">// Count frequency of each number</span>
+
+        <hr />
+
+        <!-- ══ SECTION 3: THE 5 PATTERNS ═══════════════════════ -->
+        <h2 class="h1" id="patterns">
+          &#127919; The 5 Core HashMap Interview Patterns
+        </h2>
+        <p>
+          Every HashMap problem you will encounter in FAANG interviews is a
+          variation of one of these five patterns. Learn to recognise the
+          pattern first — the code will follow naturally.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pattern</th>
+                <th>Trigger phrase</th>
+                <th>Canonical Problem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><strong>Frequency Map</strong></td>
+                <td>"count occurrences", "most frequent"</td>
+                <td>
+                  <a
+                    href="https://leetcode.com/problems/top-k-frequent-elements/"
+                    target="_blank"
+                    >Top K Frequent (LC 347)</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>Complement Lookup</strong></td>
+                <td>"find two that add to target"</td>
+                <td>
+                  <a
+                    href="https://leetcode.com/problems/two-sum/"
+                    target="_blank"
+                    >Two Sum (LC 1)</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>Prefix Sum + Map</strong></td>
+                <td>"subarray sum equals K"</td>
+                <td>
+                  <a
+                    href="https://leetcode.com/problems/subarray-sum-equals-k/"
+                    target="_blank"
+                    >Subarray Sum = K (LC 560)</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><strong>Group-by-Key</strong></td>
+                <td>"group", "anagram", "same signature"</td>
+                <td>
+                  <a
+                    href="https://leetcode.com/problems/group-anagrams/"
+                    target="_blank"
+                    >Group Anagrams (LC 49)</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><strong>Set Membership</strong></td>
+                <td>"duplicate", "seen before", "longest sequence"</td>
+                <td>
+                  <a
+                    href="https://leetcode.com/problems/longest-consecutive-sequence/"
+                    target="_blank"
+                    >Longest Consecutive (LC 128)</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pattern deep-dives -->
+        <h3 class="h2" id="freq-map">Pattern 1: Frequency Map</h3>
+        <p>
+          Count how many times each element appears. The result is a
+          <code>Map&lt;T, Integer&gt;</code> where value = count.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              &#9749; Java &middot; Frequency Map template
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Count frequency of each number</span>
 <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
 <span class="kw">for</span> (<span class="kw">int</span> x : nums)
     freq.merge(x, 1, <span class="cls">Integer</span>::sum);  <span class="cm">// Java 8 idiom</span>
 <span class="cm">// OR: freq.put(x, freq.getOrDefault(x, 0) + 1);</span></pre>
-      </div>
-
-      <h3 class="h2" id="complement">Pattern 2: Complement Lookup</h3>
-      <p>For "find two elements summing to target": as you scan, store what you've seen. For each new element,
-        check if its <mark>complement = target - element</mark> is already stored.</p>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Complement Lookup template</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+        <h3 class="h2" id="complement">Pattern 2: Complement Lookup</h3>
+        <p>
+          For "find two elements summing to target": as you scan, store what
+          you've seen. For each new element, check if its
+          <mark>complement = target - element</mark> is already stored.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              &#9749; Java &middot; Complement Lookup template
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
 <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nums.length; i++) {
     <span class="kw">int</span> complement = target - nums[i];
     <span class="kw">if</span> (seen.containsKey(complement))
         <span class="ret">return new int</span>[]{seen.get(complement), i};
     seen.put(nums[i], i);  <span class="cm">// add AFTER checking</span>
 }</pre>
-      </div>
-
-      <h3 class="h2" id="prefix-map">Pattern 3: Prefix Sum + Map</h3>
-      <p>For "subarray sum equals K": maintain a running prefix sum. At each index, check if
-        <code>prefixSum - K</code> has been seen before — that gap is a valid subarray.
-      </p>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Prefix Sum + Map template</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; prefixCount = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+        <h3 class="h2" id="prefix-map">Pattern 3: Prefix Sum + Map</h3>
+        <p>
+          For "subarray sum equals K": maintain a running prefix sum. At each
+          index, check if <code>prefixSum - K</code> has been seen before — that
+          gap is a valid subarray.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              &#9749; Java &middot; Prefix Sum + Map template
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; prefixCount = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
 prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 <span class="kw">int</span> sum = 0, count = 0;
 <span class="kw">for</span> (<span class="kw">int</span> x : nums) {
@@ -1297,36 +1412,45 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
     count += prefixCount.getOrDefault(sum - k, 0);
     prefixCount.merge(sum, 1, <span class="cls">Integer</span>::sum);
 }</pre>
-      </div>
-
-      <h3 class="h2" id="group-key">Pattern 4: Group-by-Key</h3>
-      <p>Transform each element into a <mark>canonical key</mark> (sorted string, character frequency array, etc.)
-        and group elements sharing the same key.</p>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Group-by-Key template</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; groups = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+        <h3 class="h2" id="group-key">Pattern 4: Group-by-Key</h3>
+        <p>
+          Transform each element into a <mark>canonical key</mark> (sorted
+          string, character frequency array, etc.) and group elements sharing
+          the same key.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              &#9749; Java &middot; Group-by-Key template
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; groups = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
 <span class="kw">for</span> (<span class="cls">String</span> s : strs) {
     <span class="kw">char</span>[] c = s.toCharArray();
     Arrays.sort(c);
     <span class="cls">String</span> key = <span class="kw">new</span> <span class="cls">String</span>(c);  <span class="cm">// sorted = canonical form</span>
     groups.computeIfAbsent(key, k -&gt; <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;()).add(s);
 }</pre>
-      </div>
-
-      <h3 class="h2" id="set-membership">Pattern 5: Set Membership</h3>
-      <p>Add all elements to a HashSet first. Then traverse, using the set for O(1) existence checks. Classic
-        trick for "longest consecutive sequence": only start counting from sequence beginnings (nums where
-        <code>num - 1</code> is NOT in the set).
-      </p>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">&#9749; Java &middot; Set Membership template</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
+
+        <h3 class="h2" id="set-membership">Pattern 5: Set Membership</h3>
+        <p>
+          Add all elements to a HashSet first. Then traverse, using the set for
+          O(1) existence checks. Classic trick for "longest consecutive
+          sequence": only start counting from sequence beginnings (nums where
+          <code>num - 1</code> is NOT in the set).
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              &#9749; Java &middot; Set Membership template
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
 <span class="kw">for</span> (<span class="kw">int</span> x : nums) set.add(x);
 
 <span class="kw">int</span> longest = 0;
@@ -1337,58 +1461,86 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
         longest = <span class="cls">Math</span>.max(longest, len);
     }
 }</pre>
-      </div>
-
-      <hr>
-
-      <!-- ══ SECTION 4: PRACTICE PROBLEMS ═══════════════════ -->
-      <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-      <p>Work through in order. Click a card to expand. Try solving before revealing the solution.</p>
-
-      <!-- P01: Two Sum -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 01 &middot; Complement Lookup</div>
-            <div class="prob-title">Two Sum</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/two-sum/" target="_blank"
-                style="font-size:12px">&#128279; LC 1 — Easy</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-easy">Easy</span>
-              <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Meta</span>
-              <span class="tag tag-pat">Complement Lookup</span>
-            </div>
-          </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
         </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an array and a target, return indices of the two numbers that add to target. Exactly one solution
-              exists.</p>
-            <div class="iobox">Input: nums=[2,7,11,15], target=9 → Output: [0,1]
-              Input: nums=[3,2,4], target=6 → Output: [1,2]</div>
+
+        <hr />
+
+        <!-- ══ SECTION 4: PRACTICE PROBLEMS ═══════════════════ -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Work through in order. Click a card to expand. Try solving before
+          revealing the solution.
+        </p>
+
+        <!-- P01: Two Sum -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 &middot; Complement Lookup</div>
+              <div class="prob-title">Two Sum</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/two-sum/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1 — Easy</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Meta</span>
+                <span class="tag tag-pat">Complement Lookup</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First &mdash; Before looking at solution</div>
-            <p><strong>Brute force:</strong> Check all pairs → O(n²). Too slow.<br>
-              <strong>Key insight:</strong> For each element x, the complement we need is <code>target - x</code>.
-              If we store every element we've seen so far in a HashMap (value → index), we can check if the complement
-              already exists in O(1).<br>
-              <strong>Critical detail:</strong> Put into map <em>after</em> checking — prevents using the same element
-              twice.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution with full dry run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; One-Pass HashMap</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an array and a target, return indices of the two numbers
+                that add to target. Exactly one solution exists.
+              </p>
+              <div class="iobox">
+                Input: nums=[2,7,11,15], target=9 → Output: [0,1] Input:
+                nums=[3,2,4], target=6 → Output: [1,2]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">
+                Think First &mdash; Before looking at solution
+              </div>
+              <p>
+                <strong>Brute force:</strong> Check all pairs → O(n²). Too
+                slow.<br />
+                <strong>Key insight:</strong> For each element x, the complement
+                we need is <code>target - x</code>. If we store every element
+                we've seen so far in a HashMap (value → index), we can check if
+                the complement already exists in O(1).<br />
+                <strong>Critical detail:</strong> Put into map
+                <em>after</em> checking — prevents using the same element twice.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution with full dry
+                run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; One-Pass HashMap
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;(); <span class="cm">// value → index</span>
     <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nums.length; i++) {
         <span class="kw">int</span> complement = target - nums[i];
@@ -1402,57 +1554,84 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 <span class="cm">// Dry run: nums=[2,7,11,15], target=9
 // i=0: complement=7, seen={} → miss → seen={2:0}
 // i=1: complement=2, seen={2:0} → HIT → return [0,1] ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(n)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
-      </div>
 
-      <!-- P02: Roman to Integer -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 02 &middot; Character Map</div>
-            <div class="prob-title">Roman to Integer</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/roman-to-integer/" target="_blank"
-                style="font-size:12px">&#128279; LC 13 — Easy</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-easy">Easy</span>
-              <span class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span>
-              <span class="tag tag-pat">Character Map</span>
+        <!-- P02: Roman to Integer -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; Character Map</div>
+              <div class="prob-title">Roman to Integer</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/roman-to-integer/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 13 — Easy</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span>
+                <span class="tag tag-pat">Character Map</span>
+              </div>
             </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Convert a Roman numeral string to an integer. Roman symbols: I=1, V=5, X=10, L=50, C=100, D=500, M=1000.
-              Subtraction rule: if a smaller value precedes a larger one, subtract it (e.g. IV=4, IX=9).</p>
-            <div class="iobox">Input: "III" → 3
-              Input: "LVIII" → 58 (L=50, V=5, III=3)
-              Input: "MCMXCIV" → 1994 (M=1000, CM=900, XC=90, IV=4)</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Build a HashMap from Roman characters to integer values. Scan right to left — if current value is less
-              than the next value to the right, subtract it; otherwise add it.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution with dry run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; HashMap + Right-to-Left Scan</div><button
-                    class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">romanToInt</span>(<span class="cls">String</span> s) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Convert a Roman numeral string to an integer. Roman symbols:
+                I=1, V=5, X=10, L=50, C=100, D=500, M=1000. Subtraction rule: if
+                a smaller value precedes a larger one, subtract it (e.g. IV=4,
+                IX=9).
+              </p>
+              <div class="iobox">
+                Input: "III" → 3 Input: "LVIII" → 58 (L=50, V=5, III=3) Input:
+                "MCMXCIV" → 1994 (M=1000, CM=900, XC=90, IV=4)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Build a HashMap from Roman characters to integer values. Scan
+                right to left — if current value is less than the next value to
+                the right, subtract it; otherwise add it.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; HashMap + Right-to-Left Scan
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">romanToInt</span>(<span class="cls">String</span> s) {
     <span class="cls">Map</span>&lt;<span class="cls">Character</span>, <span class="cls">Integer</span>&gt; val = <span class="cls">Map</span>.of(
         <span class="str">'I'</span>, 1, <span class="str">'V'</span>, 5, <span class="str">'X'</span>, 10, <span class="str">'L'</span>, 50,
         <span class="str">'C'</span>, 100, <span class="str">'D'</span>, 500, <span class="str">'M'</span>, 1000);
@@ -1471,58 +1650,83 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 // i=4: C=100,prev=1 → 100>=1→ add 100.result=104,prev=100
 // i=3: X=10, prev=100→ 10<100→sub 10.result=94, prev=10
 // i=2: M=1000...→ result=1994 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
-      </div>
 
-      <!-- P03: Group Anagrams -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 03 &middot; Group-by-Key</div>
-            <div class="prob-title">Group Anagrams</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/" target="_blank"
-                style="font-size:12px">&#128279; LC 49 — Medium</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-              <span class="tag tag-pat">Group-by-Key</span>
+        <!-- P03: Group Anagrams -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Group-by-Key</div>
+              <div class="prob-title">Group Anagrams</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/group-anagrams/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 49 — Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span>
+                <span class="tag tag-pat">Group-by-Key</span>
+              </div>
             </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a list of strings, group the anagrams together. An anagram is a word formed by rearranging
-              another word's letters.</p>
-            <div class="iobox">Input: ["eat","tea","tan","ate","nat","bat"]
-              Output: [["bat"],["nat","tan"],["ate","eat","tea"]]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p><strong>Key insight:</strong> All anagrams of a word share the same <mark>sorted character
-                sequence</mark>.
-              "eat", "tea", "ate" all sort to "aet". Use the sorted string as the HashMap key, and group original words
-              under it.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution with dry run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; Sort Key Grouping</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">groupAnagrams</span>(<span class="cls">String</span>[] strs) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of strings, group the anagrams together. An anagram
+                is a word formed by rearranging another word's letters.
+              </p>
+              <div class="iobox">
+                Input: ["eat","tea","tan","ate","nat","bat"] Output:
+                [["bat"],["nat","tan"],["ate","eat","tea"]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                <strong>Key insight:</strong> All anagrams of a word share the
+                same <mark>sorted character sequence</mark>. "eat", "tea", "ate"
+                all sort to "aet". Use the sorted string as the HashMap key, and
+                group original words under it.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; Sort Key Grouping
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">groupAnagrams</span>(<span class="cls">String</span>[] strs) {
     <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="cls">String</span> s : strs) {
         <span class="kw">char</span>[] c = s.toCharArray();
@@ -1538,63 +1742,99 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 // "tea" → sort → "aet" → map={"aet":["eat","tea"]}
 // "tan" → sort → "ant" → map={"aet":[...], "ant":["tan"]}
 // Return [[eat,tea],[tan]] ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n · k log
-                    k)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n ·
-                    k)</span></div>
-              </div>
-              <div class="callout teal" style="margin-top:10px">
-                <span class="callout-icon">&#128161;</span>
-                <div class="callout-body"><strong>O(n · k) alternative:</strong> Instead of sorting each string, build
-                  a frequency-count key: a fixed 26-element int array like <code>[1,0,0,...,1]</code>. Sorting is
-                  O(k log k); frequency key is O(k). Both work — mention the tradeoff in interviews.</div>
-              </div>
-            </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P04: Top K Frequent Elements -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 04 &middot; Frequency Map + Heap</div>
-            <div class="prob-title">Top K Frequent Elements</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank"
-                style="font-size:12px">&#128279; LC 347 — Medium</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Amazon</span><span class="tag tag-co">Google</span>
-              <span class="tag tag-pat">Frequency Map</span><span class="tag tag-pat">Min-Heap</span>
-            </div>
-          </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an integer array and k, return the k most frequent elements.</p>
-            <div class="iobox">Input: nums=[1,1,1,2,2,3], k=2 → Output: [1,2]
-              Input: nums=[1], k=1 → Output: [1]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Step 1: Build a frequency map (element → count). Step 2: Find the top-K most frequent. Options:<br>
-              a) Sort by frequency descending — O(n log n).<br>
-              b) Use a <mark>min-heap of size K</mark> — O(n log k). Better when k &lt;&lt; n.<br>
-              c) Bucket sort on frequency — O(n). Best theoretical complexity.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution — Min-Heap approach O(n log k)</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; Freq Map + Min-Heap</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
                 </div>
-                <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n · k log k)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n · k)</span>
+                  </div>
+                </div>
+                <div class="callout teal" style="margin-top: 10px">
+                  <span class="callout-icon">&#128161;</span>
+                  <div class="callout-body">
+                    <strong>O(n · k) alternative:</strong> Instead of sorting
+                    each string, build a frequency-count key: a fixed 26-element
+                    int array like <code>[1,0,0,...,1]</code>. Sorting is O(k
+                    log k); frequency key is O(k). Both work — mention the
+                    tradeoff in interviews.
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P04: Top K Frequent Elements -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Frequency Map + Heap
+              </div>
+              <div class="prob-title">Top K Frequent Elements</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/top-k-frequent-elements/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 347 — Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span>
+                <span class="tag tag-pat">Frequency Map</span
+                ><span class="tag tag-pat">Min-Heap</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an integer array and k, return the k most frequent
+                elements.
+              </p>
+              <div class="iobox">
+                Input: nums=[1,1,1,2,2,3], k=2 → Output: [1,2] Input: nums=[1],
+                k=1 → Output: [1]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Step 1: Build a frequency map (element → count). Step 2: Find
+                the top-K most frequent. Options:<br />
+                a) Sort by frequency descending — O(n log n).<br />
+                b) Use a <mark>min-heap of size K</mark> — O(n log k). Better
+                when k &lt;&lt; n.<br />
+                c) Bucket sort on frequency — O(n). Best theoretical complexity.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution — Min-Heap
+                approach O(n log k)
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; Freq Map + Min-Heap
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
     <span class="cm">// Step 1: frequency map</span>
     <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> x : nums) freq.merge(x, 1, <span class="cls">Integer</span>::sum);
@@ -1616,59 +1856,87 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 <span class="cm">// nums=[1,1,1,2,2,3], k=2
 // freq={1:3, 2:2, 3:1}
 // heap after all: [2(freq2), 1(freq3)] → [1,2] ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
-                    k)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n log k)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
-      </div>
 
-      <!-- P05: Subarray Sum Equals K -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 05 &middot; Prefix Sum + Map</div>
-            <div class="prob-title">Subarray Sum Equals K</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/subarray-sum-equals-k/" target="_blank"
-                style="font-size:12px">&#128279; LC 560 — Medium</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Google</span><span class="tag tag-co">Facebook</span>
-              <span class="tag tag-pat">Prefix Sum + Map</span>
+        <!-- P05: Subarray Sum Equals K -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Prefix Sum + Map</div>
+              <div class="prob-title">Subarray Sum Equals K</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/subarray-sum-equals-k/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 560 — Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Facebook</span>
+                <span class="tag tag-pat">Prefix Sum + Map</span>
+              </div>
             </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an integer array and k, return the number of contiguous subarrays that sum to k.
-              Array may contain negative numbers.</p>
-            <div class="iobox">Input: nums=[1,1,1], k=2 → 2 (subarrays [1,1] at indices 0-1 and 1-2)
-              Input: nums=[1,2,3], k=3 → 2 ([1,2] and [3])</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First — The Key Insight</div>
-            <p>If <code>prefix[j] - prefix[i] = k</code>, then subarray <code>[i+1..j]</code> sums to k.
-              Rearranging: <code>prefix[i] = prefix[j] - k</code>.<br>
-              As we scan, for each new prefix sum, we ask: <mark>how many times has (prefixSum - k) appeared
-                before?</mark>
-              Each such occurrence is a valid subarray ending here.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution with dry run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; Prefix Sum HashMap</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an integer array and k, return the number of contiguous
+                subarrays that sum to k. Array may contain negative numbers.
+              </p>
+              <div class="iobox">
+                Input: nums=[1,1,1], k=2 → 2 (subarrays [1,1] at indices 0-1 and
+                1-2) Input: nums=[1,2,3], k=3 → 2 ([1,2] and [3])
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">
+                Think First — The Key Insight
+              </div>
+              <p>
+                If <code>prefix[j] - prefix[i] = k</code>, then subarray
+                <code>[i+1..j]</code> sums to k. Rearranging:
+                <code>prefix[i] = prefix[j] - k</code>.<br />
+                As we scan, for each new prefix sum, we ask:
+                <mark>how many times has (prefixSum - k) appeared before?</mark>
+                Each such occurrence is a valid subarray ending here.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; Prefix Sum HashMap
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
     <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; prefixCount = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
     prefixCount.put(0, 1);  <span class="cm">// empty prefix sum seen once</span>
     <span class="kw">int</span> sum = 0, count = 0;
@@ -1686,63 +1954,93 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 // x=1: sum=2, need 2-2=0 → map has 1 → count=1  → map={0:1,1:1,2:1}
 // x=1: sum=3, need 3-2=1 → map has 1 → count=2  → map={...,3:1}
 // Return 2 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(n)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+                <div class="callout orange" style="margin-top: 10px">
+                  <span class="callout-icon">&#9888;</span>
+                  <div class="callout-body">
+                    <strong>Why not sliding window?</strong> Sliding window only
+                    works for non-negative arrays. Since this problem allows
+                    negative numbers, prefix sum + HashMap is the correct O(n)
+                    approach. Never use a two-pointer here.
+                  </div>
                 </div>
               </div>
-              <div class="callout orange" style="margin-top:10px">
-                <span class="callout-icon">&#9888;</span>
-                <div class="callout-body"><strong>Why not sliding window?</strong> Sliding window only works for
-                  non-negative arrays. Since this problem allows negative numbers, prefix sum + HashMap is the
-                  correct O(n) approach. Never use a two-pointer here.</div>
-              </div>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
-      </div>
 
-      <!-- P06: Longest Consecutive Sequence -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 06 &middot; Set Membership</div>
-            <div class="prob-title">Longest Consecutive Sequence</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/longest-consecutive-sequence/"
-                target="_blank" style="font-size:12px">&#128279; LC 128 — Medium</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Google</span><span class="tag tag-co">Amazon</span>
-              <span class="tag tag-pat">Set Membership</span>
+        <!-- P06: Longest Consecutive Sequence -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Set Membership</div>
+              <div class="prob-title">Longest Consecutive Sequence</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/longest-consecutive-sequence/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 128 — Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span>
+                <span class="tag tag-pat">Set Membership</span>
+              </div>
             </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an unsorted array, return the length of the longest consecutive elements sequence. Must run in
-              O(n).</p>
-            <div class="iobox">Input: [100,4,200,1,3,2] → 4 (sequence: [1,2,3,4])
-              Input: [0,3,7,2,5,8,4,6,0,1] → 9 ([0,1,2,3,4,5,6,7,8])</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p><strong>Key insight:</strong> Add all numbers to a HashSet. Only start building a sequence from
-              a "sequence start" — a number where <code>num - 1</code> is NOT in the set. From there, count
-              upwards. This ensures each number is visited at most twice → O(n).</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution with dry run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; HashSet O(n)</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">longestConsecutive</span>(<span class="kw">int</span>[] nums) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an unsorted array, return the length of the longest
+                consecutive elements sequence. Must run in O(n).
+              </p>
+              <div class="iobox">
+                Input: [100,4,200,1,3,2] → 4 (sequence: [1,2,3,4]) Input:
+                [0,3,7,2,5,8,4,6,0,1] → 9 ([0,1,2,3,4,5,6,7,8])
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                <strong>Key insight:</strong> Add all numbers to a HashSet. Only
+                start building a sequence from a "sequence start" — a number
+                where <code>num - 1</code> is NOT in the set. From there, count
+                upwards. This ensures each number is visited at most twice →
+                O(n).
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; HashSet O(n)
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">longestConsecutive</span>(<span class="kw">int</span>[] nums) {
     <span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> x : nums) set.add(x);
 
@@ -1762,65 +2060,93 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
 // x=4:   set has 3? Yes → NOT a start → skip
 // x=1:   set has 0? No → start. 2?Yes,3?Yes,4?Yes,5?No → len=4
 // longest = 4 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(n)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
-      </div>
 
-      <!-- P07: LRU Cache -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 07 &middot; Design (Hard)</div>
-            <div class="prob-title">LRU Cache</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/lru-cache/" target="_blank"
-                style="font-size:12px">&#128279; LC 146 — Hard</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-hard">Hard</span>
-              <span class="tag tag-co">Amazon</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Meta</span>
-              <span class="tag tag-pat">HashMap + DLL</span>
+        <!-- P07: LRU Cache -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 07 &middot; Design (Hard)</div>
+              <div class="prob-title">LRU Cache</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/lru-cache/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 146 — Hard</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Meta</span>
+                <span class="tag tag-pat">HashMap + DLL</span>
+              </div>
             </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Design a data structure that implements an LRU (Least Recently Used) cache with capacity constraint.
-              Both <code>get</code> and <code>put</code> must run in O(1).</p>
-            <div class="iobox">LRUCache(2) // capacity = 2
-              put(1, 1) // cache: {1=1}
-              put(2, 2) // cache: {1=1, 2=2}
-              get(1) // returns 1, cache: {2=2, 1=1} (1 moves to front)
-              put(3, 3) // evicts key 2 (LRU), cache: {1=1, 3=3}
-              get(2) // returns -1 (not found)</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First — The Key Insight</div>
-            <p>O(1) get requires a HashMap. O(1) ordering (move to front, remove last) requires a
-              <mark>Doubly Linked List</mark>. Together: HashMap (key → DLL node) + DLL (ordered from
-              most-recent to least-recent).<br><br>
-              Java shortcut: <code>LinkedHashMap</code> with access-order mode does this automatically — great to
-              mention in interviews, but implement from scratch if asked.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span>Solution — LinkedHashMap (concise) + DLL (full)</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">&#9749; Java &middot; LinkedHashMap (O(1) solution)</div><button
-                    class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> <span class="cls">LRUCache</span> <span class="kw">extends</span> <span class="cls">LinkedHashMap</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Design a data structure that implements an LRU (Least Recently
+                Used) cache with capacity constraint. Both <code>get</code> and
+                <code>put</code> must run in O(1).
+              </p>
+              <div class="iobox">
+                LRUCache(2) // capacity = 2 put(1, 1) // cache: {1=1} put(2, 2)
+                // cache: {1=1, 2=2} get(1) // returns 1, cache: {2=2, 1=1} (1
+                moves to front) put(3, 3) // evicts key 2 (LRU), cache: {1=1,
+                3=3} get(2) // returns -1 (not found)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">
+                Think First — The Key Insight
+              </div>
+              <p>
+                O(1) get requires a HashMap. O(1) ordering (move to front,
+                remove last) requires a <mark>Doubly Linked List</mark>.
+                Together: HashMap (key → DLL node) + DLL (ordered from
+                most-recent to least-recent).<br /><br />
+                Java shortcut: <code>LinkedHashMap</code> with access-order mode
+                does this automatically — great to mention in interviews, but
+                implement from scratch if asked.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Solution —
+                LinkedHashMap (concise) + DLL (full)
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; LinkedHashMap (O(1) solution)
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> <span class="cls">LRUCache</span> <span class="kw">extends</span> <span class="cls">LinkedHashMap</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; {
     <span class="kw">private int</span> capacity;
 
     <span class="fn">LRUCache</span>(<span class="kw">int</span> capacity) {
@@ -1843,184 +2169,256 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
         <span class="ret">return</span> size() &gt; capacity; <span class="cm">// evict when over capacity</span>
     }
 }</pre>
-              </div>
-              <div class="callout purple" style="margin-top:8px">
-                <span class="callout-icon">&#128301;</span>
-                <div class="callout-body"><strong>Interview note:</strong> Mention LinkedHashMap first (shows Java
-                  knowledge), then say: "If you need me to implement from scratch, I'd use a HashMap of key → DLL node,
-                  plus sentinel head/tail nodes to avoid null checks." The interviewer will usually say LinkedHashMap
-                  is fine — but know the DLL approach too for follow-ups.</div>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">get Time</span><span class="cx-val green">O(1)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">put Time</span><span class="cx-val green">O(1)</span>
+                <div class="callout purple" style="margin-top: 8px">
+                  <span class="callout-icon">&#128301;</span>
+                  <div class="callout-body">
+                    <strong>Interview note:</strong> Mention LinkedHashMap first
+                    (shows Java knowledge), then say: "If you need me to
+                    implement from scratch, I'd use a HashMap of key → DLL node,
+                    plus sentinel head/tail nodes to avoid null checks." The
+                    interviewer will usually say LinkedHashMap is fine — but
+                    know the DLL approach too for follow-ups.
+                  </div>
                 </div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                    class="cx-val yellow">O(capacity)</span></div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">get Time</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">put Time</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(capacity)</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </details>
-        </div>
-      </div>
-
-      <hr>
-
-      <!-- ══ ASSIGNMENT ══════════════════════════════════════ -->
-      <h2 class="h1" id="assignment">&#128221; Assignment</h2>
-      <div class="callout orange" style="margin:14px 0">
-        <span class="callout-icon">&#128203;</span>
-        <div class="callout-body">
-          <strong>Topic 13 Assignment — 25 Problems</strong><br>
-          Complete the assignment before moving to Matrix Problems. Covers frequency counting, Two-Sum family variants,
-          subarray sum patterns, isomorphic strings, and cache design problems.<br><br>
-          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture13/Assignment.md"
-            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">&#128196;
-            Open Assignment &rarr;</a>
-        </div>
-      </div>
-
-      <hr>
-
-      <!-- ══ CHECKLIST ═══════════════════════════════════════ -->
-      <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-      <p>Check each item before advancing to Lecture 14.</p>
-
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can explain why HashMap is O(1) average — and when it degrades to O(n)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I know the difference between Separate Chaining and Open Addressing collision resolution
+            </details>
           </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can implement Two Sum from scratch in under 3 minutes, including the "add after check"
-            detail</div>
+
+        <hr />
+
+        <!-- ══ ASSIGNMENT ══════════════════════════════════════ -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong>Topic 13 Assignment — 25 Problems</strong><br />
+            Complete the assignment before moving to Matrix Problems. Covers
+            frequency counting, Two-Sum family variants, subarray sum patterns,
+            isomorphic strings, and cache design problems.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture13/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I understand the prefix sum + HashMap pattern and can derive it from scratch</div>
+
+        <hr />
+
+        <!-- ══ CHECKLIST ═══════════════════════════════════════ -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 14.</p>
+
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain why HashMap is O(1) average — and when it degrades
+              to O(n)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know the difference between Separate Chaining and Open
+              Addressing collision resolution
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement Two Sum from scratch in under 3 minutes, including
+              the "add after check" detail
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I understand the prefix sum + HashMap pattern and can derive it
+              from scratch
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain the Group Anagrams sorted-key approach AND the
+              frequency-array key alternative
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know why Longest Consecutive Sequence can be solved in O(n)
+              using "sequence start" trick
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can design LRU Cache using LinkedHashMap AND describe the
+              DLL+HashMap approach from scratch
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know when to use HashMap vs int[] frequency array vs TreeMap vs
+              LinkedHashMap
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I completed all 25 assignment problems and can explain the
+              approach to each
+            </div>
+          </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can explain the Group Anagrams sorted-key approach AND the frequency-array key
-            alternative</div>
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">&#128640;</span>
+          <div class="callout-body">
+            <strong>You're ready for Topic 14: Matrix Problems</strong><br />
+            Matrix problems require combining array traversal with directional
+            logic (spiral, BFS over grid, DFS flood fill). The HashMap patterns
+            you just mastered appear inside those solutions too — especially for
+            island counting and multi-source BFS state tracking.
+          </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I know why Longest Consecutive Sequence can be solved in O(n) using "sequence start"
-            trick</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can design LRU Cache using LinkedHashMap AND describe the DLL+HashMap approach from
-            scratch</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I know when to use HashMap vs int[] frequency array vs TreeMap vs LinkedHashMap</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I completed all 25 assignment problems and can explain the approach to each</div>
+
+        <div
+          class="footer"
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <span style="color: var(--text3); font-size: 13px"
+            >Topic 13 of 30 — Phase 2 Core Data Structures</span
+          >
+          <a
+            href="../Lecture14/lecture14_notes.html"
+            style="
+              text-decoration: none;
+              color: var(--accent);
+              font-weight: 600;
+              font-size: 14px;
+            "
+            >Topic 14: Matrix Problems &rarr;</a
+          >
         </div>
       </div>
+      <!-- #content -->
+    </div>
+    <!-- #main -->
 
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">&#128640;</span>
-        <div class="callout-body">
-          <strong>You're ready for Topic 14: Matrix Problems</strong><br>
-          Matrix problems require combining array traversal with directional logic (spiral, BFS over grid, DFS flood
-          fill).
-          The HashMap patterns you just mastered appear inside those solutions too — especially for island counting and
-          multi-source BFS state tracking.
-        </div>
-      </div>
-
-      <div class="footer"
-        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <span style="color:var(--text3);font-size:13px">Topic 13 of 30 — Phase 2 Core Data Structures</span>
-        <a href="../Lecture14/lecture14_notes.html"
-          style="text-decoration:none;color:var(--accent);font-weight:600;font-size:14px">Topic 14: Matrix Problems
-          &rarr;</a>
-      </div>
-
-    </div><!-- #content -->
-  </div><!-- #main -->
-
-  <script>
-    // 1. Dark Mode Toggle
-    function toggleDark() {
-      const html = document.documentElement;
-      const btn = document.getElementById('darkToggle');
-      if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        btn.innerText = '🌙 Dark';
-      } else {
-        html.setAttribute('data-theme', 'dark');
-        btn.innerText = '☀️ Light';
+    <script>
+      // 1. Dark Mode Toggle
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
+        }
       }
-    }
 
-    // 2. Progress Tracker & TOC Highlighting
-    document.getElementById('main').addEventListener('scroll', function () {
-      const el = this;
-      const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-      if (document.getElementById('progressFill')) {
-        const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
-        document.getElementById('progressFill').style.width = fillPct + '%';
+      // 2. Progress Tracker & TOC Highlighting
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
+        }
+        const sections = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current)
+            item.classList.add("active");
+        });
+      });
+
+      // 3. Problem Visibility Toggle
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
       }
-      const sections = document.querySelectorAll('h1[id], h2[id], h3[id]');
-      let current = '';
-      sections.forEach(s => {
-        const top = s.getBoundingClientRect().top;
-        if (top < 150) current = s.id;
-      });
-      document.querySelectorAll('.toc-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === '#' + current) item.classList.add('active');
-      });
-    });
 
-    // 3. Problem Visibility Toggle
-    function toggleProb(headerEl) {
-      const body = headerEl.nextElementSibling;
-      if (!body) return;
-      const isOpen = body.style.display === 'block';
-      body.style.display = isOpen ? 'none' : 'block';
-      headerEl.classList.toggle('active', !isOpen);
-    }
+      // 4. Copy Code Logic
+      function copyCode(btn) {
+        const code = btn.closest(".code-block").querySelector("pre").innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        });
+      }
 
-    // 4. Copy Code Logic
-    function copyCode(btn) {
-      const code = btn.closest('.code-block').querySelector('pre').innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        const originalText = btn.innerText;
-        btn.innerText = 'Copied!';
-        btn.style.background = 'var(--green-bg)';
-        btn.style.color = 'var(--green)';
-        btn.style.borderColor = 'var(--green)';
-        setTimeout(() => {
-          btn.innerText = originalText;
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.style.borderColor = '';
-        }, 2000);
+      // 5. Details Arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
       });
-    }
-
-    // 5. Details Arrows
-    document.querySelectorAll('details').forEach(det => {
-      det.addEventListener('toggle', () => {
-        const arrow = det.querySelector('.toggle-arrow');
-        if (arrow) arrow.style.transform = det.open ? 'rotate(90deg)' : 'rotate(0deg)';
-      });
-    });
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

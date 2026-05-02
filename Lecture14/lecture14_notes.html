@@ -1,1156 +1,1142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 14 — Matrix Problems</title>
+    <meta
+      name="description"
+      content="Master Matrix Problems for FAANG interviews: spiral traversal, in-place rotation, flood fill DFS, multi-source BFS, and binary search on 2D grids."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecture 14 — Matrix Problems</title>
-  <meta name="description"
-    content="Master Matrix Problems for FAANG interviews: spiral traversal, in-place rotation, flood fill DFS, multi-source BFS, and binary search on 2D grids.">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 270px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      transition: background .2s, color .2s
-    }
-
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 8px 16px 4px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      color: var(--text2);
-      text-decoration: none;
-      transition: all .15s;
-      font-weight: 500
-    }
-
-    .toc-item:hover {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .toc-sub {
-      padding-left: 32px;
-      font-size: 12px;
-      font-weight: 400
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      width: 18px;
-      text-align: center
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 12px 16px
-    }
-
-    .sb-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      margin: 3px 10px;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      transition: all .15s
-    }
-
-    .sb-nav-btn:hover {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2);
-      backdrop-filter: blur(8px)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text3)
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--accent)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      width: 0%;
-      transition: width .3s cubic-bezier(.4, 0, .2, 1)
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: all .15s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    .page-header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      display: block;
-      margin-bottom: 12px
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--text2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green)
-    }
-
-    .meta-chip.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow)
-    }
-
-    .h1 {
-      font-family: var(--serif);
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 40px 0 14px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
-      scroll-margin-top: 20px
-    }
-
-    .h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      scroll-margin-top: 20px
-    }
-
-    .h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 20px 0 6px
-    }
-
-    p {
-      color: var(--text);
-      margin: 0 0 10px;
-      line-height: 1.75
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 36px 0
-    }
-
-    .callout {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 16px 0;
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .callout.blue {
-      background: var(--accent-bg);
-      border-color: var(--accent)
-    }
-
-    .callout.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg);
-      border-color: var(--orange)
-    }
-
-    .callout.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg);
-      border-color: var(--purple)
-    }
-
-    .callout.teal {
-      background: var(--teal-bg);
-      border-color: var(--teal)
-    }
-
-    .callout.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .callout-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .callout-body {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.65
-    }
-
-    .callout-body strong {
-      color: var(--text)
-    }
-
-    .code-block {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin: 14px 0
-    }
-
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text3);
-      font-family: var(--mono)
-    }
-
-    .copy-btn {
-      background: var(--bg4);
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: var(--sans);
-      transition: all .15s
-    }
-
-    .copy-btn:hover {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent)
-    }
-
-    pre {
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.7;
-      padding: 16px;
-      overflow-x: auto;
-      background: var(--bg2);
-      color: var(--text2)
-    }
-
-    .kw {
-      color: #6940a5;
-      font-weight: 600
-    }
-
-    .cls {
-      color: #0f7b6c;
-      font-weight: 500
-    }
-
-    .fn {
-      color: #2383e2;
-      font-weight: 500
-    }
-
-    .str {
-      color: #c75b0e
-    }
-
-    .num {
-      color: #c0392b
-    }
-
-    .cm {
-      color: #9b9790;
-      font-style: italic
-    }
-
-    .ret {
-      color: #ad1a72;
-      font-weight: 600
-    }
-
-    [data-theme="dark"] .kw {
-      color: #a07dd4
-    }
-
-    [data-theme="dark"] .cls {
-      color: #4db6a8
-    }
-
-    [data-theme="dark"] .fn {
-      color: #5ba4f5
-    }
-
-    [data-theme="dark"] .str {
-      color: #e0893a
-    }
-
-    [data-theme="dark"] .num {
-      color: #e07070
-    }
-
-    [data-theme="dark"] .cm {
-      color: #6b6860
-    }
-
-    [data-theme="dark"] .ret {
-      color: #e06aac
-    }
-
-    code {
-      font-family: var(--mono);
-      font-size: 13px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: var(--red)
-    }
-
-    [data-theme="dark"] code {
-      color: var(--orange)
-    }
-
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0
-    }
-
-    .cx-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: var(--mono);
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .cx-badge .cx-label {
-      font-size: 11px;
-      font-family: var(--sans);
-      color: var(--text3)
-    }
-
-    .cx-badge .cx-val {
-      font-weight: 600;
-      color: var(--text)
-    }
-
-    .cx-badge.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .cx-badge.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .cx-badge.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .cx-badge .cx-val.green {
-      color: var(--green)
-    }
-
-    .cx-badge .cx-val.yellow {
-      color: var(--yellow)
-    }
-
-    .cx-badge .cx-val.red {
-      color: var(--red)
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    th {
-      background: var(--bg3);
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border)
-    }
-
-    td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text2)
-    }
-
-    tr:last-child td {
-      border-bottom: none
-    }
-
-    tr:hover td {
-      background: var(--bg2)
-    }
-
-    .ascii-tree {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text2);
-      margin: 14px 0;
-      white-space: pre;
-      overflow-x: auto
-    }
-
-    .ascii-tree .hl {
-      color: var(--accent);
-      font-weight: 600
-    }
-
-    .ascii-tree .gr {
-      color: var(--green);
-      font-weight: 600
-    }
-
-    .ascii-tree .nd {
-      color: var(--orange);
-      font-weight: 600
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      white-space: pre-wrap;
-      margin: 8px 0
-    }
-
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 16px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 16px 18px;
-      cursor: pointer;
-      transition: background .15s
-    }
-
-    .prob-header:hover {
-      background: var(--bg2)
-    }
-
-    .prob-header.active {
-      background: var(--accent-bg)
-    }
-
-    .prob-left {
-      flex: 1
-    }
-
-    .prob-num {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 3px
-    }
-
-    .prob-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 5px
-    }
-
-    .prob-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 6px
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      border: 1px solid transparent
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red);
-      border-color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--purple-bg);
-      color: var(--purple);
-      border-color: var(--purple)
-    }
-
-    .tag-pat {
-      background: var(--teal-bg);
-      color: var(--teal);
-      border-color: var(--teal)
-    }
-
-    .prob-body {
-      display: none;
-      border-top: 1px solid var(--border);
-      padding: 18px
-    }
-
-    .prob-section {
-      margin-bottom: 14px
-    }
-
-    .prob-section-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 6px
-    }
-
-    details {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 10px 0;
-      overflow: hidden
-    }
-
-    summary {
-      cursor: pointer;
-      padding: 10px 14px;
-      background: var(--bg2);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background .15s;
-      border: none
-    }
-
-    summary::-webkit-details-marker {
-      display: none
-    }
-
-    summary:hover {
-      background: var(--bg3)
-    }
-
-    details[open] summary {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .toggle-arrow {
-      transition: transform .2s;
-      display: inline-block
-    }
-
-    details[open] .toggle-arrow {
-      transform: rotate(90deg)
-    }
-
-    .details-body {
-      padding: 14px 16px;
-      background: var(--bg);
-      border-top: 1px solid var(--border)
-    }
-
-    .pattern-banner {
-      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 20px 0
-    }
-
-    .pattern-banner h4 {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--purple);
-      margin-bottom: 8px
-    }
-
-    .pattern-banner p {
-      font-size: 14px;
-      color: var(--text);
-      margin: 0;
-      line-height: 1.8
-    }
-
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none
-    }
-
-    .cb-box {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border2);
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      font-size: 11px
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff
-    }
-
-    .checklist-item.done .cb-text {
-      text-decoration: line-through;
-      color: var(--text3)
-    }
-
-    mark {
-      background: var(--yellow-bg);
-      color: var(--text);
-      padding: 0 3px;
-      border-radius: 3px
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    ul,
-    ol {
-      padding-left: 24px;
-      margin: 8px 0 12px
-    }
-
-    li {
-      margin: 4px 0;
-      line-height: 1.7
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border2);
-      border-radius: 3px
-    }
-
-    @media(max-width:768px) {
+      /* ── Sidebar ── */
       #sidebar {
-        display: none
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
       }
 
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 8px 16px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        color: var(--text2);
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+
+      .toc-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .toc-sub {
+        padding-left: 32px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        width: 18px;
+        text-align: center;
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 16px;
+      }
+
+      /* ── Main + Topbar ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--accent);
+      }
+
+      .breadcrumb span {
+        color: var(--text3);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      /* ── Content ── */
       #content {
-        padding: 24px 20px 80px
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <!-- SIDEBAR -->
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">&#128218; DSA Course</div>
-      <div class="sb-title">Matrix Problems</div>
-      <div class="sb-meta">Lecture 14 of 30 &middot; Phase 2 &mdash; Core Data Structures</div>
-    </div>
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
 
-    <div class="toc-label">On this page</div>
-    <a class="toc-item" href="#intro"><span class="toc-icon">&#129532;</span>Introduction</a>
-    <a class="toc-item toc-sub" href="#mental-model">The Grid Mental Model</a>
-    <a class="toc-item toc-sub" href="#anatomy">Matrix Anatomy</a>
-    <a class="toc-item" href="#patterns"><span class="toc-icon">&#127919;</span>The 4 Core Patterns</a>
-    <a class="toc-item toc-sub" href="#spiral">1. Spiral / Boundary Walk</a>
-    <a class="toc-item toc-sub" href="#inplace">2. In-Place State Machine</a>
-    <a class="toc-item toc-sub" href="#dfs">3. Grid DFS (Flood Fill)</a>
-    <a class="toc-item toc-sub" href="#bfs">4. Grid BFS (Multi-Source)</a>
-    <a class="toc-item toc-sub" href="#search2d">5. 2D Binary Search</a>
-    <a class="toc-item" href="#practice"><span class="toc-icon">&#128170;</span>Practice Problems</a>
-    <a class="toc-item" href="#assignment"><span class="toc-icon">&#128221;</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">&#9989;</span>Checklist</a>
+      .page-emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 12px;
+      }
 
-    <div class="sb-div"></div>
-    <div style="padding:4px 10px 8px">
-      <div
-        style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 6px 6px">
-        Navigate</div>
-      <a class="sb-nav-btn" href="../Lecture13/lecture13_notes.html">&#8592; Topic 13: HashMap &amp; HashSet</a>
-      <a class="sb-nav-btn" href="../Lecture15/lecture15_notes.html">Topic 15: Trees &#8594;</a>
-    </div>
-  </nav>
+      .page-title {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+        margin-bottom: 10px;
+      }
 
-  <!-- MAIN -->
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb">
-        <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-        <a href="#">Phase 2</a><span>&rsaquo;</span>
-        <span>Lecture 14 &mdash; Matrix Problems</span>
-      </div>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3)">Progress</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 32px 0 12px;
+      }
+
+      .h2 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 24px 0 10px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text2);
+        margin: 16px 0 8px;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        border-color: var(--orange);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        border-color: var(--purple);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.65;
+      }
+
+      .callout-body strong {
+        color: var(--text);
+      }
+
+      /* ── Code blocks ── */
+      .code-block {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+
+      .code-lang {
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      .copy-btn:hover {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px;
+        overflow-x: auto;
+        background: var(--bg2);
+        color: var(--text2);
+      }
+
+      /* Syntax highlighting spans */
+      .kw {
+        color: #6940a5;
+        font-weight: 600;
+      }
+
+      .cls {
+        color: #0f7b6c;
+        font-weight: 500;
+      }
+
+      .fn {
+        color: #2383e2;
+        font-weight: 500;
+      }
+
+      .str {
+        color: #c75b0e;
+      }
+
+      .num {
+        color: #c0392b;
+      }
+
+      .cm {
+        color: #9b9790;
+        font-style: italic;
+      }
+
+      .ret {
+        color: #ad1a72;
+        font-weight: 600;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #a07dd4;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #4db6a8;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #5ba4f5;
+      }
+
+      [data-theme="dark"] .str {
+        color: #e0893a;
+      }
+
+      [data-theme="dark"] .num {
+        color: #e07070;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #6b6860;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #e06aac;
+      }
+
+      /* ── Complexity badges ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      th {
+        background: var(--bg3);
+        padding: 10px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+      }
+
+      td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── ASCII diagrams ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      /* ── IO box ── */
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Prob cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 16px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg2);
+      }
+
+      .prob-header.active {
+        background: var(--accent-bg);
+      }
+
+      .prob-left {
+        flex: 1;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 3px;
+      }
+
+      .prob-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--purple-bg);
+        color: var(--purple);
+        border-color: var(--purple);
+      }
+
+      .tag-pat {
+        background: var(--teal-bg);
+        color: var(--teal);
+        border-color: var(--teal);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+        border-color: var(--orange);
+      }
+
+      .prob-body {
+        display: none;
+        border-top: 1px solid var(--border);
+        padding: 18px;
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      details summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        background: var(--bg2);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text2);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+        border: 1px solid var(--border);
+        transition: background 0.15s;
+      }
+
+      details summary:hover {
+        background: var(--bg3);
+      }
+
+      details[open] summary {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .toggle-arrow {
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+
+      details[open] .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 4px 0 0;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Misc ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Matrix Problems</div>
+        <div class="sb-meta">
+          Lecture 14 of 30 &middot; Phase 2 &mdash; Core Data Structures
         </div>
-        <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
       </div>
-    </div>
 
-    <div id="content">
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#intro"
+        ><span class="toc-icon">&#129532;</span>Introduction</a
+      >
+      <a class="toc-item toc-sub" href="#mental-model">The Grid Mental Model</a>
+      <a class="toc-item toc-sub" href="#anatomy">Matrix Anatomy</a>
+      <a class="toc-item" href="#patterns"
+        ><span class="toc-icon">&#127919;</span>The 4 Core Patterns</a
+      >
+      <a class="toc-item toc-sub" href="#spiral">1. Spiral / Boundary Walk</a>
+      <a class="toc-item toc-sub" href="#inplace">2. In-Place State Machine</a>
+      <a class="toc-item toc-sub" href="#dfs">3. Grid DFS (Flood Fill)</a>
+      <a class="toc-item toc-sub" href="#bfs">4. Grid BFS (Multi-Source)</a>
+      <a class="toc-item toc-sub" href="#search2d">5. 2D Binary Search</a>
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">&#128170;</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">&#128221;</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">&#9989;</span>Checklist</a
+      >
 
-      <!-- PAGE HEADER -->
-      <div class="page-header">
-        <span class="page-emoji">&#129532;</span>
-        <h1 class="page-title">Matrix Problems</h1>
-        <p class="page-sub">"A 2D grid is just a graph wearing a rectangular costume &mdash; once you see it that way,
-          DFS and BFS unlock everything."</p>
-        <div class="meta-row">
-          <span class="meta-chip accent">&#128214; Lecture 14</span>
-          <span class="meta-chip accent">Phase 2 &mdash; Core Data Structures</span>
-          <span class="meta-chip yellow">&#9201; 4 Days</span>
-          <span class="meta-chip green">&#127919; 24+ Problems</span>
-          <span class="meta-chip">&#128188; Google &middot; Amazon &middot; Microsoft &middot; Meta</span>
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
+        </div>
+        <a
+          class="toc-item"
+          href="../Lecture13/lecture13_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&larr; Topic 13: HashMap &amp; HashSet</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture15/lecture15_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&rarr; Topic 15: Trees
+        </a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="#">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 14 &mdash; Matrix Problems</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
         </div>
       </div>
 
-      <!-- WHY THIS MATTERS -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">&#128161;</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          Matrix problems appear in virtually every major tech interview &mdash; Google, Amazon, Meta, Microsoft all
-          love them.
-          They test your ability to think spatially, manage 2D state, and apply graph algorithms (DFS/BFS) to a grid
-          structure.
-          Spiral traversal, island counting, BFS distance propagation, in-place transformations, and binary search on
-          sorted matrices
-          are near-guaranteed question types. <strong>Mastering the 4 matrix patterns below covers ~90% of all matrix
-            interview questions.</strong>
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#129532;</span>
+          <h1 class="page-title">Matrix Problems</h1>
+          <p class="page-sub">
+            "A 2D grid is just a graph wearing a rectangular costume &mdash;
+            once you see it that way, DFS and BFS unlock everything."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128214; Lecture 14</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 4 Days</span>
+            <span class="meta-chip green">&#127919; 24+ Problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Microsoft &middot;
+              Meta</span
+            >
+          </div>
         </div>
-      </div>
 
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">&#128279;</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 8 (Arrays) gave you 1D in-place manipulation &mdash; the same
-          mindset extends to 2D. Lecture 13 (HashMap) will appear inside DFS for visited-cell tracking.
-          Lecture 15 (Trees) and Lecture 17 (Graphs) are natural extensions &mdash; a grid IS a graph
-          where each cell has up to 4 neighbours. Every pattern here maps directly to tree/graph problems.
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Matrix problems appear in virtually every major tech interview
+            &mdash; Google, Amazon, Meta, Microsoft all love them. They test
+            your ability to think spatially, manage 2D state, and apply graph
+            algorithms (DFS/BFS) to a grid structure. Spiral traversal, island
+            counting, BFS distance propagation, in-place transformations, and
+            binary search on sorted matrices are near-guaranteed question types.
+            <strong
+              >Mastering the 4 matrix patterns below covers ~90% of all matrix
+              interview questions.</strong
+            >
+          </div>
         </div>
-      </div>
 
-      <hr>
-
-      <!-- SECTION 1: INTRODUCTION & MENTAL MODEL -->
-      <h2 class="h1" id="intro">&#129532; Introduction to Matrix Problems</h2>
-
-      <p>Before writing a single line of code, let us build the correct mental model. A matrix is just a
-        2D array declared as <code>int[][] grid</code> with <code>m</code> rows and <code>n</code> columns.
-        Every cell is identified by its row index <code>r</code> and column index <code>c</code>.</p>
-
-      <p>The single most important insight in this entire lecture is:</p>
-
-      <div class="callout purple">
-        <span class="callout-icon">&#127775;</span>
-        <div class="callout-body">
-          <strong>A 2D matrix is secretly a graph.</strong><br>
-          Each cell <code>grid[r][c]</code> is a <em>node</em>. Two cells are <em>neighbours</em> (connected by an edge)
-          if they share a side (up, down, left, right). Once you see the matrix as a graph,
-          every graph algorithm &mdash; DFS, BFS, shortest path &mdash; instantly applies. This is the unlock.
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">&#128279;</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 8 (Arrays) gave you 1D
+            in-place manipulation &mdash; the same mindset extends to 2D.
+            Lecture 13 (HashMap) will appear inside DFS for visited-cell
+            tracking. Lecture 15 (Trees) and Lecture 17 (Graphs) are natural
+            extensions &mdash; a grid IS a graph where each cell has up to 4
+            neighbours. Every pattern here maps directly to tree/graph problems.
+          </div>
         </div>
-      </div>
 
-      <h3 class="h2" id="mental-model">&#128200; The Grid Mental Model</h3>
+        <hr />
 
-      <p>Imagine you are standing on a cell <code>(r, c)</code> in the grid. You can move in at most 4 directions:</p>
+        <!-- SECTION 1: INTRODUCTION & MENTAL MODEL -->
+        <h2 class="h1" id="intro">&#129532; Introduction to Matrix Problems</h2>
 
-      <div class="ascii-tree">
-        (r-1, c) &larr; UP
-        |
-        (r, c-1) &larr; LEFT &mdash;&mdash; (<span class="hl">r, c</span>) &mdash;&mdash; RIGHT &rarr; (r, c+1)
-        |
-        (r+1, c) &larr; DOWN
+        <p>
+          Before writing a single line of code, let us build the correct mental
+          model. A matrix is just a 2D array declared as
+          <code>int[][] grid</code> with <code>m</code> rows and
+          <code>n</code> columns. Every cell is identified by its row index
+          <code>r</code> and column index <code>c</code>.
+        </p>
 
-        <span class="gr">Canonical 4-direction array (memorise this!):</span>
-        int[][] dirs = { {-1,0}, {1,0}, {0,-1}, {0,1} };
-        // UP DOWN LEFT RIGHT
+        <p>The single most important insight in this entire lecture is:</p>
 
-        <span class="gr">Bounds check before accessing neighbour:</span>
-        int nr = r + d[0], nc = c + d[1];
-        if (nr &gt;= 0 &amp;&amp; nr &lt; m &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; n) { /* safe to access */ }
-      </div>
-
-      <div class="callout yellow">
-        <span class="callout-icon">&#9888;</span>
-        <div class="callout-body">
-          <strong>Always check bounds FIRST.</strong> The most common matrix bug is accessing
-          <code>grid[r][c]</code> without verifying <code>0 &le; r &lt; m</code> and <code>0 &le; c &lt; n</code>.
-          In DFS, bounds check must be the <em>very first</em> base case &mdash; before checking the cell value.
-          Out-of-bounds access throws ArrayIndexOutOfBoundsException silently in many LeetCode environments.
+        <div class="callout purple">
+          <span class="callout-icon">&#127775;</span>
+          <div class="callout-body">
+            <strong>A 2D matrix is secretly a graph.</strong><br />
+            Each cell <code>grid[r][c]</code> is a <em>node</em>. Two cells are
+            <em>neighbours</em> (connected by an edge) if they share a side (up,
+            down, left, right). Once you see the matrix as a graph, every graph
+            algorithm &mdash; DFS, BFS, shortest path &mdash; instantly applies.
+            This is the unlock.
+          </div>
         </div>
-      </div>
 
-      <h3 class="h2" id="anatomy">&#128203; Matrix Anatomy in Java</h3>
+        <h3 class="h2" id="mental-model">&#128200; The Grid Mental Model</h3>
 
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Matrix Fundamentals</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <p>
+          Imagine you are standing on a cell <code>(r, c)</code> in the grid.
+          You can move in at most 4 directions:
+        </p>
+
+        <div class="ascii-tree">
+          (r-1, c) &larr; UP | (r, c-1) &larr; LEFT &mdash;&mdash; (<span
+            class="hl"
+            >r, c</span
+          >) &mdash;&mdash; RIGHT &rarr; (r, c+1) | (r+1, c) &larr; DOWN
+
+          <span class="gr">Canonical 4-direction array (memorise this!):</span>
+          int[][] dirs = { {-1,0}, {1,0}, {0,-1}, {0,1} }; // UP DOWN LEFT RIGHT
+
+          <span class="gr">Bounds check before accessing neighbour:</span>
+          int nr = r + d[0], nc = c + d[1]; if (nr &gt;= 0 &amp;&amp; nr &lt; m
+          &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; n) { /* safe to access */ }
         </div>
-        <pre><span class="cm">// Declaration</span>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>Always check bounds FIRST.</strong> The most common matrix
+            bug is accessing <code>grid[r][c]</code> without verifying
+            <code>0 &le; r &lt; m</code> and <code>0 &le; c &lt; n</code>. In
+            DFS, bounds check must be the <em>very first</em> base case &mdash;
+            before checking the cell value. Out-of-bounds access throws
+            ArrayIndexOutOfBoundsException silently in many LeetCode
+            environments.
+          </div>
+        </div>
+
+        <h3 class="h2" id="anatomy">&#128203; Matrix Anatomy in Java</h3>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>&#9749; Java &middot; Matrix Fundamentals</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Declaration</span>
 <span class="kw">int</span>[][] grid = <span class="kw">new int</span>[m][n];   <span class="cm">// m rows, n columns, all 0</span>
 <span class="kw">char</span>[][] board = <span class="kw">new char</span>[m][n]; <span class="cm">// for island problems (often '0' or '1')</span>
 
@@ -1177,91 +1163,98 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     <span class="kw">int</span> nr = r + d[<span class="num">0</span>], nc = c + d[<span class="num">1</span>];
     <span class="kw">if</span> (inBounds(nr, nc)) { <span class="cm">/* process neighbour */</span> }
 }</pre>
-      </div>
-
-      <div class="callout blue">
-        <span class="callout-icon">&#127919;</span>
-        <div class="callout-body">
-          <strong>Pattern Recognition Table &mdash; Read this first before any matrix problem:</strong>
         </div>
-      </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Signal Phrase in Problem</th>
-              <th>Pattern to Apply</th>
-              <th>Key Algorithm</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>"spiral order", "layer by layer", "peel"</td>
-              <td>Boundary / Spiral Walk</td>
-              <td>4-pointer shrink</td>
-            </tr>
-            <tr>
-              <td>"in place", "O(1) space" + state changes</td>
-              <td>In-Place State Machine</td>
-              <td>Sentinel encoding</td>
-            </tr>
-            <tr>
-              <td>"connected cells", "island", "flood fill", "region"</td>
-              <td>Grid DFS</td>
-              <td>Recursive flood fill</td>
-            </tr>
-            <tr>
-              <td>"shortest distance", "nearest", "minimum time"</td>
-              <td>Grid BFS</td>
-              <td>Multi-source BFS</td>
-            </tr>
-            <tr>
-              <td>"sorted rows and columns", "search in matrix"</td>
-              <td>2D Binary Search</td>
-              <td>Corner walk O(m+n)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <hr>
-      <!-- SECTION 2: THE 4 CORE PATTERNS -->
-      <h2 class="h1" id="patterns">&#127919; The 4 Core Matrix Patterns</h2>
-
-      <!-- PATTERN 1: SPIRAL -->
-      <h3 class="h2" id="spiral">Pattern 1 &mdash; Boundary / Spiral Traversal</h3>
-
-      <p><strong>When to use:</strong> Problems that ask you to visit cells in a specific order that "peels"
-        the matrix from outside in (spiral, layer by layer, zigzag).</p>
-
-      <p><strong>Core idea:</strong> Maintain 4 boundary pointers &mdash; <code>top</code>, <code>bottom</code>,
-        <code>left</code>, <code>right</code> &mdash; and shrink them inward after traversing each side.
-        Keep going while <code>top &le; bottom</code> and <code>left &le; right</code>.
-      </p>
-
-      <div class="ascii-tree">
-        Matrix: [[<span class="hl">1</span>, <span class="hl">2</span>, <span class="hl">3</span>],
-        [<span class="nd">4</span>, 5, <span class="nd">6</span>],
-        [<span class="nd">7</span>, <span class="nd">8</span>, <span class="nd">9</span>]]
-
-        Round 1: top=0,bot=2,lft=0,rgt=2
-        &rarr; traverse top row: 1, 2, 3 (top++) top=1
-        &darr; traverse right col: 6, 9 (rgt--) rgt=1
-        &larr; traverse bot row: 8, 7 (bot--) bot=1
-        &uarr; traverse left col: 4 (lft++) lft=1
-
-        Round 2: top=1,bot=1,lft=1,rgt=1
-        &rarr; traverse top row: 5 (top++) top=2 &gt; bot=1 &rarr; STOP
-
-        Result: [1, 2, 3, 6, 9, 8, 7, 4, 5] &#10003;</div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Spiral Traversal Template (LC 54)</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <div class="callout blue">
+          <span class="callout-icon">&#127919;</span>
+          <div class="callout-body">
+            <strong
+              >Pattern Recognition Table &mdash; Read this first before any
+              matrix problem:</strong
+            >
+          </div>
         </div>
-        <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] matrix) {
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Signal Phrase in Problem</th>
+                <th>Pattern to Apply</th>
+                <th>Key Algorithm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>"spiral order", "layer by layer", "peel"</td>
+                <td>Boundary / Spiral Walk</td>
+                <td>4-pointer shrink</td>
+              </tr>
+              <tr>
+                <td>"in place", "O(1) space" + state changes</td>
+                <td>In-Place State Machine</td>
+                <td>Sentinel encoding</td>
+              </tr>
+              <tr>
+                <td>"connected cells", "island", "flood fill", "region"</td>
+                <td>Grid DFS</td>
+                <td>Recursive flood fill</td>
+              </tr>
+              <tr>
+                <td>"shortest distance", "nearest", "minimum time"</td>
+                <td>Grid BFS</td>
+                <td>Multi-source BFS</td>
+              </tr>
+              <tr>
+                <td>"sorted rows and columns", "search in matrix"</td>
+                <td>2D Binary Search</td>
+                <td>Corner walk O(m+n)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+        <!-- SECTION 2: THE 4 CORE PATTERNS -->
+        <h2 class="h1" id="patterns">&#127919; The 4 Core Matrix Patterns</h2>
+
+        <!-- PATTERN 1: SPIRAL -->
+        <h3 class="h2" id="spiral">
+          Pattern 1 &mdash; Boundary / Spiral Traversal
+        </h3>
+
+        <p>
+          <strong>When to use:</strong> Problems that ask you to visit cells in
+          a specific order that "peels" the matrix from outside in (spiral,
+          layer by layer, zigzag).
+        </p>
+
+        <p>
+          <strong>Core idea:</strong> Maintain 4 boundary pointers &mdash;
+          <code>top</code>, <code>bottom</code>, <code>left</code>,
+          <code>right</code> &mdash; and shrink them inward after traversing
+          each side. Keep going while <code>top &le; bottom</code> and
+          <code>left &le; right</code>.
+        </p>
+
+        <div class="ascii-tree">
+          Matrix: [[<span class="hl">1</span>, <span class="hl">2</span>,
+          <span class="hl">3</span>], [<span class="nd">4</span>, 5,
+          <span class="nd">6</span>], [<span class="nd">7</span>,
+          <span class="nd">8</span>, <span class="nd">9</span>]] Round 1:
+          top=0,bot=2,lft=0,rgt=2 &rarr; traverse top row: 1, 2, 3 (top++) top=1
+          &darr; traverse right col: 6, 9 (rgt--) rgt=1 &larr; traverse bot row:
+          8, 7 (bot--) bot=1 &uarr; traverse left col: 4 (lft++) lft=1 Round 2:
+          top=1,bot=1,lft=1,rgt=1 &rarr; traverse top row: 5 (top++) top=2 &gt;
+          bot=1 &rarr; STOP Result: [1, 2, 3, 6, 9, 8, 7, 4, 5] &#10003;
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>&#9749; Java &middot; Spiral Traversal Template (LC 54)</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] matrix) {
     <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
     <span class="kw">int</span> top = <span class="num">0</span>, bot = matrix.length - <span class="num">1</span>;
     <span class="kw">int</span> lft = <span class="num">0</span>, rgt = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
@@ -1291,51 +1284,69 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 }
 <span class="cm">// Time: O(m*n) — every cell visited exactly once
 // Space: O(1) extra (result array not counted)</span></pre>
-      </div>
-
-      <div class="callout teal">
-        <span class="callout-icon">&#128301;</span>
-        <div class="callout-body">
-          <strong>Why the two guards (<code>if top &le; bot</code> and <code>if lft &le; rgt</code>)?</strong><br>
-          After traversing the top row and right column, the remaining rows/columns might have collapsed.
-          For example, a single-row matrix: top becomes 1 which is &gt; bot=0, so the bottom-row traversal
-          would re-collect cells we already visited. The guards prevent this double-counting.
         </div>
-      </div>
 
-      <hr>
-
-      <!-- PATTERN 2: IN-PLACE -->
-      <h3 class="h2" id="inplace">Pattern 2 &mdash; In-Place State Machine</h3>
-
-      <p><strong>When to use:</strong> Problems requiring O(1) extra space where you must record which cells
-        have been "marked" or "changed" without using a separate array.</p>
-
-      <p><strong>Core idea:</strong> <mark>Encode two states in one cell value.</mark> Use sentinel values
-        (like -1, 2, or a sign flip) to represent "this cell is scheduled to change" without actually changing
-        it yet. Make changes in a second pass once all decisions are final.</p>
-
-      <p><strong>Classic example:</strong> Rotate Image (LC 48) &mdash; 90&deg; clockwise = Transpose + Reverse each
-        row.</p>
-
-      <div class="ascii-tree">
-        <span class="gr">Step 1: Transpose (swap matrix[i][j] with matrix[j][i])</span>
-        [[1,2,3], [[1,4,7],
-        [4,5,6], &rarr; [2,5,8],
-        [7,8,9]] [3,6,9]]
-
-        <span class="gr">Step 2: Reverse each row</span>
-        [[1,4,7], [[7,4,1],
-        [2,5,8], &rarr; [8,5,2],
-        [3,6,9]] [9,6,3]] &#10003; (90&deg; clockwise)
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Rotate Image (LC 48) &mdash; Transpose + Reverse</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <div class="callout teal">
+          <span class="callout-icon">&#128301;</span>
+          <div class="callout-body">
+            <strong
+              >Why the two guards (<code>if top &le; bot</code> and
+              <code>if lft &le; rgt</code>)?</strong
+            ><br />
+            After traversing the top row and right column, the remaining
+            rows/columns might have collapsed. For example, a single-row matrix:
+            top becomes 1 which is &gt; bot=0, so the bottom-row traversal would
+            re-collect cells we already visited. The guards prevent this
+            double-counting.
+          </div>
         </div>
-        <pre><span class="kw">void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] m) {
+
+        <hr />
+
+        <!-- PATTERN 2: IN-PLACE -->
+        <h3 class="h2" id="inplace">
+          Pattern 2 &mdash; In-Place State Machine
+        </h3>
+
+        <p>
+          <strong>When to use:</strong> Problems requiring O(1) extra space
+          where you must record which cells have been "marked" or "changed"
+          without using a separate array.
+        </p>
+
+        <p>
+          <strong>Core idea:</strong>
+          <mark>Encode two states in one cell value.</mark> Use sentinel values
+          (like -1, 2, or a sign flip) to represent "this cell is scheduled to
+          change" without actually changing it yet. Make changes in a second
+          pass once all decisions are final.
+        </p>
+
+        <p>
+          <strong>Classic example:</strong> Rotate Image (LC 48) &mdash; 90&deg;
+          clockwise = Transpose + Reverse each row.
+        </p>
+
+        <div class="ascii-tree">
+          <span class="gr"
+            >Step 1: Transpose (swap matrix[i][j] with matrix[j][i])</span
+          >
+          [[1,2,3], [[1,4,7], [4,5,6], &rarr; [2,5,8], [7,8,9]] [3,6,9]]
+
+          <span class="gr">Step 2: Reverse each row</span>
+          [[1,4,7], [[7,4,1], [2,5,8], &rarr; [8,5,2], [3,6,9]] [9,6,3]]
+          &#10003; (90&deg; clockwise)
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>
+              &#9749; Java &middot; Rotate Image (LC 48) &mdash; Transpose +
+              Reverse
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] m) {
     <span class="kw">int</span> n = m.length;
 
     <span class="cm">// Step 1: Transpose — swap across main diagonal (i,j) &harr; (j,i)</span>
@@ -1356,14 +1367,17 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 <span class="cm">// Time: O(n²)  |  Space: O(1)
 // Counter-clockwise 90° = Transpose + Reverse each COLUMN
 // 180° = Reverse all rows + Reverse each row</span></pre>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Set Matrix Zeroes (LC 73) &mdash; First Row/Col as Sentinels</div><button
-            class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">void</span> <span class="fn">setZeroes</span>(<span class="kw">int</span>[][] m) {
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>
+              &#9749; Java &middot; Set Matrix Zeroes (LC 73) &mdash; First
+              Row/Col as Sentinels
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">void</span> <span class="fn">setZeroes</span>(<span class="kw">int</span>[][] m) {
     <span class="kw">int</span> rows = m.length, cols = m[<span class="num">0</span>].length;
     <span class="kw">boolean</span> row0 = <span class="kw">false</span>, col0 = <span class="kw">false</span>;
 
@@ -1389,38 +1403,46 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 // KEY: Why handle row0/col0 with separate flags?
 // Because we reuse them as sentinel storage — if we zeroed them first,
 // we'd corrupt our own sentinel data.</span></pre>
-      </div>
-
-      <hr>
-
-      <!-- PATTERN 3: GRID DFS -->
-      <h3 class="h2" id="dfs">Pattern 3 &mdash; Grid DFS (Flood Fill / Connected Components)</h3>
-
-      <p><strong>When to use:</strong> Count connected components (islands), mark/explore regions,
-        check reachability. Use DFS when you need to visit ALL connected cells and order doesn't matter.</p>
-
-      <p><strong>Core idea:</strong> Treat the grid as a graph. From any cell, recursively explore all
-        4 neighbours. Mark cells as "visited" in-place (by changing their value) to avoid revisiting.</p>
-
-      <div class="ascii-tree">
-        <span class="gr">Flood Fill DFS — "Sinking the island":</span>
-
-        Start: grid[0][0] = '1' After DFS from (0,0):
-        [['<span class="hl">1</span>','<span class="hl">1</span>','0','0'], [['<span class="nd">2</span>','<span
-          class="nd">2</span>','0','0'],
-        ['<span class="hl">1</span>','0','0','1'], &rarr; ['<span class="nd">2</span>','0','0','1'],
-        ['0','0','1','1']] ['0','0','1','1']]
-
-        island 1 sunk (count=1). Next unvisited '1': (1,3) &rarr; count=2
-        Next: (2,2) connected to (2,3) &rarr; count=3. Total islands = 3
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Grid DFS Template (Flood Fill)</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">int</span> m, n;
+
+        <hr />
+
+        <!-- PATTERN 3: GRID DFS -->
+        <h3 class="h2" id="dfs">
+          Pattern 3 &mdash; Grid DFS (Flood Fill / Connected Components)
+        </h3>
+
+        <p>
+          <strong>When to use:</strong> Count connected components (islands),
+          mark/explore regions, check reachability. Use DFS when you need to
+          visit ALL connected cells and order doesn't matter.
+        </p>
+
+        <p>
+          <strong>Core idea:</strong> Treat the grid as a graph. From any cell,
+          recursively explore all 4 neighbours. Mark cells as "visited" in-place
+          (by changing their value) to avoid revisiting.
+        </p>
+
+        <div class="ascii-tree">
+          <span class="gr">Flood Fill DFS — "Sinking the island":</span>
+
+          Start: grid[0][0] = '1' After DFS from (0,0): [['<span class="hl"
+            >1</span
+          >','<span class="hl">1</span>','0','0'], [['<span class="nd">2</span
+          >','<span class="nd">2</span>','0','0'], ['<span class="hl">1</span
+          >','0','0','1'], &rarr; ['<span class="nd">2</span>','0','0','1'],
+          ['0','0','1','1']] ['0','0','1','1']] island 1 sunk (count=1). Next
+          unvisited '1': (1,3) &rarr; count=2 Next: (2,2) connected to (2,3)
+          &rarr; count=3. Total islands = 3
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>&#9749; Java &middot; Grid DFS Template (Flood Fill)</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> m, n;
 
 <span class="kw">int</span> <span class="fn">numIslands</span>(<span class="kw">char</span>[][] grid) {
     m = grid.length; n = grid[<span class="num">0</span>].length;
@@ -1446,38 +1468,49 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 <span class="cm">// Time: O(m*n)  |  Space: O(m*n) call stack worst case
 // Interview follow-up: "What if the grid is huge and DFS stack overflows?"
 // Answer: Use BFS (iterative queue) — same O(m*n), no stack overflow risk.</span></pre>
-      </div>
-
-      <hr>
-
-      <!-- PATTERN 4: GRID BFS -->
-      <h3 class="h2" id="bfs">Pattern 4 &mdash; Grid BFS (Multi-Source Shortest Path)</h3>
-
-      <p><strong>When to use:</strong> Find <em>shortest distance</em> from some source cells to all other cells.
-        BFS guarantees the shortest path in an unweighted graph &mdash; this is its defining superpower over DFS.</p>
-
-      <p><strong>Multi-source BFS key insight:</strong> Instead of running BFS from each source cell one by one
-        (which would be O((m*n)&sup2;)), seed the queue with <mark>ALL source cells simultaneously</mark>.
-        BFS then propagates distances outward level by level in a single O(m*n) pass.</p>
-
-      <div class="ascii-tree">
-        <span class="gr">Multi-Source BFS &mdash; 01 Matrix (distance to nearest 0):</span>
-
-        Input: Queue seed (all 0s): After BFS:
-        [[0,0,0], (0,0),(0,1),(0,2) [[0,0,0],
-        [0,1,0], &rarr; (1,0),(1,2) &rarr; [0,1,0],
-        [1,1,1]] &darr; expand level by level [1,2,1]]
-
-        Minute 1: expand to all unvisited neighbours of queue &rarr; (2,0),(2,2) get dist=1
-        Minute 2: expand to (2,1) which gets dist=2. Queue empty. Done.
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Multi-Source BFS Template (01 Matrix LC 542)</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">int</span>[][] <span class="fn">updateMatrix</span>(<span class="kw">int</span>[][] mat) {
+
+        <hr />
+
+        <!-- PATTERN 4: GRID BFS -->
+        <h3 class="h2" id="bfs">
+          Pattern 4 &mdash; Grid BFS (Multi-Source Shortest Path)
+        </h3>
+
+        <p>
+          <strong>When to use:</strong> Find <em>shortest distance</em> from
+          some source cells to all other cells. BFS guarantees the shortest path
+          in an unweighted graph &mdash; this is its defining superpower over
+          DFS.
+        </p>
+
+        <p>
+          <strong>Multi-source BFS key insight:</strong> Instead of running BFS
+          from each source cell one by one (which would be O((m*n)&sup2;)), seed
+          the queue with <mark>ALL source cells simultaneously</mark>. BFS then
+          propagates distances outward level by level in a single O(m*n) pass.
+        </p>
+
+        <div class="ascii-tree">
+          <span class="gr"
+            >Multi-Source BFS &mdash; 01 Matrix (distance to nearest 0):</span
+          >
+
+          Input: Queue seed (all 0s): After BFS: [[0,0,0], (0,0),(0,1),(0,2)
+          [[0,0,0], [0,1,0], &rarr; (1,0),(1,2) &rarr; [0,1,0], [1,1,1]] &darr;
+          expand level by level [1,2,1]] Minute 1: expand to all unvisited
+          neighbours of queue &rarr; (2,0),(2,2) get dist=1 Minute 2: expand to
+          (2,1) which gets dist=2. Queue empty. Done.
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>
+              &#9749; Java &middot; Multi-Source BFS Template (01 Matrix LC 542)
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[][] <span class="fn">updateMatrix</span>(<span class="kw">int</span>[][] mat) {
     <span class="kw">int</span> m = mat.length, n = mat[<span class="num">0</span>].length;
     <span class="kw">int</span>[][] dist = <span class="kw">new int</span>[m][n];
     <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
@@ -1505,37 +1538,48 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 <span class="cm">// Time: O(m*n)  |  Space: O(m*n)
 // Why dist=-1 and not Integer.MAX_VALUE? Avoids overflow on +1 and
 // serves as the "unvisited" sentinel naturally.</span></pre>
-      </div>
-
-      <hr>
-
-      <!-- PATTERN 5: 2D BINARY SEARCH -->
-      <h3 class="h2" id="search2d">Pattern 5 &mdash; 2D Binary Search (Corner Walk)</h3>
-
-      <p><strong>When to use:</strong> Searching in a matrix where rows are sorted left-to-right AND
-        columns are sorted top-to-bottom. Brute force O(m*n) is too slow; the sorted structure lets us do O(m+n).</p>
-
-      <p><strong>Core idea:</strong> Start at the <mark>top-right corner</mark>. This cell has a magical property:
-        it is the <em>maximum</em> of its row and the <em>minimum</em> of its column.
-        So we can make a definitive decision at every step &mdash; either eliminate this row (go down) or
-        this column (go left).</p>
-
-      <div class="ascii-tree">
-        Matrix (rows sorted &rarr;, cols sorted &darr;): target = 5
-
-        [[ 1, 4, <span class="hl">7</span>, 11], Start: (0,3)=11 &gt; 5 &rarr; c-- (eliminate col 3)
-        [ 2, 5, 8, 12], (0,2)=7 &gt; 5 &rarr; c-- (eliminate col 2)
-        [ 3, 6, 9, 16], (0,1)=4 &lt; 5 &rarr; r++ (eliminate row 0)
-        [10, 13, 14, 17]] (<span class="gr">1,1)=5 == 5 &rarr; FOUND!</span>
-
-        Each step eliminates one full row OR column &rarr; at most m+n steps total &rarr; O(m+n)</div>
-
-      <div class="code-block">
-        <div class="code-header">
-          <div>&#9749; Java &middot; Corner Walk (LC 240 Search 2D Matrix II)</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] matrix, <span class="kw">int</span> target) {
+
+        <hr />
+
+        <!-- PATTERN 5: 2D BINARY SEARCH -->
+        <h3 class="h2" id="search2d">
+          Pattern 5 &mdash; 2D Binary Search (Corner Walk)
+        </h3>
+
+        <p>
+          <strong>When to use:</strong> Searching in a matrix where rows are
+          sorted left-to-right AND columns are sorted top-to-bottom. Brute force
+          O(m*n) is too slow; the sorted structure lets us do O(m+n).
+        </p>
+
+        <p>
+          <strong>Core idea:</strong> Start at the
+          <mark>top-right corner</mark>. This cell has a magical property: it is
+          the <em>maximum</em> of its row and the <em>minimum</em> of its
+          column. So we can make a definitive decision at every step &mdash;
+          either eliminate this row (go down) or this column (go left).
+        </p>
+
+        <div class="ascii-tree">
+          Matrix (rows sorted &rarr;, cols sorted &darr;): target = 5 [[ 1, 4,
+          <span class="hl">7</span>, 11], Start: (0,3)=11 &gt; 5 &rarr; c--
+          (eliminate col 3) [ 2, 5, 8, 12], (0,2)=7 &gt; 5 &rarr; c-- (eliminate
+          col 2) [ 3, 6, 9, 16], (0,1)=4 &lt; 5 &rarr; r++ (eliminate row 0)
+          [10, 13, 14, 17]] (<span class="gr">1,1)=5 == 5 &rarr; FOUND!</span>
+
+          Each step eliminates one full row OR column &rarr; at most m+n steps
+          total &rarr; O(m+n)
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <div>
+              &#9749; Java &middot; Corner Walk (LC 240 Search 2D Matrix II)
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] matrix, <span class="kw">int</span> target) {
     <span class="kw">int</span> r = <span class="num">0</span>, c = matrix[<span class="num">0</span>].length - <span class="num">1</span>;   <span class="cm">// top-right corner</span>
     <span class="kw">while</span> (r &lt; matrix.length &amp;&amp; c &gt;= <span class="num">0</span>) {
         <span class="kw">if</span>      (matrix[r][c] == target) <span class="ret">return true</span>;
@@ -1551,63 +1595,90 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 //   &rarr; treat as 1D, use classic binary search: O(log(m*n))
 // LC 240: Only row-sorted AND col-sorted independently
 //   &rarr; need corner walk: O(m+n)   ← this solution</span></pre>
-      </div>
-
-      <div class="callout yellow">
-        <span class="callout-icon">&#9888;</span>
-        <div class="callout-body">
-          <strong>Why top-right and not top-left or bottom-right?</strong><br>
-          Top-left: both neighbours (right and down) are larger &mdash; we can never eliminate anything when target is
-          larger.<br>
-          Bottom-right: both neighbours (left and up) are smaller &mdash; same problem when target is smaller.<br>
-          <strong>Top-right</strong> is the sweet spot: left neighbour is smaller (eliminate column if curr is too
-          large),
-          down neighbour is larger (eliminate row if curr is too small). One clear decision at every step.
         </div>
-      </div>
 
-      <hr>
-      <!-- PRACTICE PROBLEMS -->
-      <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-      <p>Work through these in order. Each card covers one of the 4 core patterns. Try to solve before revealing the
-        solution. The dry runs are your best teacher.</p>
-
-      <!-- P1: SPIRAL MATRIX -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 01 &middot; Boundary Traversal</div>
-            <div class="prob-title">Spiral Matrix</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/spiral-matrix/" target="_blank"
-                style="font-size:12px">&#128279; LC 54 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Amazon</span><span class="tag tag-co">Microsoft</span><span
-                class="tag tag-pat">Boundary Walk</span></div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>Why top-right and not top-left or bottom-right?</strong
+            ><br />
+            Top-left: both neighbours (right and down) are larger &mdash; we can
+            never eliminate anything when target is larger.<br />
+            Bottom-right: both neighbours (left and up) are smaller &mdash; same
+            problem when target is smaller.<br />
+            <strong>Top-right</strong> is the sweet spot: left neighbour is
+            smaller (eliminate column if curr is too large), down neighbour is
+            larger (eliminate row if curr is too small). One clear decision at
+            every step.
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
         </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an m&times;n matrix, return all elements in spiral order.</p>
-            <div class="iobox">Input: [[1,2,3],[4,5,6],[7,8,9]]
-              Output: [1,2,3,6,9,8,7,4,5]</div>
+
+        <hr />
+        <!-- PRACTICE PROBLEMS -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Work through these in order. Each card covers one of the 4 core
+          patterns. Try to solve before revealing the solution. The dry runs are
+          your best teacher.
+        </p>
+
+        <!-- P1: SPIRAL MATRIX -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 &middot; Boundary Traversal</div>
+              <div class="prob-title">Spiral Matrix</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/spiral-matrix/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 54 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-pat">Boundary Walk</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p>Think of peeling an onion. Traverse the outermost ring (top row &rarr; right col &darr; bottom row &larr;
-              left col &uarr;), then move the four boundaries inward and repeat. Always guard the bottom and left passes
-              for odd-shaped matrices.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution + Dry Run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; Four-Pointer Spiral</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] mat) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an m&times;n matrix, return all elements in spiral order.
+              </p>
+              <div class="iobox">
+                Input: [[1,2,3],[4,5,6],[7,8,9]] Output: [1,2,3,6,9,8,7,4,5]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                Think of peeling an onion. Traverse the outermost ring (top row
+                &rarr; right col &darr; bottom row &larr; left col &uarr;), then
+                move the four boundaries inward and repeat. Always guard the
+                bottom and left passes for odd-shaped matrices.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution + Dry
+                Run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; Four-Pointer Spiral</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">spiralOrder</span>(<span class="kw">int</span>[][] mat) {
     <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
     <span class="kw">int</span> top=0, bot=mat.length-1, lft=0, rgt=mat[0].length-1;
     <span class="kw">while</span> (top &lt;= bot &amp;&amp; lft &lt;= rgt) {
@@ -1618,54 +1689,84 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     }
     <span class="ret">return</span> res;
 }</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P2: ROTATE IMAGE -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; In-Place Rotation</div>
+              <div class="prob-title">Rotate Image</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/rotate-image/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 48 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-co">Apple</span
+                ><span class="tag tag-pat">Transpose + Reverse</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P2: ROTATE IMAGE -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 02 &middot; In-Place Rotation</div>
-            <div class="prob-title">Rotate Image</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/rotate-image/" target="_blank"
-                style="font-size:12px">&#128279; LC 48 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Microsoft</span><span class="tag tag-co">Apple</span><span
-                class="tag tag-pat">Transpose + Reverse</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Rotate an n&times;n matrix 90&deg; clockwise <strong>in place</strong> with O(1) extra space.</p>
-            <div class="iobox">Input: [[1,2,3],[4,5,6],[7,8,9]]
-              Output: [[7,4,1],[8,5,2],[9,6,3]]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First &mdash; the 2-Step Trick</div>
-            <p><mark>Transpose</mark> the matrix (swap [i][j] with [j][i]), then <mark>reverse each row</mark>. The
-              mathematical proof: rotating 90&deg; clockwise maps position (r,c) to (c, n-1-r). Transposing gives (c,r),
-              reversing each row turns (c,r) into (c,n-1-r). QED.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution + Step-by-Step Proof</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; Rotate Image</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] m) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Rotate an n&times;n matrix 90&deg; clockwise
+                <strong>in place</strong> with O(1) extra space.
+              </p>
+              <div class="iobox">
+                Input: [[1,2,3],[4,5,6],[7,8,9]] Output:
+                [[7,4,1],[8,5,2],[9,6,3]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">
+                Intuition First &mdash; the 2-Step Trick
+              </div>
+              <p>
+                <mark>Transpose</mark> the matrix (swap [i][j] with [j][i]),
+                then <mark>reverse each row</mark>. The mathematical proof:
+                rotating 90&deg; clockwise maps position (r,c) to (c, n-1-r).
+                Transposing gives (c,r), reversing each row turns (c,r) into
+                (c,n-1-r). QED.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution +
+                Step-by-Step Proof
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; Rotate Image</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[][] m) {
     <span class="kw">int</span> n = m.length;
     <span class="kw">for</span> (<span class="kw">int</span> i=0; i&lt;n; i++)
         <span class="kw">for</span> (<span class="kw">int</span> j=i+1; j&lt;n; j++) {
@@ -1676,60 +1777,92 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
         <span class="kw">while</span> (lo&lt;hi) { <span class="kw">int</span> t=row[lo]; row[lo]=row[hi]; row[hi]=t; lo++; hi--; }
     }
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span
-                    class="cx-val green">O(n&sup2;)</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n&sup2;)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+                <div class="callout teal" style="margin-top: 10px">
+                  <span class="callout-icon">&#128161;</span>
+                  <div class="callout-body">
+                    <strong>Variants:</strong> Counter-clockwise = Transpose +
+                    reverse each <em>column</em>. 180&deg; = reverse rows +
+                    reverse each row.
+                  </div>
                 </div>
               </div>
-              <div class="callout teal" style="margin-top:10px"><span class="callout-icon">&#128161;</span>
-                <div class="callout-body"><strong>Variants:</strong> Counter-clockwise = Transpose + reverse each
-                  <em>column</em>. 180&deg; = reverse rows + reverse each row.
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P3: SET MATRIX ZEROES -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; In-Place State Machine
+              </div>
+              <div class="prob-title">Set Matrix Zeroes</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/set-matrix-zeroes/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 73 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-co">Goldman Sachs</span
+                ><span class="tag tag-pat">Sentinel Encoding</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P3: SET MATRIX ZEROES -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 03 &middot; In-Place State Machine</div>
-            <div class="prob-title">Set Matrix Zeroes</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/set-matrix-zeroes/" target="_blank"
-                style="font-size:12px">&#128279; LC 73 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Microsoft</span><span class="tag tag-co">Goldman Sachs</span><span
-                class="tag tag-pat">Sentinel Encoding</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>If any cell is 0, set its entire row and column to 0. Do it <strong>in place</strong> using O(1) extra
-              space.</p>
-            <div class="iobox">Input: [[1,1,1],[1,0,1],[1,1,1]]
-              Output: [[1,0,1],[0,0,0],[1,0,1]]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p>Naive: use a separate boolean array to mark rows/cols &rarr; O(m+n) space. Optimised: <mark>borrow the
-                first row and first column</mark> as your marker arrays. Two boolean flags remember if those borrowed
-              sentinels themselves originally had zeros. 4 passes total, all O(m*n) time, O(1) space.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; O(1) Space Sentinels</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">void</span> <span class="fn">setZeroes</span>(<span class="kw">int</span>[][] m) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                If any cell is 0, set its entire row and column to 0. Do it
+                <strong>in place</strong> using O(1) extra space.
+              </p>
+              <div class="iobox">
+                Input: [[1,1,1],[1,0,1],[1,1,1]] Output:
+                [[1,0,1],[0,0,0],[1,0,1]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                Naive: use a separate boolean array to mark rows/cols &rarr;
+                O(m+n) space. Optimised:
+                <mark>borrow the first row and first column</mark> as your
+                marker arrays. Two boolean flags remember if those borrowed
+                sentinels themselves originally had zeros. 4 passes total, all
+                O(m*n) time, O(1) space.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; O(1) Space Sentinels</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">void</span> <span class="fn">setZeroes</span>(<span class="kw">int</span>[][] m) {
     <span class="kw">boolean</span> r0=<span class="kw">false</span>, c0=<span class="kw">false</span>;
     <span class="kw">for</span> (<span class="kw">int</span> c=0; c&lt;m[0].length; c++) <span class="kw">if</span> (m[0][c]==0) r0=<span class="kw">true</span>;
     <span class="kw">for</span> (<span class="kw">int</span> r=0; r&lt;m.length;    r++) <span class="kw">if</span> (m[r][0]==0) c0=<span class="kw">true</span>;
@@ -1742,59 +1875,85 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     <span class="kw">if</span> (r0) <span class="kw">for</span> (<span class="kw">int</span> c=0; c&lt;m[0].length; c++) m[0][c]=0;
     <span class="kw">if</span> (c0) <span class="kw">for</span> (<span class="kw">int</span> r=0; r&lt;m.length;    r++) m[r][0]=0;
 }</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P4: NUMBER OF ISLANDS -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Grid DFS / Flood Fill
+              </div>
+              <div class="prob-title">Number of Islands</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/number-of-islands/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 200 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Meta</span
+                ><span class="tag tag-pat">Grid DFS</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P4: NUMBER OF ISLANDS -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 04 &middot; Grid DFS / Flood Fill</div>
-            <div class="prob-title">Number of Islands</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/number-of-islands/" target="_blank"
-                style="font-size:12px">&#128279; LC 200 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Google</span><span class="tag tag-co">Meta</span><span class="tag tag-pat">Grid
-                DFS</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a 2D grid of '1' (land) and '0' (water), count the number of islands (groups of adjacent land
-              cells).</p>
-            <div class="iobox">Input: [['1','1','0','0'],
-              ['1','1','0','0'],
-              ['0','0','1','0'],
-              ['0','0','0','1']]
-              Output: 3</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p>Scan every cell. Each time you find an unvisited '1', you've discovered a new island &rarr; increment
-              count. Then <mark>DFS to sink the entire island</mark> (change all connected '1's to '2' so they are never
-              counted again). This is the <strong>Flood Fill</strong> pattern &mdash; exactly how a paint-bucket tool
-              works.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution + Dry Run</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; DFS Flood Fill</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">numIslands</span>(<span class="kw">char</span>[][] g) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a 2D grid of '1' (land) and '0' (water), count the number
+                of islands (groups of adjacent land cells).
+              </p>
+              <div class="iobox">
+                Input: [['1','1','0','0'], ['1','1','0','0'], ['0','0','1','0'],
+                ['0','0','0','1']] Output: 3
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                Scan every cell. Each time you find an unvisited '1', you've
+                discovered a new island &rarr; increment count. Then
+                <mark>DFS to sink the entire island</mark> (change all connected
+                '1's to '2' so they are never counted again). This is the
+                <strong>Flood Fill</strong> pattern &mdash; exactly how a
+                paint-bucket tool works.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution + Dry
+                Run
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; DFS Flood Fill</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">numIslands</span>(<span class="kw">char</span>[][] g) {
     <span class="kw">int</span> count=0;
     <span class="kw">for</span> (<span class="kw">int</span> r=0; r&lt;g.length; r++)
         <span class="kw">for</span> (<span class="kw">int</span> c=0; c&lt;g[0].length; c++)
@@ -1807,58 +1966,89 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     <span class="fn">dfs</span>(g,r-1,c); <span class="fn">dfs</span>(g,r+1,c); <span class="fn">dfs</span>(g,r,c-1); <span class="fn">dfs</span>(g,r,c+1);
 }
 <span class="cm">// Islands at (0,0)-(1,1) &rarr; count=1, Island (2,2) &rarr; count=2, (3,3) &rarr; count=3</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
                 </div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                    class="cx-val yellow">O(m*n)</span></div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(m*n)</span>
+                  </div>
+                </div>
+                <div class="callout purple" style="margin-top: 10px">
+                  <span class="callout-icon">&#128301;</span>
+                  <div class="callout-body">
+                    <strong>Interview follow-up:</strong> DFS can stack-overflow
+                    on huge grids. Convert to iterative BFS &mdash; same O(m*n),
+                    zero stack risk.
+                  </div>
+                </div>
               </div>
-              <div class="callout purple" style="margin-top:10px"><span class="callout-icon">&#128301;</span>
-                <div class="callout-body"><strong>Interview follow-up:</strong> DFS can stack-overflow on huge grids.
-                  Convert to iterative BFS &mdash; same O(m*n), zero stack risk.</div>
+            </details>
+          </div>
+        </div>
+        <!-- P5: 01 MATRIX -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Multi-Source BFS</div>
+              <div class="prob-title">01 Matrix (Distance to Nearest 0)</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/01-matrix/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 542 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">Multi-Source BFS</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-      <!-- P5: 01 MATRIX -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 05 &middot; Multi-Source BFS</div>
-            <div class="prob-title">01 Matrix (Distance to Nearest 0)</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/01-matrix/" target="_blank"
-                style="font-size:12px">&#128279; LC 542 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Amazon</span><span class="tag tag-pat">Multi-Source BFS</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a binary matrix, return a matrix where each cell = distance to its nearest 0.</p>
-            <div class="iobox">Input: [[0,0,0],[0,1,0],[1,1,1]]
-              Output: [[0,0,0],[0,1,0],[1,2,1]]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p><strong>Wrong approach:</strong> For every 1-cell, BFS to find nearest 0 &rarr; O((m*n)&sup2;). <br>
-              <strong>Key insight:</strong> <mark>Seed BFS with ALL 0-cells simultaneously.</mark> BFS radiates outward
-              level-by-level. Each 1-cell gets its distance from whichever 0-source reaches it first &mdash; guaranteed
-              to be the nearest. Single O(m*n) pass.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution + Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; Multi-Source BFS</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span>[][] <span class="fn">updateMatrix</span>(<span class="kw">int</span>[][] mat) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a binary matrix, return a matrix where each cell =
+                distance to its nearest 0.
+              </p>
+              <div class="iobox">
+                Input: [[0,0,0],[0,1,0],[1,1,1]] Output:
+                [[0,0,0],[0,1,0],[1,2,1]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                <strong>Wrong approach:</strong> For every 1-cell, BFS to find
+                nearest 0 &rarr; O((m*n)&sup2;). <br />
+                <strong>Key insight:</strong>
+                <mark>Seed BFS with ALL 0-cells simultaneously.</mark> BFS
+                radiates outward level-by-level. Each 1-cell gets its distance
+                from whichever 0-source reaches it first &mdash; guaranteed to
+                be the nearest. Single O(m*n) pass.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution + Trace
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; Multi-Source BFS</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span>[][] <span class="fn">updateMatrix</span>(<span class="kw">int</span>[][] mat) {
     <span class="kw">int</span> m=mat.length, n=mat[0].length;
     <span class="kw">int</span>[][] dist = <span class="kw">new int</span>[m][n];
     <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
@@ -1879,54 +2069,82 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     }
     <span class="ret">return</span> dist;
 }</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(m*n)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P6: ROTTING ORANGES -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 06 &middot; Multi-Source BFS with Time Tracking
+              </div>
+              <div class="prob-title">Rotting Oranges</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/rotting-oranges/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 994 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">Multi-Source BFS</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P6: ROTTING ORANGES -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 06 &middot; Multi-Source BFS with Time Tracking</div>
-            <div class="prob-title">Rotting Oranges</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/rotting-oranges/" target="_blank"
-                style="font-size:12px">&#128279; LC 994 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Google</span><span class="tag tag-pat">Multi-Source BFS</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Grid cells: 0=empty, 1=fresh orange, 2=rotten. Each minute, rotten oranges spread to adjacent fresh ones.
-              Return minimum minutes to rot all, or -1 if impossible.</p>
-            <div class="iobox">Input: [[2,1,1],[1,1,0],[0,1,1]] &rarr; Output: 4
-              Input: [[2,1,1],[0,1,1],[1,0,1]] &rarr; Output: -1 (isolated fresh)</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p>Same multi-source BFS as 01 Matrix, but now track <mark>BFS levels as minutes</mark>. Count fresh oranges
-              upfront. After BFS completes, if fresh &gt; 0 &rarr; return -1 (unreachable). Otherwise return minute
-              count.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; BFS with Level Tracking</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> <span class="fn">orangesRotting</span>(<span class="kw">int</span>[][] g) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Grid cells: 0=empty, 1=fresh orange, 2=rotten. Each minute,
+                rotten oranges spread to adjacent fresh ones. Return minimum
+                minutes to rot all, or -1 if impossible.
+              </p>
+              <div class="iobox">
+                Input: [[2,1,1],[1,1,0],[0,1,1]] &rarr; Output: 4 Input:
+                [[2,1,1],[0,1,1],[1,0,1]] &rarr; Output: -1 (isolated fresh)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                Same multi-source BFS as 01 Matrix, but now track
+                <mark>BFS levels as minutes</mark>. Count fresh oranges upfront.
+                After BFS completes, if fresh &gt; 0 &rarr; return -1
+                (unreachable). Otherwise return minute count.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; BFS with Level Tracking</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">orangesRotting</span>(<span class="kw">int</span>[][] g) {
     <span class="kw">int</span> m=g.length, n=g[0].length, fresh=0, mins=0;
     <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q=<span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> r=0;r&lt;m;r++) <span class="kw">for</span> (<span class="kw">int</span> c=0;c&lt;n;c++) {
@@ -1950,54 +2168,81 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
     }
     <span class="ret">return</span> fresh==0 ? mins : -1;
 }</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(m*n)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P7: SEARCH 2D MATRIX II -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 07 &middot; 2D Binary Search</div>
+              <div class="prob-title">Search a 2D Matrix II</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/search-a-2d-matrix-ii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 240 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-pat">Corner Walk O(m+n)</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P7: SEARCH 2D MATRIX II -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 07 &middot; 2D Binary Search</div>
-            <div class="prob-title">Search a 2D Matrix II</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/search-a-2d-matrix-ii/" target="_blank"
-                style="font-size:12px">&#128279; LC 240 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Microsoft</span><span class="tag tag-pat">Corner Walk O(m+n)</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Integers in each row are sorted left-to-right; integers in each column are sorted top-to-bottom. Search
-              for a target in O(m+n).</p>
-            <div class="iobox">Matrix: [[1,4,7,11],[2,5,8,12],[3,6,9,16],[10,13,14,17]]
-              target=5 &rarr; true | target=20 &rarr; false</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First</div>
-            <p>Start at <mark>top-right corner</mark>. This is the max of its row and min of its column. If target &lt;
-              current &rarr; go left (eliminate this column). If target &gt; current &rarr; go down (eliminate this
-              row). Each step eliminates one row or column &rarr; O(m+n) total.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution + Walk Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; Corner Walk</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] m, <span class="kw">int</span> t) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Integers in each row are sorted left-to-right; integers in each
+                column are sorted top-to-bottom. Search for a target in O(m+n).
+              </p>
+              <div class="iobox">
+                Matrix: [[1,4,7,11],[2,5,8,12],[3,6,9,16],[10,13,14,17]]
+                target=5 &rarr; true | target=20 &rarr; false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition First</div>
+              <p>
+                Start at <mark>top-right corner</mark>. This is the max of its
+                row and min of its column. If target &lt; current &rarr; go left
+                (eliminate this column). If target &gt; current &rarr; go down
+                (eliminate this row). Each step eliminates one row or column
+                &rarr; O(m+n) total.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution + Walk
+                Trace
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; Corner Walk</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] m, <span class="kw">int</span> t) {
     <span class="kw">int</span> r=0, c=m[0].length-1;
     <span class="kw">while</span> (r&lt;m.length &amp;&amp; c&gt;=0) {
         <span class="kw">if</span>      (m[r][c]==t) <span class="ret">return true</span>;
@@ -2008,59 +2253,91 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
 }
 <span class="cm">// Trace target=5: (0,3)=11&gt;5&rarr;c=2, (0,2)=7&gt;5&rarr;c=1,
 // (0,1)=4&lt;5&rarr;r=1, (1,1)=5==5 &rarr; true &#10003;</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m+n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m+n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+                <div class="callout yellow" style="margin-top: 10px">
+                  <span class="callout-icon">&#9888;</span>
+                  <div class="callout-body">
+                    <strong>LC 74 vs LC 240:</strong> LC 74 is fully row-major
+                    sorted (treat as 1D &rarr; use classic binary search O(log
+                    mn)). LC 240 only guarantees row-sorted + col-sorted &rarr;
+                    must use corner walk.
+                  </div>
                 </div>
               </div>
-              <div class="callout yellow" style="margin-top:10px"><span class="callout-icon">&#9888;</span>
-                <div class="callout-body"><strong>LC 74 vs LC 240:</strong> LC 74 is fully row-major sorted (treat as 1D
-                  &rarr; use classic binary search O(log mn)). LC 240 only guarantees row-sorted + col-sorted &rarr;
-                  must use corner walk.</div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P8: PACIFIC ATLANTIC WATER FLOW -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 08 &middot; Reverse Multi-Source BFS
+              </div>
+              <div class="prob-title">Pacific Atlantic Water Flow</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/pacific-atlantic-water-flow/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 417 &mdash; Medium</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">Reverse BFS / DFS</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P8: PACIFIC ATLANTIC WATER FLOW -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 08 &middot; Reverse Multi-Source BFS</div>
-            <div class="prob-title">Pacific Atlantic Water Flow</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/pacific-atlantic-water-flow/"
-                target="_blank" style="font-size:12px">&#128279; LC 417 &mdash; Medium</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Amazon</span><span class="tag tag-pat">Reverse BFS / DFS</span></div>
+            <span style="color: var(--text3); font-size: 18px">&rsaquo;</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">&rsaquo;</span>
-        </div>
-        <div class="prob-body">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Water flows from higher or equal cells to lower. Find all cells that can flow to <em>both</em> Pacific
-              (top/left edges) and Atlantic (bottom/right edges) oceans.</p>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Intuition First &mdash; Reverse Thinking</div>
-            <p><mark>Reverse the flow direction.</mark> Instead of asking &quot;where can this cell drain to?&quot;, ask
-              &quot;which cells can reach this ocean boundary?&quot;. BFS/DFS from Pacific borders going
-              <em>uphill</em>, then BFS/DFS from Atlantic borders going <em>uphill</em>. Cells reachable from BOTH are
-              the answer.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">&#9654;</span> Full Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div>&#9749; Java &middot; Dual BFS</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">pacificAtlantic</span>(<span class="kw">int</span>[][] h) {
+          <div class="prob-body">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Water flows from higher or equal cells to lower. Find all cells
+                that can flow to <em>both</em> Pacific (top/left edges) and
+                Atlantic (bottom/right edges) oceans.
+              </p>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">
+                Intuition First &mdash; Reverse Thinking
+              </div>
+              <p>
+                <mark>Reverse the flow direction.</mark> Instead of asking
+                &quot;where can this cell drain to?&quot;, ask &quot;which cells
+                can reach this ocean boundary?&quot;. BFS/DFS from Pacific
+                borders going <em>uphill</em>, then BFS/DFS from Atlantic
+                borders going <em>uphill</em>. Cells reachable from BOTH are the
+                answer.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span> Full Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div>&#9749; Java &middot; Dual BFS</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">pacificAtlantic</span>(<span class="kw">int</span>[][] h) {
     <span class="kw">int</span> m=h.length, n=h[0].length;
     <span class="kw">boolean</span>[][] pac=<span class="kw">new boolean</span>[m][n], atl=<span class="kw">new boolean</span>[m][n];
     <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; pq=<span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;(), aq=<span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
@@ -2086,178 +2363,365 @@ grid[r][c];                   <span class="cm">// row r, column c</span>
         }
     }
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(m*n)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(m*n)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m*n)</span>
+                  </div>
                 </div>
               </div>
+            </details>
+          </div>
+        </div>
+
+        <hr />
+        <!-- ASSIGNMENT SECTION -->
+        <h2 class="h1" id="assignment">
+          &#128221; Assignment &mdash; Company Interview Problems
+        </h2>
+
+        <div class="callout orange" style="margin-bottom: 18px">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Topic 14 Assignment &mdash; 24 Problems (5 Easy &middot; 14
+              Medium &middot; 5 Hard)</strong
+            ><br />
+            All 4 matrix patterns covered. Problems sorted by company frequency
+            and difficulty. Each problem in the assignment file includes: the
+            LeetCode link, the exact pattern to apply, a step-by-step hint,
+            common mistakes, and the companies that ask it most frequently.<br /><br />
+            <a
+              href="Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 7px 18px;
+                border-radius: 7px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+                margin-top: 4px;
+              "
+              >&#128196; Open Assignment.md &rarr;</a
+            >
+          </div>
+        </div>
+
+        <div
+          style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px"
+        >
+          <div
+            style="
+              flex: 1;
+              min-width: 140px;
+              border: 1px solid var(--green);
+              border-radius: 8px;
+              padding: 14px 16px;
+              background: var(--green-bg);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 28px; font-weight: 700; color: var(--green)">
+              5
             </div>
-          </details>
-        </div>
-      </div>
-
-      <hr>
-      <!-- ASSIGNMENT SECTION -->
-      <h2 class="h1" id="assignment">&#128221; Assignment &mdash; Company Interview Problems</h2>
-
-      <div class="callout orange" style="margin-bottom:18px">
-        <span class="callout-icon">&#128203;</span>
-        <div class="callout-body">
-          <strong>Topic 14 Assignment &mdash; 24 Problems (5 Easy &middot; 14 Medium &middot; 5 Hard)</strong><br>
-          All 4 matrix patterns covered. Problems sorted by company frequency and difficulty.
-          Each problem in the assignment file includes: the LeetCode link, the exact pattern to apply,
-          a step-by-step hint, common mistakes, and the companies that ask it most frequently.<br><br>
-          <a href="Assignment.md"
-            style="background:var(--accent);color:#fff;padding:7px 18px;border-radius:7px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block;margin-top:4px">&#128196;
-            Open Assignment.md &rarr;</a>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">
-        <div
-          style="flex:1;min-width:140px;border:1px solid var(--green);border-radius:8px;padding:14px 16px;background:var(--green-bg);text-align:center">
-          <div style="font-size:28px;font-weight:700;color:var(--green)">5</div>
-          <div style="font-size:12px;font-weight:600;color:var(--green);margin-top:2px">&#129001; Easy</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">Flood Fill &middot; Island Perimeter &middot;
-            Diagonal Sum &middot; Search Matrix I &middot; Count Negatives</div>
-        </div>
-        <div
-          style="flex:1;min-width:140px;border:1px solid var(--yellow);border-radius:8px;padding:14px 16px;background:var(--yellow-bg);text-align:center">
-          <div style="font-size:28px;font-weight:700;color:var(--yellow)">14</div>
-          <div style="font-size:12px;font-weight:600;color:var(--yellow);margin-top:2px">&#129000; Medium</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">Spiral &middot; Rotate &middot; Islands &middot;
-            BFS &middot; Pacific Atlantic &middot; Word Search &middot; and 8 more</div>
-        </div>
-        <div
-          style="flex:1;min-width:140px;border:1px solid var(--red);border-radius:8px;padding:14px 16px;background:var(--red-bg);text-align:center">
-          <div style="font-size:28px;font-weight:700;color:var(--red)">5</div>
-          <div style="font-size:12px;font-weight:600;color:var(--red);margin-top:2px">&#128997; Hard</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">Shortest Path &middot; Walls &amp; Gates
-            &middot; Rain Water II &middot; Min Path &middot; Word Search II</div>
-        </div>
-      </div>
-
-      <!-- CHECKLIST -->
-      <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-      <p>Check each item before advancing to Lecture 15 (Trees). Be honest &mdash; these are your interview readiness
-        criteria.</p>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can write the spiral matrix 4-pointer loop from memory, including the two guards</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can explain why Rotate Image = Transpose + Reverse, and derive counter-clockwise
-            variant</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can solve Set Matrix Zeroes in O(1) space using the first row and column as sentinels
+            <div
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--green);
+                margin-top: 2px;
+              "
+            >
+              &#129001; Easy
+            </div>
+            <div style="font-size: 11px; color: var(--text3); margin-top: 4px">
+              Flood Fill &middot; Island Perimeter &middot; Diagonal Sum
+              &middot; Search Matrix I &middot; Count Negatives
+            </div>
+          </div>
+          <div
+            style="
+              flex: 1;
+              min-width: 140px;
+              border: 1px solid var(--yellow);
+              border-radius: 8px;
+              padding: 14px 16px;
+              background: var(--yellow-bg);
+              text-align: center;
+            "
+          >
+            <div
+              style="font-size: 28px; font-weight: 700; color: var(--yellow)"
+            >
+              14
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--yellow);
+                margin-top: 2px;
+              "
+            >
+              &#129000; Medium
+            </div>
+            <div style="font-size: 11px; color: var(--text3); margin-top: 4px">
+              Spiral &middot; Rotate &middot; Islands &middot; BFS &middot;
+              Pacific Atlantic &middot; Word Search &middot; and 8 more
+            </div>
+          </div>
+          <div
+            style="
+              flex: 1;
+              min-width: 140px;
+              border: 1px solid var(--red);
+              border-radius: 8px;
+              padding: 14px 16px;
+              background: var(--red-bg);
+              text-align: center;
+            "
+          >
+            <div style="font-size: 28px; font-weight: 700; color: var(--red)">
+              5
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--red);
+                margin-top: 2px;
+              "
+            >
+              &#128997; Hard
+            </div>
+            <div style="font-size: 11px; color: var(--text3); margin-top: 4px">
+              Shortest Path &middot; Walls &amp; Gates &middot; Rain Water II
+              &middot; Min Path &middot; Word Search II
+            </div>
           </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can implement grid DFS flood fill and explain when to use BFS vs DFS on a grid</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I understand multi-source BFS and why seeding ALL sources first gives O(m*n) not
-            O((m*n)&sup2;)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can explain the top-right corner walk for Search 2D Matrix II and why O(m+n) works
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>
+          Check each item before advancing to Lecture 15 (Trees). Be honest
+          &mdash; these are your interview readiness criteria.
+        </p>
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can write the spiral matrix 4-pointer loop from memory,
+              including the two guards
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain why Rotate Image = Transpose + Reverse, and derive
+              counter-clockwise variant
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can solve Set Matrix Zeroes in O(1) space using the first row
+              and column as sentinels
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement grid DFS flood fill and explain when to use BFS vs
+              DFS on a grid
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I understand multi-source BFS and why seeding ALL sources first
+              gives O(m*n) not O((m*n)&sup2;)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain the top-right corner walk for Search 2D Matrix II
+              and why O(m+n) works
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know the difference: LC 74 (fully sorted &rarr; binary search)
+              vs LC 240 (row+col sorted &rarr; corner walk)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can identify which of the 4 patterns applies within 30 seconds
+              of reading any matrix problem
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I have completed all 24 assignment problems and can explain the
+              pattern behind each one
+            </div>
           </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I know the difference: LC 74 (fully sorted &rarr; binary search) vs LC 240 (row+col
-            sorted &rarr; corner walk)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I can identify which of the 4 patterns applies within 30 seconds of reading any matrix
-            problem</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">&#10003;</div>
-          <div class="cb-text">I have completed all 24 assignment problems and can explain the pattern behind each one
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">&#127795;</span>
+          <div class="callout-body">
+            <strong
+              >You are ready for Topic 15: Trees (Binary Trees &amp;
+              BST)</strong
+            ><br />
+            Trees are the natural progression from 2D grids &mdash; both are
+            graphs you traverse with DFS and BFS. Pre/in/post-order traversal =
+            DFS patterns. Level-order = BFS. The grid patterns you just mastered
+            will reappear constantly in tree problems. You are building on solid
+            ground.
           </div>
         </div>
-      </div>
 
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">&#127795;</span>
-        <div class="callout-body">
-          <strong>You are ready for Topic 15: Trees (Binary Trees &amp; BST)</strong><br>
-          Trees are the natural progression from 2D grids &mdash; both are graphs you traverse with DFS and BFS.
-          Pre/in/post-order traversal = DFS patterns. Level-order = BFS. The grid patterns you just mastered
-          will reappear constantly in tree problems. You are building on solid ground.
+        <!-- BOTTOM NAVIGATION -->
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+          "
+        >
+          <a
+            href="../Lecture13/lecture13_notes.html"
+            style="
+              text-decoration: none;
+              color: var(--text2);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              border: 1px solid var(--border);
+              border-radius: 8px;
+            "
+            >&#8592; Topic 13: HashMap &amp; HashSet</a
+          >
+          <span style="color: var(--text3); font-size: 13px"
+            >Topic 14 of 30 &mdash; Phase 2 Core Data Structures</span
+          >
+          <a
+            href="../Lecture15/lecture15_notes.html"
+            style="
+              text-decoration: none;
+              color: var(--accent);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              background: var(--accent-bg);
+              border: 1px solid var(--accent);
+              border-radius: 8px;
+            "
+            >Topic 15: Trees &#8594;</a
+          >
         </div>
       </div>
+      <!-- #content -->
+    </div>
+    <!-- #main -->
 
-      <!-- BOTTOM NAVIGATION -->
-      <div
-        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <a href="../Lecture13/lecture13_notes.html"
-          style="text-decoration:none;color:var(--text2);font-weight:600;font-size:14px;padding:8px 16px;border:1px solid var(--border);border-radius:8px">&#8592;
-          Topic 13: HashMap &amp; HashSet</a>
-        <span style="color:var(--text3);font-size:13px">Topic 14 of 30 &mdash; Phase 2 Core Data Structures</span>
-        <a href="../Lecture15/lecture15_notes.html"
-          style="text-decoration:none;color:var(--accent);font-weight:600;font-size:14px;padding:8px 16px;background:var(--accent-bg);border:1px solid var(--accent);border-radius:8px">Topic
-          15: Trees &#8594;</a>
-      </div>
-
-    </div><!-- #content -->
-  </div><!-- #main -->
-
-  <script>
-    function toggleDark() {
-      const html = document.documentElement;
-      const btn = document.getElementById('darkToggle');
-      if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme'); btn.innerText = '\u{1F319} Dark';
-      } else {
-        html.setAttribute('data-theme', 'dark'); btn.innerText = '\u2600\uFE0F Light';
+    <script>
+      // 1. Dark Mode Toggle
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
+        }
       }
-    }
-    document.getElementById('main').addEventListener('scroll', function () {
-      const pct = (this.scrollTop / (this.scrollHeight - this.clientHeight)) * 100;
-      const fill = document.getElementById('progressFill');
-      if (fill) fill.style.width = (pct > 98.5 ? 100 : pct) + '%';
-      const sections = document.querySelectorAll('[id]');
-      let current = '';
-      sections.forEach(s => { if (s.getBoundingClientRect().top < 150) current = s.id; });
-      document.querySelectorAll('.toc-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === '#' + current) item.classList.add('active');
-      });
-    });
-    function toggleProb(h) {
-      const b = h.nextElementSibling;
-      if (!b) return;
-      const open = b.style.display === 'block';
-      b.style.display = open ? 'none' : 'block';
-      h.classList.toggle('active', !open);
-    }
-    function copyCode(btn) {
-      const code = btn.closest('.code-block').querySelector('pre').innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        const orig = btn.innerText; btn.innerText = 'Copied!';
-        btn.style.background = 'var(--green-bg)'; btn.style.color = 'var(--green)'; btn.style.borderColor = 'var(--green)';
-        setTimeout(() => { btn.innerText = orig; btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
-      });
-    }
-    document.querySelectorAll('details').forEach(det => {
-      det.addEventListener('toggle', () => {
-        const arrow = det.querySelector('.toggle-arrow');
-        if (arrow) arrow.style.transform = det.open ? 'rotate(90deg)' : 'rotate(0deg)';
-      });
-    });
-  </script>
-</body>
 
+      // 2. Progress Tracker & TOC Highlighting
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
+        }
+        const sections = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current)
+            item.classList.add("active");
+        });
+      });
+
+      // 3. Problem Visibility Toggle
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy Code Logic
+      function copyCode(btn) {
+        const code = btn.closest(".code-block").querySelector("pre").innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        });
+      }
+
+      // 5. Details Arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
 </html>
