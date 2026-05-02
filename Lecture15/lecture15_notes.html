@@ -1228,6 +1228,18 @@
             Postorder : left &rarr; right &rarr; process root
           </p>
         </div>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Any DFS Traversal</h4>
+          <p>
+            function dfs(node):<br />
+            &nbsp;&nbsp;BASE: if node is null &rarr; return<br />
+            &nbsp;&nbsp;[PREORDER: process node here]<br />
+            &nbsp;&nbsp;dfs(node.left)<br />
+            &nbsp;&nbsp;[INORDER: process node here]<br />
+            &nbsp;&nbsp;dfs(node.right)<br />
+            &nbsp;&nbsp;[POSTORDER: process node here]
+          </p>
+        </div>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang"
@@ -1256,25 +1268,75 @@
     process(n.val);          <span class="cm">// ROOT</span>
 }</pre>
         </div>
-        <h3 class="h3">Iterative Inorder (most common interview ask)</h3>
+        <h3 class="h3">Iterative Traversals (No Recursion)</h3>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Iterative Inorder with Explicit Stack</span
+              >&#9749; Java &middot; Iterative Preorder + Inorder</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderIterative</span>(<span class="cls">TreeNode</span> root) {
+          <pre><span class="cm">// Iterative Preorder — push RIGHT first, then LEFT (so left is processed first)</span>
+<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">preorderIterative</span>(<span class="cls">TreeNode</span> root) {
+    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> res;
+    <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
+    stack.push(root);
+    <span class="kw">while</span> (!stack.isEmpty()) {
+        <span class="cls">TreeNode</span> n = stack.pop();
+        res.add(n.val);                     <span class="cm">// visit ROOT immediately</span>
+        <span class="kw">if</span> (n.right != <span class="kw">null</span>) stack.push(n.right);  <span class="cm">// right first → processed last</span>
+        <span class="kw">if</span> (n.left  != <span class="kw">null</span>) stack.push(n.left);
+    }
+    <span class="ret">return</span> res;
+}
+
+<span class="cm">// Iterative Inorder — go left until null, pop &amp; visit, then go right</span>
+<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderIterative</span>(<span class="cls">TreeNode</span> root) {
     <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
     <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
     <span class="cls">TreeNode</span> curr = root;
     <span class="kw">while</span> (curr != <span class="kw">null</span> || !stack.isEmpty()) {
-        <span class="kw">while</span> (curr != <span class="kw">null</span>) { stack.push(curr); curr = curr.left; }  <span class="cm">// go left</span>
+        <span class="kw">while</span> (curr != <span class="kw">null</span>) { stack.push(curr); curr = curr.left; }
         curr = stack.pop();
-        res.add(curr.val);       <span class="cm">// process</span>
-        curr = curr.right;       <span class="cm">// explore right</span>
+        res.add(curr.val);
+        curr = curr.right;
     }
     <span class="ret">return</span> res;
-}</pre>
+}
+<span class="cm">// Time O(n), Space O(h). Key trick for preorder: push RIGHT before LEFT.</span></pre>
+        </div>
+
+        <!-- P1 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; All 3 orders on this tree:</strong>
+            <div class="ascii-tree" style="margin-top: 8px">
+              <span class="hl">1</span>
+              / \
+              <span class="nd">2</span> <span class="nd">3</span>
+              /
+              <span class="nd">4</span>
+
+              Preorder (Root→L→R) : <span class="hl">1</span>
+              <span class="nd">2</span> <span class="nd">4</span>
+              <span class="nd">3</span> ← use for: clone tree, serialize, prefix
+              Inorder (L→Root→R) : <span class="nd">4</span>
+              <span class="nd">2</span> <span class="hl">1</span>
+              <span class="nd">3</span> ← use for: BST sorted output, kth
+              smallest Postorder (L→R→Root) : <span class="nd">4</span>
+              <span class="nd">2</span> <span class="nd">3</span>
+              <span class="hl">1</span> ← use for: delete tree, height, evaluate
+              expression Iterative inorder — stack state trace: curr=1 → push 1,
+              go left curr=2 → push 2, go left curr=4 → push 4, go left
+              curr=null → pop 4, visit <span class="nd">4</span>,
+              curr=4.right=null curr=null → pop 2, visit
+              <span class="nd">2</span>, curr=2.right=null curr=null → pop 1,
+              visit <span class="hl">1</span>, curr=1.right=3 curr=3 → push 3,
+              go left curr=null → pop 3, visit <span class="nd">3</span>,
+              curr=3.right=null ✓ Result: [4, 2, 1, 3]
+            </div>
+          </div>
         </div>
 
         <hr />
@@ -1325,6 +1387,29 @@
 //   Zigzag traversal  → alternate direction per level (LinkedList.addFirst)
 //   Average of levels → sum/size per level</span></pre>
         </div>
+
+        <!-- P2 DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; Level-Order on tree [1, 2, 3, 4]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
+   / \
+  <span class="nd">2</span>   <span class="nd">3</span>
+ /
+<span class="nd">4</span>
+
+Queue=[<span class="hl">1</span>]      size=1 &rarr; visit 1, enqueue 2,3   Level 0: [<span class="hl">1</span>]
+Queue=[<span class="nd">2</span>,<span class="nd">3</span>]   size=2 &rarr; visit 2 (enqueue 4), visit 3  Level 1: [<span class="nd">2</span>,<span class="nd">3</span>]
+Queue=[<span class="nd">4</span>]      size=1 &rarr; visit 4, no children   Level 2: [<span class="nd">4</span>]
+Queue=[]  done &#10003;
+
+Result: [[<span class="hl">1</span>], [<span class="nd">2</span>,<span class="nd">3</span>], [<span class="nd">4</span>]]
+Right side view = last of each level = [<span class="hl">1</span>, <span class="nd">3</span>, <span class="nd">4</span>]</div>
+          </div>
+        </div>
+
         <hr />
 
         <!-- P3: HEIGHT -->
@@ -1336,6 +1421,18 @@
           left &amp; right results. This is postorder DFS where each call
           computes something useful for its parent.
         </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Height Recursion</h4>
+          <p>
+            function height(node):<br />
+            &nbsp;&nbsp;BASE: if node is null &rarr; return 0<br />
+            &nbsp;&nbsp;leftH &larr; height(node.left)<br />
+            &nbsp;&nbsp;rightH &larr; height(node.right)<br />
+            &nbsp;&nbsp;return 1 + max(leftH, rightH)<br /><br />
+            <em>Key:</em> children compute FIRST (postorder). Parent uses both
+            results.
+          </p>
+        </div>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang"
@@ -1365,14 +1462,19 @@
               >Dry Run &mdash; maxDepth on [3, 9, 20, null, null, 15,
               7]:</strong
             ><br />
-            <div class="ascii-tree" style="margin-top: 8px">
-              3 / 9 20 / 15 7 maxDepth(3): maxDepth(9) &#x2192; max(0,0)+1 =
-              <span class="ret">1</span> maxDepth(20): maxDepth(15) &#x2192;
-              <span class="ret">1</span> maxDepth(7) &#x2192;
-              <span class="ret">1</span> &#x2192; max(1,1)+1 =
-              <span class="ret">2</span> &#x2192; max(1,2)+1 =
-              <span class="hl">3</span> &#10003;
-            </div>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">       <span class="hl">3</span>
+      / \
+     <span class="nd">9</span>   <span class="nd">20</span>
+         / \
+       <span class="nd">15</span>   <span class="nd">7</span>
+
+Call-stack unwind (children resolve before parent):
+  maxDepth(<span class="nd">9</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">15</span>) &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">7</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">20</span>) &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">1</span> &rarr; 1+max(1,1) = <span class="ret">2</span>
+  maxDepth(<span class="hl">3</span>)  &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">2</span> &rarr; 1+max(1,2) = <span class="hl">3</span> &#10003;</div>
           </div>
         </div>
         <hr />
@@ -1386,6 +1488,22 @@
           function&apos;s return value is a <em>helper</em> value, not the final
           answer. This trips up beginners the most.
         </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Global State Pattern</h4>
+          <p>
+            global ans = initial_value<br /><br />
+            function dfs(node):<br />
+            &nbsp;&nbsp;BASE: if node is null &rarr; return 0 (or -INF)<br />
+            &nbsp;&nbsp;left &larr; dfs(node.left) &nbsp;&nbsp;<em
+              >(helper value)</em
+            ><br />
+            &nbsp;&nbsp;right &larr; dfs(node.right)<br />
+            &nbsp;&nbsp;ans = max(ans, combine(left, right, node))
+            <em>&larr; update global</em><br />
+            &nbsp;&nbsp;return max(left, right) + node
+            <em>&larr; return helper to parent</em>
+          </p>
+        </div>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang"
@@ -1419,6 +1537,56 @@
             Pattern 4, LC 124 is a 10-line solution.
           </div>
         </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Binary Tree Maximum Path Sum (LC 124)
+              &mdash; Hard</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> maxSum = <span class="cls">Integer</span>.MIN_VALUE;  <span class="cm">// global: reset per problem instance</span>
+
+<span class="kw">int</span> <span class="fn">maxPathSum</span>(<span class="cls">TreeNode</span> root) {
+    <span class="fn">gain</span>(root);
+    <span class="ret">return</span> maxSum;
+}
+<span class="cm">// gain(n) = max contribution this subtree can add to a path going UP to parent</span>
+<span class="kw">int</span> <span class="fn">gain</span>(<span class="cls">TreeNode</span> n) {
+    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
+    <span class="kw">int</span> lGain = <span class="cls">Math</span>.max(0, <span class="fn">gain</span>(n.left));   <span class="cm">// ignore negative branches</span>
+    <span class="kw">int</span> rGain = <span class="cls">Math</span>.max(0, <span class="fn">gain</span>(n.right));
+    maxSum = <span class="cls">Math</span>.max(maxSum, lGain + n.val + rGain);  <span class="cm">// path THROUGH this node</span>
+    <span class="ret">return</span> n.val + <span class="cls">Math</span>.max(lGain, rGain);  <span class="cm">// can only go ONE direction up</span>
+}
+<span class="cm">// Why max(0, gain)? A negative subtree hurts the path — better to skip it.
+// Why return only ONE direction? A path going up can't branch — parent picks one side.</span></pre>
+        </div>
+
+        <!-- P4 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; Diameter of [1,2,3,4,5] (answer=3):</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
+   / \
+  <span class="nd">2</span>   <span class="nd">3</span>
+ / \
+<span class="nd">4</span>   <span class="nd">5</span>
+
+&#9888; dfs() returns HEIGHT; global maxD stores DIAMETER
+
+Call-stack unwind (postorder):
+  dfs(<span class="nd">4</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
+  dfs(<span class="nd">5</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
+  dfs(<span class="nd">2</span>) &rarr; lh=<span class="ret">1</span>,rh=<span class="ret">1</span> &rarr; maxD=max(0,<span class="nd">2</span>) &rarr; return <span class="ret">2</span>
+  dfs(<span class="nd">3</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(2,0)=<span class="nd">2</span> &rarr; return <span class="ret">1</span>
+  dfs(<span class="hl">1</span>) &rarr; lh=<span class="ret">2</span>,rh=<span class="ret">1</span> &rarr; maxD=max(2,<span class="hl">3</span>) &rarr; return <span class="ret">3</span>
+
+Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)</div>
+          </div>
+        </div>
+
         <hr />
 
         <!-- P5: BST -->
@@ -1428,6 +1596,19 @@
           strictly less, and all values in its right subtree are strictly
           greater.
         </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; BST Operations</h4>
+          <p>
+            <strong>Search:</strong> if val &lt; node &rarr; go left; if val
+            &gt; node &rarr; go right; if equal &rarr; found<br />
+            <strong>Insert:</strong> same as search until null, place new node
+            there<br />
+            <strong>Validate:</strong> pass (min, max) bounds; every node must
+            satisfy min &lt; val &lt; max<br />
+            <strong>Inorder:</strong> always produces sorted sequence &larr; key
+            BST insight
+          </p>
+        </div>
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
@@ -1463,6 +1644,41 @@
     <span class="fn">kth</span>(n.right);
 }</pre>
         </div>
+        <h3 class="h3">BST Insert &amp; Delete</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; BST Insert (LC 701) + Delete (LC 450)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// INSERT: navigate like search until null spot found, place node there</span>
+<span class="cls">TreeNode</span> <span class="fn">insertIntoBST</span>(<span class="cls">TreeNode</span> root, <span class="kw">int</span> val) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">new</span> <span class="cls">TreeNode</span>(val);
+    <span class="kw">if</span> (val &lt; root.val) root.left  = <span class="fn">insertIntoBST</span>(root.left,  val);
+    <span class="kw">else</span>               root.right = <span class="fn">insertIntoBST</span>(root.right, val);
+    <span class="ret">return</span> root;  <span class="cm">// return root so parent pointer stays valid</span>
+}
+
+<span class="cm">// DELETE: 3 cases
+// Case 1: leaf node    → return null
+// Case 2: one child    → return that child
+// Case 3: two children → swap with inorder successor, delete successor below</span>
+<span class="cls">TreeNode</span> <span class="fn">deleteNode</span>(<span class="cls">TreeNode</span> root, <span class="kw">int</span> key) {
+    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">null</span>;
+    <span class="kw">if</span>      (key &lt; root.val) root.left  = <span class="fn">deleteNode</span>(root.left,  key);
+    <span class="kw">else if</span> (key &gt; root.val) root.right = <span class="fn">deleteNode</span>(root.right, key);
+    <span class="kw">else</span> {
+        <span class="kw">if</span> (root.left  == <span class="kw">null</span>) <span class="ret">return</span> root.right;   <span class="cm">// Cases 1 &amp; 2</span>
+        <span class="kw">if</span> (root.right == <span class="kw">null</span>) <span class="ret">return</span> root.left;
+        <span class="cls">TreeNode</span> succ = root.right;
+        <span class="kw">while</span> (succ.left != <span class="kw">null</span>) succ = succ.left;      <span class="cm">// leftmost = successor</span>
+        root.val = succ.val;                               <span class="cm">// copy value up</span>
+        root.right = <span class="fn">deleteNode</span>(root.right, succ.val);   <span class="cm">// delete old successor</span>
+    }
+    <span class="ret">return</span> root;
+}
+<span class="cm">// Time O(h): O(log n) balanced BST, O(n) worst case (skewed)</span></pre>
+        </div>
         <hr />
 
         <!-- P6: LCA -->
@@ -1474,6 +1690,19 @@
           of both. It is the first node where they &ldquo;split&rdquo; in the
           tree.
         </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; LCA (Binary Tree)</h4>
+          <p>
+            function lca(node, p, q):<br />
+            &nbsp;&nbsp;BASE: if node is null OR node is p OR node is q &rarr;
+            return node<br />
+            &nbsp;&nbsp;left &larr; lca(node.left, p, q)<br />
+            &nbsp;&nbsp;right &larr; lca(node.right, p, q)<br />
+            &nbsp;&nbsp;if both left and right non-null &rarr; return node
+            <em>(split point!)</em><br />
+            &nbsp;&nbsp;return whichever is non-null
+          </p>
+        </div>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang"
@@ -1503,13 +1732,19 @@
             <strong
               >Dry Run &mdash; LCA(root=3, p=5, q=1) on [3,5,1,6,2,0,8]:</strong
             >
-            <div class="ascii-tree" style="margin-top: 8px">
-              3 / 5 1 / \ / 6 2 0 8 lca(3, 5, 1): left = lca(5, 5, 1) &#x2192;
-              node==p &#x2192; return <span class="nd">5</span> right = lca(1,
-              5, 1) &#x2192; node==q &#x2192; return
-              <span class="nd">1</span> both non-null &#x2192; return
-              <span class="hl">3</span> (the split!) &#10003;
-            </div>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">         <span class="hl">3</span>
+        / \
+      <span class="nd">5</span>     <span class="nd">1</span>
+     / \   / \
+   <span class="nd">6</span>   <span class="nd">2</span> <span class="nd">0</span>   <span class="nd">8</span>
+
+lca(<span class="hl">3</span>, p=5, q=1):
+  left  = lca(<span class="nd">5</span>, p=5, q=1) &rarr; node==p &rarr; return <span class="nd">5</span>  &#9668; found p
+  right = lca(<span class="nd">1</span>, p=5, q=1) &rarr; node==q &rarr; return <span class="nd">1</span>  &#9668; found q
+  both non-null &rarr; split point &rarr; return <span class="hl">3</span> &#10003;
+
+Key: once both sides return non-null, the current node IS the LCA.</div>
           </div>
         </div>
         <hr />
@@ -1519,23 +1754,137 @@
         <div class="callout blue">
           <span class="callout-icon">&#128218;</span>
           <div class="callout-body">
-            <strong>5 problems, one per major pattern.</strong> Solve each
-            yourself before expanding the solution. Goal: within 30 seconds of
-            reading a tree problem, identify the pattern.
+            <strong>6 problems, one per pattern.</strong> Solve each yourself
+            before expanding the solution. Goal: within 30 seconds of reading
+            any tree problem, identify the pattern.
           </div>
         </div>
 
-        <!-- P1 -->
+        <!-- PROB 01: Inorder (Pattern 1 - DFS) -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01</div>
+              <div class="prob-num">
+                Problem 01 &middot;
+                <a
+                  href="https://leetcode.com/problems/binary-tree-inorder-traversal/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 94</a
+                >
+              </div>
+              <div class="prob-title">Binary Tree Inorder Traversal</div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Pattern 1: DFS Traversal</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Microsoft &middot; Google</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given the root of a binary tree, return the
+                <em>inorder traversal</em> of its node values (left &rarr; root
+                &rarr; right).
+              </p>
+              <div class="iobox">
+                Input: [1,null,2,3] Output: [1,3,2] Input: [] Output: []
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Pattern 1 &mdash; recursive inorder is trivial (3 lines). The
+                real interview ask:
+                <strong>can you do it iteratively?</strong> Use an explicit
+                stack. Keep going left until null, pop, visit, then move right.
+                The outer <code>while</code> condition
+                <code>curr != null || !stack.isEmpty()</code> covers the case
+                where all left nodes are exhausted but the stack still has nodes
+                to return to.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution (Recursive + Iterative)
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#9749; Java &middot; LC 94 &mdash; Both Approaches</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cm">// Recursive — Pattern 1 in its purest form:</span>
+<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderRecursive</span>(<span class="cls">TreeNode</span> root) {
+    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="fn">dfs</span>(root, res);
+    <span class="ret">return</span> res;
+}
+<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">TreeNode</span> n, <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res) {
+    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
+    <span class="fn">dfs</span>(n.left, res);
+    res.add(n.val);   <span class="cm">// ROOT (after left)</span>
+    <span class="fn">dfs</span>(n.right, res);
+}
+
+<span class="cm">// Iterative — the classic interview follow-up:</span>
+<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderIterative</span>(<span class="cls">TreeNode</span> root) {
+    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
+    <span class="cls">TreeNode</span> curr = root;
+    <span class="kw">while</span> (curr != <span class="kw">null</span> || !stack.isEmpty()) {
+        <span class="kw">while</span> (curr != <span class="kw">null</span>) { stack.push(curr); curr = curr.left; }
+        curr = stack.pop();
+        res.add(curr.val);
+        curr = curr.right;
+    }
+    <span class="ret">return</span> res;
+}
+<span class="cm">// Both: Time O(n), Space O(h) where h = tree height</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(h) stack</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- PROB 02: Max Depth (Pattern 3) -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/maximum-depth-of-binary-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 104</a
+                >
+              </div>
               <div class="prob-title">Maximum Depth of Binary Tree</div>
               <div class="prob-tags">
                 <span class="tag tag-easy">Easy</span>
                 <span class="tag tag-pat">Pattern 3: Height Recursion</span>
                 <span class="tag tag-co">Amazon &middot; Google</span>
-                <span class="tag tag-lc">LC 104</span>
               </div>
             </div>
             <div class="prob-right">
@@ -1594,11 +1943,19 @@
           </div>
         </div>
 
-        <!-- P2 -->
+        <!-- PROB 03: Level Order (Pattern 2) -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 02</div>
+              <div class="prob-num">
+                Problem 03 &middot;
+                <a
+                  href="https://leetcode.com/problems/binary-tree-level-order-traversal/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 102</a
+                >
+              </div>
               <div class="prob-title">Binary Tree Level Order Traversal</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
@@ -1680,7 +2037,15 @@
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 03</div>
+              <div class="prob-num">
+                Problem 04 &middot;
+                <a
+                  href="https://leetcode.com/problems/diameter-of-binary-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 543</a
+                >
+              </div>
               <div class="prob-title">Diameter of Binary Tree</div>
               <div class="prob-tags">
                 <span class="tag tag-easy">Easy</span>
@@ -1754,7 +2119,15 @@
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04</div>
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/validate-binary-search-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 98</a
+                >
+              </div>
               <div class="prob-title">Validate Binary Search Tree</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
@@ -1826,7 +2199,15 @@
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05</div>
+              <div class="prob-num">
+                Problem 06 &middot;
+                <a
+                  href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 236</a
+                >
+              </div>
               <div class="prob-title">
                 Lowest Common Ancestor of a Binary Tree
               </div>
