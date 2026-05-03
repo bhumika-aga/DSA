@@ -1,1241 +1,1300 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecture 3 — OOP & Collections Deep Dive</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 260px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      flex-direction: row;
-      transition: background .2s, color .2s;
-    }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 0 16px 6px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 16px;
-      cursor: pointer;
-      color: var(--text2);
-      transition: background .12s, color .12s;
-      text-decoration: none
-    }
-
-    .toc-item:hover,
-    .toc-item.active {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      font-weight: 500;
-      color: var(--accent)
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      flex-shrink: 0
-    }
-
-    .toc-sub {
-      padding-left: 36px;
-      font-size: 12px;
-      color: var(--text3)
-    }
-
-    .toc-sub:hover {
-      color: var(--text2)
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 10px 16px
-    }
-
-    /* ── Main ── */
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    /* ── Topbar ── */
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2);
-      gap: 12px;
-      backdrop-filter: blur(8px)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--text)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width .3s
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3)
-    }
-
-    /* ── Page Header ── */
-    .page-header {
-      margin-bottom: 40px;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      margin-bottom: 12px;
-      display: block
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      background: var(--bg2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent-bg)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green-bg)
-    }
-
-    .meta-chip.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow-bg)
-    }
-
-    /* ── Headings ── */
-    .h1 {
-      font-family: var(--serif);
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 40px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--border);
-      scroll-margin-top: 20px
-    }
-
-    .h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      scroll-margin-top: 20px
-    }
-
-    .h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 20px 0 6px
-    }
-
-    p {
-      color: var(--text);
-      margin: 0 0 10px;
-      line-height: 1.75
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 32px 0
-    }
-
-    /* ── Callouts ── */
-    .callout {
-      display: flex;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 14px 0;
-      font-size: 14px;
-      line-height: 1.65
-    }
-
-    .callout-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .callout-body {
-      flex: 1
-    }
-
-    .callout-body strong {
-      font-weight: 600
-    }
-
-    .callout.blue {
-      background: var(--accent-bg);
-      color: var(--text)
-    }
-
-    .callout.green {
-      background: var(--green-bg);
-      color: var(--text)
-    }
-
-    .callout.yellow {
-      background: var(--yellow-bg);
-      color: var(--text)
-    }
-
-    .callout.red {
-      background: var(--red-bg);
-      color: var(--text)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg);
-      color: var(--text)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg);
-      color: var(--text)
-    }
-
-    .callout.teal {
-      background: var(--teal-bg);
-      color: var(--text)
-    }
-
-    /* ── Code Blocks ── */
-    .code-block {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      gap: 10px
-    }
-
-    .code-lang {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3)
-    }
-
-    .copy-btn {
-      background: none;
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 11px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    .copy-btn:hover {
-      background: var(--bg)
-    }
-
-    pre {
-      padding: 16px;
-      overflow-x: auto;
-      margin: 0;
-      font-family: var(--mono);
-      font-size: 13.5px;
-      line-height: 1.75;
-      tab-size: 4
-    }
-
-    .kw {
-      color: #0550ae;
-      font-weight: 500
-    }
-
-    .cm {
-      color: #6a737d;
-      font-style: italic
-    }
-
-    .str {
-      color: #0a8043
-    }
-
-    .num {
-      color: #953800
-    }
-
-    .fn {
-      color: #8250df
-    }
-
-    .cls {
-      color: #1a7f37
-    }
-
-    .ret {
-      color: #0550ae
-    }
-
-    [data-theme="dark"] .kw {
-      color: #79c0ff
-    }
-
-    [data-theme="dark"] .cm {
-      color: #8b949e
-    }
-
-    [data-theme="dark"] .str {
-      color: #a5d6ff
-    }
-
-    [data-theme="dark"] .num {
-      color: #ff9150
-    }
-
-    [data-theme="dark"] .fn {
-      color: #d2a8ff
-    }
-
-    [data-theme="dark"] .cls {
-      color: #7ee787
-    }
-
-    [data-theme="dark"] .ret {
-      color: #79c0ff
-    }
-
-    code {
-      font-family: var(--mono);
-      font-size: 13px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: var(--red)
-    }
-
-    [data-theme="dark"] code {
-      color: var(--orange)
-    }
-
-    /* ── Tables ── */
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    thead th {
-      background: var(--bg2);
-      padding: 9px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: .03em;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap
-    }
-
-    tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      line-height: 1.5
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none
-    }
-
-    tbody tr:hover td {
-      background: var(--bg2)
-    }
-
-    /* ── Lists ── */
-    ul,
-    ol {
-      padding-left: 24px;
-      margin: 8px 0 12px
-    }
-
-    li {
-      margin: 4px 0;
-      line-height: 1.7
-    }
-
-    li::marker {
-      color: var(--text3)
-    }
-
-    /* ── Toggles ── */
-    details {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 10px 0;
-      overflow: hidden
-    }
-
-    summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--bg2);
-      list-style: none;
-      transition: background .12s;
-      user-select: none
-    }
-
-    summary::-webkit-details-marker {
-      display: none
-    }
-
-    summary:hover {
-      background: var(--bg3)
-    }
-
-    .toggle-arrow {
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .2s;
-      color: var(--text3);
-      font-size: 12px;
-      flex-shrink: 0
-    }
-
-    details[open] summary .toggle-arrow {
-      transform: rotate(90deg)
-    }
-
-    .details-body {
-      padding: 14px 16px;
-      background: var(--bg);
-      border-top: 1px solid var(--border)
-    }
-
-    /* ── Practice problem cards ── */
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background .12s
-    }
-
-    .prob-header:hover {
-      background: var(--bg3)
-    }
-
-    .prob-left {
-      flex: 1;
-      min-width: 0
-    }
-
-    .prob-num {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: 4px
-    }
-
-    .prob-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .prob-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 8px
-    }
-
-    .tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 500
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .tag-pat {
-      background: var(--purple-bg);
-      color: var(--purple)
-    }
-
-    .tag-lc {
-      background: var(--orange-bg);
-      color: var(--orange)
-    }
-
-    .prob-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      flex-shrink: 0
-    }
-
-    .prob-body {
-      padding: 16px;
-      background: var(--bg)
-    }
-
-    .prob-section {
-      margin-bottom: 14px
-    }
-
-    .prob-section-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 6px
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border-left: 3px solid var(--border2);
-      padding: 10px 14px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      margin: 8px 0;
-      white-space: pre-wrap
-    }
-
-    /* ── Progress Bar ── */
-    .progress-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      width: 0%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ── Checklist Component ── */
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin: 8px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-      user-select: none;
-    }
-
-    .checklist-item:hover {
-      background: var(--bg2);
-      border-color: var(--border);
-    }
-
-    .cb-box {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border2);
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: transparent;
-      font-size: 12px;
-      flex-shrink: 0;
-      background: var(--bg);
-    }
-
-    .cb-text {
-      font-size: 14.5px;
-      color: var(--text);
-      transition: all 0.2s ease;
-      font-weight: 500;
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .checklist-item.done .cb-text {
-      color: var(--text3);
-      text-decoration: line-through;
-    }
-
-    /* ── ASCII Tree Dry Runs ── */
-    .ascii-tree {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text2);
-      margin: 14px 0;
-      white-space: pre;
-      overflow-x: auto;
-    }
-
-    .ascii-tree .hl {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .ascii-tree .nd {
-      color: var(--orange);
-      font-weight: 600;
-    }
-
-    .ascii-tree .ret {
-      color: var(--purple);
-      font-weight: 600;
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      white-space: pre-wrap;
-    }
-
-    /* ── Complexity ── */
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0
-    }
-
-    .cx-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: var(--mono);
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .cx-badge .cx-label {
-      font-size: 11px;
-      font-family: var(--sans);
-      color: var(--text3)
-    }
-
-    .cx-badge .cx-val {
-      font-weight: 600;
-      color: var(--text)
-    }
-
-    .cx-badge.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .cx-badge.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .cx-badge.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .cx-badge .cx-val.green {
-      color: var(--green)
-    }
-
-    .cx-badge .cx-val.yellow {
-      color: var(--yellow)
-    }
-
-    .cx-badge .cx-val.red {
-      color: var(--red)
-    }
-
-    /* ── Pattern banner ── */
-    .pattern-banner {
-      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 20px 0
-    }
-
-    .pattern-banner h4 {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--purple);
-      margin-bottom: 8px
-    }
-
-    .pattern-banner p {
-      font-size: 14px;
-      font-family: var(--mono);
-      color: var(--text);
-      margin: 0;
-      line-height: 1.8
-    }
-
-    /* ── Big-O chart ── */
-    .bigo-chart-wrap {
-      margin: 14px 0 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--bg2);
-      padding: 16px
-    }
-
-    /* ── Checklist ── */
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none
-    }
-
-    .cb-box {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border2);
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      font-size: 11px
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff
-    }
-
-    .checklist-item.done .cb-text {
-      text-decoration: line-through;
-      color: var(--text3)
-    }
-
-    /* ── Inline highlight ── */
-    mark {
-      background: var(--yellow-bg);
-      color: var(--text);
-      padding: 0 3px;
-      border-radius: 3px
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border2);
-      border-radius: 3px
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    @media(max-width:768px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 3 — OOP & Collections Deep Dive</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
       #sidebar {
-        display: none
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
       }
 
       #content {
-        padding: 24px 20px 80px
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">📚 DSA Course</div>
-      <div class="sb-title">OOP & Collections</div>
-      <div class="sb-meta">Lecture 3 of 30 · Phase 1 — Foundations</div>
-    </div>
-    <div class="toc-label">On this page</div>
-    <a class="toc-item" href="#pillars"><span class="toc-icon">🏗</span>Four Pillars of OOP</a>
-    <a class="toc-item toc-sub" href="#encapsulation">Encapsulation</a>
-    <a class="toc-item toc-sub" href="#inheritance">Inheritance</a>
-    <a class="toc-item toc-sub" href="#polymorphism">Polymorphism</a>
-    <a class="toc-item toc-sub" href="#abstraction">Abstract vs Interface</a>
-    <a class="toc-item" href="#comparable"><span class="toc-icon">📊</span>Comparable vs Comparator</a>
-    <a class="toc-item" href="#generics"><span class="toc-icon">🧬</span>Generics Deep Dive</a>
-    <a class="toc-item" href="#arraylist-internals"><span class="toc-icon">📋</span>ArrayList Internals</a>
-    <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
-    <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
-    <div class="sb-div"></div>
-    <div style="padding:8px 16px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-      <a class="toc-item" href="../Lecture2/lecture2_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 2: Memory</a>
-      <a class="toc-item" href="../Lecture4/lecture4_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 4: Java 8+</a>
-    </div>
-  </nav>
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb">
-        <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
-        <a href="#">Phase 1</a><span>›</span>
-        <span>Lecture 3</span>
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">📚 DSA Course</div>
+        <div class="sb-title">OOP & Collections</div>
+        <div class="sb-meta">Lecture 3 of 30 · Phase 1 — Foundations</div>
       </div>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3)">Progress</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#pillars"
+        ><span class="toc-icon">🏗</span>Four Pillars of OOP</a
+      >
+      <a class="toc-item toc-sub" href="#encapsulation">Encapsulation</a>
+      <a class="toc-item toc-sub" href="#inheritance">Inheritance</a>
+      <a class="toc-item toc-sub" href="#polymorphism">Polymorphism</a>
+      <a class="toc-item toc-sub" href="#abstraction">Abstract vs Interface</a>
+      <a class="toc-item" href="#comparable"
+        ><span class="toc-icon">📊</span>Comparable vs Comparator</a
+      >
+      <a class="toc-item" href="#generics"
+        ><span class="toc-icon">🧬</span>Generics Deep Dive</a
+      >
+      <a class="toc-item" href="#arraylist-internals"
+        ><span class="toc-icon">📋</span>ArrayList Internals</a
+      >
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">💪</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">📝</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">✅</span>Checklist</a
+      >
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
         </div>
-        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+        <a
+          class="toc-item"
+          href="../Lecture2/lecture2_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >← Topic 2: Memory</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture4/lecture4_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >→ Topic 4: Java 8+</a
+        >
       </div>
-    </div>
-    <div id="content">
-      <div class="page-header">
-        <span class="page-emoji">🏗</span>
-        <h1 class="page-title">OOP & Collections Deep Dive</h1>
-        <p class="page-sub">"First, learn the rules. Then break them intelligently. OOP gives you the rules for building
-          scalable systems."</p>
-        <div class="meta-row"><span class="meta-chip accent">📖 Lecture 3</span><span class="meta-chip accent">Phase 1 —
-            Foundations</span><span class="meta-chip yellow">⏱ 4 days</span><span class="meta-chip green">🎯 20+
-            problems</span><span class="meta-chip ">💼 Amazon · Microsoft · Oracle</span></div>
-      </div>
-
-      <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">🌍</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          Object-Oriented Programming (OOP) is how engineers manage complexity. A single FAANG backend service can have
-          millions of lines of code written by hundreds of engineers. Without OOP principles, that codebase collapses
-          under its own weight. Encapsulation, Inheritance, Polymorphism, and Abstraction are the four tools that keep
-          large systems maintainable — and they appear directly in interview questions like "Design a Parking Lot" or
-          "Design an LRU Cache."
+    </nav>
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
+          <a href="#">Phase 1</a><span>›</span>
+          <span>Lecture 3</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
         </div>
       </div>
-
-      <h3 class="h2" style="margin-top:0">📖 Before We Start — The Big Picture</h3>
-      <p>In the real world, we manage complexity by grouping related things. A <strong>class</strong> is a blueprint
-        (the architect's drawing of a house). An <strong>object</strong> is the actual thing built from that blueprint
-        (a real house). Every Toyota car on the road is a different <em>object</em>, but they all share the same
-        <em>class</em> (blueprint). OOP is just this idea — applied to code.
-      </p>
-      <p>You already used objects in Lecture 2 when you read about the <code>String</code> class,
-        <code>ArrayList</code>, and the JVM's heap. Every single one of those is a class. This lecture teaches you how
-        to <em>design</em> your own classes and how to make them work together elegantly.
-      </p>
-
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">🔗</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 2 explained memory — every object you <code>new</code> up goes on
-          the heap. This lecture teaches you what those objects are. Lecture 4 (Java 8+) extends this with lambdas and
-          functional interfaces, which are just anonymous object implementations behind the scenes.
+      <div id="content">
+        <div class="page-header">
+          <span class="page-emoji">🏗</span>
+          <h1 class="page-title">OOP & Collections Deep Dive</h1>
+          <p class="page-sub">
+            "First, learn the rules. Then break them intelligently. OOP gives
+            you the rules for building scalable systems."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">📖 Lecture 3</span
+            ><span class="meta-chip accent">Phase 1 — Foundations</span
+            ><span class="meta-chip yellow">⏱ 4 days</span
+            ><span class="meta-chip green">🎯 20+ problems</span
+            ><span class="meta-chip">💼 Amazon · Microsoft · Oracle</span>
+          </div>
         </div>
-      </div>
 
-      <hr>
-
-      <h2 class="h1" id="pillars">🏗 The Four Pillars of OOP</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Pillar</th>
-              <th>What it means</th>
-              <th>DSA Example</th>
-              <th>Key mechanism</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Encapsulation</strong></td>
-              <td>Bundle data + methods; hide internals via access modifiers</td>
-              <td>LinkedList: private head, public add/remove</td>
-              <td>private fields + public getters/setters</td>
-            </tr>
-            <tr>
-              <td><strong>Abstraction</strong></td>
-              <td>Expose <em>what</em> to do; hide <em>how</em></td>
-              <td>PriorityQueue: you call offer/poll, not heapifyUp</td>
-              <td>abstract classes, interfaces</td>
-            </tr>
-            <tr>
-              <td><strong>Inheritance</strong></td>
-              <td>Subclass reuses + extends superclass</td>
-              <td>TreeNode extends Node; DFS methods inherited</td>
-              <td>extends keyword, super()</td>
-            </tr>
-            <tr>
-              <td><strong>Polymorphism</strong></td>
-              <td>Same interface, different behaviour per type</td>
-              <td>Comparator: sort by salary vs name without changing sort logic</td>
-              <td>@Override, method overloading</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h3 class="h2" id="encapsulation">1. Encapsulation</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · BankAccount</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">🌍</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Object-Oriented Programming (OOP) is how engineers manage
+            complexity. A single FAANG backend service can have millions of
+            lines of code written by hundreds of engineers. Without OOP
+            principles, that codebase collapses under its own weight.
+            Encapsulation, Inheritance, Polymorphism, and Abstraction are the
+            four tools that keep large systems maintainable — and they appear
+            directly in interview questions like "Design a Parking Lot" or
+            "Design an LRU Cache."
+          </div>
         </div>
-        <pre><span class="kw">class</span> <span class="cls">BankAccount</span> {
+
+        <h3 class="h2" style="margin-top: 0">
+          📖 Before We Start — The Big Picture
+        </h3>
+        <p>
+          In the real world, we manage complexity by grouping related things. A
+          <strong>class</strong> is a blueprint (the architect's drawing of a
+          house). An <strong>object</strong> is the actual thing built from that
+          blueprint (a real house). Every Toyota car on the road is a different
+          <em>object</em>, but they all share the same
+          <em>class</em> (blueprint). OOP is just this idea — applied to code.
+        </p>
+        <p>
+          You already used objects in Lecture 2 when you read about the
+          <code>String</code> class, <code>ArrayList</code>, and the JVM's heap.
+          Every single one of those is a class. This lecture teaches you how to
+          <em>design</em> your own classes and how to make them work together
+          elegantly.
+        </p>
+
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">🔗</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 2 explained memory — every
+            object you <code>new</code> up goes on the heap. This lecture
+            teaches you what those objects are. Lecture 4 (Java 8+) extends this
+            with lambdas and functional interfaces, which are just anonymous
+            object implementations behind the scenes.
+          </div>
+        </div>
+
+        <hr />
+
+        <h2 class="h1" id="pillars">🏗 The Four Pillars of OOP</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Pillar</th>
+                <th>What it means</th>
+                <th>DSA Example</th>
+                <th>Key mechanism</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Encapsulation</strong></td>
+                <td>
+                  Bundle data + methods; hide internals via access modifiers
+                </td>
+                <td>LinkedList: private head, public add/remove</td>
+                <td>private fields + public getters/setters</td>
+              </tr>
+              <tr>
+                <td><strong>Abstraction</strong></td>
+                <td>Expose <em>what</em> to do; hide <em>how</em></td>
+                <td>PriorityQueue: you call offer/poll, not heapifyUp</td>
+                <td>abstract classes, interfaces</td>
+              </tr>
+              <tr>
+                <td><strong>Inheritance</strong></td>
+                <td>Subclass reuses + extends superclass</td>
+                <td>TreeNode extends Node; DFS methods inherited</td>
+                <td>extends keyword, super()</td>
+              </tr>
+              <tr>
+                <td><strong>Polymorphism</strong></td>
+                <td>Same interface, different behaviour per type</td>
+                <td>
+                  Comparator: sort by salary vs name without changing sort logic
+                </td>
+                <td>@Override, method overloading</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="h2" id="encapsulation">1. Encapsulation</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · BankAccount</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">class</span> <span class="cls">BankAccount</span> {
     <span class="kw">private double</span> balance;  <span class="cm">// hidden — cannot access directly</span>
     <span class="cls">BankAccount</span>(<span class="kw">double</span> init) { balance = init; }
 
@@ -1247,14 +1306,14 @@
 }
 <span class="cm">// Cannot do: account.balance = -1000; (compile error!)</span>
 <span class="cm">// Must go through deposit/withdraw which enforce business rules</span></pre>
-      </div>
-      <h3 class="h2" id="inheritance">2. Inheritance</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Inheritance Chain</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">abstract class</span> <span class="cls">Shape</span> {
+        <h3 class="h2" id="inheritance">2. Inheritance</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Inheritance Chain</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">abstract class</span> <span class="cls">Shape</span> {
     <span class="kw">abstract double</span> <span class="fn">area</span>();
     <span class="kw">void</span> <span class="fn">print</span>() { System.out.println(<span class="str">"Area: "</span> + area()); } <span class="cm">// inherited</span>
 }
@@ -1274,90 +1333,97 @@
 <span class="cm">// Polymorphism in action:</span>
 <span class="cls">Shape</span>[] shapes = {<span class="kw">new</span> <span class="cls">Circle</span>(5), <span class="kw">new</span> <span class="cls">Rectangle</span>(3,4)};
 <span class="kw">for</span> (<span class="cls">Shape</span> s : shapes) s.print(); <span class="cm">// calls correct area() per type</span></pre>
-      </div>
-      <h3 class="h2" id="polymorphism">3. Polymorphism — Runtime vs Compile-time</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>When resolved</th>
-              <th>Mechanism</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Runtime (Dynamic)</strong></td>
-              <td>At runtime</td>
-              <td>@Override — subclass overrides parent method</td>
-              <td>Shape.area() calls Circle.area() or Rectangle.area()</td>
-            </tr>
-            <tr>
-              <td><strong>Compile-time (Static)</strong></td>
-              <td>At compile time</td>
-              <td>Method overloading — same name, different params</td>
-              <td>print(int) vs print(String) vs print(double)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h3 class="h2" id="abstraction">4. Abstract Class vs Interface — The Critical Comparison</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Dimension</th>
-              <th>Abstract Class</th>
-              <th>Interface</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Instantiation</strong></td>
-              <td>Cannot instantiate</td>
-              <td>Cannot instantiate</td>
-            </tr>
-            <tr>
-              <td><strong>Constructor</strong></td>
-              <td>✅ Can have</td>
-              <td>❌ Cannot have</td>
-            </tr>
-            <tr>
-              <td><strong>Fields</strong></td>
-              <td>Any access modifier</td>
-              <td>Only <code>public static final</code> (constants)</td>
-            </tr>
-            <tr>
-              <td><strong>Methods</strong></td>
-              <td>Abstract + concrete</td>
-              <td>Abstract + <code>default</code> + <code>static</code> (Java 8+)</td>
-            </tr>
-            <tr>
-              <td><strong>Multiple inheritance</strong></td>
-              <td>❌ One parent only</td>
-              <td>✅ A class can implement many</td>
-            </tr>
-            <tr>
-              <td><strong>When to use</strong></td>
-              <td>"Is-a" with shared state/code (Template Method pattern)</td>
-              <td>"Can-do" (Comparable, Runnable, Serializable)</td>
-            </tr>
-            <tr>
-              <td><strong>DSA Example</strong></td>
-              <td>AbstractList providing default iterator</td>
-              <td>Comparable for natural ordering in TreeSet/PQ</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h2 class="h1" id="comparable">📊 Comparable vs Comparator</h2>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Both Patterns</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">class</span> <span class="cls">Employee</span> <span class="kw">implements</span> <span class="cls">Comparable</span>&lt;<span class="cls">Employee</span>&gt; {
+        <h3 class="h2" id="polymorphism">
+          3. Polymorphism — Runtime vs Compile-time
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>When resolved</th>
+                <th>Mechanism</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Runtime (Dynamic)</strong></td>
+                <td>At runtime</td>
+                <td>@Override — subclass overrides parent method</td>
+                <td>Shape.area() calls Circle.area() or Rectangle.area()</td>
+              </tr>
+              <tr>
+                <td><strong>Compile-time (Static)</strong></td>
+                <td>At compile time</td>
+                <td>Method overloading — same name, different params</td>
+                <td>print(int) vs print(String) vs print(double)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="h2" id="abstraction">
+          4. Abstract Class vs Interface — The Critical Comparison
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Abstract Class</th>
+                <th>Interface</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Instantiation</strong></td>
+                <td>Cannot instantiate</td>
+                <td>Cannot instantiate</td>
+              </tr>
+              <tr>
+                <td><strong>Constructor</strong></td>
+                <td>✅ Can have</td>
+                <td>❌ Cannot have</td>
+              </tr>
+              <tr>
+                <td><strong>Fields</strong></td>
+                <td>Any access modifier</td>
+                <td>Only <code>public static final</code> (constants)</td>
+              </tr>
+              <tr>
+                <td><strong>Methods</strong></td>
+                <td>Abstract + concrete</td>
+                <td>
+                  Abstract + <code>default</code> + <code>static</code> (Java
+                  8+)
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Multiple inheritance</strong></td>
+                <td>❌ One parent only</td>
+                <td>✅ A class can implement many</td>
+              </tr>
+              <tr>
+                <td><strong>When to use</strong></td>
+                <td>"Is-a" with shared state/code (Template Method pattern)</td>
+                <td>"Can-do" (Comparable, Runnable, Serializable)</td>
+              </tr>
+              <tr>
+                <td><strong>DSA Example</strong></td>
+                <td>AbstractList providing default iterator</td>
+                <td>Comparable for natural ordering in TreeSet/PQ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="comparable">📊 Comparable vs Comparator</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Both Patterns</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">class</span> <span class="cls">Employee</span> <span class="kw">implements</span> <span class="cls">Comparable</span>&lt;<span class="cls">Employee</span>&gt; {
     <span class="cls">String</span> name; <span class="kw">int</span> salary;
     @Override
     <span class="kw">public int</span> <span class="fn">compareTo</span>(<span class="cls">Employee</span> o) {
@@ -1380,14 +1446,16 @@
 list.sort(combined);
 <span class="cls">Arrays</span>.sort(arr, combined);
 <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(combined); <span class="cm">// custom-ordered heap</span></pre>
-      </div>
-      <h2 class="h1" id="generics">🧬 Generics Deep Dive</h2>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Generic Methods & Bounded Wildcards</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cm">// Generic method — works for any Comparable type</span>
+        <h2 class="h1" id="generics">🧬 Generics Deep Dive</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              ☕ Java · Generic Methods & Bounded Wildcards
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Generic method — works for any Comparable type</span>
 <span class="kw">public static</span> &lt;T <span class="kw">extends</span> <span class="cls">Comparable</span>&lt;T&gt;&gt; T <span class="fn">findMax</span>(<span class="cls">List</span>&lt;T&gt; list) {
     T max = list.get(0);
     <span class="kw">for</span> (T item : list) <span class="kw">if</span> (item.compareTo(max) &gt; 0) max = item;
@@ -1408,20 +1476,24 @@ list.sort(combined);
 } <span class="cm">// works for List&lt;Integer&gt;, List&lt;Number&gt;, List&lt;Object&gt;</span>
 
 <span class="cm">// PECS: Producer Extends, Consumer Super</span></pre>
-      </div>
-      <h2 class="h1" id="arraylist-internals">📋 ArrayList Internals</h2>
-      <div class="callout blue"><span class="callout-icon">📌</span>
-        <div class="callout-body"><strong>ArrayList is backed by a plain Object[] array.</strong> When you call
-          <code>new ArrayList&lt;&gt;()</code> it creates an Object[10] internally. When full, it allocates a NEW array
-          of size 1.5× and copies everything over. This copy is O(n) but happens rarely, so add() is O(1) amortised.
         </div>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · ArrayList resize simulation</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <h2 class="h1" id="arraylist-internals">📋 ArrayList Internals</h2>
+        <div class="callout blue">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>ArrayList is backed by a plain Object[] array.</strong> When
+            you call <code>new ArrayList&lt;&gt;()</code> it creates an
+            Object[10] internally. When full, it allocates a NEW array of size
+            1.5× and copies everything over. This copy is O(n) but happens
+            rarely, so add() is O(1) amortised.
+          </div>
         </div>
-        <pre><span class="cm">// Pseudocode approximation of ArrayList internals</span>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · ArrayList resize simulation</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Pseudocode approximation of ArrayList internals</span>
 <span class="kw">class</span> <span class="cls">SimpleArrayList</span>&lt;T&gt; {
     <span class="cls">Object</span>[] data = <span class="kw">new</span> <span class="cls">Object</span>[10]; <span class="cm">// default capacity</span>
     <span class="kw">int</span> size = 0;
@@ -1440,33 +1512,48 @@ list.sort(combined);
     }
 }
 <span class="cm">// Tip: new ArrayList&lt;&gt;(expectedSize) avoids all resizing overhead</span></pre>
-      </div>
-      <h2 class="h1" id="practice">💪 Practice Problems</h2>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 01 · Design</div>
-            <div class="prob-title">Design a Stack Using ArrayList</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/implement-stack-using-queues/"
-                target="_blank" style="font-size:12px">🔗 LC 225 (concept)</a></div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-pat">OOP Design</span></div>
-          </div>
-          <span style="color:var(--text3);font-size:18px">›</span>
         </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Implement a generic Stack class using ArrayList with push, pop, peek, isEmpty, size — all O(1).</p>
+        <h2 class="h1" id="practice">💪 Practice Problems</h2>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 · Design</div>
+              <div class="prob-title">Design a Stack Using ArrayList</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/implement-stack-using-queues/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 225 (concept)</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">OOP Design</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> <span class="cls">Stack</span>&lt;T&gt; {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Implement a generic Stack class using ArrayList with push, pop,
+                peek, isEmpty, size — all O(1).
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> <span class="cls">Stack</span>&lt;T&gt; {
     <span class="kw">private</span> <span class="cls">List</span>&lt;T&gt; data = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
     <span class="kw">void</span> <span class="fn">push</span>(T val) { data.add(val); }      <span class="cm">// append to END = O(1)</span>
     T <span class="fn">pop</span>() { <span class="ret">return</span> data.remove(data.size()-1); } <span class="cm">// remove last = O(1)</span>
@@ -1474,42 +1561,54 @@ list.sort(combined);
     <span class="kw">boolean</span> <span class="fn">isEmpty</span>() { <span class="ret">return</span> data.isEmpty(); }
     <span class="kw">int</span> <span class="fn">size</span>() { <span class="ret">return</span> data.size(); }
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(1) all
-                    ops</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(1) all ops</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 · Sorting</div>
+              <div class="prob-title">Sort Employees by Salary then Name</div>
+
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-pat">Comparator Chain</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 02 · Sorting</div>
-            <div class="prob-title">Sort Employees by Salary then Name</div>
-
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Microsoft</span><span
-                class="tag tag-pat">Comparator Chain</span></div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Sort a list of Employee objects: primary by salary descending, secondary by name ascending. Do not modify
-              the Employee class.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt; employees = ...;
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Sort a list of Employee objects: primary by salary descending,
+                secondary by name ascending. Do not modify the Employee class.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt; employees = ...;
 employees.sort(
     <span class="cls">Comparator</span>.comparingInt((<span class="cls">Employee</span> e) -> e.salary).reversed()
               .thenComparing(e -> e.name)
@@ -1520,52 +1619,80 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
     <span class="kw">if</span> (<span class="kw">a</span>.salary != <span class="kw">b</span>.salary) <span class="ret">return</span> <span class="kw">b</span>.salary - <span class="kw">a</span>.salary; <span class="cm">// desc salary</span>
     <span class="ret">return</span> <span class="kw">a</span>.name.compareTo(<span class="kw">b</span>.name);              <span class="cm">// asc name</span>
 });</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
-                    n)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(1)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n log n)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P03 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 · HashMap Grouping</div>
+              <div class="prob-title">Group Anagrams</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/group-anagrams/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 49</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">HashMap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P03 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 03 · HashMap Grouping</div>
-            <div class="prob-title">Group Anagrams</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/" target="_blank"
-                style="font-size:12px">🔗 LC 49</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Google</span><span class="tag tag-pat">HashMap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given an array of strings, group the strings that are anagrams of each other.</p>
-            <div class="iobox">["eat","tea","tan","ate","nat","bat"] → [["bat"],["nat","tan"],["ate","eat","tea"]]</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Two strings are anagrams if their sorted characters are identical. Use a
-              <code>HashMap&lt;String, List&lt;String&gt;&gt;</code> where the key is the sorted version of each word.
-              All words with the same sorted key belong in the same group.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution + Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Sort-key HashMap</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">public</span> List&lt;List&lt;String&gt;&gt; <span class="fn">groupAnagrams</span>(String[] strs) {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an array of strings, group the strings that are anagrams
+                of each other.
+              </p>
+              <div class="iobox">
+                ["eat","tea","tan","ate","nat","bat"] →
+                [["bat"],["nat","tan"],["ate","eat","tea"]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Two strings are anagrams if their sorted characters are
+                identical. Use a
+                <code>HashMap&lt;String, List&lt;String&gt;&gt;</code> where the
+                key is the sorted version of each word. All words with the same
+                sorted key belong in the same group.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">►</span>Solution + Trace
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Sort-key HashMap</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">public</span> List&lt;List&lt;String&gt;&gt; <span class="fn">groupAnagrams</span>(String[] strs) {
     Map&lt;String, List&lt;String&gt;&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
     <span class="kw">for</span> (String s : strs) {
         <span class="kw">char</span>[] ch = s.<span class="fn">toCharArray</span>(); Arrays.<span class="fn">sort</span>(ch);
@@ -1575,54 +1702,81 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
     <span class="ret">return new</span> ArrayList&lt;&gt;(map.<span class="fn">values</span>());
 }
 <span class="cm">// "eat"→sort→"aet", "tea"→sort→"aet" → same group ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(N·K log K)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(N·K)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(N·K log
-                    K)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                    class="cx-val yellow">O(N·K)</span></div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 · Two-Stack OOP</div>
+              <div class="prob-title">Implement Queue Using Two Stacks</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/implement-queue-using-stacks/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 232</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-pat">OOP Design</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P04 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 04 · Two-Stack OOP</div>
-            <div class="prob-title">Implement Queue Using Two Stacks</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/implement-queue-using-stacks/"
-                target="_blank" style="font-size:12px">🔗 LC 232</a></div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Microsoft</span><span class="tag tag-pat">OOP Design</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Implement a first-in-first-out (FIFO) queue using two stacks. Support <code>push</code>,
-              <code>pop</code>, <code>peek</code>, and <code>empty</code>.
-            </p>
-            <div class="iobox">push(1)→push(2)→peek()=1→pop()=1→empty()=false</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Use two stacks: <code>inbox</code> and <code>outbox</code>. Push always goes to <code>inbox</code>.
-              Pop/peek: if <code>outbox</code> is empty, pour all of <code>inbox</code> into <code>outbox</code> (this
-              reverses order, making the oldest element on top). Then pop/peek from <code>outbox</code>. Amortised O(1)
-              per operation.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Inbox/Outbox Two-Stack Queue</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> MyQueue {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Implement a first-in-first-out (FIFO) queue using two stacks.
+                Support <code>push</code>, <code>pop</code>, <code>peek</code>,
+                and <code>empty</code>.
+              </p>
+              <div class="iobox">
+                push(1)→push(2)→peek()=1→pop()=1→empty()=false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Use two stacks: <code>inbox</code> and <code>outbox</code>. Push
+                always goes to <code>inbox</code>. Pop/peek: if
+                <code>outbox</code> is empty, pour all of
+                <code>inbox</code> into <code>outbox</code> (this reverses
+                order, making the oldest element on top). Then pop/peek from
+                <code>outbox</code>. Amortised O(1) per operation.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      ☕ Java · Inbox/Outbox Two-Stack Queue
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> MyQueue {
     Deque&lt;Integer&gt; inbox = <span class="kw">new</span> ArrayDeque&lt;&gt;();
     Deque&lt;Integer&gt; outbox = <span class="kw">new</span> ArrayDeque&lt;&gt;();
 
@@ -1639,54 +1793,78 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
 }
 <span class="cm">// push(1)push(2): inbox=[2,1]
 // peek(): outbox empty → pour → outbox=[1,2], peek=1 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(1)
-                    amortised</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(N)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) amortised</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 · Polymorphism</div>
+              <div class="prob-title">Iterator Pattern — Reverse Iterator</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/binary-search-tree-iterator/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 173 (concept)</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">Iterator / Interface</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P05 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 05 · Polymorphism</div>
-            <div class="prob-title">Iterator Pattern — Reverse Iterator</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/binary-search-tree-iterator/"
-                target="_blank" style="font-size:12px">🔗 LC 173 (concept)</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-pat">Iterator / Interface</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Implement a <code>ReverseIterator&lt;T&gt;</code> class that allows iterating a
-              <code>List&lt;T&gt;</code> in reverse order while implementing Java's <code>Iterator&lt;T&gt;</code>
-              interface.
-            </p>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Implementing <code>Iterator&lt;T&gt;</code> requires <code>hasNext()</code> and <code>next()</code>.
-              Start your index pointer at <code>list.size() - 1</code> and decrement it each call. This exercises
-              interface implementation, generics, and polymorphism simultaneously — all OOP concepts from this lecture.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Implementing Iterator&lt;T&gt;</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> ReverseIterator&lt;T&gt; <span class="kw">implements</span> Iterator&lt;T&gt; {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Implement a <code>ReverseIterator&lt;T&gt;</code> class that
+                allows iterating a <code>List&lt;T&gt;</code> in reverse order
+                while implementing Java's <code>Iterator&lt;T&gt;</code>
+                interface.
+              </p>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Implementing <code>Iterator&lt;T&gt;</code> requires
+                <code>hasNext()</code> and <code>next()</code>. Start your index
+                pointer at <code>list.size() - 1</code> and decrement it each
+                call. This exercises interface implementation, generics, and
+                polymorphism simultaneously — all OOP concepts from this
+                lecture.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      ☕ Java · Implementing Iterator&lt;T&gt;
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> ReverseIterator&lt;T&gt; <span class="kw">implements</span> Iterator&lt;T&gt; {
     <span class="kw">private final</span> List&lt;T&gt; list;
     <span class="kw">private int</span> idx;
 
@@ -1703,87 +1881,160 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
 }
 <span class="cm">// Usage: Iterator&lt;Integer&gt; it = new ReverseIterator&lt;&gt;(List.of(1,2,3));
 // it.next() → 3, 2, 1</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(1) per
-                    call</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) per call</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
                 </div>
               </div>
+            </details>
+          </div>
+        </div>
+
+        <h2 class="h1" id="assignment">📝 Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">📋</span>
+          <div class="callout-body">
+            <strong>Lecture 3 Assignment</strong><br />20+ company-tagged OOP &
+            collections problems including LRU Cache, Design HashMap, Group
+            Anagrams, and inheritance design exercises.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture3/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+              "
+              >📄 Open Assignment →</a
+            >
+          </div>
+        </div>
+        <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can name all 4 OOP pillars and give a DSA example for each
             </div>
-          </details>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know when to use Abstract Class vs Interface (5+ criteria)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can implement a custom Comparator using lambda and
+              Comparator.comparing()
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand Comparable for natural ordering
+              (TreeSet/PriorityQueue)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know why ArrayList.remove(int index) is O(n) but get(index) is
+              O(1)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can write a generic method with bounded type parameters
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can explain what PECS (Producer Extends, Consumer Super) means
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand ArrayList resizing: when it happens and what the new
+              capacity is
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can solve Group Anagrams using HashMap in under 5 minutes
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can explain the difference between method overriding and
+              overloading
+            </div>
+          </div>
         </div>
-      </div>
 
-      <h2 class="h1" id="assignment">📝 Assignment</h2>
-      <div class="callout orange" style="margin:14px 0">
-        <span class="callout-icon">📋</span>
-        <div class="callout-body"><strong>Lecture 3 Assignment</strong><br>20+ company-tagged OOP & collections problems
-          including LRU Cache, Design HashMap, Group Anagrams, and inheritance design exercises.<br><br>
-          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture3/Assignment.md"
-            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
-            Open Assignment →</a>
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">🧠</span>
+          <div class="callout-body">
+            <strong>You're ready for Topic 4: Java 8+ &amp; Streams</strong
+            ><br />
+            You've nailed OOP — inheritance, polymorphism, and Java Collections.
+            Java 8 brought the biggest syntax revolution in the language:
+            lambdas, streams, and Optional. Master these and your code becomes
+            concise and interview-ready.
+          </div>
         </div>
-      </div>
-      <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can name all 4 OOP pillars and give a DSA example for each</div>
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <a
+            href="../Lecture2/lecture2_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >&larr; Topic 2: Java Memory</a
+          ><a
+            href="../Lecture4/lecture4_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >Topic 4: Java 8+ &amp; Streams &rarr;</a
+          >
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know when to use Abstract Class vs Interface (5+ criteria)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can implement a custom Comparator using lambda and Comparator.comparing()</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand Comparable for natural ordering (TreeSet/PriorityQueue)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know why ArrayList.remove(int index) is O(n) but get(index) is O(1)</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can write a generic method with bounded type parameters</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can explain what PECS (Producer Extends, Consumer Super) means</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand ArrayList resizing: when it happens and what the new capacity is</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can solve Group Anagrams using HashMap in under 5 minutes</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can explain the difference between method overriding and overloading</div>
-        </div>
-      </div>
-
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">🧠</span>
-        <div class="callout-body">
-          <strong>You're ready for Topic 4: Java 8+ &amp; Streams</strong><br>
-          You've nailed OOP — inheritance, polymorphism, and Java Collections. Java 8 brought the biggest syntax
-          revolution in the language: lambdas, streams, and Optional. Master these and your code becomes concise and
-          interview-ready.
-        </div>
-      </div>
-      <div
-        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-        <a href="../Lecture2/lecture2_notes.html"
-          style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Topic 2: Java Memory</a><a
-          href="../Lecture4/lecture4_notes.html" style="color:var(--accent);font-weight:600;text-decoration:none">Topic
-          4: Java 8+ &amp; Streams &rarr;</a>
       </div>
     </div>
-  </div>
+  </body>
+</html>

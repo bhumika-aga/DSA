@@ -161,7 +161,7 @@
 - Master Lambda expressions for concise and readable interview code
 - Understand functional interfaces (Predicate, Consumer, Supplier, Function)
 - Use the Streams API to process collections like a pro (filter, map, reduce)
-- Learn Optional<T> to handle null-safety without bulky if-statements
+- Learn `Optional<T>` to handle null-safety without bulky if-statements
 
 #### 🔑 Key Patterns
 
@@ -176,7 +176,7 @@
 
 1. **Day 1:** Lambda expressions syntax, functional interfaces Basics, `@FunctionalInterface` annotation
 2. **Day 2:** Streams API deep dive — filter, map, flatMap, findFirst, collectors (toList, groupingBy)
-3. **Day 3:** Advanced Streams — reduce, parallel streams, Optional<T> for null safety, method references
+3. **Day 3:** Advanced Streams — reduce, parallel streams, `Optional<T>` for null safety, method references
 
 #### 🏢 Companies That Ask These
 

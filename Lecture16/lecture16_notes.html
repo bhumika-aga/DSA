@@ -1,0 +1,2288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 16 — Heaps &amp; Priority Queues | DSA Course</title>
+    <meta
+      name="description"
+      content="Master heaps and priority queues: array representation, sift operations, Top-K, Two Heaps median, K-way merge — with full dry runs and Java code."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 8px 16px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        color: var(--text2);
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+
+      .toc-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .toc-sub {
+        padding-left: 32px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        width: 18px;
+        text-align: center;
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 16px;
+      }
+
+      /* ── Main + Topbar ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--accent);
+      }
+
+      .breadcrumb span {
+        color: var(--text3);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      /* ── Content ── */
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 12px;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 32px 0 12px;
+      }
+
+      .h2 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 24px 0 10px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text2);
+        margin: 16px 0 8px;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        border-color: var(--orange);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        border-color: var(--purple);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.65;
+      }
+
+      .callout-body strong {
+        color: var(--text);
+      }
+
+      /* ── Code blocks ── */
+      .code-block {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+
+      .code-lang {
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+
+      .copy-btn:hover {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px;
+        overflow-x: auto;
+        background: var(--bg2);
+        color: var(--text2);
+      }
+
+      /* Syntax highlighting spans */
+      .kw {
+        color: #6940a5;
+        font-weight: 600;
+      }
+
+      .cls {
+        color: #0f7b6c;
+        font-weight: 500;
+      }
+
+      .fn {
+        color: #2383e2;
+        font-weight: 500;
+      }
+
+      .str {
+        color: #c75b0e;
+      }
+
+      .num {
+        color: #c0392b;
+      }
+
+      .cm {
+        color: #9b9790;
+        font-style: italic;
+      }
+
+      .ret {
+        color: #ad1a72;
+        font-weight: 600;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #a07dd4;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #4db6a8;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #5ba4f5;
+      }
+
+      [data-theme="dark"] .str {
+        color: #e0893a;
+      }
+
+      [data-theme="dark"] .num {
+        color: #e07070;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #6b6860;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #e06aac;
+      }
+
+      /* ── Complexity badges ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      th {
+        background: var(--bg3);
+        padding: 10px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+      }
+
+      td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text2);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── ASCII diagrams ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      /* ── IO box ── */
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Prob cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 16px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg2);
+      }
+
+      .prob-header.active {
+        background: var(--accent-bg);
+      }
+
+      .prob-left {
+        flex: 1;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 3px;
+      }
+
+      .prob-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--purple-bg);
+        color: var(--purple);
+        border-color: var(--purple);
+      }
+
+      .tag-pat {
+        background: var(--teal-bg);
+        color: var(--teal);
+        border-color: var(--teal);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+        border-color: var(--orange);
+      }
+
+      .prob-body {
+        display: none;
+        border-top: 1px solid var(--border);
+        padding: 18px;
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      details summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        background: var(--bg2);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text2);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 0;
+        border: 1px solid var(--border);
+        transition: background 0.15s;
+      }
+
+      details summary:hover {
+        background: var(--bg3);
+      }
+
+      details[open] summary {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .toggle-arrow {
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+
+      details[open] .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 4px 0 0;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Misc ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Pattern Banner ── */
+      .pattern-banner {
+        background: var(--purple-bg);
+        border: 1px solid var(--purple);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 14px 0;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--purple);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .pattern-banner p {
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Heaps &amp; Priority Queues</div>
+        <div class="sb-meta">
+          Lecture 16 of 30 &middot; Phase 2 &mdash; Core Data Structures
+        </div>
+      </div>
+
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#intro"
+        ><span class="toc-icon">&#127774;</span>Introduction</a
+      >
+      <a class="toc-item" href="#anatomy"
+        ><span class="toc-icon">&#127959;</span>Heap Anatomy</a
+      >
+      <a class="toc-item toc-sub" href="#array-rep">Array Representation</a>
+      <a class="toc-item toc-sub" href="#heap-property">Min vs Max Heap</a>
+      <a class="toc-item" href="#operations"
+        ><span class="toc-icon">&#9881;</span>Core Operations</a
+      >
+      <a class="toc-item toc-sub" href="#sift-up">Insert &amp; Sift-Up</a>
+      <a class="toc-item toc-sub" href="#sift-down">Delete &amp; Sift-Down</a>
+      <a class="toc-item toc-sub" href="#build-heap">Build Heap O(n)</a>
+      <a class="toc-item" href="#java-api"
+        ><span class="toc-icon">&#9749;</span>Java PriorityQueue</a
+      >
+      <a class="toc-item" href="#patterns"
+        ><span class="toc-icon">&#127919;</span>The 5 Patterns</a
+      >
+      <a class="toc-item toc-sub" href="#p1">1. Min/Max Heap Ops</a>
+      <a class="toc-item toc-sub" href="#p2">2. Top-K Elements</a>
+      <a class="toc-item toc-sub" href="#p3">3. Two Heaps (Median)</a>
+      <a class="toc-item toc-sub" href="#p4">4. K-way Merge</a>
+      <a class="toc-item toc-sub" href="#p5">5. Greedy Heap</a>
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">&#128170;</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">&#128221;</span>Assignment</a
+      >
+      <div class="sb-div"></div>
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">&#9989;</span>Checklist</a
+      >
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
+        </div>
+        <a
+          class="toc-item"
+          href="../Lecture15/lecture15_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&larr; Topic 15: Trees &amp; BST</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture17/lecture17_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&rarr; Topic 17: Graphs</a
+        >
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="#">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 16</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#9968;</span>
+          <h1 class="page-title">Heaps &amp; Priority Queues</h1>
+          <p class="page-sub">
+            &ldquo;A heap is a complete binary tree stored in an array. Every
+            parent is smaller than its children (min-heap) &mdash; and that one
+            rule unlocks O(log n) insert &amp; extract.&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 16</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 5 Days</span>
+            <span class="meta-chip green">&#127919; 20 Problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Microsoft</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro" style="margin-bottom: 20px">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Heaps appear in 15&ndash;20% of FAANG interviews. Three problem
+            families dominate:
+            <strong>Top-K</strong> (Kth largest, K closest points),
+            <strong>Two Heaps</strong> (running median), and
+            <strong>K-way Merge</strong> (merge K sorted lists). Master these
+            three and you have a pattern for roughly 80% of all heap problems.
+            Java&apos;s <code>PriorityQueue</code> is your primary tool &mdash;
+            understand what it does internally so you never misuse it.
+          </div>
+        </div>
+
+        <!-- CONNECTION -->
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">&#128279;</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> A heap IS a complete binary tree
+            (Lecture 15) stored in an array (Lecture 3). The parent-child
+            formulas below come directly from BFS level-order indexing. After
+            this lecture, heaps underpin Dijkstra&apos;s algorithm (Lecture 17
+            Graphs) and the median-of-medians approach in Sorting.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- HEAP ANATOMY -->
+        <h2 class="h1" id="anatomy">
+          &#127968; Heap Anatomy &mdash; The Array Representation
+        </h2>
+        <p>
+          A <em>complete binary tree</em> can be stored perfectly in an array
+          with no pointers needed. The structural rules are fixed by index
+          arithmetic:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >Array Representation &mdash; Index Formulas</span
+            >
+          </div>
+          <pre>
+ Index:   0    1    2    3    4    5    6
+ Array: [ 1,   3,   5,   7,   9,   8,   6 ]   ← min-heap
+
+ Visualised as a tree:
+            1          ← index 0  (root)
+          /   \
+         3     5       ← index 1, 2
+        / \   / \
+       7   9 8   6     ← index 3, 4, 5, 6
+
+ Parent of i  → (i - 1) / 2
+ Left child   → 2*i + 1
+ Right child  → 2*i + 2
+
+ Heap Property (min-heap): parent ≤ both children at EVERY node
+ Max-heap: flip to parent ≥ both children</pre
+          >
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>Key complexity facts:</strong><br />
+            Insert (offer): O(log n) &mdash; sift UP &nbsp;|&nbsp; Extract-min
+            (poll): O(log n) &mdash; sift DOWN &nbsp;|&nbsp; Peek-min: O(1)
+            &mdash; always at index 0 &nbsp;|&nbsp; Build heap from array: O(n)
+            &mdash; not O(n log n)!
+          </div>
+        </div>
+
+        <!-- SIFT OPS -->
+        <h3 class="h3">Sift-Up &amp; Sift-Down</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Min-Heap from Scratch (sift-up +
+              sift-down)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] heap; <span class="kw">int</span> size;
+
+<span class="cm">// INSERT: add at end, bubble up until heap property restored</span>
+<span class="kw">void</span> <span class="fn">offer</span>(<span class="kw">int</span> val) {
+    heap[size++] = val;
+    <span class="fn">siftUp</span>(size - 1);
+}
+<span class="kw">void</span> <span class="fn">siftUp</span>(<span class="kw">int</span> i) {
+    <span class="kw">while</span> (i > 0) {
+        <span class="kw">int</span> p = (i - 1) / 2;
+        <span class="kw">if</span> (heap[p] <= heap[i]) <span class="kw">break</span>;  <span class="cm">// already valid</span>
+        <span class="fn">swap</span>(i, p);
+        i = p;
+    }
+}
+
+<span class="cm">// EXTRACT-MIN: swap root with last, shrink, sift root down</span>
+<span class="kw">int</span> <span class="fn">poll</span>() {
+    <span class="kw">int</span> min = heap[0];
+    heap[0] = heap[--size];
+    <span class="fn">siftDown</span>(0);
+    <span class="ret">return</span> min;
+}
+<span class="kw">void</span> <span class="fn">siftDown</span>(<span class="kw">int</span> i) {
+    <span class="kw">while</span> (<span class="num">2</span>*i+<span class="num">1</span> < size) {
+        <span class="kw">int</span> left = <span class="num">2</span>*i+<span class="num">1</span>, right = <span class="num">2</span>*i+<span class="num">2</span>;
+        <span class="kw">int</span> smallest = (right < size && heap[right] < heap[left]) ? right : left;
+        <span class="kw">if</span> (heap[i] <= heap[smallest]) <span class="kw">break</span>;
+        <span class="fn">swap</span>(i, smallest);
+        i = smallest;
+    }
+}
+
+<span class="cm">// BUILD HEAP in O(n): sift-down from last internal node upward</span>
+<span class="kw">void</span> <span class="fn">buildHeap</span>(<span class="kw">int</span>[] arr) {
+    heap = arr; size = arr.length;
+    <span class="kw">for</span> (<span class="kw">int</span> i = size/<span class="num">2</span> - <span class="num">1</span>; i >= <span class="num">0</span>; i--) <span class="fn">siftDown</span>(i);
+}
+<span class="cm">// Why O(n)? Leaf nodes need 0 work. Bottom half are all leaves.
+// Formal proof: sum of sift-down heights = O(n) (geometric series)</span></pre>
+        </div>
+
+        <!-- SIFT DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; Insert 2 into min-heap [1,3,5,7,9]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">Before: heap = [<span class="hl">1</span>, 3, 5, 7, 9]
+         <span class="hl">1</span>
+        / \
+       3   5
+      / \
+     7   9
+
+Insert 2 at index 5: heap = [1, 3, 5, 7, 9, <span class="nd">2</span>]
+i=5, parent=(5-1)/2=2, heap[2]=5 > heap[5]=<span class="nd">2</span> &rarr; swap
+heap = [1, 3, <span class="nd">2</span>, 7, 9, 5]
+i=2, parent=(2-1)/2=0, heap[0]=1 &le; heap[2]=2 &rarr; STOP &#10003;
+
+After:  heap = [<span class="hl">1</span>, 3, <span class="nd">2</span>, 7, 9, 5]
+         <span class="hl">1</span>
+        / \
+       3   <span class="nd">2</span>    &larr; min-heap property restored
+      / \ /
+     7  9 5</div>
+          </div>
+        </div>
+
+        <!-- JAVA PQ NOTE -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Java PriorityQueue cheatsheet:</strong><br />
+            <code
+              >PriorityQueue&lt;Integer&gt; minH = new
+              PriorityQueue&lt;&gt;();</code
+            >
+            &nbsp;&nbsp; <em>(default: min-heap)</em><br />
+            <code
+              >PriorityQueue&lt;Integer&gt; maxH = new
+              PriorityQueue&lt;&gt;(Collections.reverseOrder());</code
+            ><br />
+            <code
+              >PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b)
+              -&gt; a[0]-b[0]);</code
+            >
+            &nbsp;&mdash; sort by first element<br /><br />
+            Key methods: <code>offer(x)</code> O(log n) &nbsp;|&nbsp;
+            <code>poll()</code> O(log n) &nbsp;|&nbsp; <code>peek()</code> O(1)
+            &nbsp;|&nbsp; <code>size()</code> O(1)
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- PATTERNS TABLE -->
+        <h2 class="h1" id="patterns">&#127919; The 5 Core Patterns</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pattern</th>
+                <th>Signal Phrase</th>
+                <th>Tool</th>
+                <th>Canonical Problem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>Min/Max Heap Ops</td>
+                <td>Kth largest, running max/min</td>
+                <td>Single heap</td>
+                <td>Kth Largest in Array</td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>Top K Elements</td>
+                <td>"top K", "K most frequent", "K closest"</td>
+                <td>Size-K min-heap</td>
+                <td>Top K Frequent, K Closest Points</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>Two Heaps (Median)</td>
+                <td>"median", "sliding window median"</td>
+                <td>maxH + minH balanced</td>
+                <td>Median from Data Stream</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td>K-way Merge</td>
+                <td>"merge K sorted", "smallest from K"</td>
+                <td>Min-heap of size K</td>
+                <td>Merge K Sorted Lists</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td>Greedy Heap</td>
+                <td>"schedule", "reorganize", "cooldown"</td>
+                <td>Max-heap + queue</td>
+                <td>Task Scheduler, Reorganize String</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+
+        <!-- P1: MIN/MAX HEAP -->
+        <h2 class="h1" id="p1">
+          &#128200; Pattern 1 &mdash; Single Heap (Kth Largest)
+        </h2>
+        <p>
+          The simplest heap pattern. Use a <strong>size-K min-heap</strong> to
+          track the K largest elements seen so far. The root (min of heap) is
+          always the Kth largest. If a new element is larger than the root, pop
+          root and push new element.
+        </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Kth Largest</h4>
+          <p>
+            Maintain a min-heap of size K:<br />
+            &nbsp;&nbsp;for each num in nums:<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;offer num to heap<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;if heap.size() &gt; K &rarr; poll (discard
+            smallest)<br />
+            &nbsp;&nbsp;return heap.peek() &mdash; the Kth largest<br /><br />
+            <em>Why size-K min-heap?</em> The K largest elements survive. Their
+            minimum (heap root) is exactly the Kth largest.
+          </p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Kth Largest Element in Array (LC 215)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();  <span class="cm">// min-heap</span>
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
+        minH.offer(n);
+        <span class="kw">if</span> (minH.size() > k) minH.poll();  <span class="cm">// evict smallest; top K survive</span>
+    }
+    <span class="ret">return</span> minH.peek();  <span class="cm">// min of top-K = Kth largest</span>
+}
+<span class="cm">// Time O(n log k)  Space O(k)
+// Why NOT sort? Sort is O(n log n). If k &lt;&lt; n, heap is much faster.</span></pre>
+        </div>
+
+        <!-- P1 DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; findKthLargest([3,2,1,5,6,4], k=2):</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">offer 3: heap=[3]
+offer 2: heap=[2,3]
+offer 1: heap=[1,2,3] size=3 > k=2 &rarr; poll 1  heap=[<span class="nd">2</span>,3]
+offer 5: heap=[2,3,5] size=3 > k=2 &rarr; poll 2  heap=[<span class="nd">3</span>,5]
+offer 6: heap=[3,5,6] size=3 > k=2 &rarr; poll 3  heap=[<span class="nd">5</span>,6]
+offer 4: heap=[4,5,6] size=3 > k=2 &rarr; poll 4  heap=[<span class="nd">5</span>,6]
+
+peek = <span class="hl">5</span> &#10003;  (5 is the 2nd largest in [3,2,1,5,6,4])</div>
+          </div>
+        </div>
+        <hr />
+
+        <!-- P2: TOP K -->
+        <h2 class="h1" id="p2">&#127942; Pattern 2 &mdash; Top K Elements</h2>
+        <p>
+          A generalisation of Pattern 1. Any problem asking for the
+          <em>K most/least something</em> follows this shape. Key insight:
+          <strong>use a min-heap of size K for top-K largest</strong>
+          (counterintuitive &mdash; min-heap, not max-heap).
+        </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Top K Frequent</h4>
+          <p>
+            1. Count frequencies with a HashMap<br />
+            2. Push (freq, num) into a min-heap of size K<br />
+            3. If heap size &gt; K, poll (removes least frequent)<br />
+            4. Remaining K entries are the top-K frequent<br /><br />
+            <em>Why min-heap?</em> We want to EVICT the least frequent (smallest
+            freq) to keep top-K. The min is always at the root, so we can
+            discard it in O(log k).
+          </p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Top K Frequent Elements (LC 347) + K
+              Closest Points (LC 973)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Top K Frequent Elements:</span>
+<span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq.merge(n, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
+    <span class="cm">// min-heap: sort by frequency ascending → easily evict least frequent</span>
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    <span class="kw">for</span> (<span class="kw">var</span> e : freq.entrySet()) {
+        minH.offer(<span class="kw">new</span> <span class="kw">int</span>[]{e.getValue(), e.getKey()});
+        <span class="kw">if</span> (minH.size() &gt; k) minH.poll();
+    }
+    <span class="kw">int</span>[] res = <span class="kw">new</span> <span class="kw">int</span>[k];
+    <span class="kw">for</span> (<span class="kw">int</span> i = k-<span class="num">1</span>; i &gt;= <span class="num">0</span>; i--) res[i] = minH.poll()[<span class="num">1</span>];
+    <span class="ret">return</span> res;
+}
+<span class="cm">// Time O(n log k)  Space O(n) for freq map
+
+// K Closest Points to Origin — same pattern, different comparator:</span>
+<span class="kw">int</span>[][] <span class="fn">kClosest</span>(<span class="kw">int</span>[][] pts, <span class="kw">int</span> k) {
+    <span class="cm">// max-heap by distance — evict farthest, keep K closest</span>
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(
+        (a,b) -&gt; (b[<span class="num">0</span>]*b[<span class="num">0</span>]+b[<span class="num">1</span>]*b[<span class="num">1</span>]) - (a[<span class="num">0</span>]*a[<span class="num">0</span>]+a[<span class="num">1</span>]*a[<span class="num">1</span>]));
+    <span class="kw">for</span> (<span class="kw">int</span>[] p : pts) {
+        maxH.offer(p);
+        <span class="kw">if</span> (maxH.size() &gt; k) maxH.poll();  <span class="cm">// evict farthest</span>
+    }
+    <span class="ret">return</span> maxH.toArray(<span class="kw">new</span> <span class="kw">int</span>[<span class="num">0</span>][]);
+}
+<span class="cm">// Note: use squared distance to avoid floating point sqrt</span></pre>
+        </div>
+        <hr />
+
+        <!-- P3: TWO HEAPS -->
+        <h2 class="h1" id="p3">
+          &#9878; Pattern 3 &mdash; Two Heaps (Running Median)
+        </h2>
+        <p>
+          Split the data stream into two halves: a
+          <strong>max-heap for the lower half</strong> and a
+          <strong>min-heap for the upper half</strong>. Keep their sizes
+          balanced (differ by at most 1). The median is always at one of the two
+          roots.
+        </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Two Heaps Median</h4>
+          <p>
+            maxH = max-heap (lower half) &nbsp;|&nbsp; minH = min-heap (upper
+            half)<br /><br />
+            addNum(n):<br />
+            &nbsp;&nbsp;offer n to maxH<br />
+            &nbsp;&nbsp;offer maxH.poll() to minH &nbsp;&nbsp;<em
+              >(push max-of-lower up)</em
+            ><br />
+            &nbsp;&nbsp;if minH.size() &gt; maxH.size() &rarr; offer minH.poll()
+            to maxH<br /><br />
+            findMedian():<br />
+            &nbsp;&nbsp;if sizes equal &rarr; (maxH.peek() + minH.peek()) /
+            2.0<br />
+            &nbsp;&nbsp;else &rarr; maxH.peek() &nbsp;<em
+              >(maxH always has the extra element)</em
+            >
+          </p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Find Median from Data Stream (LC 295)
+              &mdash; Hard</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder()); <span class="cm">// lower half</span>
+<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();                           <span class="cm">// upper half</span>
+
+<span class="kw">void</span> <span class="fn">addNum</span>(<span class="kw">int</span> n) {
+    maxH.offer(n);
+    minH.offer(maxH.poll());        <span class="cm">// ensure max-of-lower ≤ min-of-upper</span>
+    <span class="kw">if</span> (minH.size() &gt; maxH.size()) maxH.offer(minH.poll());  <span class="cm">// rebalance</span>
+}
+
+<span class="kw">double</span> <span class="fn">findMedian</span>() {
+    <span class="kw">if</span> (maxH.size() == minH.size()) <span class="ret">return</span> (maxH.peek() + minH.peek()) / 2.0;
+    <span class="ret">return</span> maxH.peek();  <span class="cm">// maxH has the extra element</span>
+}
+<span class="cm">// addNum: O(log n)  findMedian: O(1)
+// Invariant: maxH.peek() ≤ minH.peek() always (cross-push enforces this)</span></pre>
+        </div>
+        <div class="callout teal">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; addNum sequence [1, 2, 3]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">addNum(1):
+  maxH.offer(1)=[1]  minH.offer(maxH.poll()=1)=[1]  maxH=[]
+  minH.size()=1 > maxH.size()=0 &rarr; maxH.offer(minH.poll()=1)
+  maxH=[<span class="hl">1</span>]  minH=[]    findMedian()=<span class="hl">1.0</span>
+
+addNum(2):
+  maxH.offer(2)=[1,2]  minH.offer(maxH.poll()=2)=[2]  maxH=[<span class="nd">1</span>]
+  sizes equal(1,1)     findMedian()=(<span class="nd">1</span>+2)/2=<span class="hl">1.5</span>
+
+addNum(3):
+  maxH.offer(3)=[1,3]  minH.offer(maxH.poll()=3)=[2,3]  maxH=[<span class="nd">1</span>]
+  minH.size()=2 > maxH.size()=1 &rarr; maxH.offer(minH.poll()=2)
+  maxH=[<span class="nd">2</span>,1]  minH=[3]    findMedian()=<span class="hl">2.0</span> &#10003;</div>
+          </div>
+        </div>
+        <hr />
+
+        <!-- P4: K-WAY MERGE -->
+        <h2 class="h1" id="p4">&#128257; Pattern 4 &mdash; K-way Merge</h2>
+        <p>
+          Given K sorted lists (or arrays), use a min-heap to efficiently pull
+          the globally smallest element each time. Always keep exactly one
+          element from each active list in the heap.
+        </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; K-way Merge</h4>
+          <p>
+            1. Push the first element of each list into min-heap (with list
+            index + position)<br />
+            2. While heap not empty:<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;Poll the smallest element &rarr; add to
+            result<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;If that list has more elements &rarr; push
+            the next one<br /><br />
+            <em>Key:</em> heap always has at most K elements &rarr; poll is
+            O(log K) not O(log n)
+          </p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Merge K Sorted Lists (LC 23)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">ListNode</span> <span class="fn">mergeKLists</span>(<span class="cls">ListNode</span>[] lists) {
+    <span class="cm">// min-heap ordered by node value</span>
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">ListNode</span>&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; a.val - b.val);
+    <span class="kw">for</span> (<span class="cls">ListNode</span> head : lists) <span class="kw">if</span> (head != <span class="kw">null</span>) pq.offer(head);
+
+    <span class="cls">ListNode</span> dummy = <span class="kw">new</span> <span class="cls">ListNode</span>(<span class="num">0</span>), curr = dummy;
+    <span class="kw">while</span> (!pq.isEmpty()) {
+        curr.next = pq.poll();          <span class="cm">// pull globally smallest</span>
+        curr = curr.next;
+        <span class="kw">if</span> (curr.next != <span class="kw">null</span>) pq.offer(curr.next);  <span class="cm">// push next from same list</span>
+    }
+    <span class="ret">return</span> dummy.next;
+}
+<span class="cm">// Time O(N log K) where N = total nodes, K = number of lists
+// Space O(K) for the heap — only K nodes live in the heap at any time</span></pre>
+        </div>
+
+        <!-- P4 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong
+              >Dry Run &mdash; Merge K=3 lists [[1,4,5],[1,3,4],[2,6]]:</strong
+            >
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">Initial heap (heads): [<span class="hl">1</span>(L1), 1(L2), 2(L3)]
+
+Step 1: poll 1(L1) &rarr; result=[<span class="hl">1</span>] push 4(L1) heap=[1(L2),2(L3),4(L1)]
+Step 2: poll 1(L2) &rarr; result=[1,<span class="nd">1</span>] push 3(L2) heap=[2,3,4]
+Step 3: poll 2(L3) &rarr; result=[1,1,<span class="nd">2</span>] push 6(L3) heap=[3,4,6]
+Step 4: poll 3(L2) &rarr; result=[1,1,2,<span class="nd">3</span>] push 4(L2) heap=[4,4,6]
+Step 5: poll 4(L1) &rarr; result=[...,<span class="nd">4</span>] push 5(L1) heap=[4,5,6]
+Step 6: poll 4(L2) &rarr; result=[...,<span class="nd">4</span>] L2 done heap=[5,6]
+Step 7: poll 5(L1) &rarr; result=[...,<span class="nd">5</span>] L1 done heap=[6]
+Step 8: poll 6(L3) &rarr; result=[...,<span class="nd">6</span>] done &#10003;
+Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
+          </div>
+        </div>
+        <hr />
+
+        <!-- P5: GREEDY HEAP -->
+        <h2 class="h1" id="p5">
+          &#9889; Pattern 5 &mdash; Greedy Heap (Task Scheduler)
+        </h2>
+        <p>
+          Use a max-heap to always process the most frequent/highest-priority
+          task next. When a cooldown constraint exists, pair the heap with a
+          wait queue.
+        </p>
+        <div class="pattern-banner">
+          <h4>Pseudocode &mdash; Task Scheduler</h4>
+          <p>
+            maxH = max-heap of task frequencies<br />
+            queue = [(freq_after_task, available_at_time)]<br /><br />
+            while maxH or queue not empty:<br />
+            &nbsp;&nbsp;time++<br />
+            &nbsp;&nbsp;if maxH not empty &rarr; pick most frequent, decrement,
+            push to queue with (freq-1, time+n)<br />
+            &nbsp;&nbsp;if queue.front.available_at &le; time &rarr; push back
+            to maxH
+          </p>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Task Scheduler (LC 621) + Reorganize String
+              (LC 767)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Task Scheduler — greedy: always do the most-frequent available task</span>
+<span class="kw">int</span> <span class="fn">leastInterval</span>(<span class="kw">char</span>[] tasks, <span class="kw">int</span> n) {
+    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
+    <span class="kw">for</span> (<span class="kw">char</span> c : tasks) cnt[c-<span class="str">'A'</span>]++;
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
+    <span class="kw">for</span> (<span class="kw">int</span> c : cnt) <span class="kw">if</span> (c > <span class="num">0</span>) maxH.offer(c);
+    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; waitQ = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();   <span class="cm">// [remaining_count, available_at]</span>
+    <span class="kw">int</span> time = <span class="num">0</span>;
+    <span class="kw">while</span> (!maxH.isEmpty() || !waitQ.isEmpty()) {
+        time++;
+        <span class="kw">if</span> (!maxH.isEmpty()) {
+            <span class="kw">int</span> rem = maxH.poll() - <span class="num">1</span>;
+            <span class="kw">if</span> (rem > <span class="num">0</span>) waitQ.offer(<span class="kw">new</span> <span class="kw">int</span>[]{rem, time + n});
+        }
+        <span class="kw">if</span> (!waitQ.isEmpty() && waitQ.peek()[<span class="num">1</span>] == time) maxH.offer(waitQ.poll()[<span class="num">0</span>]);
+    }
+    <span class="ret">return</span> time;
+}
+<span class="cm">// Time O(T * 26) where T = total tasks  Space O(26) = O(1)
+
+// Reorganize String — same greedy idea:
+// Always pick the most frequent char that != previous char</span>
+<span class="cls">String</span> <span class="fn">reorganizeString</span>(<span class="cls">String</span> s) {
+    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
+    <span class="kw">for</span> (<span class="kw">char</span> c : s.toCharArray()) cnt[c-<span class="str">'a'</span>]++;
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; b[<span class="num">0</span>]-a[<span class="num">0</span>]);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">26</span>; i++) <span class="kw">if</span> (cnt[i]&gt;<span class="num">0</span>) maxH.offer(<span class="kw">new</span> <span class="kw">int</span>[]{cnt[i], i});
+    <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
+    <span class="kw">while</span> (maxH.size() &gt;= <span class="num">2</span>) {
+        <span class="kw">int</span>[] a = maxH.poll(), b = maxH.poll();
+        sb.append((<span class="kw">char</span>)('a'+a[<span class="num">1</span>])); sb.append((<span class="kw">char</span>)('a'+b[<span class="num">1</span>]));
+        <span class="kw">if</span> (--a[<span class="num">0</span>] > <span class="num">0</span>) maxH.offer(a);
+        <span class="kw">if</span> (--b[<span class="num">0</span>] > <span class="num">0</span>) maxH.offer(b);
+    }
+    <span class="kw">if</span> (!maxH.isEmpty()) {
+        <span class="kw">if</span> (maxH.peek()[<span class="num">0</span>] &gt; <span class="num">1</span>) <span class="ret">return</span> <span class="str">""</span>;  <span class="cm">// impossible</span>
+        sb.append((<span class="kw">char</span>)('a'+maxH.poll()[<span class="num">1</span>]));
+    }
+    <span class="ret">return</span> sb.toString();
+}
+<span class="cm">// Time O(n log 26) = O(n)  Space O(n) for output</span></pre>
+        </div>
+        <hr />
+
+        <!-- PRACTICE -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+
+        <!-- PROB 01 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 01 &middot;
+                <a
+                  href="https://leetcode.com/problems/kth-largest-element-in-an-array/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 215</a
+                >
+              </div>
+              <div class="prob-title">Kth Largest Element in an Array</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 1: Single Min-Heap</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Facebook</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an integer array and integer k, return the kth largest
+                element (not kth distinct).
+              </p>
+              <div class="iobox">Input: nums=[3,2,1,5,6,4] k=2 Output: 5</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Maintain a <strong>min-heap of size k</strong>. After processing
+                all elements, the root is the Kth largest. The heap evicts
+                smaller elements &mdash; only the K biggest survive.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 215</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) { minH.offer(n); <span class="kw">if</span> (minH.size()>k) minH.poll(); }
+    <span class="ret">return</span> minH.peek();
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log k)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(k)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 02 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/top-k-frequent-elements/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 347</a
+                >
+              </div>
+              <div class="prob-title">Top K Frequent Elements</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 2: Top K</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Facebook</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an array and integer k, return the k most frequent
+                elements.
+              </p>
+              <div class="iobox">Input: [1,1,1,2,2,3] k=2 Output: [1,2]</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Count frequencies in a HashMap, then maintain a
+                <strong>size-K min-heap by frequency</strong>. The min-heap
+                evicts the least frequent, so only top-K frequent remain.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 347</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq.merge(n, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    <span class="kw">for</span> (<span class="kw">var</span> e : freq.entrySet()) {
+        pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{e.getValue(), e.getKey()});
+        <span class="kw">if</span> (pq.size() > k) pq.poll();
+    }
+    <span class="kw">int</span>[] res = <span class="kw">new</span> <span class="kw">int</span>[k];
+    <span class="kw">for</span> (<span class="kw">int</span> i=k-<span class="num">1</span>; i>=<span class="num">0</span>; i--) res[i] = pq.poll()[<span class="num">1</span>];
+    <span class="ret">return</span> res;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n log k)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 03 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot;
+                <a
+                  href="https://leetcode.com/problems/find-median-from-data-stream/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 295</a
+                >
+              </div>
+              <div class="prob-title">Find Median from Data Stream</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Pattern 3: Two Heaps</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Design a data structure supporting <code>addNum(int)</code> and
+                <code>findMedian()</code> with the stream arriving one number at
+                a time.
+              </p>
+              <div class="iobox">
+                addNum(1), addNum(2), findMedian()=1.5, addNum(3),
+                findMedian()=2.0
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Two heaps: <strong>maxH</strong> holds the lower half,
+                <strong>minH</strong> holds the upper half. Always push to maxH
+                first, then rebalance. Median lives at one or both roots.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 295</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
+<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();
+<span class="kw">void</span> <span class="fn">addNum</span>(<span class="kw">int</span> n) {
+    maxH.offer(n); minH.offer(maxH.poll());
+    <span class="kw">if</span> (minH.size() > maxH.size()) maxH.offer(minH.poll());
+}
+<span class="kw">double</span> <span class="fn">findMedian</span>() {
+    <span class="ret">return</span> maxH.size()==minH.size() ? (maxH.peek()+minH.peek())/2.0 : maxH.peek();
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">addNum</span
+                    ><span class="cx-val yellow">O(log n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">findMedian</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot;
+                <a
+                  href="https://leetcode.com/problems/merge-k-sorted-lists/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 23</a
+                >
+              </div>
+              <div class="prob-title">Merge K Sorted Lists</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Pattern 4: K-way Merge</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Merge K sorted linked lists and return the sorted linked list.
+              </p>
+              <div class="iobox">
+                Input: [[1,4,5],[1,3,4],[2,6]] Output: [1,1,2,3,4,4,5,6]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Push all K heads into a min-heap. Each poll gives the globally
+                smallest node. Then push the next node from that list. Heap size
+                stays ≤ K throughout.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 23</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">ListNode</span> <span class="fn">mergeKLists</span>(<span class="cls">ListNode</span>[] lists) {
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">ListNode</span>&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a.val-b.val);
+    <span class="kw">for</span> (<span class="cls">ListNode</span> h : lists) <span class="kw">if</span> (h!=<span class="kw">null</span>) pq.offer(h);
+    <span class="cls">ListNode</span> dummy = <span class="kw">new</span> <span class="cls">ListNode</span>(<span class="num">0</span>), cur = dummy;
+    <span class="kw">while</span> (!pq.isEmpty()) {
+        cur.next = pq.poll(); cur = cur.next;
+        <span class="kw">if</span> (cur.next != <span class="kw">null</span>) pq.offer(cur.next);
+    }
+    <span class="ret">return</span> dummy.next;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(N log K)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(K)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/task-scheduler/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 621</a
+                >
+              </div>
+              <div class="prob-title">Task Scheduler</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 5: Greedy Heap</span>
+                <span class="tag tag-co">Amazon &middot; Facebook</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given tasks with a cooldown n, return the minimum time to finish
+                all tasks. Same-letter tasks must be separated by n intervals.
+              </p>
+              <div class="iobox">
+                Input: tasks=["A","A","A","B","B","B"] n=2 Output: 8 (ABAB_A_B
+                or similar)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Greedy: always do the most-frequent available task. Max-heap
+                gives the most frequent. If none available, idle. A wait queue
+                tracks when each task becomes available again.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 621</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">leastInterval</span>(<span class="kw">char</span>[] tasks, <span class="kw">int</span> n) {
+    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
+    <span class="kw">for</span> (<span class="kw">char</span> c : tasks) cnt[c-<span class="str">'A'</span>]++;
+    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
+    <span class="kw">for</span> (<span class="kw">int</span> c : cnt) <span class="kw">if</span> (c><span class="num">0</span>) maxH.offer(c);
+    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; waitQ = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+    <span class="kw">int</span> time = <span class="num">0</span>;
+    <span class="kw">while</span> (!maxH.isEmpty() || !waitQ.isEmpty()) {
+        time++;
+        <span class="kw">if</span> (!maxH.isEmpty()) { <span class="kw">int</span> r=maxH.poll()-<span class="num">1</span>; <span class="kw">if</span>(r><span class="num">0</span>) waitQ.offer(<span class="kw">new</span> <span class="kw">int</span>[]{r,time+n}); }
+        <span class="kw">if</span> (!waitQ.isEmpty() && waitQ.peek()[<span class="num">1</span>]==time) maxH.offer(waitQ.poll()[<span class="num">0</span>]);
+    }
+    <span class="ret">return</span> time;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(T)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <hr />
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">
+          &#128221; Assignment &mdash; Company Interview Problems
+        </h2>
+        <div class="callout orange" style="margin-bottom: 18px">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Topic 16 Assignment &mdash; 20 Problems (5 Easy &middot; 10
+              Medium &middot; 5 Hard)</strong
+            ><br />
+            All 5 heap patterns covered. Every problem tagged with pattern,
+            company, and difficulty.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture16/Assignment.md"
+              style="
+                display: inline-block;
+                margin-top: 6px;
+                padding: 6px 16px;
+                background: var(--accent);
+                color: #fff;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+              "
+            >
+              &#128196; Open Assignment.md &rarr;</a
+            >
+          </div>
+        </div>
+        <hr />
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>
+          Check each item before advancing to Lecture 17 (Graphs). Be honest
+          &mdash; these are your interview readiness criteria.
+        </p>
+        <div style="margin: 14px 0">
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain the array representation of a heap (parent/child
+              index formulas) without looking it up
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement sift-up and sift-down from scratch and explain why
+              build-heap is O(n), not O(n log n)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know when to use a min-heap vs max-heap for Top-K problems
+              (counterintuitive: use min-heap for K largest)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement the Two Heaps pattern (addNum + findMedian) from
+              memory in under 2 minutes
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I understand why K-way merge is O(N log K) and not O(N log N)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can write a custom PriorityQueue comparator for arrays, objects,
+              and lambda expressions
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I have completed all 20 assignment problems and can identify the
+              pattern within 30 seconds
+            </div>
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">&#11088;</span>
+          <div class="callout-body">
+            <strong>You are ready for Topic 17: Graphs</strong><br />
+            Graphs generalise trees: a node can have more than 2 neighbours. BFS
+            and DFS patterns you used on trees apply directly. The heap you
+            built here powers Dijkstra&apos;s shortest path algorithm in Graphs.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+          "
+        >
+          <a
+            href="../Lecture15/lecture15_notes.html"
+            style="
+              color: var(--text2);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              text-decoration: none;
+            "
+          >
+            &#8592; Topic 15: Trees &amp; BST</a
+          >
+          <span style="color: var(--text3); font-size: 13px"
+            >Topic 16 of 30 &mdash; Phase 2</span
+          >
+          <a
+            href="../Lecture17/lecture17_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              background: var(--accent-bg);
+              border: 1px solid var(--accent);
+              border-radius: 8px;
+              text-decoration: none;
+            "
+          >
+            Topic 17: Graphs &#8594;</a
+          >
+        </div>
+      </div>
+      <!-- #content -->
+    </div>
+    <!-- #main -->
+
+    <script>
+      // 1. Dark Mode Toggle
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
+        }
+      }
+
+      // 2. Progress Tracker & TOC Highlighting
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
+        }
+        const sections = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current)
+            item.classList.add("active");
+        });
+      });
+
+      // 3. Problem Visibility Toggle
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy Code Logic
+      function copyCode(btn) {
+        const code = btn.closest(".code-block").querySelector("pre").innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        });
+      }
+
+      // 5. Details Arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,1260 +1,1324 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Lecture 2 — Java Memory Management & Collections</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 260px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      flex-direction: row;
-      transition: background .2s, color .2s;
-    }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 0 16px 6px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 16px;
-      cursor: pointer;
-      color: var(--text2);
-      transition: background .12s, color .12s;
-      text-decoration: none
-    }
-
-    .toc-item:hover,
-    .toc-item.active {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      font-weight: 500;
-      color: var(--accent)
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      flex-shrink: 0
-    }
-
-    .toc-sub {
-      padding-left: 36px;
-      font-size: 12px;
-      color: var(--text3)
-    }
-
-    .toc-sub:hover {
-      color: var(--text2)
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 10px 16px
-    }
-
-    /* ── Main ── */
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    /* ── Topbar ── */
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2);
-      gap: 12px;
-      backdrop-filter: blur(8px)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--text)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width .3s
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3)
-    }
-
-    /* ── Page Header ── */
-    .page-header {
-      margin-bottom: 40px;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      margin-bottom: 12px;
-      display: block
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      background: var(--bg2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent-bg)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green-bg)
-    }
-
-    .meta-chip.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow-bg)
-    }
-
-    /* ── Headings ── */
-    .h1 {
-      font-family: var(--serif);
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 40px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--border);
-      scroll-margin-top: 20px
-    }
-
-    .h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      scroll-margin-top: 20px
-    }
-
-    .h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 20px 0 6px
-    }
-
-    p {
-      color: var(--text);
-      margin: 0 0 10px;
-      line-height: 1.75
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 32px 0
-    }
-
-    /* ── Callouts ── */
-    .callout {
-      display: flex;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 14px 0;
-      font-size: 14px;
-      line-height: 1.65
-    }
-
-    .callout-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .callout-body {
-      flex: 1
-    }
-
-    .callout-body strong {
-      font-weight: 600
-    }
-
-    .callout.blue {
-      background: var(--accent-bg);
-      color: var(--text)
-    }
-
-    .callout.green {
-      background: var(--green-bg);
-      color: var(--text)
-    }
-
-    .callout.yellow {
-      background: var(--yellow-bg);
-      color: var(--text)
-    }
-
-    .callout.red {
-      background: var(--red-bg);
-      color: var(--text)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg);
-      color: var(--text)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg);
-      color: var(--text)
-    }
-
-    .callout.teal {
-      background: var(--teal-bg);
-      color: var(--text)
-    }
-
-    /* ── Code Blocks ── */
-    .code-block {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      gap: 10px
-    }
-
-    .code-lang {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3)
-    }
-
-    .copy-btn {
-      background: none;
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 11px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    .copy-btn:hover {
-      background: var(--bg)
-    }
-
-    pre {
-      padding: 16px;
-      overflow-x: auto;
-      margin: 0;
-      font-family: var(--mono);
-      font-size: 13.5px;
-      line-height: 1.75;
-      tab-size: 4
-    }
-
-    .kw {
-      color: #0550ae;
-      font-weight: 500
-    }
-
-    .cm {
-      color: #6a737d;
-      font-style: italic
-    }
-
-    .str {
-      color: #0a8043
-    }
-
-    .num {
-      color: #953800
-    }
-
-    .fn {
-      color: #8250df
-    }
-
-    .cls {
-      color: #1a7f37
-    }
-
-    .ret {
-      color: #0550ae
-    }
-
-    [data-theme="dark"] .kw {
-      color: #79c0ff
-    }
-
-    [data-theme="dark"] .cm {
-      color: #8b949e
-    }
-
-    [data-theme="dark"] .str {
-      color: #a5d6ff
-    }
-
-    [data-theme="dark"] .num {
-      color: #ff9150
-    }
-
-    [data-theme="dark"] .fn {
-      color: #d2a8ff
-    }
-
-    [data-theme="dark"] .cls {
-      color: #7ee787
-    }
-
-    [data-theme="dark"] .ret {
-      color: #79c0ff
-    }
-
-    code {
-      font-family: var(--mono);
-      font-size: 13px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: var(--red)
-    }
-
-    [data-theme="dark"] code {
-      color: var(--orange)
-    }
-
-    /* ── Tables ── */
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    thead th {
-      background: var(--bg2);
-      padding: 9px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: .03em;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap
-    }
-
-    tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      line-height: 1.5
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none
-    }
-
-    tbody tr:hover td {
-      background: var(--bg2)
-    }
-
-    /* ── Lists ── */
-    ul,
-    ol {
-      padding-left: 24px;
-      margin: 8px 0 12px
-    }
-
-    li {
-      margin: 4px 0;
-      line-height: 1.7
-    }
-
-    li::marker {
-      color: var(--text3)
-    }
-
-    /* ── Toggles ── */
-    details {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 10px 0;
-      overflow: hidden
-    }
-
-    summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--bg2);
-      list-style: none;
-      transition: background .12s;
-      user-select: none
-    }
-
-    summary::-webkit-details-marker {
-      display: none
-    }
-
-    summary:hover {
-      background: var(--bg3)
-    }
-
-    .toggle-arrow {
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .2s;
-      color: var(--text3);
-      font-size: 12px;
-      flex-shrink: 0
-    }
-
-    details[open] summary .toggle-arrow {
-      transform: rotate(90deg)
-    }
-
-    .details-body {
-      padding: 14px 16px;
-      background: var(--bg);
-      border-top: 1px solid var(--border)
-    }
-
-    /* ── Practice problem cards ── */
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background .12s
-    }
-
-    .prob-header:hover {
-      background: var(--bg3)
-    }
-
-    .prob-left {
-      flex: 1;
-      min-width: 0
-    }
-
-    .prob-num {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: 4px
-    }
-
-    .prob-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .prob-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 8px
-    }
-
-    .tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 500
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .tag-pat {
-      background: var(--purple-bg);
-      color: var(--purple)
-    }
-
-    .tag-lc {
-      background: var(--orange-bg);
-      color: var(--orange)
-    }
-
-    .prob-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      flex-shrink: 0
-    }
-
-    .prob-body {
-      padding: 16px;
-      background: var(--bg)
-    }
-
-    .prob-section {
-      margin-bottom: 14px
-    }
-
-    .prob-section-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 6px
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border-left: 3px solid var(--border2);
-      padding: 10px 14px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      margin: 8px 0;
-      white-space: pre-wrap
-    }
-
-    /* ── Progress Bar ── */
-    .progress-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      width: 0%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ── Checklist Component ── */
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin: 8px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-      user-select: none;
-    }
-
-    .checklist-item:hover {
-      background: var(--bg2);
-      border-color: var(--border);
-    }
-
-    .cb-box {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border2);
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: transparent;
-      font-size: 12px;
-      flex-shrink: 0;
-      background: var(--bg);
-    }
-
-    .cb-text {
-      font-size: 14.5px;
-      color: var(--text);
-      transition: all 0.2s ease;
-      font-weight: 500;
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .checklist-item.done .cb-text {
-      color: var(--text3);
-      text-decoration: line-through;
-    }
-
-    /* ── ASCII Tree Dry Runs ── */
-    .ascii-tree {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text2);
-      margin: 14px 0;
-      white-space: pre;
-      overflow-x: auto;
-    }
-
-    .ascii-tree .hl {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .ascii-tree .nd {
-      color: var(--orange);
-      font-weight: 600;
-    }
-
-    .ascii-tree .ret {
-      color: var(--purple);
-      font-weight: 600;
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      white-space: pre-wrap;
-    }
-
-    /* ── Complexity ── */
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0
-    }
-
-    .cx-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: var(--mono);
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .cx-badge .cx-label {
-      font-size: 11px;
-      font-family: var(--sans);
-      color: var(--text3)
-    }
-
-    .cx-badge .cx-val {
-      font-weight: 600;
-      color: var(--text)
-    }
-
-    .cx-badge.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .cx-badge.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .cx-badge.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .cx-badge .cx-val.green {
-      color: var(--green)
-    }
-
-    .cx-badge .cx-val.yellow {
-      color: var(--yellow)
-    }
-
-    .cx-badge .cx-val.red {
-      color: var(--red)
-    }
-
-    /* ── Pattern banner ── */
-    .pattern-banner {
-      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 20px 0
-    }
-
-    .pattern-banner h4 {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--purple);
-      margin-bottom: 8px
-    }
-
-    .pattern-banner p {
-      font-size: 14px;
-      font-family: var(--mono);
-      color: var(--text);
-      margin: 0;
-      line-height: 1.8
-    }
-
-    /* ── Big-O chart ── */
-    .bigo-chart-wrap {
-      margin: 14px 0 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--bg2);
-      padding: 16px
-    }
-
-    /* ── Checklist ── */
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none
-    }
-
-    .cb-box {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border2);
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      font-size: 11px
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff
-    }
-
-    .checklist-item.done .cb-text {
-      text-decoration: line-through;
-      color: var(--text3)
-    }
-
-    /* ── Inline highlight ── */
-    mark {
-      background: var(--yellow-bg);
-      color: var(--text);
-      padding: 0 3px;
-      border-radius: 3px
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border2);
-      border-radius: 3px
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    @media(max-width:768px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Lecture 2 — Java Memory Management & Collections</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
       #sidebar {
-        display: none
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
       }
 
       #content {
-        padding: 24px 20px 80px
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">📚 DSA Course</div>
-      <div class="sb-title">Memory Management & JCF</div>
-      <div class="sb-meta">Lecture 2 of 30 · Phase 1 — Foundations</div>
-    </div>
-    <div class="toc-label">On this page</div>
-    <a class="toc-item" href="#jvm"><span class="toc-icon">🏗</span>JVM Architecture</a>
-    <a class="toc-item toc-sub" href="#stack-frames">Stack Frames</a>
-    <a class="toc-item toc-sub" href="#stack-vs-heap">Stack vs Heap</a>
-    <a class="toc-item" href="#string-pool"><span class="toc-icon">🔡</span>String Pool</a>
-    <a class="toc-item" href="#gc"><span class="toc-icon">🗑</span>Garbage Collection</a>
-    <a class="toc-item" href="#jcf"><span class="toc-icon">🗂</span>JCF Masterclass</a>
-    <a class="toc-item toc-sub" href="#hashmap-internals">HashMap Internals</a>
-    <a class="toc-item toc-sub" href="#choice-guide">When to Use Which</a>
-    <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
-    <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
-    <div class="sb-div"></div>
-    <div style="padding:8px 16px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-      <a class="toc-item" href="../Lecture1/lecture1_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 1: Java Fundamentals</a>
-      <a class="toc-item" href="../Lecture3/lecture3_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 3: OOP & Collections</a>
-    </div>
-  </nav>
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb"><a href="../dsa_study_plan.html">DSA Course</a><span>›</span><a href="#">Phase
-          1</a><span>›</span><span>Lecture 2</span></div>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3)">Progress</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">📚 DSA Course</div>
+        <div class="sb-title">Memory Management & JCF</div>
+        <div class="sb-meta">Lecture 2 of 30 · Phase 1 — Foundations</div>
+      </div>
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#jvm"
+        ><span class="toc-icon">🏗</span>JVM Architecture</a
+      >
+      <a class="toc-item toc-sub" href="#stack-frames">Stack Frames</a>
+      <a class="toc-item toc-sub" href="#stack-vs-heap">Stack vs Heap</a>
+      <a class="toc-item" href="#string-pool"
+        ><span class="toc-icon">🔡</span>String Pool</a
+      >
+      <a class="toc-item" href="#gc"
+        ><span class="toc-icon">🗑</span>Garbage Collection</a
+      >
+      <a class="toc-item" href="#jcf"
+        ><span class="toc-icon">🗂</span>JCF Masterclass</a
+      >
+      <a class="toc-item toc-sub" href="#hashmap-internals"
+        >HashMap Internals</a
+      >
+      <a class="toc-item toc-sub" href="#choice-guide">When to Use Which</a>
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">💪</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">📝</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">✅</span>Checklist</a
+      >
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
         </div>
-        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+        <a
+          class="toc-item"
+          href="../Lecture1/lecture1_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >← Topic 1: Java Fundamentals</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture3/lecture3_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >→ Topic 3: OOP & Collections</a
+        >
       </div>
-    </div>
-    <div id="content">
-      <div class="page-header">
-        <span class="page-emoji">🧠</span>
-        <h1 class="page-title">Java Memory Management & Collections</h1>
-        <p class="page-sub">"You rent memory from the JVM. Understand the landlord — or face eviction
-          (OutOfMemoryError)."</p>
-        <div class="meta-row"><span class="meta-chip accent">📖 Lecture 2</span><span class="meta-chip accent">Phase
-            1</span><span class="meta-chip yellow">⏱ 5 days</span><span class="meta-chip green">🎯 25+
-            problems</span><span class="meta-chip ">Google · Oracle · Goldman</span></div>
-      </div>
-
-      <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">🌍</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          Memory management is invisible — until it crashes your program. Understanding <em>where</em> a variable lives
-          (stack vs heap) explains every "surprising" Java behavior you will ever encounter: why primitives are copied
-          but objects are shared, why passing an object to a method can change it while passing an int never can, and
-          why a missing <code>null</code> check causes a <code>NullPointerException</code>. This knowledge also directly
-          impacts how you reason about the space complexity of your algorithms.
+    </nav>
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>›</span
+          ><a href="#">Phase 1</a><span>›</span><span>Lecture 2</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
         </div>
       </div>
-
-      <h3 class="h2" style="margin-top:0">📖 Before We Start — The Big Picture</h3>
-      <p>Every Java program runs inside the <strong>Java Virtual Machine (JVM)</strong> — a software layer that sits
-        between your code and the real hardware. The JVM manages all memory on your behalf, splitting it into distinct
-        regions, each with a specific job.</p>
-      <p><strong>Stack</strong> = a small, fast notepad on your desk. Each method call writes its local variables here.
-        When the method returns, the page is torn off and thrown away. <strong>Heap</strong> = a large warehouse. Every
-        object you create with <code>new</code> is stored here and stays until nobody is referencing it anymore. The
-        <strong>Garbage Collector</strong> is the warehouse cleaner — it periodically sweeps away objects nobody is
-        using.
-      </p>
-
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">🔗</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 1 taught you <em>what</em> types exist. This lecture explains
-          <em>where</em> they live in memory. Lecture 3 (OOP) builds on this — every object you create goes onto the
-          heap, and understanding that is why <code>==</code> compares addresses, not values.
+      <div id="content">
+        <div class="page-header">
+          <span class="page-emoji">🧠</span>
+          <h1 class="page-title">Java Memory Management & Collections</h1>
+          <p class="page-sub">
+            "You rent memory from the JVM. Understand the landlord — or face
+            eviction (OutOfMemoryError)."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">📖 Lecture 2</span
+            ><span class="meta-chip accent">Phase 1</span
+            ><span class="meta-chip yellow">⏱ 5 days</span
+            ><span class="meta-chip green">🎯 25+ problems</span
+            ><span class="meta-chip">Google · Oracle · Goldman</span>
+          </div>
         </div>
-      </div>
 
-      <hr>
-
-      <h2 class="h1" id="jvm">🏗 JVM Architecture</h2>
-      <div class="callout blue"><span class="callout-icon">📌</span>
-        <div class="callout-body"><strong>The Mental Model:</strong> The JVM manages all memory for your program in
-          distinct regions. Understanding these regions explains why Java behaves differently from C/C++ and helps you
-          reason about performance and bugs.</div>
-      </div>
-      <div class="ascii-tree">
-
-        ┌──────────────────────── JVM MEMORY ────────────────────────┐
-        │ HEAP (all threads share this) │
-        │ ┌───────────────┐ ┌───────────────────┐ ┌──────────┐ │
-        │ │ YOUNG GEN │ │ OLD GEN │ │ METASPACE│ │
-        │ │ Eden |S0|S1 │ │ (long-lived objs) │ │ Classes │ │
-        │ │ new objs │ │ tenured ≥15 GCs │ │ Statics │ │
-        │ └───────────────┘ └───────────────────┘ └──────────┘ │
-        ├────────────────────────────────────────────────────────────┤
-        │ STACK (one per thread — holds method frames) │
-        │ ┌───────────────┐ ┌───────────────┐ ┌───────────┐ │
-        │ │ Frame:main │ │ Frame:sort │ │ Frame:cmp │ ← TOP │
-        │ │ local vars │ │ local vars │ │ a,b,ret │ │
-        │ └───────────────┘ └───────────────┘ └───────────┘ │
-        └────────────────────────────────────────────────────────────┘
-      </div>
-      <h3 class="h2" id="stack-vs-heap">Stack vs Heap Quick Reference</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Stack</th>
-              <th>Heap</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>What lives here</strong></td>
-              <td>Primitives, reference variables (pointer itself), frames</td>
-              <td>All objects, arrays</td>
-            </tr>
-            <tr>
-              <td><strong>Size</strong></td>
-              <td>Small ~1 MB/thread</td>
-              <td>Large (configured via -Xmx)</td>
-            </tr>
-            <tr>
-              <td><strong>Thread safety</strong></td>
-              <td>✅ Private per thread</td>
-              <td>❌ Shared — needs sync</td>
-            </tr>
-            <tr>
-              <td><strong>Speed</strong></td>
-              <td>⚡ Very fast (LIFO pointer)</td>
-              <td>Slower (GC pressure)</td>
-            </tr>
-            <tr>
-              <td><strong>Error</strong></td>
-              <td>StackOverflowError</td>
-              <td>OutOfMemoryError</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Memory Layout</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">🌍</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Memory management is invisible — until it crashes your program.
+            Understanding <em>where</em> a variable lives (stack vs heap)
+            explains every "surprising" Java behavior you will ever encounter:
+            why primitives are copied but objects are shared, why passing an
+            object to a method can change it while passing an int never can, and
+            why a missing <code>null</code> check causes a
+            <code>NullPointerException</code>. This knowledge also directly
+            impacts how you reason about the space complexity of your
+            algorithms.
+          </div>
         </div>
-        <pre><span class="kw">int</span> x = 42;               <span class="cm">// x lives on STACK (primitive)</span>
+
+        <h3 class="h2" style="margin-top: 0">
+          📖 Before We Start — The Big Picture
+        </h3>
+        <p>
+          Every Java program runs inside the
+          <strong>Java Virtual Machine (JVM)</strong> — a software layer that
+          sits between your code and the real hardware. The JVM manages all
+          memory on your behalf, splitting it into distinct regions, each with a
+          specific job.
+        </p>
+        <p>
+          <strong>Stack</strong> = a small, fast notepad on your desk. Each
+          method call writes its local variables here. When the method returns,
+          the page is torn off and thrown away. <strong>Heap</strong> = a large
+          warehouse. Every object you create with <code>new</code> is stored
+          here and stays until nobody is referencing it anymore. The
+          <strong>Garbage Collector</strong> is the warehouse cleaner — it
+          periodically sweeps away objects nobody is using.
+        </p>
+
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">🔗</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 1 taught you
+            <em>what</em> types exist. This lecture explains <em>where</em> they
+            live in memory. Lecture 3 (OOP) builds on this — every object you
+            create goes onto the heap, and understanding that is why
+            <code>==</code> compares addresses, not values.
+          </div>
+        </div>
+
+        <hr />
+
+        <h2 class="h1" id="jvm">🏗 JVM Architecture</h2>
+        <div class="callout blue">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>The Mental Model:</strong> The JVM manages all memory for
+            your program in distinct regions. Understanding these regions
+            explains why Java behaves differently from C/C++ and helps you
+            reason about performance and bugs.
+          </div>
+        </div>
+        <div class="ascii-tree">
+          ┌──────────────────────── JVM MEMORY ────────────────────────┐ │ HEAP
+          (all threads share this) │ │ ┌───────────────┐ ┌───────────────────┐
+          ┌──────────┐ │ │ │ YOUNG GEN │ │ OLD GEN │ │ METASPACE│ │ │ │ Eden
+          |S0|S1 │ │ (long-lived objs) │ │ Classes │ │ │ │ new objs │ │ tenured
+          ≥15 GCs │ │ Statics │ │ │ └───────────────┘ └───────────────────┘
+          └──────────┘ │
+          ├────────────────────────────────────────────────────────────┤ │ STACK
+          (one per thread — holds method frames) │ │ ┌───────────────┐
+          ┌───────────────┐ ┌───────────┐ │ │ │ Frame:main │ │ Frame:sort │ │
+          Frame:cmp │ ← TOP │ │ │ local vars │ │ local vars │ │ a,b,ret │ │ │
+          └───────────────┘ └───────────────┘ └───────────┘ │
+          └────────────────────────────────────────────────────────────┘
+        </div>
+        <h3 class="h2" id="stack-vs-heap">Stack vs Heap Quick Reference</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Stack</th>
+                <th>Heap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>What lives here</strong></td>
+                <td>
+                  Primitives, reference variables (pointer itself), frames
+                </td>
+                <td>All objects, arrays</td>
+              </tr>
+              <tr>
+                <td><strong>Size</strong></td>
+                <td>Small ~1 MB/thread</td>
+                <td>Large (configured via -Xmx)</td>
+              </tr>
+              <tr>
+                <td><strong>Thread safety</strong></td>
+                <td>✅ Private per thread</td>
+                <td>❌ Shared — needs sync</td>
+              </tr>
+              <tr>
+                <td><strong>Speed</strong></td>
+                <td>⚡ Very fast (LIFO pointer)</td>
+                <td>Slower (GC pressure)</td>
+              </tr>
+              <tr>
+                <td><strong>Error</strong></td>
+                <td>StackOverflowError</td>
+                <td>OutOfMemoryError</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Memory Layout</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> x = 42;               <span class="cm">// x lives on STACK (primitive)</span>
 <span class="cls">String</span> s = <span class="str">"hi"</span>;          <span class="cm">// s (ref) on STACK → String object on HEAP</span>
 <span class="kw">int</span>[] arr = {1,2,3};    <span class="cm">// arr (ref) on STACK → int[3] on HEAP</span>
 
@@ -1266,14 +1330,14 @@ System.out.println(a[0]); <span class="cm">// → 99! Same heap array</span>
 
 <span class="cm">// Deep copy needed for independence:</span>
 <span class="kw">int</span>[] c = <span class="cls">Arrays</span>.copyOf(a, a.length);</pre>
-      </div>
-      <h2 class="h1" id="string-pool">🔡 String Pool & Interning</h2>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · String Pool</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cls">String</span> a = <span class="str">"hello"</span>;           <span class="cm">// Pool["hello"] → 0xAAA</span>
+        <h2 class="h1" id="string-pool">🔡 String Pool & Interning</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · String Pool</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">String</span> a = <span class="str">"hello"</span>;           <span class="cm">// Pool["hello"] → 0xAAA</span>
 <span class="cls">String</span> b = <span class="str">"hello"</span>;           <span class="cm">// same Pool object 0xAAA</span>
 System.out.println(a == b);      <span class="cm">// → true</span>
 
@@ -1285,171 +1349,196 @@ System.out.println(a.equals(c)); <span class="cm">// → true  (same content)</s
 System.out.println(a == d);      <span class="cm">// → true</span>
 
 <span class="cm">// RULE: ALWAYS use .equals() for string comparison. Never ==.</span></pre>
-      </div>
-      <h2 class="h1" id="gc">🗑 Garbage Collection</h2>
-      <div class="callout green"><span class="callout-icon">💡</span>
-        <div class="callout-body"><strong>Generational Hypothesis:</strong> Most objects die young. GC exploits this by
-          collecting the small Young Generation frequently (Minor GC — fast) and the Old Generation rarely (Major GC —
-          slow Stop-the-World).</div>
-      </div>
-      <h2 class="h1" id="jcf">🗂 JCF Masterclass</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Class</th>
-              <th>Backing</th>
-              <th>get</th>
-              <th>add/put</th>
-              <th>remove</th>
-              <th>Order</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>ArrayList</strong></td>
-              <td>Object[]</td>
-              <td>O(1)</td>
-              <td>O(1)*</td>
-              <td>O(n)</td>
-              <td>Insertion</td>
-            </tr>
-            <tr>
-              <td>LinkedList</td>
-              <td>Doubly linked</td>
-              <td>O(n)</td>
-              <td>O(1) ends</td>
-              <td>O(1) ends</td>
-              <td>Insertion</td>
-            </tr>
-            <tr>
-              <td><strong>ArrayDeque</strong></td>
-              <td>Circular array</td>
-              <td>O(1) ends</td>
-              <td>O(1)*</td>
-              <td>O(1) ends</td>
-              <td>Insertion</td>
-            </tr>
-            <tr>
-              <td><strong>PriorityQueue</strong></td>
-              <td>Binary heap</td>
-              <td>O(1) peek</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>Priority</td>
-            </tr>
-            <tr>
-              <td><strong>HashSet</strong></td>
-              <td>HashMap</td>
-              <td>—</td>
-              <td>O(1) avg</td>
-              <td>O(1) avg</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td>TreeSet</td>
-              <td>Red-Black</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>Sorted</td>
-            </tr>
-            <tr>
-              <td><strong>HashMap</strong></td>
-              <td>Array+list/tree</td>
-              <td>O(1) avg</td>
-              <td>O(1) avg</td>
-              <td>O(1) avg</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td>LinkedHashMap</td>
-              <td>HashMap+list</td>
-              <td>O(1) avg</td>
-              <td>O(1) avg</td>
-              <td>O(1) avg</td>
-              <td>Insertion</td>
-            </tr>
-            <tr>
-              <td>TreeMap</td>
-              <td>Red-Black</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>Sorted key</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h3 class="h2" id="hashmap-internals">HashMap Internals</h3>
-      <div class="callout blue"><span class="callout-icon">🔍</span>
-        <div class="callout-body"><strong>Bucket index</strong> = <code>hash(key) &amp; (n-1)</code>. Collisions form a
-          linked list per bucket. When chain length ≥ 8 it treeifies to a Red-Black Tree (O(log n) worst case). Doubles
-          capacity when size &gt; capacity × 0.75.</div>
-      </div>
-      <h3 class="h2" id="choice-guide">When to Use Which</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Need</th>
-              <th>Use</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Frequency count</td>
-              <td><code>HashMap&lt;T,Integer&gt;</code> + getOrDefault</td>
-            </tr>
-            <tr>
-              <td>Visited set (BFS/DFS)</td>
-              <td><code>HashSet&lt;T&gt;</code></td>
-            </tr>
-            <tr>
-              <td>Min/Max always available</td>
-              <td><code>PriorityQueue</code> (min-heap default)</td>
-            </tr>
-            <tr>
-              <td>Stack or Queue</td>
-              <td><code>ArrayDeque</code> (faster than Stack class)</td>
-            </tr>
-            <tr>
-              <td>LRU Cache</td>
-              <td><code>LinkedHashMap</code> with accessOrder=true</td>
-            </tr>
-            <tr>
-              <td>Floor/Ceiling key queries</td>
-              <td><code>TreeMap</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h2 class="h1" id="practice">💪 Practice Problems</h2>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P01 · Hashing</div>
-            <div class="prob-title">Group Anagrams</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/" target="_blank"
-                style="font-size:12px">🔗 LC 49</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Google</span><span class="tag tag-pat">HashMap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
         </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Group strings that are anagrams of each other.</p>
-            <div class="iobox">["eat","tea","tan","ate","nat","bat"] → [["bat"],["nat","tan"],["ate","eat","tea"]]</div>
+        <h2 class="h1" id="gc">🗑 Garbage Collection</h2>
+        <div class="callout green">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>Generational Hypothesis:</strong> Most objects die young. GC
+            exploits this by collecting the small Young Generation frequently
+            (Minor GC — fast) and the Old Generation rarely (Major GC — slow
+            Stop-the-World).
           </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">groupAnagrams</span>(<span class="cls">String</span>[] strs) {
+        </div>
+        <h2 class="h1" id="jcf">🗂 JCF Masterclass</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Backing</th>
+                <th>get</th>
+                <th>add/put</th>
+                <th>remove</th>
+                <th>Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ArrayList</strong></td>
+                <td>Object[]</td>
+                <td>O(1)</td>
+                <td>O(1)*</td>
+                <td>O(n)</td>
+                <td>Insertion</td>
+              </tr>
+              <tr>
+                <td>LinkedList</td>
+                <td>Doubly linked</td>
+                <td>O(n)</td>
+                <td>O(1) ends</td>
+                <td>O(1) ends</td>
+                <td>Insertion</td>
+              </tr>
+              <tr>
+                <td><strong>ArrayDeque</strong></td>
+                <td>Circular array</td>
+                <td>O(1) ends</td>
+                <td>O(1)*</td>
+                <td>O(1) ends</td>
+                <td>Insertion</td>
+              </tr>
+              <tr>
+                <td><strong>PriorityQueue</strong></td>
+                <td>Binary heap</td>
+                <td>O(1) peek</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>Priority</td>
+              </tr>
+              <tr>
+                <td><strong>HashSet</strong></td>
+                <td>HashMap</td>
+                <td>—</td>
+                <td>O(1) avg</td>
+                <td>O(1) avg</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>TreeSet</td>
+                <td>Red-Black</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>Sorted</td>
+              </tr>
+              <tr>
+                <td><strong>HashMap</strong></td>
+                <td>Array+list/tree</td>
+                <td>O(1) avg</td>
+                <td>O(1) avg</td>
+                <td>O(1) avg</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>LinkedHashMap</td>
+                <td>HashMap+list</td>
+                <td>O(1) avg</td>
+                <td>O(1) avg</td>
+                <td>O(1) avg</td>
+                <td>Insertion</td>
+              </tr>
+              <tr>
+                <td>TreeMap</td>
+                <td>Red-Black</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>Sorted key</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="h2" id="hashmap-internals">HashMap Internals</h3>
+        <div class="callout blue">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body">
+            <strong>Bucket index</strong> = <code>hash(key) &amp; (n-1)</code>.
+            Collisions form a linked list per bucket. When chain length ≥ 8 it
+            treeifies to a Red-Black Tree (O(log n) worst case). Doubles
+            capacity when size &gt; capacity × 0.75.
+          </div>
+        </div>
+        <h3 class="h2" id="choice-guide">When to Use Which</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Need</th>
+                <th>Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frequency count</td>
+                <td><code>HashMap&lt;T,Integer&gt;</code> + getOrDefault</td>
+              </tr>
+              <tr>
+                <td>Visited set (BFS/DFS)</td>
+                <td><code>HashSet&lt;T&gt;</code></td>
+              </tr>
+              <tr>
+                <td>Min/Max always available</td>
+                <td><code>PriorityQueue</code> (min-heap default)</td>
+              </tr>
+              <tr>
+                <td>Stack or Queue</td>
+                <td><code>ArrayDeque</code> (faster than Stack class)</td>
+              </tr>
+              <tr>
+                <td>LRU Cache</td>
+                <td><code>LinkedHashMap</code> with accessOrder=true</td>
+              </tr>
+              <tr>
+                <td>Floor/Ceiling key queries</td>
+                <td><code>TreeMap</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="practice">💪 Practice Problems</h2>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P01 · Hashing</div>
+              <div class="prob-title">Group Anagrams</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/group-anagrams/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 49</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">HashMap</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>Group strings that are anagrams of each other.</p>
+              <div class="iobox">
+                ["eat","tea","tan","ate","nat","bat"] →
+                [["bat"],["nat","tan"],["ate","eat","tea"]]
+              </div>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">groupAnagrams</span>(<span class="cls">String</span>[] strs) {
     <span class="cls">Map</span>&lt;<span class="cls">String</span>,<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="cls">String</span> s : strs) {
         <span class="kw">char</span>[] ch = s.toCharArray(); <span class="cls">Arrays</span>.sort(ch);
@@ -1458,43 +1547,61 @@ System.out.println(a == d);      <span class="cm">// → true</span>
     <span class="ret">return new</span> <span class="cls">ArrayList</span>&lt;&gt;(map.values());
 }
 <span class="cm">// "eat"→sort→"aet", "tea"→sort→"aet" → same group!</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n·k log k)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n·k)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n·k log
-                    k)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                    class="cx-val yellow">O(n·k)</span></div>
+            </details>
+          </div>
+        </div>
+
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P02 · HashMap+Heap</div>
+              <div class="prob-title">Top K Frequent Elements</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/top-k-frequent-elements/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 347</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Facebook</span
+                ><span class="tag tag-pat">HashMap+MinHeap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P02 · HashMap+Heap</div>
-            <div class="prob-title">Top K Frequent Elements</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/top-k-frequent-elements/" target="_blank"
-                style="font-size:12px">🔗 LC 347</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Facebook</span><span class="tag tag-pat">HashMap+MinHeap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Return the k most frequent elements from an array.</p>
-            <div class="iobox">[1,1,1,2,2,3], k=2 → [1,2]</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java</div><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>Return the k most frequent elements from an array.</p>
+              <div class="iobox">[1,1,1,2,2,3], k=2 → [1,2]</div>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
     <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> n:nums) freq.merge(n,1,<span class="cls">Integer</span>::sum);
     <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[1]-b[1]);
@@ -1506,94 +1613,141 @@ System.out.println(a == d);      <span class="cm">// → true</span>
     <span class="kw">for</span>(<span class="kw">int</span> i=k-1;i>=0;i--) res[i]=pq.poll()[0];
     <span class="ret">return</span> res;
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
-                    k)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n log k)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P03 · LinkedHashMap</div>
+              <div class="prob-title">LRU Cache</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/lru-cache/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 146</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Microsoft</span
+                ><span class="tag tag-pat">LinkedHashMap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P03 · LinkedHashMap</div>
-            <div class="prob-title">LRU Cache</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/lru-cache/" target="_blank"
-                style="font-size:12px">🔗 LC 146</a></div>
-            <div class="prob-tags"><span class="tag tag-hard">Hard</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Microsoft</span><span class="tag tag-pat">LinkedHashMap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Design LRU Cache with O(1) get and put. Evict least recently used when over capacity.</p>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · LinkedHashMap access-order trick</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> <span class="cls">LRUCache</span> <span class="kw">extends</span> <span class="cls">LinkedHashMap</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Design LRU Cache with O(1) get and put. Evict least recently
+                used when over capacity.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      ☕ Java · LinkedHashMap access-order trick
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> <span class="cls">LRUCache</span> <span class="kw">extends</span> <span class="cls">LinkedHashMap</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; {
     <span class="kw">final int</span> cap;
     <span class="cls">LRUCache</span>(<span class="kw">int</span> c) { <span class="kw">super</span>(c,0.75f,<span class="kw">true</span>); cap=c; } <span class="cm">// true=accessOrder</span>
     <span class="kw">public int</span> <span class="fn">get</span>(<span class="kw">int</span> k) { <span class="ret">return</span> <span class="kw">super</span>.getOrDefault(k,-1); }
     <span class="kw">public void</span> <span class="fn">put</span>(<span class="kw">int</span> k,<span class="kw">int</span> v) { <span class="kw">super</span>.put(k,v); }
     @Override <span class="kw">protected boolean</span> <span class="fn">removeEldestEntry</span>(<span class="cls">Map.Entry</span> e) { <span class="ret">return</span> size()>cap; }
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(1) all</span>
                 </div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span
-                    class="cx-val yellow">O(capacity)</span></div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) all</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(capacity)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P04 · HashMap Lookup</div>
+              <div class="prob-title">Two Sum</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/two-sum/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 1</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">HashMap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P04 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P04 · HashMap Lookup</div>
-            <div class="prob-title">Two Sum</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/two-sum/" target="_blank"
-                style="font-size:12px">🔗 LC 1</a></div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-co">Google</span><span class="tag tag-pat">HashMap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given array <code>nums</code> and target, return indices of the two numbers that add up to target.</p>
-            <div class="iobox">[2,7,11,15], target=9 → [0,1]</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>For each element <code>nums[i]</code>, the <em>complement</em> we need is <code>target - nums[i]</code>.
-              Store each number and its index in a HashMap. Before inserting, check if the complement already exists —
-              if so, we're done.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution + Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · One-Pass HashMap</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">public int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given array <code>nums</code> and target, return indices of the
+                two numbers that add up to target.
+              </p>
+              <div class="iobox">[2,7,11,15], target=9 → [0,1]</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                For each element <code>nums[i]</code>, the
+                <em>complement</em> we need is <code>target - nums[i]</code>.
+                Store each number and its index in a HashMap. Before inserting,
+                check if the complement already exists — if so, we're done.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">►</span>Solution + Trace
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · One-Pass HashMap</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">public int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     Map&lt;Integer, Integer&gt; seen = <span class="kw">new</span> HashMap&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) {
         <span class="kw">int</span> need = target - nums[i];
@@ -1606,51 +1760,77 @@ System.out.println(a == d);      <span class="cm">// → true</span>
 <span class="cm">// [2,7,11,15] t=9:
 // i=0: need=7, not in map → put {2:0}
 // i=1: need=2, found at 0 → return [0,1] ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(N)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(N)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P05 · Stack</div>
+              <div class="prob-title">Valid Parentheses</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/valid-parentheses/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 20</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Meta</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">Stack</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P05 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P05 · Stack</div>
-            <div class="prob-title">Valid Parentheses</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/valid-parentheses/" target="_blank"
-                style="font-size:12px">🔗 LC 20</a></div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Meta</span><span
-                class="tag tag-co">Google</span><span class="tag tag-pat">Stack</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a string of brackets, return <code>true</code> if every open bracket has a matching close bracket
-              in the correct order.</p>
-            <div class="iobox">"()[]{}" → true &nbsp;&nbsp; "([)]" → false &nbsp;&nbsp; "{[]}" → true</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Push open brackets onto a Stack. When you see a close bracket, the Stack's top must be the matching open
-              bracket — if not, it's invalid. After scanning, the stack must be empty (every open was closed).</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Stack</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">public boolean</span> <span class="fn">isValid</span>(String s) {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a string of brackets, return <code>true</code> if every
+                open bracket has a matching close bracket in the correct order.
+              </p>
+              <div class="iobox">
+                "()[]{}" → true &nbsp;&nbsp; "([)]" → false &nbsp;&nbsp; "{[]}"
+                → true
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Push open brackets onto a Stack. When you see a close bracket,
+                the Stack's top must be the matching open bracket — if not, it's
+                invalid. After scanning, the stack must be empty (every open was
+                closed).
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Stack</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">public boolean</span> <span class="fn">isValid</span>(String s) {
     Deque&lt;Character&gt; stack = <span class="kw">new</span> ArrayDeque&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">char</span> c : s.<span class="fn">toCharArray</span>()) {
         <span class="kw">if</span> (c == <span class="str">'('</span> || c == <span class="str">'['</span> || c == <span class="str">'{'</span>) stack.<span class="fn">push</span>(c);
@@ -1664,53 +1844,78 @@ System.out.println(a == d);      <span class="cm">// → true</span>
     }
     <span class="ret">return</span> stack.<span class="fn">isEmpty</span>();
 }</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(N)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(N)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P06 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P06 · Two-Stack Design</div>
+              <div class="prob-title">Min Stack</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/min-stack/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 155</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">Design</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P06 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P06 · Two-Stack Design</div>
-            <div class="prob-title">Min Stack</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/min-stack/" target="_blank"
-                style="font-size:12px">🔗 LC 155</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-pat">Design</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Design a stack that supports <code>push</code>, <code>pop</code>, <code>top</code>, and
-              <code>getMin</code> — all in O(1) time.
-            </p>
-            <div class="iobox">push(5)→push(3)→push(7)→getMin()=3, pop()→getMin()=3, pop()→getMin()=5</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Use <strong>two stacks</strong>: a main stack for all values, and a <em>min-stack</em> that tracks the
-              current minimum at each level. When you push a value, also push the new minimum. When you pop, pop from
-              both. <code>getMin()</code> is always the top of the min-stack.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Parallel Min-Stack</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">class</span> MinStack {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Design a stack that supports <code>push</code>,
+                <code>pop</code>, <code>top</code>, and <code>getMin</code> —
+                all in O(1) time.
+              </p>
+              <div class="iobox">
+                push(5)→push(3)→push(7)→getMin()=3, pop()→getMin()=3,
+                pop()→getMin()=5
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Use <strong>two stacks</strong>: a main stack for all values,
+                and a <em>min-stack</em> that tracks the current minimum at each
+                level. When you push a value, also push the new minimum. When
+                you pop, pop from both. <code>getMin()</code> is always the top
+                of the min-stack.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Parallel Min-Stack</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">class</span> MinStack {
     Deque&lt;Integer&gt; stack = <span class="kw">new</span> ArrayDeque&lt;&gt;();
     Deque&lt;Integer&gt; minStack = <span class="kw">new</span> ArrayDeque&lt;&gt;();
 
@@ -1727,54 +1932,80 @@ System.out.println(a == d);      <span class="cm">// → true</span>
 // push(3): stack=[3,5], min=[3,5]
 // push(7): stack=[7,3,5], min=[3,3,5]
 // getMin()=3 ✓  pop()→stack=[3,5],min=[3,5] → getMin()=3 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(1) all
-                    ops</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(N)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) all ops</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P07 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">P07 · HashSet</div>
+              <div class="prob-title">Longest Consecutive Sequence</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/longest-consecutive-sequence/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 128</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-co">Meta</span
+                ><span class="tag tag-pat">HashSet</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P07 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">P07 · HashSet</div>
-            <div class="prob-title">Longest Consecutive Sequence</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/longest-consecutive-sequence/"
-                target="_blank" style="font-size:12px">🔗 LC 128</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-co">Meta</span><span class="tag tag-pat">HashSet</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given unsorted array, find the length of the longest sequence of consecutive integers. Must run in O(N).
-            </p>
-            <div class="iobox">[100,4,200,1,3,2] → 4 (sequence: 1,2,3,4)</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Load all numbers into a <code>HashSet</code>. For each number, only start counting if it's the
-              <em>start</em> of a sequence (i.e., <code>n-1</code> is NOT in the set). Then count consecutive numbers
-              <code>n+1, n+2, ...</code> until the chain breaks. This is O(N) because each number is visited at most
-              twice.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution + Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · HashSet + Sequence Start</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">public int</span> <span class="fn">longestConsecutive</span>(<span class="kw">int</span>[] nums) {
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given unsorted array, find the length of the longest sequence of
+                consecutive integers. Must run in O(N).
+              </p>
+              <div class="iobox">[100,4,200,1,3,2] → 4 (sequence: 1,2,3,4)</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Load all numbers into a <code>HashSet</code>. For each number,
+                only start counting if it's the <em>start</em> of a sequence
+                (i.e., <code>n-1</code> is NOT in the set). Then count
+                consecutive numbers <code>n+1, n+2, ...</code> until the chain
+                breaks. This is O(N) because each number is visited at most
+                twice.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">►</span>Solution + Trace
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      ☕ Java · HashSet + Sequence Start
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">public int</span> <span class="fn">longestConsecutive</span>(<span class="kw">int</span>[] nums) {
     Set&lt;Integer&gt; set = <span class="kw">new</span> HashSet&lt;&gt;();
     <span class="kw">for</span> (<span class="kw">int</span> n : nums) set.<span class="fn">add</span>(n);
     <span class="kw">int</span> best = <span class="num">0</span>;
@@ -1789,165 +2020,236 @@ System.out.println(a == d);      <span class="cm">// → true</span>
 }
 <span class="cm">// [100,4,200,1,3,2]: set has all values
 // n=1: 0 not in set → start! count 1,2,3,4 → len=4 → best=4 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(N)</span>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(N)</span>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
-        </div>
-      </div>
-
-      <h2 class="h1" id="assignment">📝 Assignment</h2>
-      <div class="callout orange"><span class="callout-icon">📋</span>
-        <div class="callout-body"><strong>Lecture 2 Assignment</strong><br>25+ problems: JVM memory quiz, String pool
-          traps, HashMap patterns, LRU Cache, Top-K, Group Anagrams, and heap operation practice.<br><br><a
-            href="https://github.com/bhumika-aga/DSA/blob/main/Lecture2/Assignment.md"
-            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none">Open
-            Assignment →</a></div>
-      </div>
-      <h2 class="h1" id="checklist">✅ Completion Checklist</h2>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can draw the JVM memory layout from scratch (Stack, Eden, S0/S1, Old Gen, Metaspace)
+            </details>
           </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know what lives on Stack vs Heap and can trace any code snippet</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know why <code>new String("x") == "x"</code> is false</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can explain GC eligibility and what a memory leak looks like in Java</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know time complexity of HashMap, TreeMap, PriorityQueue, ArrayDeque</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand how HashMap computes bucket index and handles collisions</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can implement LRU Cache using LinkedHashMap in under 10 min</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can solve Top-K using HashMap + PriorityQueue</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know when to use TreeMap.floorKey() vs HashMap</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand the treeify threshold (8) and load factor (0.75) in HashMap</div>
-        </div>
-      </div>
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">🧠</span>
-        <div class="callout-body">
-          <strong>You're ready for Topic 3: OOP & Collections</strong><br>
-          You've mastered Java Memory — the JVM Stack &amp; Heap, garbage collection, and String interning. OOP is where
-          Java's power truly unlocks. Get ready for inheritance, polymorphism, generics, and Java Collections.
-        </div>
-      </div>
 
-      <div
-        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-        <a href="../Lecture1/lecture1_notes.html" style="color:var(--accent);font-weight:600;text-decoration:none">←
-          Topic 1: Java Fundamentals</a><a href="../Lecture3/lecture3_notes.html"
-          style="color:var(--accent);font-weight:600;text-decoration:none">Topic 3: OOP & Collections →</a>
+        <h2 class="h1" id="assignment">📝 Assignment</h2>
+        <div class="callout orange">
+          <span class="callout-icon">📋</span>
+          <div class="callout-body">
+            <strong>Lecture 2 Assignment</strong><br />25+ problems: JVM memory
+            quiz, String pool traps, HashMap patterns, LRU Cache, Top-K, Group
+            Anagrams, and heap operation practice.<br /><br /><a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture2/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+              "
+              >Open Assignment →</a
+            >
+          </div>
+        </div>
+        <h2 class="h1" id="checklist">✅ Completion Checklist</h2>
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can draw the JVM memory layout from scratch (Stack, Eden, S0/S1,
+              Old Gen, Metaspace)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know what lives on Stack vs Heap and can trace any code snippet
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know why <code>new String("x") == "x"</code> is false
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can explain GC eligibility and what a memory leak looks like in
+              Java
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know time complexity of HashMap, TreeMap, PriorityQueue,
+              ArrayDeque
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand how HashMap computes bucket index and handles
+              collisions
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can implement LRU Cache using LinkedHashMap in under 10 min
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can solve Top-K using HashMap + PriorityQueue
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know when to use TreeMap.floorKey() vs HashMap
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand the treeify threshold (8) and load factor (0.75) in
+              HashMap
+            </div>
+          </div>
+        </div>
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">🧠</span>
+          <div class="callout-body">
+            <strong>You're ready for Topic 3: OOP & Collections</strong><br />
+            You've mastered Java Memory — the JVM Stack &amp; Heap, garbage
+            collection, and String interning. OOP is where Java's power truly
+            unlocks. Get ready for inheritance, polymorphism, generics, and Java
+            Collections.
+          </div>
+        </div>
+
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <a
+            href="../Lecture1/lecture1_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >← Topic 1: Java Fundamentals</a
+          ><a
+            href="../Lecture3/lecture3_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >Topic 3: OOP & Collections →</a
+          >
+        </div>
       </div>
     </div>
-  </div>
-  <script>
-    // 1. Dark Mode Toggle
-    function toggleDark() {
-      const html = document.documentElement;
-      const btn = document.getElementById('darkToggle');
-      if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        btn.innerText = '🌙 Dark';
-      } else {
-        html.setAttribute('data-theme', 'dark');
-        btn.innerText = '☀️ Light';
-      }
-    }
-
-    // 2. Progress Tracker & TOC Highlighting
-    document.getElementById('main').addEventListener('scroll', function () {
-      const el = this;
-      const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-
-      // Progress bar fill logic with threshold
-      if (document.getElementById('progressFill')) {
-        const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
-        document.getElementById('progressFill').style.width = fillPct + '%';
+    <script>
+      // 1. Dark Mode Toggle
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
+        }
       }
 
-      // Active TOC Highlighting
-      const sections = document.querySelectorAll('h1, h2, h3');
-      let current = "";
-      sections.forEach(s => {
-        const top = s.getBoundingClientRect().top;
-        if (top < 150) current = s.id;
-      });
+      // 2. Progress Tracker & TOC Highlighting
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
 
-      document.querySelectorAll('.toc-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === "#" + current) {
-          item.classList.add('active');
+        // Progress bar fill logic with threshold
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
         }
+
+        // Active TOC Highlighting
+        const sections = document.querySelectorAll("h1, h2, h3");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current) {
+            item.classList.add("active");
+          }
+        });
       });
-    });
 
-    // 3. Problem Visibility Toggle
-    function toggleProb(headerEl) {
-      const body = headerEl.nextElementSibling;
-      if (!body) return;
-      const isOpen = body.style.display === 'block';
-      body.style.display = isOpen ? 'none' : 'block';
-      headerEl.classList.toggle('active', !isOpen);
-    }
+      // 3. Problem Visibility Toggle
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
 
-    // 4. Copy Code Logic
-    function copyCode(btn) {
-      const code = btn.closest('.code-block').querySelector('pre').innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        const originalText = btn.innerText;
-        btn.innerText = 'Copied!';
-        btn.style.background = 'var(--green-bg)';
-        btn.style.color = 'var(--green)';
-        btn.style.borderColor = 'var(--green)';
-        setTimeout(() => {
-          btn.innerText = originalText;
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.style.borderColor = '';
-        }, 2000);
+      // 4. Copy Code Logic
+      function copyCode(btn) {
+        const code = btn.closest(".code-block").querySelector("pre").innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        });
+      }
+
+      // 5. Details Arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow) {
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+          }
+        });
       });
-    }
-
-    // 5. Details Arrows
-    document.querySelectorAll('details').forEach(det => {
-      det.addEventListener('toggle', () => {
-        const arrow = det.querySelector('.toggle-arrow');
-        if (arrow) {
-          arrow.style.transform = det.open ? 'rotate(90deg)' : 'rotate(0deg)';
-        }
-      });
-    });
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

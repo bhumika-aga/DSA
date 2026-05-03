@@ -1,1206 +1,1270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecture 4 — Java 8+ Modern Features</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 260px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      flex-direction: row;
-      transition: background .2s, color .2s;
-    }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 0 16px 6px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 16px;
-      cursor: pointer;
-      color: var(--text2);
-      transition: background .12s, color .12s;
-      text-decoration: none
-    }
-
-    .toc-item:hover,
-    .toc-item.active {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      font-weight: 500;
-      color: var(--accent)
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      flex-shrink: 0
-    }
-
-    .toc-sub {
-      padding-left: 36px;
-      font-size: 12px;
-      color: var(--text3)
-    }
-
-    .toc-sub:hover {
-      color: var(--text2)
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 10px 16px
-    }
-
-    /* ── Main ── */
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    /* ── Topbar ── */
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2);
-      gap: 12px;
-      backdrop-filter: blur(8px)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--text)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width .3s
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3)
-    }
-
-    /* ── Page Header ── */
-    .page-header {
-      margin-bottom: 40px;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      margin-bottom: 12px;
-      display: block
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      background: var(--bg2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent-bg)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green-bg)
-    }
-
-    .meta-chip.yellow {
-      background: var(--yellow-bg);
-      color: var(--yellow);
-      border-color: var(--yellow-bg)
-    }
-
-    /* ── Headings ── */
-    .h1 {
-      font-family: var(--serif);
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 40px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--border);
-      scroll-margin-top: 20px
-    }
-
-    .h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      scroll-margin-top: 20px
-    }
-
-    .h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 20px 0 6px
-    }
-
-    p {
-      color: var(--text);
-      margin: 0 0 10px;
-      line-height: 1.75
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 32px 0
-    }
-
-    /* ── Callouts ── */
-    .callout {
-      display: flex;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 14px 0;
-      font-size: 14px;
-      line-height: 1.65
-    }
-
-    .callout-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .callout-body {
-      flex: 1
-    }
-
-    .callout-body strong {
-      font-weight: 600
-    }
-
-    .callout.blue {
-      background: var(--accent-bg);
-      color: var(--text)
-    }
-
-    .callout.green {
-      background: var(--green-bg);
-      color: var(--text)
-    }
-
-    .callout.yellow {
-      background: var(--yellow-bg);
-      color: var(--text)
-    }
-
-    .callout.red {
-      background: var(--red-bg);
-      color: var(--text)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg);
-      color: var(--text)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg);
-      color: var(--text)
-    }
-
-    .callout.teal {
-      background: var(--teal-bg);
-      color: var(--text)
-    }
-
-    /* ── Code Blocks ── */
-    .code-block {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      gap: 10px
-    }
-
-    .code-lang {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3)
-    }
-
-    .copy-btn {
-      background: none;
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 11px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    .copy-btn:hover {
-      background: var(--bg)
-    }
-
-    pre {
-      padding: 16px;
-      overflow-x: auto;
-      margin: 0;
-      font-family: var(--mono);
-      font-size: 13.5px;
-      line-height: 1.75;
-      tab-size: 4
-    }
-
-    .kw {
-      color: #0550ae;
-      font-weight: 500
-    }
-
-    .cm {
-      color: #6a737d;
-      font-style: italic
-    }
-
-    .str {
-      color: #0a8043
-    }
-
-    .num {
-      color: #953800
-    }
-
-    .fn {
-      color: #8250df
-    }
-
-    .cls {
-      color: #1a7f37
-    }
-
-    .ret {
-      color: #0550ae
-    }
-
-    [data-theme="dark"] .kw {
-      color: #79c0ff
-    }
-
-    [data-theme="dark"] .cm {
-      color: #8b949e
-    }
-
-    [data-theme="dark"] .str {
-      color: #a5d6ff
-    }
-
-    [data-theme="dark"] .num {
-      color: #ff9150
-    }
-
-    [data-theme="dark"] .fn {
-      color: #d2a8ff
-    }
-
-    [data-theme="dark"] .cls {
-      color: #7ee787
-    }
-
-    [data-theme="dark"] .ret {
-      color: #79c0ff
-    }
-
-    code {
-      font-family: var(--mono);
-      font-size: 13px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: var(--red)
-    }
-
-    [data-theme="dark"] code {
-      color: var(--orange)
-    }
-
-    /* ── Tables ── */
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    thead th {
-      background: var(--bg2);
-      padding: 9px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: .03em;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap
-    }
-
-    tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      line-height: 1.5
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none
-    }
-
-    tbody tr:hover td {
-      background: var(--bg2)
-    }
-
-    /* ── Lists ── */
-    ul,
-    ol {
-      padding-left: 24px;
-      margin: 8px 0 12px
-    }
-
-    li {
-      margin: 4px 0;
-      line-height: 1.7
-    }
-
-    li::marker {
-      color: var(--text3)
-    }
-
-    /* ── Toggles ── */
-    details {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 10px 0;
-      overflow: hidden
-    }
-
-    summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--bg2);
-      list-style: none;
-      transition: background .12s;
-      user-select: none
-    }
-
-    summary::-webkit-details-marker {
-      display: none
-    }
-
-    summary:hover {
-      background: var(--bg3)
-    }
-
-    .toggle-arrow {
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .2s;
-      color: var(--text3);
-      font-size: 12px;
-      flex-shrink: 0
-    }
-
-    details[open] summary .toggle-arrow {
-      transform: rotate(90deg)
-    }
-
-    .details-body {
-      padding: 14px 16px;
-      background: var(--bg);
-      border-top: 1px solid var(--border)
-    }
-
-    /* ── Practice problem cards ── */
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background .12s
-    }
-
-    .prob-header:hover {
-      background: var(--bg3)
-    }
-
-    .prob-left {
-      flex: 1;
-      min-width: 0
-    }
-
-    .prob-num {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: 4px
-    }
-
-    .prob-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .prob-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 8px
-    }
-
-    .tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 500
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .tag-pat {
-      background: var(--purple-bg);
-      color: var(--purple)
-    }
-
-    .tag-lc {
-      background: var(--orange-bg);
-      color: var(--orange)
-    }
-
-    .prob-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      flex-shrink: 0
-    }
-
-    .prob-body {
-      padding: 16px;
-      background: var(--bg)
-    }
-
-    .prob-section {
-      margin-bottom: 14px
-    }
-
-    .prob-section-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text3);
-      margin-bottom: 6px
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border-left: 3px solid var(--border2);
-      padding: 10px 14px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      margin: 8px 0;
-      white-space: pre-wrap
-    }
-
-    /* ── Progress Bar ── */
-    .progress-bar {
-      width: 120px;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      width: 0%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ── Checklist Component ── */
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin: 8px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-      user-select: none;
-    }
-
-    .checklist-item:hover {
-      background: var(--bg2);
-      border-color: var(--border);
-    }
-
-    .cb-box {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border2);
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: transparent;
-      font-size: 12px;
-      flex-shrink: 0;
-      background: var(--bg);
-    }
-
-    .cb-text {
-      font-size: 14.5px;
-      color: var(--text);
-      transition: all 0.2s ease;
-      font-weight: 500;
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .checklist-item.done .cb-text {
-      color: var(--text3);
-      text-decoration: line-through;
-    }
-
-    /* ── ASCII Tree Dry Runs ── */
-    .ascii-tree {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text2);
-      margin: 14px 0;
-      white-space: pre;
-      overflow-x: auto;
-    }
-
-    .ascii-tree .hl {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .ascii-tree .nd {
-      color: var(--orange);
-      font-weight: 600;
-    }
-
-    .ascii-tree .ret {
-      color: var(--purple);
-      font-weight: 600;
-    }
-
-    .iobox {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text2);
-      white-space: pre-wrap;
-    }
-
-    /* ── Complexity ── */
-    .complexity-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0
-    }
-
-    .cx-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: var(--mono);
-      border: 1px solid var(--border);
-      background: var(--bg2)
-    }
-
-    .cx-badge .cx-label {
-      font-size: 11px;
-      font-family: var(--sans);
-      color: var(--text3)
-    }
-
-    .cx-badge .cx-val {
-      font-weight: 600;
-      color: var(--text)
-    }
-
-    .cx-badge.green {
-      background: var(--green-bg);
-      border-color: var(--green)
-    }
-
-    .cx-badge.yellow {
-      background: var(--yellow-bg);
-      border-color: var(--yellow)
-    }
-
-    .cx-badge.red {
-      background: var(--red-bg);
-      border-color: var(--red)
-    }
-
-    .cx-badge .cx-val.green {
-      color: var(--green)
-    }
-
-    .cx-badge .cx-val.yellow {
-      color: var(--yellow)
-    }
-
-    .cx-badge .cx-val.red {
-      color: var(--red)
-    }
-
-    /* ── Pattern banner ── */
-    .pattern-banner {
-      background: linear-gradient(135deg, var(--purple-bg) 0%, var(--accent-bg) 100%);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 20px 0
-    }
-
-    .pattern-banner h4 {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--purple);
-      margin-bottom: 8px
-    }
-
-    .pattern-banner p {
-      font-size: 14px;
-      font-family: var(--mono);
-      color: var(--text);
-      margin: 0;
-      line-height: 1.8
-    }
-
-    /* ── Big-O chart ── */
-    .bigo-chart-wrap {
-      margin: 14px 0 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--bg2);
-      padding: 16px
-    }
-
-    /* ── Checklist ── */
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      cursor: pointer;
-      user-select: none
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none
-    }
-
-    .cb-box {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border2);
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-      font-size: 11px
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff
-    }
-
-    .checklist-item.done .cb-text {
-      text-decoration: line-through;
-      color: var(--text3)
-    }
-
-    /* ── Inline highlight ── */
-    mark {
-      background: var(--yellow-bg);
-      color: var(--text);
-      padding: 0 3px;
-      border-radius: 3px
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border2);
-      border-radius: 3px
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none
-    }
-
-    a:hover {
-      text-decoration: underline
-    }
-
-    @media(max-width:768px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 4 — Java 8+ Modern Features</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
       #sidebar {
-        display: none
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
       }
 
       #content {
-        padding: 24px 20px 80px
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">📚 DSA Course</div>
-      <div class="sb-title">Java 8+ Modern Features</div>
-      <div class="sb-meta">Lecture 4 of 30 · Phase 1 — Foundations</div>
-    </div>
-    <div class="toc-label">On this page</div>
-    <a class="toc-item" href="#lambdas"><span class="toc-icon">λ</span>Lambda Expressions</a>
-    <a class="toc-item toc-sub" href="#functional-interfaces">Functional Interfaces</a>
-    <a class="toc-item toc-sub" href="#method-refs">Method References</a>
-    <a class="toc-item" href="#streams"><span class="toc-icon">🌊</span>Streams API</a>
-    <a class="toc-item toc-sub" href="#intermediate">Intermediate Ops</a>
-    <a class="toc-item toc-sub" href="#terminal">Terminal Ops</a>
-    <a class="toc-item toc-sub" href="#collectors">Collectors</a>
-    <a class="toc-item" href="#optional"><span class="toc-icon">📦</span>Optional<T></a>
-    <a class="toc-item" href="#default-methods"><span class="toc-icon">🔧</span>Default Methods</a>
-    <a class="toc-item" href="#practice"><span class="toc-icon">💪</span>Practice Problems</a>
-    <a class="toc-item" href="#assignment"><span class="toc-icon">📝</span>Assignment</a>
-    <a class="toc-item" href="#checklist"><span class="toc-icon">✅</span>Checklist</a>
-    <div class="sb-div"></div>
-    <div style="padding:8px 16px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-      <a class="toc-item" href="../Lecture3/lecture3_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 3: OOP</a>
-      <a class="toc-item" href="../Lecture5/lecture5_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 5: Recursion</a>
-    </div>
-  </nav>
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb">
-        <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
-        <a href="#">Phase 1</a><span>›</span>
-        <span>Lecture 4</span>
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">📚 DSA Course</div>
+        <div class="sb-title">Java 8+ Modern Features</div>
+        <div class="sb-meta">Lecture 4 of 30 · Phase 1 — Foundations</div>
       </div>
-      <div class="topbar-right">
-        <span style="font-size:12px;color:var(--text3)">Progress</span>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#lambdas"
+        ><span class="toc-icon">λ</span>Lambda Expressions</a
+      >
+      <a class="toc-item toc-sub" href="#functional-interfaces"
+        >Functional Interfaces</a
+      >
+      <a class="toc-item toc-sub" href="#method-refs">Method References</a>
+      <a class="toc-item" href="#streams"
+        ><span class="toc-icon">🌊</span>Streams API</a
+      >
+      <a class="toc-item toc-sub" href="#intermediate">Intermediate Ops</a>
+      <a class="toc-item toc-sub" href="#terminal">Terminal Ops</a>
+      <a class="toc-item toc-sub" href="#collectors">Collectors</a>
+      <a class="toc-item" href="#optional"
+        ><span class="toc-icon">📦</span>Optional&lt;T&gt;</a
+      >
+      <a class="toc-item" href="#default-methods"
+        ><span class="toc-icon">🔧</span>Default Methods</a
+      >
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">💪</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">📝</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">✅</span>Checklist</a
+      >
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
         </div>
-        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
+        <a
+          class="toc-item"
+          href="../Lecture3/lecture3_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >← Topic 3: OOP</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture5/lecture5_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >→ Topic 5: Recursion</a
+        >
       </div>
-    </div>
-    <div id="content">
-      <div class="page-header">
-        <span class="page-emoji">⚡</span>
-        <h1 class="page-title">Java 8+ Modern Features</h1>
-        <p class="page-sub">"Lambdas didn't change what Java can do. They changed how beautifully you can do it."</p>
-        <div class="meta-row"><span class="meta-chip accent">📖 Lecture 4</span><span class="meta-chip accent">Phase 1 —
-            Foundations</span><span class="meta-chip yellow">⏱ 3 days</span><span class="meta-chip green">🎯 15+
-            problems</span><span class="meta-chip ">💼 Amazon · LinkedIn · Salesforce</span></div>
-      </div>
-
-      <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">🌍</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          Java 8 was the most impactful Java release in a decade. Lambdas, Streams, and Optional transformed how Java
-          code looks and reads — and you will write all three in interviews. When a FAANG interviewer asks you to sort a
-          list of objects, filter a collection, or process data in a pipeline, the cleanest answer uses Java 8 features.
-          Beyond interviews, every modern Java codebase you will maintain or build uses these daily.
+    </nav>
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>›</span>
+          <a href="#">Phase 1</a><span>›</span>
+          <span>Lecture 4</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
         </div>
       </div>
-
-      <h3 class="h2" style="margin-top:0">📖 Before We Start — The Big Picture</h3>
-      <p>Before Java 8, passing <em>behavior</em> around required you to write an entire anonymous class — a full class
-        definition just to say "sort by length." Java 8 introduced <strong>lambdas</strong> to fix this. A lambda is
-        just a function without a name. Instead of writing 5 lines, you write
-        <code>(a, b) -&gt; a.length() - b.length()</code>.
-      </p>
-      <p><strong>Streams</strong> are a pipeline for processing collections — think of it as a conveyor belt: your data
-        flows through a series of operations (filter, map, sort) and exits at the end as a result. The key insight is
-        that streams are <em>lazy</em> — nothing runs until you demand a final result, eliminating wasted work.</p>
-
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">🔗</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 3 introduced <code>Comparator</code> and <code>Comparable</code>.
-          This lecture shows how lambdas replace the verbose anonymous class syntax you would have used in Lecture 3.
-          Lecture 5 (Recursion) does not use Java 8 features directly, but the functional thinking (input → output, no
-          side effects) is the same mindset recursion requires.
+      <div id="content">
+        <div class="page-header">
+          <span class="page-emoji">⚡</span>
+          <h1 class="page-title">Java 8+ Modern Features</h1>
+          <p class="page-sub">
+            "Lambdas didn't change what Java can do. They changed how
+            beautifully you can do it."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">📖 Lecture 4</span
+            ><span class="meta-chip accent">Phase 1 — Foundations</span
+            ><span class="meta-chip yellow">⏱ 3 days</span
+            ><span class="meta-chip green">🎯 15+ problems</span
+            ><span class="meta-chip">💼 Amazon · LinkedIn · Salesforce</span>
+          </div>
         </div>
-      </div>
 
-      <hr>
-
-      <h2 class="h1" id="lambdas">λ Lambda Expressions</h2>
-      <div class="callout blue"><span class="callout-icon">📌</span>
-        <div class="callout-body"><strong>What is a Lambda?</strong> A lambda is an anonymous function — a function
-          without a name, class, or explicit return type declaration. Java 8 introduced them to enable functional
-          programming patterns and eliminate boilerplate anonymous class syntax.</div>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Evolution: Anonymous Class → Lambda → Method Reference</div><button
-            class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">🌍</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Java 8 was the most impactful Java release in a decade. Lambdas,
+            Streams, and Optional transformed how Java code looks and reads —
+            and you will write all three in interviews. When a FAANG interviewer
+            asks you to sort a list of objects, filter a collection, or process
+            data in a pipeline, the cleanest answer uses Java 8 features. Beyond
+            interviews, every modern Java codebase you will maintain or build
+            uses these daily.
+          </div>
         </div>
-        <pre><span class="cm">// JAVA 7: Anonymous class (verbose, but explicit)</span>
+
+        <h3 class="h2" style="margin-top: 0">
+          📖 Before We Start — The Big Picture
+        </h3>
+        <p>
+          Before Java 8, passing <em>behavior</em> around required you to write
+          an entire anonymous class — a full class definition just to say "sort
+          by length." Java 8 introduced <strong>lambdas</strong> to fix this. A
+          lambda is just a function without a name. Instead of writing 5 lines,
+          you write <code>(a, b) -&gt; a.length() - b.length()</code>.
+        </p>
+        <p>
+          <strong>Streams</strong> are a pipeline for processing collections —
+          think of it as a conveyor belt: your data flows through a series of
+          operations (filter, map, sort) and exits at the end as a result. The
+          key insight is that streams are <em>lazy</em> — nothing runs until you
+          demand a final result, eliminating wasted work.
+        </p>
+
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">🔗</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 3 introduced
+            <code>Comparator</code> and <code>Comparable</code>. This lecture
+            shows how lambdas replace the verbose anonymous class syntax you
+            would have used in Lecture 3. Lecture 5 (Recursion) does not use
+            Java 8 features directly, but the functional thinking (input →
+            output, no side effects) is the same mindset recursion requires.
+          </div>
+        </div>
+
+        <hr />
+
+        <h2 class="h1" id="lambdas">λ Lambda Expressions</h2>
+        <div class="callout blue">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>What is a Lambda?</strong> A lambda is an anonymous function
+            — a function without a name, class, or explicit return type
+            declaration. Java 8 introduced them to enable functional programming
+            patterns and eliminate boilerplate anonymous class syntax.
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">
+              ☕ Java · Evolution: Anonymous Class → Lambda → Method Reference
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// JAVA 7: Anonymous class (verbose, but explicit)</span>
 <span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt; c = <span class="kw">new</span> <span class="cls">Comparator</span>&lt;<span class="cls">String</span>&gt;() {
     @Override
     <span class="kw">public int</span> <span class="fn">compare</span>(<span class="cls">String</span> a, <span class="cls">String</span> b) { <span class="ret">return</span> a.length() - b.length(); }
@@ -1217,71 +1281,73 @@
 x -> x * 2                          <span class="cm">// one param (no parens needed)</span>
 (x, y) -> x + y                     <span class="cm">// two params</span>
 (int x, int y) -> { <span class="ret">return</span> x + y; } <span class="cm">// explicit types + block body</span></pre>
-      </div>
-      <h3 class="h2" id="functional-interfaces">1.1 — Built-in Functional Interfaces</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Interface</th>
-              <th>Method Signature</th>
-              <th>Use Case</th>
-              <th>Example Lambda</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>Predicate&lt;T&gt;</code></td>
-              <td><code>boolean test(T t)</code></td>
-              <td>Filter / condition check</td>
-              <td><code>x -> x > 0</code></td>
-            </tr>
-            <tr>
-              <td><code>Function&lt;T,R&gt;</code></td>
-              <td><code>R apply(T t)</code></td>
-              <td>Transform / map</td>
-              <td><code>s -> s.length()</code></td>
-            </tr>
-            <tr>
-              <td><code>Consumer&lt;T&gt;</code></td>
-              <td><code>void accept(T t)</code></td>
-              <td>Side effect (print, save)</td>
-              <td><code>s -> System.out.println(s)</code></td>
-            </tr>
-            <tr>
-              <td><code>Supplier&lt;T&gt;</code></td>
-              <td><code>T get()</code></td>
-              <td>Factory / lazy init</td>
-              <td><code>() -> new ArrayList&lt;&gt;()</code></td>
-            </tr>
-            <tr>
-              <td><code>BiFunction&lt;T,U,R&gt;</code></td>
-              <td><code>R apply(T t, U u)</code></td>
-              <td>Two-input transform</td>
-              <td><code>(a,b) -> a + b</code></td>
-            </tr>
-            <tr>
-              <td><code>UnaryOperator&lt;T&gt;</code></td>
-              <td><code>T apply(T t)</code></td>
-              <td>Same-type transform</td>
-              <td><code>s -> s.toUpperCase()</code></td>
-            </tr>
-            <tr>
-              <td><code>BinaryOperator&lt;T&gt;</code></td>
-              <td><code>T apply(T t1, T t2)</code></td>
-              <td>Two same-type → one</td>
-              <td><code>(a,b) -> Math.max(a,b)</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h3 class="h2" id="method-refs">1.2 — Method References</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · 4 Types of Method References</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cm">// 1. Static method reference</span>
+        <h3 class="h2" id="functional-interfaces">
+          1.1 — Built-in Functional Interfaces
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>Method Signature</th>
+                <th>Use Case</th>
+                <th>Example Lambda</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Predicate&lt;T&gt;</code></td>
+                <td><code>boolean test(T t)</code></td>
+                <td>Filter / condition check</td>
+                <td><code>x -> x > 0</code></td>
+              </tr>
+              <tr>
+                <td><code>Function&lt;T,R&gt;</code></td>
+                <td><code>R apply(T t)</code></td>
+                <td>Transform / map</td>
+                <td><code>s -> s.length()</code></td>
+              </tr>
+              <tr>
+                <td><code>Consumer&lt;T&gt;</code></td>
+                <td><code>void accept(T t)</code></td>
+                <td>Side effect (print, save)</td>
+                <td><code>s -> System.out.println(s)</code></td>
+              </tr>
+              <tr>
+                <td><code>Supplier&lt;T&gt;</code></td>
+                <td><code>T get()</code></td>
+                <td>Factory / lazy init</td>
+                <td><code>() -> new ArrayList&lt;&gt;()</code></td>
+              </tr>
+              <tr>
+                <td><code>BiFunction&lt;T,U,R&gt;</code></td>
+                <td><code>R apply(T t, U u)</code></td>
+                <td>Two-input transform</td>
+                <td><code>(a,b) -> a + b</code></td>
+              </tr>
+              <tr>
+                <td><code>UnaryOperator&lt;T&gt;</code></td>
+                <td><code>T apply(T t)</code></td>
+                <td>Same-type transform</td>
+                <td><code>s -> s.toUpperCase()</code></td>
+              </tr>
+              <tr>
+                <td><code>BinaryOperator&lt;T&gt;</code></td>
+                <td><code>T apply(T t1, T t2)</code></td>
+                <td>Two same-type → one</td>
+                <td><code>(a,b) -> Math.max(a,b)</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="h2" id="method-refs">1.2 — Method References</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · 4 Types of Method References</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// 1. Static method reference</span>
 <span class="cls">Function</span>&lt;<span class="cls">String</span>,<span class="cls">Integer</span>&gt; parse = <span class="cls">Integer</span>::parseInt;   <span class="cm">// Class::staticMethod</span>
 
 <span class="cm">// 2. Instance method reference (specific instance)</span>
@@ -1296,20 +1362,23 @@ x -> x * 2                          <span class="cm">// one param (no parens nee
 
 <span class="cm">// Practical example — sort strings by length then alpha:</span>
 list.sort(<span class="cls">Comparator</span>.comparingInt(<span class="cls">String</span>::length).thenComparing(<span class="cls">String</span>::compareTo));</pre>
-      </div>
-      <h2 class="h1" id="streams">🌊 Streams API</h2>
-      <div class="callout purple"><span class="callout-icon">🎯</span>
-        <div class="callout-body"><strong>Streams Pipeline:</strong> SOURCE → [intermediate ops] → TERMINAL. Streams are
-          <em>lazy</em> — intermediate ops do nothing until a terminal op triggers evaluation. This means you can chain
-          many operations with only one pass through the data.
         </div>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Stream Pipeline</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <h2 class="h1" id="streams">🌊 Streams API</h2>
+        <div class="callout purple">
+          <span class="callout-icon">🎯</span>
+          <div class="callout-body">
+            <strong>Streams Pipeline:</strong> SOURCE → [intermediate ops] →
+            TERMINAL. Streams are <em>lazy</em> — intermediate ops do nothing
+            until a terminal op triggers evaluation. This means you can chain
+            many operations with only one pass through the data.
+          </div>
         </div>
-        <pre><span class="cm">// Classic stream pipeline:</span>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Stream Pipeline</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Classic stream pipeline:</span>
 <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; result = employees.stream()          <span class="cm">// SOURCE</span>
     .filter(e -> e.salary &gt; 50000)                 <span class="cm">// INTERMEDIATE: filter</span>
     .map(<span class="cls">Employee</span>::getName)                       <span class="cm">// INTERMEDIATE: transform</span>
@@ -1320,14 +1389,16 @@ list.sort(<span class="cls">Comparator</span>.comparingInt(<span class="cls">Str
 
 <span class="cm">// Key insight: the filter/map/sorted DO NOTHING until collect() is called!</span>
 <span class="cm">// Lazy evaluation = no wasted work</span></pre>
-      </div>
-      <h3 class="h2" id="intermediate">2.1 — Intermediate Operations (lazy)</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · All Intermediate Ops</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre>stream.filter(x -> x > 0)              <span class="cm">// keep elements matching predicate</span>
+        <h3 class="h2" id="intermediate">
+          2.1 — Intermediate Operations (lazy)
+        </h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · All Intermediate Ops</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>stream.filter(x -> x > 0)              <span class="cm">// keep elements matching predicate</span>
 stream.map(x -> x * 2)                 <span class="cm">// transform each element</span>
 stream.flatMap(x -> x.stream())        <span class="cm">// flatten nested streams (List&lt;List&lt;T&gt;&gt; → Stream&lt;T&gt;)</span>
 stream.distinct()                      <span class="cm">// remove duplicates (uses equals/hashCode)</span>
@@ -1337,14 +1408,14 @@ stream.limit(n)                        <span class="cm">// take first n elements
 stream.skip(n)                         <span class="cm">// skip first n</span>
 stream.peek(x -> log(x))               <span class="cm">// side effect without consuming (debugging!)</span>
 stream.mapToInt(String::length)         <span class="cm">// boxed → primitive stream (no autoboxing)</span></pre>
-      </div>
-      <h3 class="h2" id="terminal">2.2 — Terminal Operations (eager)</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · All Terminal Ops</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre>stream.collect(toList())                <span class="cm">// → List</span>
+        <h3 class="h2" id="terminal">2.2 — Terminal Operations (eager)</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · All Terminal Ops</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>stream.collect(toList())                <span class="cm">// → List</span>
 stream.collect(toSet())                 <span class="cm">// → Set</span>
 stream.collect(joining(", ", "[", "]")) <span class="cm">// → "[a, b, c]"</span>
 stream.count()                          <span class="cm">// → long</span>
@@ -1356,14 +1427,14 @@ stream.allMatch(x -> x &gt; 0)            <span class="cm">// → boolean</span>
 stream.noneMatch(x -> x &lt; 0)           <span class="cm">// → boolean</span>
 stream.min(Comparator.naturalOrder())   <span class="cm">// → Optional&lt;T&gt;</span>
 stream.toArray()                        <span class="cm">// → Object[]</span></pre>
-      </div>
-      <h3 class="h2" id="collectors">2.3 — Collectors (the power tools)</h3>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Key Collectors</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="cm">// groupingBy — partition into Map&lt;K, List&lt;V&gt;&gt;</span>
+        <h3 class="h2" id="collectors">2.3 — Collectors (the power tools)</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Key Collectors</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// groupingBy — partition into Map&lt;K, List&lt;V&gt;&gt;</span>
 <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">Employee</span>&gt;&gt; byDept =
     employees.stream().collect(<span class="cls">Collectors</span>.groupingBy(e -> e.department));
 
@@ -1387,20 +1458,24 @@ seniors.get(<span class="kw">true</span>);  <span class="cm">// high earners</sp
 <span class="cls">IntSummaryStatistics</span> stats =
     employees.stream().collect(<span class="cls">Collectors</span>.summarizingInt(e -> e.salary));
 stats.getAverage(); stats.getMax(); stats.getMin(); stats.getSum();</pre>
-      </div>
-      <h2 class="h1" id="optional">📦 Optional&lt;T&gt; — Null Safety</h2>
-      <div class="callout red"><span class="callout-icon">⚠️</span>
-        <div class="callout-body"><strong>The Billion Dollar Mistake:</strong> Tony Hoare introduced null in 1965 and
-          called it his "billion dollar mistake." Java's <code>Optional&lt;T&gt;</code> forces you to
-          <em>acknowledge</em> that a value might be absent, eliminating silent NullPointerExceptions.
         </div>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Optional Patterns</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
+        <h2 class="h1" id="optional">📦 Optional&lt;T&gt; — Null Safety</h2>
+        <div class="callout red">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <strong>The Billion Dollar Mistake:</strong> Tony Hoare introduced
+            null in 1965 and called it his "billion dollar mistake." Java's
+            <code>Optional&lt;T&gt;</code> forces you to
+            <em>acknowledge</em> that a value might be absent, eliminating
+            silent NullPointerExceptions.
+          </div>
         </div>
-        <pre><span class="cm">// Creating</span>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Optional Patterns</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Creating</span>
 <span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; present = <span class="cls">Optional</span>.of(<span class="str">"hello"</span>);    <span class="cm">// throws NPE if null!</span>
 <span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; maybe  = <span class="cls">Optional</span>.ofNullable(str);  <span class="cm">// safe: null → empty</span>
 <span class="cls">Optional</span>&lt;<span class="cls">String</span>&gt; empty  = <span class="cls">Optional</span>.empty();
@@ -1422,14 +1497,16 @@ maybe.filter(s -> s.length() &gt; 5);    <span class="cm">// keep only if condit
     .flatMap(<span class="cls">User</span>::getAddress)
     .map(<span class="cls">Address</span>::getCity)
     .orElse(<span class="str">"Unknown"</span>);</pre>
-      </div>
-      <h2 class="h1" id="default-methods">🔧 Default & Static Interface Methods</h2>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-lang">☕ Java · Default Methods (Java 8+)</div><button class="copy-btn"
-            onclick="copyCode(this)">Copy</button>
         </div>
-        <pre><span class="kw">interface</span> <span class="cls">Printable</span> {
+        <h2 class="h1" id="default-methods">
+          🔧 Default & Static Interface Methods
+        </h2>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-lang">☕ Java · Default Methods (Java 8+)</div>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">interface</span> <span class="cls">Printable</span> {
     <span class="cls">String</span> <span class="fn">content</span>();   <span class="cm">// abstract — must implement</span>
 
     <span class="kw">default void</span> <span class="fn">print</span>() {          <span class="cm">// default — can override</span>
@@ -1444,171 +1521,233 @@ maybe.filter(s -> s.length() &gt; 5);    <span class="cm">// keep only if condit
 <span class="cm">// Why default methods? Backward compatibility!</span>
 <span class="cm">// Java 8 added forEach, stream, removeIf to Collection without breaking existing implementations</span>
 <span class="cm">// Collection.forEach() is a default method calling Iterator internally</span></pre>
-      </div>
-      <h2 class="h1" id="practice">💪 Practice Problems</h2>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 01 · Streams</div>
-            <div class="prob-title">Filter Students by GPA</div>
-
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-pat">Stream filter+sort</span></div>
-          </div>
-          <span style="color:var(--text3);font-size:18px">›</span>
         </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a list of Student objects with name and gpa, return names of students with GPA &gt; 3.5, sorted
-              alphabetically.</p>
-            <div class="iobox">Input: [{Alice,3.8},{Bob,3.2},{Carol,3.9}] → ["Alice","Carol"]</div>
+        <h2 class="h1" id="practice">💪 Practice Problems</h2>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 · Streams</div>
+              <div class="prob-title">Filter Students by GPA</div>
+
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">Stream filter+sort</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Streams</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre>students.stream()
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of Student objects with name and gpa, return names
+                of students with GPA &gt; 3.5, sorted alphabetically.
+              </p>
+              <div class="iobox">
+                Input: [{Alice,3.8},{Bob,3.2},{Carol,3.9}] → ["Alice","Carol"]
+              </div>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Streams</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>
+students.stream()
     .filter(s -> s.gpa &gt; 3.5)
     .map(s -> s.name)
     .sorted()
-    .collect(Collectors.toList());</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n log
-                    n)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
+    .collect(Collectors.toList());</pre
+                  >
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n log n)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 · Collectors</div>
+              <div class="prob-title">Group Words by First Letter</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/group-anagrams/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 Related: LC 49</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">groupingBy</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 02 · Collectors</div>
-            <div class="prob-title">Group Words by First Letter</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/group-anagrams/" target="_blank"
-                style="font-size:12px">🔗 Related: LC 49</a></div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Google</span><span
-                class="tag tag-pat">groupingBy</span></div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a list of words, group them by their first letter using streams.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · groupingBy</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre>Map&lt;Character, List&lt;String&gt;&gt; grouped = words.stream()
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of words, group them by their first letter using
+                streams.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · groupingBy</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>
+Map&lt;Character, List&lt;String&gt;&gt; grouped = words.stream()
     .collect(Collectors.groupingBy(w -> w.charAt(0)));
 
 // Count per group:
 Map&lt;Character, Long&gt; counts = words.stream()
-    .collect(Collectors.groupingBy(w -> w.charAt(0), Collectors.counting()));</pre>
+    .collect(Collectors.groupingBy(w -> w.charAt(0), Collectors.counting()));</pre
+                  >
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(n)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(n)</span>
-                </div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(n)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 · Optional</div>
+              <div class="prob-title">Safe User Lookup Chain</div>
+
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">LinkedIn</span
+                ><span class="tag tag-pat">Optional flatMap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 03 · Optional</div>
-            <div class="prob-title">Safe User Lookup Chain</div>
-
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">LinkedIn</span><span
-                class="tag tag-pat">Optional flatMap</span></div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given methods <code>Optional&lt;User&gt; findById(int id)</code> and
-              <code>Optional&lt;Address&gt; getAddress(User u)</code>, safely get the city or "Unknown" if anything is
-              absent.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Optional chain</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre>String city = findById(id)
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given methods
+                <code>Optional&lt;User&gt; findById(int id)</code> and
+                <code>Optional&lt;Address&gt; getAddress(User u)</code>, safely
+                get the city or "Unknown" if anything is absent.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Optional chain</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>
+String city = findById(id)
     .flatMap(u -> getAddress(u))
     .map(addr -> addr.city)
     .orElse("Unknown");
 
-// flatMap avoids Optional&lt;Optional&lt;Address&gt;&gt; — unwraps the inner Optional</pre>
+// flatMap avoids Optional&lt;Optional&lt;Address&gt;&gt; — unwraps the inner Optional</pre
+                  >
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(1)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(1)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(1)</span>
-                </div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(1)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 · reduce() Terminal Op</div>
+              <div class="prob-title">
+                Sum and Product Using Stream reduce()
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">Stream reduce</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P04 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 04 · reduce() Terminal Op</div>
-            <div class="prob-title">Sum and Product Using Stream reduce()</div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-pat">Stream reduce</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a list of integers, compute (a) the sum of all elements and (b) the product of all elements using
-              <strong>only</strong> <code>Stream.reduce()</code> — no loops.
-            </p>
-            <div class="iobox">[1, 2, 3, 4, 5] → sum=15, product=120</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p><code>reduce(identity, accumulator)</code>: starts with <code>identity</code> and folds each element into
-              the running result. For sum: identity=0, accumulator <code>(a,b)→a+b</code>. For product: identity=1,
-              accumulator <code>(a,b)→a*b</code>. The <code>BinaryOperator&lt;T&gt;</code> functional interface is used
-              here.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Stream.reduce()</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="kw">int</span> sum = nums.stream()
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of integers, compute (a) the sum of all elements
+                and (b) the product of all elements using <strong>only</strong>
+                <code>Stream.reduce()</code> — no loops.
+              </p>
+              <div class="iobox">[1, 2, 3, 4, 5] → sum=15, product=120</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                <code>reduce(identity, accumulator)</code>: starts with
+                <code>identity</code> and folds each element into the running
+                result. For sum: identity=0, accumulator <code>(a,b)→a+b</code>.
+                For product: identity=1, accumulator <code>(a,b)→a*b</code>. The
+                <code>BinaryOperator&lt;T&gt;</code> functional interface is
+                used here.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Stream.reduce()</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> sum = nums.stream()
     .reduce(<span class="num">0</span>, Integer::sum);             <span class="cm">// identity=0, op=sum</span>
 
 <span class="kw">int</span> product = nums.stream()
@@ -1618,55 +1757,73 @@ Map&lt;Character, Long&gt; counts = words.stream()
 <span class="kw">int</span> sum2 = nums.stream()
     .mapToInt(Integer::intValue)
     .sum();                                 <span class="cm">// built-in, no boxing</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(N)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(N)</span>
-                </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
-                </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 · Method References</div>
+              <div class="prob-title">Rewrite Lambda as Method Reference</div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span
+                ><span class="tag tag-co">Google</span
+                ><span class="tag tag-pat">Method Reference</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P05 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 05 · Method References</div>
-            <div class="prob-title">Rewrite Lambda as Method Reference</div>
-            <div class="prob-tags"><span class="tag tag-easy">Easy</span><span class="tag tag-co">Google</span><span
-                class="tag tag-pat">Method Reference</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Convert each of the following lambdas to their most concise method reference form:</p>
-            <div class="iobox">1. s -> s.toUpperCase()
-              2. n -> Integer.parseInt(n)
-              3. (a, b) -> Integer.max(a, b)
-              4. () -> new ArrayList&lt;&gt;()
-              5. s -> System.out.println(s)</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>There are 4 kinds of method references: <br>
-              • <code>ClassName::staticMethod</code> (static ref)<br>
-              • <code>instance::instanceMethod</code> (bound instance ref)<br>
-              • <code>ClassName::instanceMethod</code> (unbound instance ref — first param becomes receiver)<br>
-              • <code>ClassName::new</code> (constructor ref)</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solutions</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Method Reference Conversions</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cm">// 1. s -> s.toUpperCase()  — unbound instance method ref</span>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Convert each of the following lambdas to their most concise
+                method reference form:
+              </p>
+              <div class="iobox">
+                1. s -> s.toUpperCase() 2. n -> Integer.parseInt(n) 3. (a, b) ->
+                Integer.max(a, b) 4. () -> new ArrayList&lt;&gt;() 5. s ->
+                System.out.println(s)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                There are 4 kinds of method references: <br />
+                • <code>ClassName::staticMethod</code> (static ref)<br />
+                • <code>instance::instanceMethod</code> (bound instance ref)<br />
+                • <code>ClassName::instanceMethod</code> (unbound instance ref —
+                first param becomes receiver)<br />
+                • <code>ClassName::new</code> (constructor ref)
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solutions</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      ☕ Java · Method Reference Conversions
+                    </div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cm">// 1. s -> s.toUpperCase()  — unbound instance method ref</span>
 Function&lt;String, String&gt; f1 = String::toUpperCase;
 
 <span class="cm">// 2. n -> Integer.parseInt(n)  — static method ref</span>
@@ -1680,50 +1837,70 @@ Supplier&lt;ArrayList&lt;String&gt;&gt; f4 = ArrayList::new;
 
 <span class="cm">// 5. s -> System.out.println(s)  — bound instance method ref</span>
 Consumer&lt;String&gt; f5 = System.out::println;</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(1) —
-                    syntactic</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
                 </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) — syntactic</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P06 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 · Multi-Key Sort</div>
+              <div class="prob-title">
+                Sort Transactions by Amount then Date
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Stripe</span
+                ><span class="tag tag-pat">Comparator.comparing</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P06 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 06 · Multi-Key Sort</div>
-            <div class="prob-title">Sort Transactions by Amount then Date</div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Stripe</span><span
-                class="tag tag-pat">Comparator.comparing</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a list of <code>Transaction</code> objects with <code>amount</code> (double) and <code>date</code>
-              (LocalDate), sort them: primary by <strong>amount descending</strong>, secondary by <strong>date
-                ascending</strong>. Do not modify the <code>Transaction</code> class.</p>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Use <code>Comparator.comparingDouble()</code> for the primary key (add <code>.reversed()</code> for
-              descending), then chain <code>.thenComparing()</code> for the secondary key. This is cleaner and less
-              error-prone than writing a raw lambda that manually checks two fields.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Chained Comparator</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cm">// record Transaction(double amount, LocalDate date) {}</span>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of <code>Transaction</code> objects with
+                <code>amount</code> (double) and <code>date</code> (LocalDate),
+                sort them: primary by <strong>amount descending</strong>,
+                secondary by <strong>date ascending</strong>. Do not modify the
+                <code>Transaction</code> class.
+              </p>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                Use <code>Comparator.comparingDouble()</code> for the primary
+                key (add <code>.reversed()</code> for descending), then chain
+                <code>.thenComparing()</code> for the secondary key. This is
+                cleaner and less error-prone than writing a raw lambda that
+                manually checks two fields.
+              </p>
+            </div>
+            <details>
+              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · Chained Comparator</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cm">// record Transaction(double amount, LocalDate date) {}</span>
 
 transactions.sort(
     Comparator.comparingDouble(Transaction::amount).reversed()
@@ -1739,55 +1916,73 @@ transactions.sort((a, b) -&gt; {
 
 <span class="cm">// Pro tip: Comparator.comparing chains read like English:
 // "compare by amount reversed, then by date" ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(N log N)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(log N)</span>
+                  </div>
+                </div>
               </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(N log
-                    N)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(log
-                    N)</span></div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P07 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 07 · flatMap</div>
+              <div class="prob-title">Flatten a List of Lists with Stream</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span
+                ><span class="tag tag-co">Amazon</span
+                ><span class="tag tag-pat">flatMap</span>
               </div>
             </div>
-          </details>
-        </div>
-      </div>
-
-      <!-- P07 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 07 · flatMap</div>
-            <div class="prob-title">Flatten a List of Lists with Stream</div>
-            <div class="prob-tags"><span class="tag tag-med">Medium</span><span class="tag tag-co">Amazon</span><span
-                class="tag tag-pat">flatMap</span></div>
-          </div><span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a <code>List&lt;List&lt;Integer&gt;&gt;</code>, flatten it into a single
-              <code>List&lt;Integer&gt;</code> containing all unique elements in sorted order using only Stream
-              operations.
-            </p>
-            <div class="iobox">[[3,1,4],[1,5,9],[2,6]] → [1, 2, 3, 4, 5, 6, 9]</div>
+            <span style="color: var(--text3); font-size: 18px">›</span>
           </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p><code>map()</code> transforms each element — but if each list element is itself a list,
-              <code>map()</code> would give you a <code>Stream&lt;Stream&lt;Integer&gt;&gt;</code>.
-              <code>flatMap()</code> transforms AND flattens one level: it takes each element, turns it into a Stream,
-              and merges all those Streams into one. Then <code>.distinct().sorted()</code> handles uniqueness and
-              ordering.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">►</span>Solution + Why flatMap?</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · flatMap vs map</div><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button>
-                </div>
-                <pre><span class="cm">// WRONG — map gives Stream&lt;Stream&lt;Integer&gt;&gt;:</span>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a <code>List&lt;List&lt;Integer&gt;&gt;</code>, flatten it
+                into a single <code>List&lt;Integer&gt;</code> containing all
+                unique elements in sorted order using only Stream operations.
+              </p>
+              <div class="iobox">
+                [[3,1,4],[1,5,9],[2,6]] → [1, 2, 3, 4, 5, 6, 9]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Think First</div>
+              <p>
+                <code>map()</code> transforms each element — but if each list
+                element is itself a list, <code>map()</code> would give you a
+                <code>Stream&lt;Stream&lt;Integer&gt;&gt;</code>.
+                <code>flatMap()</code> transforms AND flattens one level: it
+                takes each element, turns it into a Stream, and merges all those
+                Streams into one. Then <code>.distinct().sorted()</code> handles
+                uniqueness and ordering.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">►</span>Solution + Why flatMap?
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">☕ Java · flatMap vs map</div>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="cm">// WRONG — map gives Stream&lt;Stream&lt;Integer&gt;&gt;:</span>
 nested.stream().map(Collection::stream); <span class="cm">// ← nested streams, not flattened</span>
 
 <span class="cm">// CORRECT — flatMap flattens one level:</span>
@@ -1801,88 +1996,162 @@ List&lt;Integer&gt; result = nested.stream()
 // flatMap → 3,1,4,1,5,9,2,6
 // distinct → 3,1,4,5,9,2,6
 // sorted  → [1,2,3,4,5,6,9] ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge yellow"><span class="cx-label">Time</span><span class="cx-val yellow">O(N log
-                    N)</span></div>
-                <div class="cx-badge yellow"><span class="cx-label">Space</span><span class="cx-val yellow">O(N)</span>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(N log N)</span>
+                  </div>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val yellow">O(N)</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
-        </div>
-      </div>
-
-      <h2 class="h1" id="assignment">📝 Assignment</h2>
-      <div class="callout orange" style="margin:14px 0">
-        <span class="callout-icon">📋</span>
-        <div class="callout-body"><strong>Lecture 4 Assignment</strong><br>15+ problems covering Streams, Optional,
-          lambda sorting, and functional interface composition.<br><br>
-          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
-            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
-            Open Assignment →</a>
-        </div>
-      </div>
-      <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can rewrite any anonymous Comparator as a lambda and then as a method reference</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know all 7 core functional interfaces and their method signatures</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can build a complete stream pipeline: filter → map → sorted → collect</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know the difference between intermediate (lazy) and terminal (eager) operations</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can use groupingBy, partitioningBy, and joining collectors</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand why flatMap is needed for nested structures</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I never use Optional.get() without isPresent() (or I use orElse/orElseThrow instead)
+            </details>
           </div>
         </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know when to use Optional.map() vs Optional.flatMap()</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can write a custom @FunctionalInterface with a valid SAM</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand why default methods were added to interfaces in Java 8</div>
-        </div>
-      </div>
 
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">🧠</span>
-        <div class="callout-body">
-          <strong>You're ready for Topic 5: Recursion &amp; Backtracking</strong><br>
-          You've conquered Java 8+ — lambdas, streams, and functional interfaces. Recursion is the foundational
-          algorithm pattern that unlocks trees, graphs, DP, and backtracking. Every FAANG interview has it. Build the
-          mental model now.
+        <h2 class="h1" id="assignment">📝 Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">📋</span>
+          <div class="callout-body">
+            <strong>Lecture 4 Assignment</strong><br />15+ problems covering
+            Streams, Optional, lambda sorting, and functional interface
+            composition.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture4/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+              "
+              >📄 Open Assignment →</a
+            >
+          </div>
         </div>
-      </div>
-      <div
-        style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-        <a href="../Lecture3/lecture3_notes.html"
-          style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Topic 3: OOP &amp; Collections</a><a
-          href="../Lecture5/lecture5_notes.html" style="color:var(--accent);font-weight:600;text-decoration:none">Topic
-          5: Recursion &amp; Backtracking &rarr;</a>
+        <h2 class="h1" id="checklist">✅ Lecture Completion Checklist</h2>
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can rewrite any anonymous Comparator as a lambda and then as a
+              method reference
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know all 7 core functional interfaces and their method
+              signatures
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can build a complete stream pipeline: filter → map → sorted →
+              collect
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know the difference between intermediate (lazy) and terminal
+              (eager) operations
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can use groupingBy, partitioningBy, and joining collectors
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand why flatMap is needed for nested structures
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I never use Optional.get() without isPresent() (or I use
+              orElse/orElseThrow instead)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know when to use Optional.map() vs Optional.flatMap()
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can write a custom @FunctionalInterface with a valid SAM
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand why default methods were added to interfaces in Java
+              8
+            </div>
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">🧠</span>
+          <div class="callout-body">
+            <strong
+              >You're ready for Topic 5: Recursion &amp; Backtracking</strong
+            ><br />
+            You've conquered Java 8+ — lambdas, streams, and functional
+            interfaces. Recursion is the foundational algorithm pattern that
+            unlocks trees, graphs, DP, and backtracking. Every FAANG interview
+            has it. Build the mental model now.
+          </div>
+        </div>
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <a
+            href="../Lecture3/lecture3_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >&larr; Topic 3: OOP &amp; Collections</a
+          ><a
+            href="../Lecture5/lecture5_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              text-decoration: none;
+            "
+            >Topic 5: Recursion &amp; Backtracking &rarr;</a
+          >
+        </div>
       </div>
     </div>
-  </div>
+  </body>
+</html>

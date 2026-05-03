@@ -1,835 +1,916 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Topic 10 — Searching Algorithms</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
-    rel="stylesheet">
-  <!-- KaTeX for Premium Math Rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}] });"></script>
-  <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f7f6f3;
-      --bg3: #efede9;
-      --bg4: #e8e5df;
-      --border: #e3e0d9;
-      --border2: #d0ccc4;
-      --text: #37352f;
-      --text2: #6b6860;
-      --text3: #9b9790;
-      --accent: #2383e2;
-      --accent-bg: #e8f1fc;
-      --green: #0f7b6c;
-      --green-bg: #e9f5f3;
-      --red: #c0392b;
-      --red-bg: #fdf0ee;
-      --yellow: #8a6d00;
-      --yellow-bg: #fdf6e3;
-      --purple: #6940a5;
-      --purple-bg: #f0ecf9;
-      --orange: #c75b0e;
-      --orange-bg: #fef0e7;
-      --pink: #ad1a72;
-      --pink-bg: #fce8f3;
-      --teal: #0d7d6e;
-      --teal-bg: #e4f4f1;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', sans-serif;
-      --serif: 'Merriweather', serif;
-      --sidebar-w: 260px
-    }
-
-    [data-theme="dark"] {
-      --bg: #191919;
-      --bg2: #212121;
-      --bg3: #2d2d2d;
-      --bg4: #383838;
-      --border: #333;
-      --border2: #444;
-      --text: #e8e6e1;
-      --text2: #9b9790;
-      --text3: #6b6860;
-      --accent: #5ba4f5;
-      --accent-bg: #1a2d42;
-      --green: #4db6a8;
-      --green-bg: #0e2420;
-      --red: #e07070;
-      --red-bg: #2e1414;
-      --yellow: #d4a42a;
-      --yellow-bg: #2a1f06;
-      --purple: #a07dd4;
-      --purple-bg: #1e1530;
-      --orange: #e0893a;
-      --orange-bg: #2a1608;
-      --pink: #e06aac;
-      --pink-bg: #2a1020;
-      --teal: #38c9b8;
-      --teal-bg: #0d2420
-    }
-
-    html,
-    body {
-      height: 100%;
-      overflow: hidden;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.7;
-      display: flex;
-      flex-direction: row;
-      transition: background .2s, color .2s;
-    }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: var(--sidebar-w);
-      min-width: var(--sidebar-w);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      padding: 20px 0;
-      font-size: 13px;
-      flex-shrink: 0
-    }
-
-    .sb-header {
-      padding: 0 16px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px
-    }
-
-    .sb-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 10px
-    }
-
-    .sb-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.3
-    }
-
-    .sb-meta {
-      color: var(--text3);
-      font-size: 11px;
-      margin-top: 4px
-    }
-
-    .toc-label {
-      padding: 0 16px 6px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: var(--text3)
-    }
-
-    .toc-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 16px;
-      cursor: pointer;
-      color: var(--text2);
-      transition: background .12s, color .12s;
-      text-decoration: none
-    }
-
-    .toc-item:hover,
-    .toc-item.active {
-      background: var(--bg3);
-      color: var(--text)
-    }
-
-    .toc-item.active {
-      font-weight: 500;
-      color: var(--accent)
-    }
-
-    .toc-icon {
-      font-size: 14px;
-      flex-shrink: 0
-    }
-
-    .toc-sub {
-      padding-left: 36px;
-      font-size: 12px;
-      color: var(--text3)
-    }
-
-    .toc-sub:hover {
-      color: var(--text2)
-    }
-
-    .sb-div {
-      height: 1px;
-      background: var(--border);
-      margin: 10px 16px
-    }
-
-    /* ── Main ── */
-    #main {
-      flex: 1;
-      overflow-y: auto;
-      height: 100vh
-    }
-
-    #content {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 64px 120px
-    }
-
-    /* ── Topbar ── */
-    #topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px 10px 28px;
-      font-size: 13px;
-      color: var(--text2);
-      gap: 12px;
-      backdrop-filter: blur(8px)
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px
-    }
-
-    .breadcrumb a {
-      color: var(--text3);
-      text-decoration: none
-    }
-
-    .breadcrumb a:hover {
-      color: var(--text)
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width .3s
-    }
-
-    #darkToggle {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text2);
-      font-family: var(--sans);
-      transition: background .12s
-    }
-
-    #darkToggle:hover {
-      background: var(--bg3)
-    }
-
-    /* ── Page Header ── */
-    .page-header {
-      margin-bottom: 40px;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border)
-    }
-
-    .page-emoji {
-      font-size: 48px;
-      margin-bottom: 12px;
-      display: block
-    }
-
-    .page-title {
-      font-family: var(--serif);
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 10px
-    }
-
-    .page-sub {
-      font-size: 16px;
-      color: var(--text2);
-      font-style: italic;
-      margin-bottom: 16px
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center
-    }
-
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      background: var(--bg2)
-    }
-
-    .meta-chip.accent {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border-color: var(--accent-bg)
-    }
-
-    .meta-chip.purple {
-      background: var(--purple-bg);
-      color: var(--purple);
-      border-color: var(--purple-bg)
-    }
-
-    .meta-chip.green {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: var(--green-bg)
-    }
-
-    /* ── Notion Blocks ── */
-    .section {
-      margin-bottom: 8px;
-      scroll-margin-top: 20px
-    }
-
-    .h1 {
-      font-family: var(--serif);
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-      margin: 40px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--border)
-    }
-
-    .h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    p {
-      color: var(--text);
-      margin: 0 0 10px;
-      line-height: 1.75
-    }
-
-    .callout {
-      display: flex;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 14px 0;
-      font-size: 14px;
-      line-height: 1.65
-    }
-
-    .callout.blue {
-      background: var(--accent-bg)
-    }
-
-    .callout.green {
-      background: var(--green-bg)
-    }
-
-    .callout.orange {
-      background: var(--orange-bg)
-    }
-
-    .callout.purple {
-      background: var(--purple-bg)
-    }
-
-    /* ── Code Blocks ── */
-    .code-block {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2)
-    }
-
-    .copy-btn {
-      background: none;
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 11px;
-      cursor: pointer;
-      color: var(--text2);
-      transition: background .12s
-    }
-
-    .copy-btn:hover {
-      background: var(--bg)
-    }
-
-    pre {
-      padding: 16px;
-      overflow-x: auto;
-      margin: 0;
-      font-family: var(--mono);
-      font-size: 13.5px;
-      line-height: 1.75
-    }
-
-    /* ── Tables ── */
-    .table-wrap {
-      overflow-x: auto;
-      margin: 14px 0;
-      border-radius: 8px;
-      border: 1px solid var(--border)
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px
-    }
-
-    thead th {
-      background: var(--bg2);
-      padding: 9px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--text2);
-      border-bottom: 1px solid var(--border)
-    }
-
-    tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top
-    }
-
-    /* ── Checklist ── */
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin: 8px 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-bottom: 1px solid var(--border);
-      user-select: none;
-    }
-
-    .checklist-item:last-child {
-      border-bottom: none;
-    }
-
-    .checklist-item:hover {
-      background: var(--bg2);
-    }
-
-    .cb-box {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border2);
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      color: transparent;
-      font-size: 12px;
-      flex-shrink: 0;
-      background: var(--bg);
-    }
-
-    .cb-text {
-      font-size: 14.5px;
-      color: var(--text);
-      transition: all 0.2s ease;
-      font-weight: 500;
-    }
-
-    .checklist-item.done .cb-box {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-    }
-
-    .checklist-item.done .cb-text {
-      color: var(--text3);
-      text-decoration: line-through;
-    }
-
-    /* ── Practice Problem Cards ── */
-    .prob-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin: 14px 0;
-      overflow: hidden
-    }
-
-    .prob-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer
-    }
-
-    .prob-title {
-      font-weight: 600;
-      font-size: 15px
-    }
-
-    .prob-tags {
-      display: flex;
-      gap: 5px;
-      margin-top: 8px
-    }
-
-    .tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 500
-    }
-
-    .tag-easy {
-      background: var(--green-bg);
-      color: var(--green)
-    }
-
-    .tag-med {
-      background: var(--yellow-bg);
-      color: var(--yellow)
-    }
-
-    .tag-hard {
-      background: var(--red-bg);
-      color: var(--red)
-    }
-
-    .tag-co {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .tag-pat {
-      background: var(--purple-bg);
-      color: var(--purple)
-    }
-
-    .prob-body {
-      padding: 16px;
-      display: none
-    }
-
-    .complexity-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px
-    }
-
-    .cx-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      border: 1px solid var(--border)
-    }
-
-    footer {
-      margin-top: 80px;
-      padding: 40px 0;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      color: var(--text3);
-      font-size: 13px
-    }
-
-    /* Code Syntax */
-    .kw {
-      color: #0550ae
-    }
-
-    .str {
-      color: #0a8043
-    }
-
-    .cm {
-      color: #6a737d;
-      font-style: italic
-    }
-
-    .fn {
-      color: #8250df
-    }
-
-    .num {
-      color: #953800
-    }
-
-    [data-theme="dark"] .kw {
-      color: #79c0ff
-    }
-
-    [data-theme="dark"] .str {
-      color: #a5d6ff
-    }
-
-    [data-theme="dark"] .cm {
-      color: #8b949e
-    }
-
-    [data-theme="dark"] .fn {
-      color: #d2a8ff
-    }
-
-    [data-theme="dark"] .num {
-      color: #ff9150
-    }
-  </style>
-</head>
-
-<body>
-  <nav id="sidebar">
-    <div class="sb-header">
-      <div class="sb-badge">📚 Phase 2</div>
-      <div class="sb-title">Core Data Structures</div>
-      <div class="sb-meta">Topic 10 of 30 · DSA Mastery</div>
-    </div>
-
-    <div class="toc-label">Search Curriculum</div>
-    <a href="#overview" class="toc-item active">
-      <span class="toc-icon">🌐</span> Search Overview
-    </a>
-    <a href="#deep-dive" class="toc-item">
-      <span class="toc-icon">🔬</span> Algorithms Deep Dive
-    </a>
-    <a href="#variations" class="toc-item">
-      <span class="toc-icon">🔄</span> Search Variations
-    </a>
-    <a href="#complexity" class="toc-item">
-      <span class="toc-icon">⏱️</span> Complexity Analysis
-    </a>
-    <a href="#matrix" class="toc-item">
-      <span class="toc-icon">🗺️</span> 2D Matrix Search
-    </a>
-
-    <div class="sb-div"></div>
-    <div class="toc-label">Practice</div>
-    <a href="#practice" class="toc-item">
-      <span class="toc-icon">💪</span> Problem Set
-    </a>
-    <a href="#assignment" class="toc-item">
-      <span class="toc-icon">📝</span> Assignment
-    </a>
-    <div class="sb-div"></div>
-    <a href="#checklist" class="toc-item">
-      <span class="toc-icon">✅</span> Completion Checklist
-    </a>
-
-    <div class="sb-div"></div>
-    <div style="padding:8px 16px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">NAVIGATE</div>
-      <a class="toc-item" href="../Lecture9/lecture9_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">← Topic 9: Sorting</a>
-      <a class="toc-item" href="../Lecture11/lecture11_notes.html"
-        style="padding:5px 0;font-size:13px;color:var(--text3)">→ Topic 11: Linked Lists</a>
-    </div>
-  </nav>
-
-  <div id="main">
-    <div id="topbar">
-      <div class="breadcrumb">
-        <a href="../dsa_study_plan.html">DSA Course</a>
-        <span style="color:var(--text3)">/</span>
-        <a href="#">Phase 2</a>
-        <span style="color:var(--text3)">/</span>
-        <strong style="color:var(--text)">Searching Algorithms</strong>
-      </div>
-      <div class="topbar-right">
-        <div class="progress-bar">
-          <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
-        </div>
-        <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
-      </div>
-    </div>
-
-    <div id="content">
-      <header class="page-header">
-        <span class="page-emoji">🔍</span>
-        <h1 class="page-title">Searching Algorithms</h1>
-        <p class="page-sub">"From exhaustive scanning to logarithmic bounds. Searching is the art of eliminating the
-          irrelevant."</p>
-        <div class="meta-row">
-          <span class="meta-chip accent">📖 Topic 10</span>
-          <span class="meta-chip accent">Phase 2 — Core Data Structures</span>
-          <span class="meta-chip yellow">⏱ 5 days</span>
-          <span class="meta-chip green">🎯 28 problems</span>
-          <span class="meta-chip">💼 Google · Uber · Facebook</span>
-        </div>
-      </header>
-
-      <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-      <div class="callout blue" style="margin-bottom:20px">
-        <span class="callout-icon">🌍</span>
-        <div class="callout-body">
-          <strong>Why does this topic matter?</strong><br>
-          Searching is how every large system finds things fast. Google indexes billions of pages and returns results in
-          milliseconds because of binary search principles at every layer. Binary Search turns an O(N) problem into
-          O(log N) — for N = 1 billion, that's the difference between 1 billion operations and just 30. Beyond simple
-          element search, "Binary Search on Answer Space" is one of the most powerful interview tricks — it converts
-          problems that look impossible into clean O(N log N) solutions.
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topic 10 — Searching Algorithms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- KaTeX for Premium Math Rendering -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true },
+          ],
+        })
+      "
+    ></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.purple {
+        background: var(--purple-bg);
+        color: var(--purple);
+        border-color: var(--purple-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      /* ── Notion Blocks ── */
+      .section {
+        margin-bottom: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--border);
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── Practice Problem Cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      .prob-tags {
+        display: flex;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .prob-body {
+        padding: 16px;
+        display: none;
+      }
+
+      .complexity-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .cx-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        border: 1px solid var(--border);
+      }
+
+      footer {
+        margin-top: 80px;
+        padding: 40px 0;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        color: var(--text3);
+        font-size: 13px;
+      }
+
+      /* Code Syntax */
+      .kw {
+        color: #0550ae;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">📚 Phase 2</div>
+        <div class="sb-title">Core Data Structures</div>
+        <div class="sb-meta">Topic 10 of 30 · DSA Mastery</div>
       </div>
 
-      <h3 class="h2" style="margin-top:0">📖 Before We Start — The Big Picture</h3>
-      <p>Searching is the problem of finding a target element in a dataset. The strategy depends entirely on what you
-        know about the data:</p>
-      <ul>
-        <li><strong>Unsorted data?</strong> You have no choice but Linear Search — O(N). No trick can help without first
-          sorting.</li>
-        <li><strong>Sorted data?</strong> Binary Search reduces the problem by half with every comparison — O(log N).
-          This is the cornerstone of this lecture.</li>
-        <li><strong>Sorted 2D matrix?</strong> You can flatten it to 1D or use Staircase search.</li>
-        <li><strong>Answer-space search?</strong> You don't search for a value in an array — you binary search for the
-          optimal answer to a minimization/maximization problem.</li>
-      </ul>
-      <p>The key insight of <strong>Binary Search</strong> is the <em>invariant</em>: at every step, you maintain the
-        guarantee that the target — if it exists — lies within <code>[lo, hi]</code>. By checking the midpoint, you
-        eliminate half the remaining candidates. You only need 30 checks to find any element in a 1-billion element
-        array.</p>
+      <div class="toc-label">Search Curriculum</div>
+      <a href="#overview" class="toc-item active">
+        <span class="toc-icon">🌐</span> Search Overview
+      </a>
+      <a href="#deep-dive" class="toc-item">
+        <span class="toc-icon">🔬</span> Algorithms Deep Dive
+      </a>
+      <a href="#variations" class="toc-item">
+        <span class="toc-icon">🔄</span> Search Variations
+      </a>
+      <a href="#complexity" class="toc-item">
+        <span class="toc-icon">⏱️</span> Complexity Analysis
+      </a>
+      <a href="#matrix" class="toc-item">
+        <span class="toc-icon">🗺️</span> 2D Matrix Search
+      </a>
 
-      <div class="callout green" style="margin-bottom:32px">
-        <span class="callout-icon">🔗</span>
-        <div class="callout-body">
-          <strong>How it connects:</strong> Lecture 9 (Sorting) is the prerequisite — Binary Search requires sorted
-          data. Lecture 5 (Recursion) shows the elegant recursive formulation of Binary Search. Binary Search on answer
-          space appears in later lectures on Graphs (finding minimum cost) and Dynamic Programming.
+      <div class="sb-div"></div>
+      <div class="toc-label">Practice</div>
+      <a href="#practice" class="toc-item">
+        <span class="toc-icon">💪</span> Problem Set
+      </a>
+      <a href="#assignment" class="toc-item">
+        <span class="toc-icon">📝</span> Assignment
+      </a>
+      <div class="sb-div"></div>
+      <a href="#checklist" class="toc-item">
+        <span class="toc-icon">✅</span> Completion Checklist
+      </a>
+
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
+        </div>
+        <a
+          class="toc-item"
+          href="../Lecture9/lecture9_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >← Topic 9: Sorting</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture11/lecture11_notes.html"
+          style="padding: 5px 0; font-size: 13px; color: var(--text3)"
+          >→ Topic 11: Linked Lists</a
+        >
+      </div>
+    </nav>
+
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a>
+          <span style="color: var(--text3)">/</span>
+          <a href="#">Phase 2</a>
+          <span style="color: var(--text3)">/</span>
+          <strong style="color: var(--text)">Searching Algorithms</strong>
+        </div>
+        <div class="topbar-right">
+          <div class="progress-bar">
+            <div
+              id="progressFill"
+              class="progress-fill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">🌙 Dark</button>
         </div>
       </div>
 
-      <hr>
+      <div id="content">
+        <header class="page-header">
+          <span class="page-emoji">🔍</span>
+          <h1 class="page-title">Searching Algorithms</h1>
+          <p class="page-sub">
+            "From exhaustive scanning to logarithmic bounds. Searching is the
+            art of eliminating the irrelevant."
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">📖 Topic 10</span>
+            <span class="meta-chip accent">Phase 2 — Core Data Structures</span>
+            <span class="meta-chip yellow">⏱ 5 days</span>
+            <span class="meta-chip green">🎯 28 problems</span>
+            <span class="meta-chip">💼 Google · Uber · Facebook</span>
+          </div>
+        </header>
 
-      <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
-      <section id="overview" class="section">
-        <h2 class="h1">🌐 Search Overview</h2>
-        <p>The goal of searching algorithms is simply to locate a target element in a dataset. Optimization comes from
-          leveraging the properties of the dataset:</p>
+        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
+        <div class="callout blue" style="margin-bottom: 20px">
+          <span class="callout-icon">🌍</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Searching is how every large system finds things fast. Google
+            indexes billions of pages and returns results in milliseconds
+            because of binary search principles at every layer. Binary Search
+            turns an O(N) problem into O(log N) — for N = 1 billion, that's the
+            difference between 1 billion operations and just 30. Beyond simple
+            element search, "Binary Search on Answer Space" is one of the most
+            powerful interview tricks — it converts problems that look
+            impossible into clean O(N log N) solutions.
+          </div>
+        </div>
+
+        <h3 class="h2" style="margin-top: 0">
+          📖 Before We Start — The Big Picture
+        </h3>
+        <p>
+          Searching is the problem of finding a target element in a dataset. The
+          strategy depends entirely on what you know about the data:
+        </p>
         <ul>
-          <li><strong>Linear Search:</strong> The universal fallback. Scans one by one. Required when data is unsorted.
+          <li>
+            <strong>Unsorted data?</strong> You have no choice but Linear Search
+            — O(N). No trick can help without first sorting.
           </li>
-          <li><strong>Binary Search:</strong> The divide-and-conquer king. Slices domains in half, but requires sorted
-            data.</li>
-          <li><strong>Ternary Search:</strong> Divides space into thirds. Specialized for finding peaks/valleys in
-            unimodal functions.</li>
-          <li><strong>Interpolation Search:</strong> Guesses the location based on values. Incredible speed, but
-            requires uniformly distributed data.</li>
+          <li>
+            <strong>Sorted data?</strong> Binary Search reduces the problem by
+            half with every comparison — O(log N). This is the cornerstone of
+            this lecture.
+          </li>
+          <li>
+            <strong>Sorted 2D matrix?</strong> You can flatten it to 1D or use
+            Staircase search.
+          </li>
+          <li>
+            <strong>Answer-space search?</strong> You don't search for a value
+            in an array — you binary search for the optimal answer to a
+            minimization/maximization problem.
+          </li>
         </ul>
-      </section>
+        <p>
+          The key insight of <strong>Binary Search</strong> is the
+          <em>invariant</em>: at every step, you maintain the guarantee that the
+          target — if it exists — lies within <code>[lo, hi]</code>. By checking
+          the midpoint, you eliminate half the remaining candidates. You only
+          need 30 checks to find any element in a 1-billion element array.
+        </p>
 
-      <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
-      <section id="deep-dive" class="section">
-        <h2 class="h1">🔬 Algorithms Deep Dive</h2>
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">🔗</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> Lecture 9 (Sorting) is the
+            prerequisite — Binary Search requires sorted data. Lecture 5
+            (Recursion) shows the elegant recursive formulation of Binary
+            Search. Binary Search on answer space appears in later lectures on
+            Graphs (finding minimum cost) and Dynamic Programming.
+          </div>
+        </div>
 
-        <h3 class="h2">Linear Search</h3>
-        <p>While mathematically $O(N)$ is slow, it is paradoxically the <em>fastest</em> search for tiny arrays ($N <
-            100$) due to CPU contiguous memory caching avoiding pointer jumping overhead.</p>
-            <div class="callout orange">
-              <p><strong>Caveat - The Recursion Trap:</strong> Writing Linear Search recursively occupies $O(N)$ Space
-                due to the Call Stack. Always write Linear Search iteratively in Java!</p>
-            </div>
+        <hr />
 
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-lang">☕ Java · Linear Search (Iterative vs Recursive)</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
+        <section id="overview" class="section">
+          <h2 class="h1">🌐 Search Overview</h2>
+          <p>
+            The goal of searching algorithms is simply to locate a target
+            element in a dataset. Optimization comes from leveraging the
+            properties of the dataset:
+          </p>
+          <ul>
+            <li>
+              <strong>Linear Search:</strong> The universal fallback. Scans one
+              by one. Required when data is unsorted.
+            </li>
+            <li>
+              <strong>Binary Search:</strong> The divide-and-conquer king.
+              Slices domains in half, but requires sorted data.
+            </li>
+            <li>
+              <strong>Ternary Search:</strong> Divides space into thirds.
+              Specialized for finding peaks/valleys in unimodal functions.
+            </li>
+            <li>
+              <strong>Interpolation Search:</strong> Guesses the location based
+              on values. Incredible speed, but requires uniformly distributed
+              data.
+            </li>
+          </ul>
+        </section>
+
+        <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
+        <section id="deep-dive" class="section">
+          <h2 class="h1">🔬 Algorithms Deep Dive</h2>
+
+          <h3 class="h2">Linear Search</h3>
+          <p>
+            While mathematically $O(N)$ is slow, it is paradoxically the
+            <em>fastest</em> search for tiny arrays ($N < 100$) due to CPU
+            contiguous memory caching avoiding pointer jumping overhead.
+          </p>
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Recursion Trap:</strong> Writing Linear
+              Search recursively occupies $O(N)$ Space due to the Call Stack.
+              Always write Linear Search iteratively in Java!
+            </p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">
+                ☕ Java · Linear Search (Iterative vs Recursive)
               </div>
-              <pre><span class="cm">// Iterative: Space O(1)</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Iterative: Space O(1)</span>
 <span class="kw">public int</span> <span class="fn">linearSearch</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < nums.length; i++) {
         <span class="kw">if</span> (nums[i] == target) <span class="ret">return</span> i;
@@ -843,24 +924,28 @@
     <span class="kw">if</span> (nums[index] == target) <span class="ret">return</span> index;
     <span class="ret">return</span> <span class="fn">recursiveLinear</span>(nums, target, index + <span class="num">1</span>);
 }</pre>
-            </div>
+          </div>
 
-            <h3 class="h2">Binary Search</h3>
-            <p>Systematically eliminates halves. Heavily vulnerable to infinite loops if boundaries (`low`, `high`)
-              overlap incorrectly.</p>
-            <div class="callout orange">
-              <p><strong>Caveat - The Overflow Bug:</strong> Calculating <code>mid = (low + high) / 2</code> overflows
-                the 32-bit integer limit if boundaries are massive. <strong>Always use:</strong>
-                <code>mid = low + (high - low) / 2</code>.
-              </p>
-            </div>
+          <h3 class="h2">Binary Search</h3>
+          <p>
+            Systematically eliminates halves. Heavily vulnerable to infinite
+            loops if boundaries (`low`, `high`) overlap incorrectly.
+          </p>
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Overflow Bug:</strong> Calculating
+              <code>mid = (low + high) / 2</code> overflows the 32-bit integer
+              limit if boundaries are massive. <strong>Always use:</strong>
+              <code>mid = low + (high - low) / 2</code>.
+            </p>
+          </div>
 
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-lang">☕ Java · Classic Binary Search</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><span class="kw">public int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">☕ Java · Classic Binary Search</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">public int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
     <span class="kw">while</span> (lo <= hi) { <span class="cm">// '<=' allows exhaustive 1-element checks</span>
         <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -870,24 +955,31 @@
     }
     <span class="ret">return</span> -<span class="num">1</span>;
 }</pre>
-            </div>
+          </div>
 
-            <h3 class="h2">Interpolation Search</h3>
-            <p>Instead of blindly checking the middle, it estimates position:
-              <code>pos = lo + ((target - arr[lo]) * (hi - lo) / (arr[hi] - arr[lo]))</code>.
+          <h3 class="h2">Interpolation Search</h3>
+          <p>
+            Instead of blindly checking the middle, it estimates position:
+            <code
+              >pos = lo + ((target - arr[lo]) * (hi - lo) / (arr[hi] -
+              arr[lo]))</code
+            >.
+          </p>
+          <div class="callout green">
+            <p>
+              <strong>Good to Know:</strong> Outperforms Binary Search by
+              reaching $O(\log(\log N))$, <em>but only</em> if data is linearly
+              uniform (e.g., 10, 20, 30...). If clumped heavily, it crashes to
+              $O(N)$.
             </p>
-            <div class="callout green">
-              <p><strong>Good to Know:</strong> Outperforms Binary Search by reaching $O(\log(\log N))$, <em>but
-                  only</em> if data is linearly uniform (e.g., 10, 20, 30...). If clumped heavily, it crashes to $O(N)$.
-              </p>
-            </div>
+          </div>
 
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-lang">☕ Java · Interpolation Search</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><span class="kw">while</span> (lo <= hi && target >= arr[lo] && target <= arr[hi]) {
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">☕ Java · Interpolation Search</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">while</span> (lo <= hi && target >= arr[lo] && target <= arr[hi]) {
     <span class="cm">// Prevent division by zero</span>
     <span class="kw">if</span> (lo == hi) {
         <span class="kw">if</span> (arr[lo] == target) <span class="ret">return</span> lo;
@@ -898,46 +990,58 @@
     <span class="kw">if</span> (arr[pos] < target) lo = pos + <span class="num">1</span>;
     <span class="kw">else</span> hi = pos - <span class="num">1</span>;
 }</pre>
-            </div>
+          </div>
 
-            <h3 class="h2">Ternary Search</h3>
-            <p>Calculates <code>mid1</code> and <code>mid2</code> to eliminate a third of the array per pass. It is
-              mathematically slower than Binary Search (`2 * log_3(N) > log_2(N)`), so it is <strong>never</strong> used
-              for exact targeting natively.</p>
-            <div class="callout purple">
-              <p><strong>Primary Use Case:</strong> Finding the maximum/minimum point in a continuous <em>Unimodal</em>
-                function (a curve that goes strictly up, then strictly down).</p>
-            </div>
+          <h3 class="h2">Ternary Search</h3>
+          <p>
+            Calculates <code>mid1</code> and <code>mid2</code> to eliminate a
+            third of the array per pass. It is mathematically slower than Binary
+            Search (`2 * log_3(N) > log_2(N)`), so it is
+            <strong>never</strong> used for exact targeting natively.
+          </p>
+          <div class="callout purple">
+            <p>
+              <strong>Primary Use Case:</strong> Finding the maximum/minimum
+              point in a continuous <em>Unimodal</em> function (a curve that
+              goes strictly up, then strictly down).
+            </p>
+          </div>
 
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-lang">☕ Java · Ternary Search (Peak Finding)</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">
+                ☕ Java · Ternary Search (Peak Finding)
               </div>
-              <pre><span class="kw">while</span> (hi - lo > <span class="num">2</span>) {
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">while</span> (hi - lo > <span class="num">2</span>) {
     <span class="kw">int</span> mid1 = lo + (hi - lo) / <span class="num">3</span>;
     <span class="kw">int</span> mid2 = hi - (hi - lo) / <span class="num">3</span>;
     <span class="cm">// Assuming we are searching for the Maximum peak in f(x)</span>
     <span class="kw">if</span> (<span class="fn">f</span>(mid1) < <span class="fn">f</span>(mid2)) lo = mid1; <span class="cm">// Max must be right of mid1</span>
     <span class="kw">else</span> hi = mid2; <span class="cm">// Max must be left of mid2</span>
 }</pre>
-            </div>
-      </section>
-
-      <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
-      <section id="variations" class="section">
-        <h2 class="h1">🔄 Algorithm Variations</h2>
-
-        <h3 class="h2">Upper / Lower Bounds (Duplicates)</h3>
-        <p>If finding the <strong>first</strong> occurrence of a duplicate, when `nums[mid] == target`, don't stop! Keep
-          searching left: <code>ans = mid; high = mid - 1;</code> to capture the earliest index boundary.</p>
-
-        <div class="code-block">
-          <div class="code-header">
-            <span>☕ Java · Lower Bound logic</span>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> ans = -<span class="num">1</span>;
+        </section>
+
+        <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
+        <section id="variations" class="section">
+          <h2 class="h1">🔄 Algorithm Variations</h2>
+
+          <h3 class="h2">Upper / Lower Bounds (Duplicates)</h3>
+          <p>
+            If finding the <strong>first</strong> occurrence of a duplicate,
+            when `nums[mid] == target`, don't stop! Keep searching left:
+            <code>ans = mid; high = mid - 1;</code> to capture the earliest
+            index boundary.
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>☕ Java · Lower Bound logic</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">int</span> ans = -<span class="num">1</span>;
 <span class="kw">while</span> (lo <= hi) {
     <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
     <span class="kw">if</span> (nums[mid] == target) {
@@ -946,42 +1050,56 @@
     } <span class="kw">else if</span> (nums[mid] < target) lo = mid + <span class="num">1</span>;
     <span class="kw">else</span> hi = mid - <span class="num">1</span>;
 }</pre>
-        </div>
+          </div>
 
-        <h3 class="h2">Search in Rotated Sorted Array</h3>
-        <p>If an array is shifted (`[4, 5, 6, 7, 0, 1, 2]`), you test which half is strictly monotonic. If `nums[lo] <=
-            nums[mid]`, the left side is perfectly sorted, and you can evaluate containment safely.</p>
+          <h3 class="h2">Search in Rotated Sorted Array</h3>
+          <p>
+            If an array is shifted (`[4, 5, 6, 7, 0, 1, 2]`), you test which
+            half is strictly monotonic. If `nums[lo] <= nums[mid]`, the left
+            side is perfectly sorted, and you can evaluate containment safely.
+          </p>
 
-            <div class="code-block">
-              <div class="code-header">
-                <span>☕ Java · Sorted Half Validation</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><span class="kw">if</span> (nums[lo] <= nums[mid]) { <span class="cm">// Left half is perfectly sorted</span>
+          <div class="code-block">
+            <div class="code-header">
+              <span>☕ Java · Sorted Half Validation</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">if</span> (nums[lo] <= nums[mid]) { <span class="cm">// Left half is perfectly sorted</span>
     <span class="kw">if</span> (target >= nums[lo] && target < nums[mid]) hi = mid - <span class="num">1</span>; <span class="cm">// Must be in left</span>
     <span class="kw">else</span> lo = mid + <span class="num">1</span>; <span class="cm">// Must be in right</span>
 } <span class="kw">else</span> { <span class="cm">// Right half is perfectly sorted</span>
     <span class="kw">if</span> (target > nums[mid] && target <= nums[hi]) lo = mid + <span class="num">1</span>; <span class="cm">// Must be in right</span>
     <span class="kw">else</span> hi = mid - <span class="num">1</span>; <span class="cm">// Must be in left</span>
 }</pre>
+          </div>
+
+          <h3 class="h2">Binary Search on Answer Space</h3>
+          <p>
+            Searching for an abstract minimum/maximum configuration instead of
+            an array index.
+          </p>
+          <ol>
+            <li>
+              <strong>Domain:</strong> Establish `lo` = absolute min answer,
+              `hi` = absolute max.
+            </li>
+            <li>
+              <strong>isValid(mid):</strong> Write a secondary $O(N)$ function
+              to test if `mid` properly satisfies all constraints.
+            </li>
+            <li>
+              <strong>Optimize:</strong> If `isValid(mid)` is logically valid,
+              try optimizing further by lowering requirements: `hi = mid`.
+              Otherwise, `lo = mid + 1`.
+            </li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>☕ Java · Answer Space Template</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-
-            <h3 class="h2">Binary Search on Answer Space</h3>
-            <p>Searching for an abstract minimum/maximum configuration instead of an array index.</p>
-            <ol>
-              <li><strong>Domain:</strong> Establish `lo` = absolute min answer, `hi` = absolute max.</li>
-              <li><strong>isValid(mid):</strong> Write a secondary $O(N)$ function to test if `mid` properly satisfies
-                all constraints.</li>
-              <li><strong>Optimize:</strong> If `isValid(mid)` is logically valid, try optimizing further by lowering
-                requirements: `hi = mid`. Otherwise, `lo = mid + 1`.</li>
-            </ol>
-
-            <div class="code-block">
-              <div class="code-header">
-                <span>☕ Java · Answer Space Template</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><span class="kw">while</span> (lo < hi) {
+            <pre><span class="kw">while</span> (lo < hi) {
     <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
     <span class="kw">if</span> (<span class="fn">isValid</span>(mid)) {
         hi = mid; <span class="cm">// It works! See if we can find a smaller valid capacity</span>
@@ -990,78 +1108,86 @@
     }
 }
 <span class="ret">return</span> lo;</pre>
-            </div>
-      </section>
-
-      <!-- ══ 3. COMPLEXITY ANALYSIS ════════════════════════════ -->
-      <section id="complexity" class="section">
-        <h2 class="h1">⏱️ Complexity Analysis</h2>
-        <p>A global snapshot verifying Time bounds and internal memory Space usage natively.</p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Algorithm</th>
-                <th>Condition</th>
-                <th>Time (Worst)</th>
-                <th>Time (Best)</th>
-                <th>Space</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Linear Search</td>
-                <td>Unsorted</td>
-                <td>$O(N)$</td>
-                <td>$O(1)$</td>
-                <td>$O(1)$</td>
-              </tr>
-              <tr>
-                <td>Binary Search</td>
-                <td>Sorted</td>
-                <td>$O(\log_2 N)$</td>
-                <td>$O(1)$</td>
-                <td>$O(1)$</td>
-              </tr>
-              <tr>
-                <td>Ternary Search</td>
-                <td>Sorted / Unimodal</td>
-                <td>$O(\log_3 N)$</td>
-                <td>$O(1)$</td>
-                <td>$O(1)$</td>
-              </tr>
-              <tr>
-                <td>Interpolation</td>
-                <td>Sorted, Uniform</td>
-                <td>$O(N)$</td>
-                <td>$O(\log(\log N))$</td>
-                <td>$O(1)$</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ══ 4. MATRIX & 2D ARRAYS ═════════════════════════════ -->
-      <section id="matrix" class="section">
-        <h2 class="h1">🗺️ 2D Matrix Traversals</h2>
-
-        <h3 class="h2">Perfectly Flattened Binary Search</h3>
-        <p>If a matrix `M x C` is strictly sorted universally (the end of Row 1 is less than the start of Row 2), treat
-          it like a 1D array of length `M * C`.</p>
-        <div class="callout green">
-          <p><strong>The Indexing Math:</strong><br>
-            Row Index = <code>mid / C</code><br>
-            Col Index = <code>mid % C</code></p>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <span>☕ Java · 1D to 2D Mapping</span>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> rows = matrix.length, cols = matrix[<span class="num">0</span>].length;
+        </section>
+
+        <!-- ══ 3. COMPLEXITY ANALYSIS ════════════════════════════ -->
+        <section id="complexity" class="section">
+          <h2 class="h1">⏱️ Complexity Analysis</h2>
+          <p>
+            A global snapshot verifying Time bounds and internal memory Space
+            usage natively.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Condition</th>
+                  <th>Time (Worst)</th>
+                  <th>Time (Best)</th>
+                  <th>Space</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Linear Search</td>
+                  <td>Unsorted</td>
+                  <td>$O(N)$</td>
+                  <td>$O(1)$</td>
+                  <td>$O(1)$</td>
+                </tr>
+                <tr>
+                  <td>Binary Search</td>
+                  <td>Sorted</td>
+                  <td>$O(\log_2 N)$</td>
+                  <td>$O(1)$</td>
+                  <td>$O(1)$</td>
+                </tr>
+                <tr>
+                  <td>Ternary Search</td>
+                  <td>Sorted / Unimodal</td>
+                  <td>$O(\log_3 N)$</td>
+                  <td>$O(1)$</td>
+                  <td>$O(1)$</td>
+                </tr>
+                <tr>
+                  <td>Interpolation</td>
+                  <td>Sorted, Uniform</td>
+                  <td>$O(N)$</td>
+                  <td>$O(\log(\log N))$</td>
+                  <td>$O(1)$</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ══ 4. MATRIX & 2D ARRAYS ═════════════════════════════ -->
+        <section id="matrix" class="section">
+          <h2 class="h1">🗺️ 2D Matrix Traversals</h2>
+
+          <h3 class="h2">Perfectly Flattened Binary Search</h3>
+          <p>
+            If a matrix `M x C` is strictly sorted universally (the end of Row 1
+            is less than the start of Row 2), treat it like a 1D array of length
+            `M * C`.
+          </p>
+          <div class="callout green">
+            <p>
+              <strong>The Indexing Math:</strong><br />
+              Row Index = <code>mid / C</code><br />
+              Col Index = <code>mid % C</code>
+            </p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>☕ Java · 1D to 2D Mapping</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">int</span> rows = matrix.length, cols = matrix[<span class="num">0</span>].length;
 <span class="kw">int</span> lo = <span class="num">0</span>, hi = (rows * cols) - <span class="num">1</span>;
 <span class="kw">while</span> (lo <= hi) {
     <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -1070,62 +1196,82 @@
     <span class="kw">if</span> (val < target) lo = mid + <span class="num">1</span>;
     <span class="kw">else</span> hi = mid - <span class="num">1</span>;
 }</pre>
-        </div>
-
-        <h3 class="h2">Staircase / Saddleback Search</h3>
-        <p>If the array is <em>only</em> sorted horizontally per row and vertically per col (meaning Row 2 can start
-          with a smaller number than the end of Row 1), you cannot flatten it. You start exclusively at the
-          <strong>Top-Right</strong> coordinate, shrinking the domain leftwards or downwards in $O(M + N)$ combinations.
-        </p>
-
-        <div class="code-block">
-          <div class="code-header">
-            <span>☕ Java · Top-Right Staircase</span>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> row = <span class="num">0</span>, col = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
+
+          <h3 class="h2">Staircase / Saddleback Search</h3>
+          <p>
+            If the array is <em>only</em> sorted horizontally per row and
+            vertically per col (meaning Row 2 can start with a smaller number
+            than the end of Row 1), you cannot flatten it. You start exclusively
+            at the <strong>Top-Right</strong> coordinate, shrinking the domain
+            leftwards or downwards in $O(M + N)$ combinations.
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>☕ Java · Top-Right Staircase</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="kw">int</span> row = <span class="num">0</span>, col = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
 <span class="kw">while</span> (row < matrix.length && col >= <span class="num">0</span>) {
     <span class="kw">if</span> (matrix[row][col] == target) <span class="ret">return</span> <span class="kw">true</span>;
     <span class="kw">if</span> (matrix[row][col] > target) col--; <span class="cm">// Eliminate current column</span>
     <span class="kw">else</span> row++; <span class="cm">// Eliminate current row</span>
 }</pre>
-        </div>
-      </section>
-
-      <!-- PRACTICE PROBLEMS -->
-      <section id="practice" class="section">
-        <h2 class="h1">💪 Practice Problems</h2>
-
-        <!-- P1 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 · Rotated Shift</div>
-              <div class="prob-title">Search in Rotated Sorted Array</div>
-              <div style="margin-top:4px"><a href="https://leetcode.com/problems/search-in-rotated-sorted-array/"
-                  target="_blank" style="font-size:12px">🔗 LC 33 - Rotated Sorted Array</a></div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Google</span>
-                <span class="tag tag-co">Microsoft</span>
-              </div>
-            </div>
-            <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
           </div>
-          <div class="prob-body" style="display:none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Search for a target in a rotated sorted array in $O(\log N)$ time.</p>
+        </section>
+
+        <!-- PRACTICE PROBLEMS -->
+        <section id="practice" class="section">
+          <h2 class="h1">💪 Practice Problems</h2>
+
+          <!-- P1 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 01 · Rotated Shift</div>
+                <div class="prob-title">Search in Rotated Sorted Array</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/search-in-rotated-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 33 - Rotated Sorted Array</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Google</span>
+                  <span class="tag tag-co">Microsoft</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
             </div>
-            <details>
-              <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">☕ Java · Pivot Logic</div>
-                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                  </div>
-                  <pre><span class="kw">public int</span> <span class="fn">search</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Search for a target in a rotated sorted array in $O(\log N)$
+                  time.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow"></span>Full solution with
+                  complexity
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <div class="code-lang">☕ Java · Pivot Logic</div>
+                      <button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public int</span> <span class="fn">search</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
     <span class="kw">while</span> (lo <= hi) {
         <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -1141,49 +1287,69 @@
     }
     <span class="ret">return</span> -<span class="num">1</span>;
 }</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(log
-                      N)</span></div>
-                  <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </details>
+              </details>
+            </div>
           </div>
-        </div>
 
-        <!-- P2 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 · Unsorted Array Bounds</div>
-              <div class="prob-title">Find Peak Element</div>
-              <div style="margin-top:4px"><a href="https://leetcode.com/problems/find-peak-element/" target="_blank"
-                  style="font-size:12px">🔗 LC 162 - Find Peak Element</a></div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Uber</span>
-                <span class="tag tag-co">Amazon</span>
+          <!-- P2 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 02 · Unsorted Array Bounds</div>
+                <div class="prob-title">Find Peak Element</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-peak-element/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 162 - Find Peak Element</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Uber</span>
+                  <span class="tag tag-co">Amazon</span>
+                </div>
               </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
             </div>
-            <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-          </div>
-          <div class="prob-body" style="display:none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Find a local maximum in an array where neighbors aren't equal. Implement strictly in $O(\log N)$ time.
-              </p>
-            </div>
-            <details>
-              <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">☕ Java · Upward Slope</div>
-                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                  </div>
-                  <pre><span class="kw">public int</span> <span class="fn">findPeakElement</span>(<span class="kw">int</span>[] nums) {
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find a local maximum in an array where neighbors aren't equal.
+                  Implement strictly in $O(\log N)$ time.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow"></span>Full solution with
+                  complexity
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <div class="code-lang">☕ Java · Upward Slope</div>
+                      <button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public int</span> <span class="fn">findPeakElement</span>(<span class="kw">int</span>[] nums) {
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
     <span class="kw">while</span> (lo < hi) {
         <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -1197,49 +1363,69 @@
     }
     <span class="ret">return</span> lo;
 }</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(log
-                      N)</span></div>
-                  <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </details>
+              </details>
+            </div>
           </div>
-        </div>
 
-        <!-- P3 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 · Dual Partition Arrays</div>
-              <div class="prob-title">Median of Two Sorted Arrays</div>
-              <div style="margin-top:4px"><a href="https://leetcode.com/problems/median-of-two-sorted-arrays/"
-                  target="_blank" style="font-size:12px">🔗 LC 4 - Median of Two Arrays</a></div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-co">Apple</span>
-                <span class="tag tag-co">Adobe</span>
+          <!-- P3 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 03 · Dual Partition Arrays</div>
+                <div class="prob-title">Median of Two Sorted Arrays</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/median-of-two-sorted-arrays/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 4 - Median of Two Arrays</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-hard">Hard</span>
+                  <span class="tag tag-co">Apple</span>
+                  <span class="tag tag-co">Adobe</span>
+                </div>
               </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
             </div>
-            <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-          </div>
-          <div class="prob-body" style="display:none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Find the combined median in $O(\log(\min(M,N)))$ time. This relies heavily on precise array
-                partitioning boundaries.</p>
-            </div>
-            <details>
-              <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">☕ Java · Partition Search</div>
-                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                  </div>
-                  <pre><span class="kw">public double</span> <span class="fn">findMedianSortedArrays</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span>[] nums2) {
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find the combined median in $O(\log(\min(M,N)))$ time. This
+                  relies heavily on precise array partitioning boundaries.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow"></span>Full solution with
+                  complexity
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <div class="code-lang">☕ Java · Partition Search</div>
+                      <button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public double</span> <span class="fn">findMedianSortedArrays</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span>[] nums2) {
     <span class="kw">if</span> (nums1.length > nums2.length) <span class="ret">return</span> <span class="fn">findMedianSortedArrays</span>(nums2, nums1);
     <span class="kw">int</span> x = nums1.length, y = nums2.length;
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = x;
@@ -1268,49 +1454,68 @@
     }
     <span class="ret">return</span> <span class="num">0.0</span>;
 }</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green"><span class="cx-label">Time</span><span
-                      class="cx-val green">O(log(min(M,N)))</span></div>
-                  <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log(min(M,N)))</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- P4 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 04 · Answer Space bounds</div>
-            <div class="prob-title">Koko Eating Bananas</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/koko-eating-bananas/" target="_blank"
-                style="font-size:12px">🔗 LC 875 - Koko Eating Bananas</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Airbnb</span>
+              </details>
             </div>
           </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Find the minimum eating speed <code>K</code> such that Koko can eat all the bananas within <code>H</code>
-              hours.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Monotonic Search</div>
-                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+
+          <!-- P4 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 04 · Answer Space bounds</div>
+                <div class="prob-title">Koko Eating Bananas</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/koko-eating-bananas/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 875 - Koko Eating Bananas</a
+                  >
                 </div>
-                <pre><span class="kw">public int</span> <span class="fn">minEatingSpeed</span>(<span class="kw">int</span>[] piles, <span class="kw">int</span> h) {
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Airbnb</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find the minimum eating speed <code>K</code> such that Koko
+                  can eat all the bananas within <code>H</code> hours.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow"></span>Full solution with
+                  complexity
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <div class="code-lang">☕ Java · Monotonic Search</div>
+                      <button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public int</span> <span class="fn">minEatingSpeed</span>(<span class="kw">int</span>[] piles, <span class="kw">int</span> h) {
     <span class="kw">int</span> lo = <span class="num">1</span>, hi = <span class="num">1000000000</span>; <span class="cm">// Max pile value constraint</span>
     <span class="kw">while</span> (lo < hi) {
         <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -1327,48 +1532,68 @@
     }
     <span class="ret">return</span> hours <= h;
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(N
-                    log(MaxP))</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(N log(MaxP))</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </details>
             </div>
-          </details>
-        </div>
-      </div>
+          </div>
 
-      <!-- P5 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 05 · Grid Flattening</div>
-            <div class="prob-title">Search a 2D Matrix</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/search-a-2d-matrix/" target="_blank"
-                style="font-size:12px">🔗 LC 74 - Search a 2D Matrix</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Amazon</span>
-            </div>
-          </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Write an efficient algorithm that searches for a value inside an `M x N` matrix uniformly sorted
-              perfectly across rows.</p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow"></span>Full solution with complexity</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header">
-                  <div class="code-lang">☕ Java · Midpoint Mapping</div>
-                  <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <!-- P5 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 05 · Grid Flattening</div>
+                <div class="prob-title">Search a 2D Matrix</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/search-a-2d-matrix/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 74 - Search a 2D Matrix</a
+                  >
                 </div>
-                <pre><span class="kw">public boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] matrix, <span class="kw">int</span> target) {
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Amazon</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Write an efficient algorithm that searches for a value inside
+                  an `M x N` matrix uniformly sorted perfectly across rows.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow"></span>Full solution with
+                  complexity
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <div class="code-lang">☕ Java · Midpoint Mapping</div>
+                      <button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] matrix, <span class="kw">int</span> target) {
     <span class="kw">int</span> m = matrix.length, n = matrix[<span class="num">0</span>].length;
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = m * n - <span class="num">1</span>;
     <span class="kw">while</span> (lo <= hi) {
@@ -1380,58 +1605,84 @@
     }
     <span class="ret">return</span> <span class="kw">false</span>;
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(log(M *
-                    N))</span></div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log(M * N))</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- P06 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 06 · Find Pivot</div>
+                <div class="prob-title">Minimum in Rotated Sorted Array</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 153</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Microsoft</span
+                  ><span class="tag tag-co">Amazon</span>
+                  <span class="tag tag-pat">Binary Search</span>
                 </div>
               </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
             </div>
-          </details>
-        </div>
-      </div>
-      </section>
-
-      <!-- P06 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 06 · Find Pivot</div>
-            <div class="prob-title">Minimum in Rotated Sorted Array</div>
-            <div style="margin-top:4px"><a href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
-                target="_blank" style="font-size:12px">🔗 LC 153</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Microsoft</span><span class="tag tag-co">Amazon</span>
-              <span class="tag tag-pat">Binary Search</span>
-            </div>
-          </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a sorted array rotated at some unknown pivot, find the minimum element in O(log N) time.</p>
-            <div class="ascii-tree">Original: [1, 2, 3, 4, 5]
-              Rotated: [3, 4, 5, 1, 2] ← pivot at index 3
-              Minimum = 1</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>The minimum is at the rotation point. At each step, compare <code>nums[mid]</code> with
-              <code>nums[hi]</code>. If <code>nums[mid] > nums[hi]</code>, the minimum is to the RIGHT of mid (the right
-              half is the "smaller" section). If <code>nums[mid] ≤ nums[hi]</code>, the minimum is at mid or to the
-              LEFT.
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">▶</span> Solution + Trace</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header"><span>☕ Java · Binary Search on Rotation Pivot</span><button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button></div>
-                <pre><span class="kw">public int</span> <span class="fn">findMin</span>(<span class="kw">int</span>[] nums) {
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given a sorted array rotated at some unknown pivot, find the
+                  minimum element in O(log N) time.
+                </p>
+                <div class="ascii-tree">
+                  Original: [1, 2, 3, 4, 5] Rotated: [3, 4, 5, 1, 2] ← pivot at
+                  index 3 Minimum = 1
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Think First</div>
+                <p>
+                  The minimum is at the rotation point. At each step, compare
+                  <code>nums[mid]</code> with <code>nums[hi]</code>. If
+                  <code>nums[mid] > nums[hi]</code>, the minimum is to the RIGHT
+                  of mid (the right half is the "smaller" section). If
+                  <code>nums[mid] ≤ nums[hi]</code>, the minimum is at mid or to
+                  the LEFT.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">▶</span> Solution + Trace
+                </summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <span>☕ Java · Binary Search on Rotation Pivot</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public int</span> <span class="fn">findMin</span>(<span class="kw">int</span>[] nums) {
     <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
     <span class="kw">while</span> (lo &lt; hi) {
         <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
@@ -1445,60 +1696,88 @@
 <span class="cm">// [3,4,5,1,2]: lo=0,hi=4, mid=2, nums[2]=5 > nums[4]=2 → lo=3
 // lo=3,hi=4, mid=3, nums[3]=1 ≤ nums[4]=2 → hi=3
 // lo==hi=3 → return nums[3]=1 ✓</span></pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(log N)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
-                </div>
-              </div>
+              </details>
             </div>
-          </details>
-        </div>
-      </div>
+          </div>
 
-      <!-- P07 -->
-      <div class="prob-card">
-        <div class="prob-header" onclick="toggleProb(this)">
-          <div class="prob-left">
-            <div class="prob-num">Problem 07 · Lower/Upper Bound</div>
-            <div class="prob-title">Find First and Last Position of Element</div>
-            <div style="margin-top:4px"><a
-                href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
-                target="_blank" style="font-size:12px">🔗 LC 34</a></div>
-            <div class="prob-tags">
-              <span class="tag tag-med">Medium</span>
-              <span class="tag tag-co">Facebook</span><span class="tag tag-co">Google</span>
-              <span class="tag tag-pat">Binary Search Bounds</span>
+          <!-- P07 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 07 · Lower/Upper Bound</div>
+                <div class="prob-title">
+                  Find First and Last Position of Element
+                </div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 34</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Facebook</span
+                  ><span class="tag tag-co">Google</span>
+                  <span class="tag tag-pat">Binary Search Bounds</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
             </div>
-          </div>
-          <span style="color:var(--text3);font-size:18px;margin-top:2px">›</span>
-        </div>
-        <div class="prob-body" style="display:none">
-          <div class="prob-section">
-            <div class="prob-section-label">Problem</div>
-            <p>Given a sorted array with possible duplicates and target, return <code>[firstIndex, lastIndex]</code> of
-              the target, or <code>[-1, -1]</code> if not found. Must run in O(log N).</p>
-            <div class="ascii-tree">nums=[5,7,7,8,8,10], target=8
-              First occurrence: index 3
-              Last occurrence: index 4
-              Output: [3, 4]</div>
-          </div>
-          <div class="prob-section">
-            <div class="prob-section-label">Think First</div>
-            <p>Run binary search <strong>twice</strong>: once to find the <em>leftmost</em> (lower bound) — when
-              <code>nums[mid]==target</code>, record mid and continue left (<code>hi=mid-1</code>). Once for the
-              <em>rightmost</em> (upper bound) — when <code>nums[mid]==target</code>, record mid and continue right
-              (<code>lo=mid+1</code>).
-            </p>
-          </div>
-          <details>
-            <summary><span class="toggle-arrow">▶</span> Solution</summary>
-            <div class="details-body">
-              <div class="code-block">
-                <div class="code-header"><span>☕ Java · Two Binary Searches (Lower + Upper Bound)</span><button
-                    class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-                <pre><span class="kw">public int</span>[] <span class="fn">searchRange</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given a sorted array with possible duplicates and target,
+                  return <code>[firstIndex, lastIndex]</code> of the target, or
+                  <code>[-1, -1]</code> if not found. Must run in O(log N).
+                </p>
+                <div class="ascii-tree">
+                  nums=[5,7,7,8,8,10], target=8 First occurrence: index 3 Last
+                  occurrence: index 4 Output: [3, 4]
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Think First</div>
+                <p>
+                  Run binary search <strong>twice</strong>: once to find the
+                  <em>leftmost</em> (lower bound) — when
+                  <code>nums[mid]==target</code>, record mid and continue left
+                  (<code>hi=mid-1</code>). Once for the
+                  <em>rightmost</em> (upper bound) — when
+                  <code>nums[mid]==target</code>, record mid and continue right
+                  (<code>lo=mid+1</code>).
+                </p>
+              </div>
+              <details>
+                <summary><span class="toggle-arrow">▶</span> Solution</summary>
+                <div class="details-body">
+                  <div class="code-block">
+                    <div class="code-header">
+                      <span
+                        >☕ Java · Two Binary Searches (Lower + Upper
+                        Bound)</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="kw">public int</span>[] <span class="fn">searchRange</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
     <span class="ret">return new int</span>[] { <span class="fn">bound</span>(nums, target, <span class="kw">true</span>), <span class="fn">bound</span>(nums, target, <span class="kw">false</span>) };
 }
 
@@ -1515,162 +1794,232 @@
     }
     <span class="ret">return</span> ans;
 }</pre>
-              </div>
-              <div class="complexity-row">
-                <div class="cx-badge green"><span class="cx-label">Time</span><span class="cx-val green">O(log N)</span>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="cx-badge green"><span class="cx-label">Space</span><span class="cx-val green">O(1)</span>
-                </div>
-              </div>
+              </details>
             </div>
-          </details>
+          </div>
+        </section>
+        <!-- #practice -->
+
+        <!-- ══ SECTION: ASSIGNMENT ══════════════════════════════ -->
+
+        <h2 class="h1" id="assignment">📝 Topic Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">📋</span>
+          <div class="callout-body">
+            <strong>Topic 10 Assignment — 28 Problems</strong><br />
+            Complete the assignment before moving forward. It includes 8 Easy,
+            13 Medium, 7 Hard problems, and conceptual checks — all carefully
+            chosen to master Searching algorithms.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture10/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+              "
+              >📄 Open Assignment →</a
+            >
+          </div>
+        </div>
+
+        <!-- ══ SECTION: CHECKLIST ══════════════════════════════ -->
+        <h2 class="h1" id="checklist">✅ Topic Completion Checklist</h2>
+        <p>Check each item before advancing to Topic 11.</p>
+
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can distinguish when to use Linear Search over Binary Search
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand why `mid = low + (high - low) / 2` prevents integer
+              overflow
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can implement standard Binary Search in under 2 minutes bug-free
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I know the 3 main Binary Search templates and their boundary
+              conditions
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can map a 1D index to a 2D matrix safely via `[mid/nc][mid%nc]`
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand the monotonic property required to pivot Rotated
+              Arrays
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can solve 'Search in Rotated Sorted Array' efficiently
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I can formulate `isValid(mid)` checks for Answer Space patterns
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I understand the dual partition formula for Median of Two Arrays
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I have completed successfully at least 20 problems from the
+              Assignment
+            </div>
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">🧠</span>
+          <div class="callout-body">
+            <strong>You're ready for Topic 11: Linked Lists</strong><br />
+            We're stepping out of contiguous arrays and stepping into dynamic
+            node allocation! Master pointer tracking now because it will be
+            absolutely vital for Trees and Graphs.
+          </div>
+        </div>
+
+        <div
+          class="footer"
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <a
+            href="../Lecture9/lecture9_notes.html"
+            style="text-decoration: none; color: var(--text3); font-size: 14px"
+            >← Topic 9: Sorting Algorithms</a
+          >
+          <span style="color: var(--text3); font-size: 13px"
+            >Topic 10 of 30 — Phase 2 Core Data Structures</span
+          >
+          <a
+            href="../Lecture11/lecture11_notes.html"
+            style="
+              text-decoration: none;
+              color: var(--accent);
+              font-weight: 600;
+              font-size: 14px;
+            "
+            >Topic 11: Linked Lists →</a
+          >
         </div>
       </div>
-
-      <!-- ══ SECTION: ASSIGNMENT ══════════════════════════════ -->
-
-      <h2 class="h1" id="assignment">📝 Topic Assignment</h2>
-      <div class="callout orange" style="margin:14px 0">
-        <span class="callout-icon">📋</span>
-        <div class="callout-body">
-          <strong>Topic 10 Assignment — 28 Problems</strong><br>
-          Complete the assignment before moving forward. It includes 8 Easy, 13 Medium, 7 Hard problems,
-          and conceptual checks — all carefully chosen to master Searching algorithms.<br><br>
-          <a href="https://github.com/bhumika-aga/DSA/blob/main/Lecture10/Assignment.md"
-            style="background:var(--accent);color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;display:inline-block">📄
-            Open Assignment →</a>
-        </div>
-      </div>
-
-      <!-- ══ SECTION: CHECKLIST ══════════════════════════════ -->
-      <h2 class="h1" id="checklist">✅ Topic Completion Checklist</h2>
-      <p>Check each item before advancing to Topic 11.</p>
-
-      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin:14px 0">
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can distinguish when to use Linear Search over Binary Search</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand why `mid = low + (high - low) / 2` prevents integer overflow</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can implement standard Binary Search in under 2 minutes bug-free</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I know the 3 main Binary Search templates and their boundary conditions</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can map a 1D index to a 2D matrix safely via `[mid/nc][mid%nc]`</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand the monotonic property required to pivot Rotated Arrays</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can solve 'Search in Rotated Sorted Array' efficiently</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I can formulate `isValid(mid)` checks for Answer Space patterns</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I understand the dual partition formula for Median of Two Arrays</div>
-        </div>
-        <div class="checklist-item" onclick="this.classList.toggle('done')">
-          <div class="cb-box">✓</div>
-          <div class="cb-text">I have completed successfully at least 20 problems from the Assignment</div>
-        </div>
-      </div>
-
-      <div class="callout green" style="margin-top:24px">
-        <span class="callout-icon">🧠</span>
-        <div class="callout-body">
-          <strong>You're ready for Topic 11: Linked Lists</strong><br>
-          We're stepping out of contiguous arrays and stepping into dynamic node allocation! Master pointer tracking now
-          because it will be absolutely vital for Trees and Graphs.
-        </div>
-      </div>
-
-      <div class="footer"
-        style="margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <a href="../Lecture9/lecture9_notes.html" style="text-decoration: none; color: var(--text3); font-size: 14px;">←
-          Topic 9: Sorting Algorithms</a>
-        <span style="color: var(--text3); font-size: 13px;">Topic 10 of 30 — Phase 2 Core Data Structures</span>
-        <a href="../Lecture11/lecture11_notes.html"
-          style="text-decoration: none; color: var(--accent); font-weight: 600; font-size: 14px;">Topic 11: Linked Lists
-          →</a>
-      </div>
-
     </div>
-  </div>
 
-  <script>
-    function toggleDark() {
-      const html = document.documentElement;
-      const btn = document.getElementById('darkToggle');
-      if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        btn.innerText = '🌙 Dark';
-      } else {
-        html.setAttribute('data-theme', 'dark');
-        btn.innerText = '☀️ Light';
-      }
-    }
-
-    document.getElementById('main').addEventListener('scroll', function () {
-      const el = this;
-      const scrollPct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-
-      if (document.getElementById('progressFill')) {
-        const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
-        document.getElementById('progressFill').style.width = fillPct + '%';
-      }
-
-      const sections = document.querySelectorAll('section[id]');
-      let current = "";
-      sections.forEach(s => {
-        const top = s.getBoundingClientRect().top;
-        if (top < 150) current = s.id;
-      });
-
-      document.querySelectorAll('.toc-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === "#" + current) {
-          item.classList.add('active');
+    <script>
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
         }
-      });
-    });
-
-    function toggleProb(headerEl) {
-      const body = headerEl.nextElementSibling;
-      if (!body) return;
-      const isOpen = body.style.display === 'block';
-      body.style.display = isOpen ? 'none' : 'block';
-      headerEl.classList.toggle('active', !isOpen);
-
-      const arrow = headerEl.lastElementChild;
-      if (arrow && arrow.tagName.toLowerCase() === 'span') {
-        arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
-        arrow.style.display = 'inline-block';
-        arrow.style.transition = 'transform 0.2s';
       }
-    }
 
-    async function copyCode(btn) {
-      const pre = btn.closest('.code-block').querySelector('pre');
-      await navigator.clipboard.writeText(pre.innerText);
-      const oldText = btn.innerText;
-      btn.innerText = 'Copied!';
-      setTimeout(() => btn.innerText = oldText, 2000);
-    }
-  </script>
-</body>
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
 
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
+        }
+
+        const sections = document.querySelectorAll("section[id]");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current) {
+            item.classList.add("active");
+          }
+        });
+      });
+
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+
+        const arrow = headerEl.lastElementChild;
+        if (arrow && arrow.tagName.toLowerCase() === "span") {
+          arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
+          arrow.style.display = "inline-block";
+          arrow.style.transition = "transform 0.2s";
+        }
+      }
+
+      async function copyCode(btn) {
+        const pre = btn.closest(".code-block").querySelector("pre");
+        await navigator.clipboard.writeText(pre.innerText);
+        const oldText = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => (btn.innerText = oldText), 2000);
+      }
+    </script>
+  </body>
 </html>
