@@ -1,0 +1,2663 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 17 — Graphs | DSA Course</title>
+    <meta
+      name="description"
+      content="Master graphs: BFS, DFS, cycle detection, topological sort, Dijkstra, Bellman-Ford, MST, bipartite — with full dry runs and Java code."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        padding: 20px 0;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .toc-label {
+        padding: 8px 16px 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        color: var(--text2);
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+      .toc-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+      .toc-item.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .toc-sub {
+        padding-left: 32px;
+        font-size: 12px;
+        font-weight: 400;
+      }
+      .toc-icon {
+        font-size: 14px;
+        width: 18px;
+        text-align: center;
+      }
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text3);
+      }
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+      .breadcrumb a:hover {
+        color: var(--accent);
+      }
+      .breadcrumb span {
+        color: var(--text3);
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+      #darkToggle:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      /* ── Content ── */
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 120px;
+      }
+
+      .page-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .page-emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 12px;
+      }
+      .page-title {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+        margin-bottom: 10px;
+      }
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        color: var(--text2);
+      }
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+
+      .h1 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 32px 0 12px;
+      }
+      .h2 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 24px 0 10px;
+      }
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text2);
+        margin: 16px 0 8px;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+      .callout.blue {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+      .callout.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+      .callout.orange {
+        background: var(--orange-bg);
+        border-color: var(--orange);
+      }
+      .callout.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+      .callout.purple {
+        background: var(--purple-bg);
+        border-color: var(--purple);
+      }
+      .callout.teal {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+      .callout.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .callout-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.65;
+      }
+      .callout-body strong {
+        color: var(--text);
+      }
+
+      /* ── Code blocks ── */
+      .code-block {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+      .code-lang {
+        color: var(--text3);
+      }
+      .copy-btn {
+        background: var(--bg4);
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: var(--sans);
+        transition: all 0.15s;
+      }
+      .copy-btn:hover {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px;
+        overflow-x: auto;
+        background: var(--bg2);
+        color: var(--text2);
+      }
+
+      .kw {
+        color: #6940a5;
+        font-weight: 600;
+      }
+      .cls {
+        color: #0f7b6c;
+        font-weight: 500;
+      }
+      .fn {
+        color: #2383e2;
+        font-weight: 500;
+      }
+      .str {
+        color: #c75b0e;
+      }
+      .num {
+        color: #c0392b;
+      }
+      .cm {
+        color: #9b9790;
+        font-style: italic;
+      }
+      .ret {
+        color: #ad1a72;
+        font-weight: 600;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #a07dd4;
+      }
+      [data-theme="dark"] .cls {
+        color: #4db6a8;
+      }
+      [data-theme="dark"] .fn {
+        color: #5ba4f5;
+      }
+      [data-theme="dark"] .str {
+        color: #e0893a;
+      }
+      [data-theme="dark"] .num {
+        color: #e07070;
+      }
+      [data-theme="dark"] .cm {
+        color: #6b6860;
+      }
+      [data-theme="dark"] .ret {
+        color: #e06aac;
+      }
+
+      /* ── Complexity badges ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      /* ── Tables ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 13.5px;
+      }
+      th {
+        background: var(--bg3);
+        color: var(--text2);
+        font-weight: 600;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--border2);
+      }
+      td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Pattern Banner ── */
+      .pattern-banner {
+        background: var(--purple-bg);
+        border: 1px solid var(--purple);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 14px 0;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--purple);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .pattern-banner p {
+        margin: 0;
+      }
+
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+      /* ── IO box ── */
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+        margin: 8px 0;
+      }
+
+      /* ── Prob cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 16px 0;
+        overflow: hidden;
+      }
+      .prob-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 18px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .prob-header:hover {
+        background: var(--bg2);
+      }
+      .prob-header.active {
+        background: var(--accent-bg);
+      }
+      .prob-left {
+        flex: 1;
+      }
+      .prob-num {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 3px;
+      }
+      .prob-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 6px;
+      }
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .tag-co {
+        background: var(--purple-bg);
+        color: var(--purple);
+        border-color: var(--purple);
+      }
+      .tag-pat {
+        background: var(--teal-bg);
+        color: var(--teal);
+        border-color: var(--teal);
+      }
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+        border-color: var(--orange);
+      }
+      .prob-body {
+        display: none;
+        border-top: 1px solid var(--border);
+        padding: 18px;
+      }
+      .prob-section {
+        margin-bottom: 14px;
+      }
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+      details summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        background: var(--bg2);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text2);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .toggle-arrow {
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+      details[open] .toggle-arrow {
+        transform: rotate(90deg);
+      }
+      .details-body {
+        padding: 4px 0 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Graphs</div>
+        <div class="sb-meta">
+          Lecture 17 of 30 &middot; Phase 3 &mdash; Advanced DS
+        </div>
+      </div>
+
+      <div class="toc-label">On this page</div>
+      <a class="toc-item" href="#intro"
+        ><span class="toc-icon">&#127757;</span>Introduction</a
+      >
+      <a class="toc-item" href="#representations"
+        ><span class="toc-icon">&#128200;</span>Representations</a
+      >
+      <a class="toc-item toc-sub" href="#adj-list">Adjacency List</a>
+      <a class="toc-item toc-sub" href="#adj-matrix">Grid (Implicit)</a>
+      <a class="toc-item" href="#bfs"
+        ><span class="toc-icon">&#127754;</span>BFS</a
+      >
+      <a class="toc-item toc-sub" href="#bfs-single">Single-Source</a>
+      <a class="toc-item toc-sub" href="#bfs-multi">Multi-Source</a>
+      <a class="toc-item" href="#dfs"
+        ><span class="toc-icon">&#128195;</span>DFS</a
+      >
+      <a class="toc-item toc-sub" href="#dfs-components"
+        >Connected Components</a
+      >
+      <a class="toc-item" href="#cycle"
+        ><span class="toc-icon">&#128257;</span>Cycle Detection</a
+      >
+      <a class="toc-item toc-sub" href="#cycle-directed">Directed (3-color)</a>
+      <a class="toc-item toc-sub" href="#cycle-undirected"
+        >Undirected (parent-skip)</a
+      >
+      <a class="toc-item" href="#topo"
+        ><span class="toc-icon">&#9654;</span>Topological Sort</a
+      >
+      <a class="toc-item toc-sub" href="#kahns">Kahn's BFS</a>
+      <a class="toc-item toc-sub" href="#topo-dfs">DFS-based</a>
+      <a class="toc-item" href="#dijkstra"
+        ><span class="toc-icon">&#9881;</span>Dijkstra's</a
+      >
+      <a class="toc-item" href="#bellman"
+        ><span class="toc-icon">&#128308;</span>Bellman-Ford</a
+      >
+      <a class="toc-item" href="#floyd"
+        ><span class="toc-icon">&#128307;</span>Floyd-Warshall</a
+      >
+      <a class="toc-item" href="#mst"
+        ><span class="toc-icon">&#127795;</span>MST</a
+      >
+      <a class="toc-item toc-sub" href="#kruskal">Kruskal's</a>
+      <a class="toc-item toc-sub" href="#prim">Prim's</a>
+      <a class="toc-item" href="#bipartite"
+        ><span class="toc-icon">&#127800;</span>Bipartite</a
+      >
+      <a class="toc-item" href="#tarjan"
+        ><span class="toc-icon">&#128291;</span>Tarjan's Bridges</a
+      >
+      <a class="toc-item" href="#patterns"
+        ><span class="toc-icon">&#127919;</span>Pattern Summary</a
+      >
+      <a class="toc-item" href="#practice"
+        ><span class="toc-icon">&#128170;</span>Practice Problems</a
+      >
+      <a class="toc-item" href="#assignment"
+        ><span class="toc-icon">&#128221;</span>Assignment</a
+      >
+      <a class="toc-item" href="#checklist"
+        ><span class="toc-icon">&#9989;</span>Checklist</a
+      >
+      <div class="sb-div"></div>
+      <div style="padding: 8px 16px">
+        <div style="font-size: 11px; color: var(--text3); margin-bottom: 6px">
+          NAVIGATE
+        </div>
+        <a
+          class="toc-item"
+          href="../Lecture16/lecture16_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&larr; Topic 16: Heaps</a
+        >
+        <a
+          class="toc-item"
+          href="../Lecture18/lecture18_notes.html"
+          style="font-size: 13px; color: var(--text3)"
+          >&rarr; Topic 18: Union-Find</a
+        >
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="#">Phase 3</a><span>&rsaquo;</span>
+          <span>Lecture 17</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#128375;</span>
+          <h1 class="page-title">Graphs</h1>
+          <p class="page-sub">
+            &ldquo;A graph is nodes connected by edges. BFS finds the shortest
+            path; DFS finds connectivity. Everything else &mdash; Dijkstra,
+            topological sort, MST &mdash; is built on top of those two
+            primitives.&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 17</span>
+            <span class="meta-chip accent">Phase 3 &mdash; Advanced DS</span>
+            <span class="meta-chip yellow">&#9201; 12 Days</span>
+            <span class="meta-chip green">&#127919; 45 Problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Meta &middot; Amazon &middot; Microsoft
+              &middot; Uber</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Graphs are the single largest topic in FAANG interviews by problem
+            count. Nearly every system can be modelled as a graph &mdash; social
+            networks, maps, dependency resolution, state machines. The good
+            news: <strong>95% of all graph interview problems</strong> use
+            exactly two primitives &mdash; BFS and DFS. Learn to recognise which
+            one to reach for and every other algorithm (Dijkstra, Kahn&apos;s,
+            Kruskal&apos;s) is just a variation.
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">&#128279;</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> BFS is the level-order traversal
+            you already know from trees (Lecture 15), but on a general graph
+            with cycles you must track <code>visited[]</code>. Dijkstra&apos;s
+            uses the min-heap from Lecture 16. Kruskal&apos;s MST needs
+            Union-Find (Lecture 18 &mdash; next). After Graphs, Dynamic
+            Programming on DAGs and interval scheduling both rely on topological
+            order.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ REPRESENTATIONS ═══ -->
+        <h2 class="h1" id="representations">&#128200; Graph Representations</h2>
+        <p>
+          A graph <em>G = (V, E)</em> has <strong>V</strong> vertices (nodes)
+          and <strong>E</strong> edges. How you store it determines the
+          complexity of every operation.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Representation</th>
+              <th>Space</th>
+              <th>Check Edge</th>
+              <th>List Neighbours</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Adjacency List</strong></td>
+              <td>O(V + E)</td>
+              <td>O(degree)</td>
+              <td>O(degree)</td>
+              <td>Sparse graphs (most interview problems)</td>
+            </tr>
+            <tr>
+              <td><strong>Adjacency Matrix</strong></td>
+              <td>O(V&sup2;)</td>
+              <td>O(1)</td>
+              <td>O(V)</td>
+              <td>Dense graphs, Floyd-Warshall</td>
+            </tr>
+            <tr>
+              <td><strong>Edge List</strong></td>
+              <td>O(E)</td>
+              <td>O(E)</td>
+              <td>O(E)</td>
+              <td>Kruskal&apos;s MST (sort edges)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="h3" id="adj-list">Adjacency List in Java</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Build Adjacency List</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> n = <span class="num">5</span>;  <span class="cm">// nodes 0..4</span>
+<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) adj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
+
+<span class="cm">// undirected edge 0-1</span>
+adj.<span class="fn">get</span>(<span class="num">0</span>).<span class="fn">add</span>(<span class="num">1</span>);
+adj.<span class="fn">get</span>(<span class="num">1</span>).<span class="fn">add</span>(<span class="num">0</span>);
+
+<span class="cm">// weighted directed edge u→v with weight w</span>
+<span class="cm">// Use: List&lt;int[]&gt; where int[]{neighbour, weight}</span>
+<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; wAdj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) wAdj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
+wAdj.<span class="fn">get</span>(u).<span class="fn">add</span>(<span class="kw">new</span> <span class="kw">int</span>[]{v, weight});</pre>
+        </div>
+
+        <h3 class="h3" id="adj-matrix">Grid as Implicit Graph</h3>
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>Grid problems ARE graph problems.</strong> Each cell
+            <code>(r,c)</code> is a node. Edges go to the 4 (or 8) adjacent
+            cells. You never need to build an explicit adjacency list &mdash;
+            just use the 4-direction delta array. This covers: Number of
+            Islands, Rotting Oranges, 01 Matrix, Pacific Atlantic Water Flow.
+            <br /><br />
+            <code>int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};</code>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ BFS ═══ -->
+        <h2 class="h1" id="bfs">&#127754; BFS &mdash; Breadth-First Search</h2>
+        <p>
+          BFS visits nodes level by level. Because it expands the closest nodes
+          first, it
+          <strong>guarantees shortest path in an unweighted graph</strong>. Use
+          a <code>Queue</code> and a <code>visited</code> set/array.
+        </p>
+
+        <div class="pattern-banner">
+          <h4>&#127919; BFS Recognition Signal</h4>
+          <p>
+            "Shortest path", "minimum steps", "minimum moves", "fewest hops" in
+            an
+            <em>unweighted</em> graph or grid &rarr;
+            <strong>reach for BFS first</strong>. If edges have weights, switch
+            to Dijkstra&apos;s.
+          </p>
+        </div>
+
+        <h3 class="h3" id="bfs-single">Single-Source BFS Template</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; BFS Shortest Path Template</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] <span class="fn">bfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> src, <span class="kw">int</span> n) {
+    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, -<span class="num">1</span>);
+    dist[src] = <span class="num">0</span>;
+    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+    q.<span class="fn">offer</span>(src);
+
+    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+        <span class="kw">int</span> node = q.<span class="fn">poll</span>();
+        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
+            <span class="kw">if</span> (dist[nei] == -<span class="num">1</span>) {     <span class="cm">// not visited</span>
+                dist[nei] = dist[node] + <span class="num">1</span>;
+                q.<span class="fn">offer</span>(nei);
+            }
+        }
+    }
+    <span class="ret">return</span> dist;
+}
+<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V + E)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
+          </div>
+        </div>
+
+        <h3 class="h3" id="bfs-multi">Multi-Source BFS</h3>
+        <p>
+          When multiple starting nodes all exist at distance 0, seed them all
+          into the queue at once before the BFS loop begins. This avoids running
+          BFS from each source separately.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Multi-Source BFS (Rotting Oranges
+              pattern)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Seed all rotten oranges at distance 0</span>
+<span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; rows; r++)
+    <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; cols; c++)
+        <span class="kw">if</span> (grid[r][c] == <span class="num">2</span>) q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{r, c, <span class="num">0</span>});  <span class="cm">// {row, col, time}</span>
+
+<span class="kw">int</span>[][] dirs = {{<span class="num">1</span>,<span class="num">0</span>},{-<span class="num">1</span>,<span class="num">0</span>},{<span class="num">0</span>,<span class="num">1</span>},{<span class="num">0</span>,-<span class="num">1</span>}};
+<span class="kw">int</span> maxTime = <span class="num">0</span>;
+
+<span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+    <span class="kw">int</span>[] cur = q.<span class="fn">poll</span>();
+    <span class="kw">int</span> r = cur[<span class="num">0</span>], c = cur[<span class="num">1</span>], t = cur[<span class="num">2</span>];
+    maxTime = <span class="cls">Math</span>.<span class="fn">max</span>(maxTime, t);
+    <span class="kw">for</span> (<span class="kw">int</span>[] d : dirs) {
+        <span class="kw">int</span> nr = r + d[<span class="num">0</span>], nc = c + d[<span class="num">1</span>];
+        <span class="kw">if</span> (nr &gt;= <span class="num">0</span> &amp;&amp; nr &lt; rows &amp;&amp; nc &gt;= <span class="num">0</span> &amp;&amp; nc &lt; cols &amp;&amp; grid[nr][nc] == <span class="num">1</span>) {
+            grid[nr][nc] = <span class="num">2</span>;   <span class="cm">// mark visited by overwriting</span>
+            q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{nr, nc, t + <span class="num">1</span>});
+        }
+    }
+}</pre>
+        </div>
+
+        <hr />
+
+        <!-- ═══ DFS ═══ -->
+        <h2 class="h1" id="dfs">&#128195; DFS &mdash; Depth-First Search</h2>
+        <p>
+          DFS explores as deep as possible before backtracking. Use it when you
+          need
+          <strong>connectivity</strong>, <strong>paths</strong>,
+          <strong>cycles</strong>, or <strong>component labelling</strong>. Can
+          be written recursively or iteratively (explicit stack).
+        </p>
+
+        <div class="pattern-banner">
+          <h4>&#127919; DFS Recognition Signal</h4>
+          <p>
+            "Connected components", "number of islands", "can you reach X from
+            Y", "all paths", "cycle exists" &rarr; <strong>DFS</strong>. Also:
+            any problem where you need to explore an entire region (flood fill,
+            island area).
+          </p>
+        </div>
+
+        <h3 class="h3" id="dfs-components">
+          DFS Template + Connected Components
+        </h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; DFS — Count Connected Components</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">boolean</span>[] visited;
+
+<span class="kw">int</span> <span class="fn">countComponents</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
+    visited = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+    <span class="kw">int</span> count = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+        <span class="kw">if</span> (!visited[i]) {
+            <span class="fn">dfs</span>(adj, i);
+            count++;
+        }
+    }
+    <span class="ret">return</span> count;
+}
+
+<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node) {
+    visited[node] = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
+        <span class="kw">if</span> (!visited[nei]) <span class="fn">dfs</span>(adj, nei);
+}
+<span class="cm">// Time: O(V + E)  Space: O(V) recursion stack</span></pre>
+        </div>
+
+        <div class="callout orange">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>Stack overflow on large inputs:</strong> Java&apos;s default
+            stack handles ~10k–30k recursive calls. For n &gt; 10<sup>4</sup>,
+            convert to iterative DFS using an explicit
+            <code>Deque&lt;Integer&gt; stack</code>.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ CYCLE DETECTION ═══ -->
+        <h2 class="h1" id="cycle">&#128257; Cycle Detection</h2>
+
+        <h3 class="h3" id="cycle-directed">
+          Directed Graph &mdash; 3-Color DFS
+        </h3>
+        <p>
+          Track three states per node: <strong>0 = unvisited</strong>,
+          <strong>1 = in current DFS path (grey)</strong>,
+          <strong>2 = fully processed (black)</strong>. If during DFS you reach
+          a grey node, you found a back edge &rarr; cycle.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Directed Cycle Detection (3-color)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] color; <span class="cm">// 0=white, 1=grey, 2=black</span>
+
+<span class="kw">boolean</span> <span class="fn">hasCycle</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
+    color = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (color[i] == <span class="num">0</span> &amp;&amp; <span class="fn">dfs</span>(adj, i)) <span class="ret">return</span> <span class="kw">true</span>;
+    <span class="ret">return</span> <span class="kw">false</span>;
+}
+
+<span class="kw">boolean</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node) {
+    color[node] = <span class="num">1</span>;  <span class="cm">// mark grey (in progress)</span>
+    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
+        <span class="kw">if</span> (color[nei] == <span class="num">1</span>) <span class="ret">return</span> <span class="kw">true</span>;  <span class="cm">// back edge = cycle</span>
+        <span class="kw">if</span> (color[nei] == <span class="num">0</span> &amp;&amp; <span class="fn">dfs</span>(adj, nei)) <span class="ret">return</span> <span class="kw">true</span>;
+    }
+    color[node] = <span class="num">2</span>;  <span class="cm">// mark black (done)</span>
+    <span class="ret">return</span> <span class="kw">false</span>;
+}</pre>
+        </div>
+
+        <h3 class="h3" id="cycle-undirected">
+          Undirected Graph &mdash; Parent-Skip DFS
+        </h3>
+        <p>
+          In undirected graphs the edge <code>u&harr;v</code> appears in both
+          directions. When doing DFS from <code>u</code> via edge to
+          <code>v</code>, skip the edge back to <code>u</code> (the parent). If
+          you still reach an already-visited node, it&apos;s a cycle.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Undirected Cycle Detection
+              (parent-skip)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">boolean</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node, <span class="kw">int</span> parent, <span class="kw">boolean</span>[] vis) {
+    vis[node] = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
+        <span class="kw">if</span> (!vis[nei]) {
+            <span class="kw">if</span> (<span class="fn">dfs</span>(adj, nei, node, vis)) <span class="ret">return</span> <span class="kw">true</span>;
+        } <span class="kw">else if</span> (nei != parent) {  <span class="cm">// visited AND not the edge we came from</span>
+            <span class="ret">return</span> <span class="kw">true</span>;
+        }
+    }
+    <span class="ret">return</span> <span class="kw">false</span>;
+}</pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>BFS-based cycle detection (undirected):</strong> Also works
+            &mdash; track parent per node in the BFS queue. But the DFS
+            parent-skip is cleaner in interviews. For directed graphs, BFS-based
+            is Kahn&apos;s algorithm (cycle = not all nodes processed).
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ TOPOLOGICAL SORT ═══ -->
+        <h2 class="h1" id="topo">&#9654; Topological Sort</h2>
+        <p>
+          A <strong>topological order</strong> of a DAG lists every node before
+          all nodes it points to. Only valid on Directed Acyclic Graphs. If a
+          cycle exists, no topological order exists. Use case: course
+          prerequisites, build dependency order, task scheduling.
+        </p>
+
+        <h3 class="h3" id="kahns">
+          Kahn&apos;s Algorithm (BFS-based) &mdash; Recommended
+        </h3>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Intuition:</strong> A node with in-degree 0 has no
+            dependencies &mdash; process it first. After removing it, some
+            neighbours lose a dependency (in-degree drops). If their in-degree
+            reaches 0, they&apos;re ready. Repeat. If the output order has fewer
+            than V nodes, there was a cycle.
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Kahn's Topological Sort</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] <span class="fn">topoSort</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
+    <span class="kw">int</span>[] inDegree = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="kw">for</span> (<span class="kw">int</span> u = <span class="num">0</span>; u &lt; n; u++)
+        <span class="kw">for</span> (<span class="kw">int</span> v : adj.<span class="fn">get</span>(u)) inDegree[v]++;
+
+    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (inDegree[i] == <span class="num">0</span>) q.<span class="fn">offer</span>(i);
+
+    <span class="kw">int</span>[] order = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="kw">int</span> idx = <span class="num">0</span>;
+    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+        <span class="kw">int</span> node = q.<span class="fn">poll</span>();
+        order[idx++] = node;
+        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
+            <span class="kw">if</span> (--inDegree[nei] == <span class="num">0</span>) q.<span class="fn">offer</span>(nei);
+    }
+    <span class="cm">// idx &lt; n means cycle exists — no valid topo order</span>
+    <span class="ret">return</span> idx == n ? order : <span class="kw">new</span> <span class="kw">int</span>[<span class="num">0</span>];
+}
+<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+        </div>
+
+        <h3 class="h3" id="topo-dfs">DFS-based Topological Sort</h3>
+        <p>
+          After fully processing a node (all descendants done), push it onto a
+          stack. Reverse the stack for the order. Equivalent to Kahn&apos;s but
+          DFS-native &mdash; useful when you already have DFS in the solution.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; DFS Topo Sort (post-order + stack)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cls">Deque</span>&lt;<span class="cls">Integer</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
+<span class="kw">boolean</span>[] visited = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+
+<span class="kw">void</span> <span class="fn">dfs</span>(<span class="kw">int</span> node) {
+    visited[node] = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
+        <span class="kw">if</span> (!visited[nei]) <span class="fn">dfs</span>(nei);
+    stack.<span class="fn">push</span>(node);  <span class="cm">// push AFTER all neighbours done</span>
+}
+
+<span class="cm">// Call dfs(i) for each unvisited i, then read stack top-to-bottom</span></pre>
+        </div>
+
+        <hr />
+
+        <!-- ═══ DIJKSTRA ═══ -->
+        <h2 class="h1" id="dijkstra">&#9881; Dijkstra&apos;s Algorithm</h2>
+        <p>
+          Dijkstra finds the shortest path in a
+          <strong>weighted graph with non-negative edges</strong>. It is
+          essentially BFS with a <strong>min-heap</strong> instead of a plain
+          queue, always processing the node with the currently known shortest
+          distance.
+        </p>
+
+        <div class="pattern-banner">
+          <h4>&#127919; Dijkstra Recognition Signal</h4>
+          <p>
+            "Shortest path", "minimum cost/time/effort" and edges have
+            <em>non-negative weights</em>
+            &rarr; Dijkstra. Weights are negative? &rarr; Bellman-Ford. K-stops
+            constraint? &rarr; Modified Bellman-Ford (DP with relaxation limit).
+          </p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Dijkstra's Shortest Path (min-heap)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] <span class="fn">dijkstra</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj, <span class="kw">int</span> src, <span class="kw">int</span> n) {
+    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, <span class="cls">Integer</span>.MAX_VALUE);
+    dist[src] = <span class="num">0</span>;
+
+    <span class="cm">// min-heap: {dist, node}</span>
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
+    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>, src});
+
+    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+        <span class="kw">int</span>[] cur = pq.<span class="fn">poll</span>();
+        <span class="kw">int</span> d = cur[<span class="num">0</span>], node = cur[<span class="num">1</span>];
+
+        <span class="kw">if</span> (d &gt; dist[node]) <span class="kw">continue</span>;  <span class="cm">// stale entry — skip</span>
+
+        <span class="kw">for</span> (<span class="kw">int</span>[] edge : adj.<span class="fn">get</span>(node)) {
+            <span class="kw">int</span> nei = edge[<span class="num">0</span>], w = edge[<span class="num">1</span>];
+            <span class="kw">if</span> (dist[node] + w &lt; dist[nei]) {
+                dist[nei] = dist[node] + w;
+                pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{dist[nei], nei});
+            }
+        }
+    }
+    <span class="ret">return</span> dist;
+}
+<span class="cm">// Time: O((V + E) log V)  Space: O(V)</span></pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>The &ldquo;stale entry&rdquo; check is critical.</strong>
+            Java&apos;s PriorityQueue does not support decrease-key, so when you
+            find a shorter path you push a new entry rather than updating the
+            old one. Old (larger) entries remain in the heap. The check
+            <code>if (d &gt; dist[node]) continue</code> discards them when they
+            eventually pop.
+          </div>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O((V+E) log V)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val">O(V + E)</span>
+          </div>
+          <div class="cx-badge yellow">
+            <span class="cx-label">Constraint</span
+            ><span class="cx-val">Non-negative weights only</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ BELLMAN-FORD ═══ -->
+        <h2 class="h1" id="bellman">&#128308; Bellman-Ford</h2>
+        <p>
+          Bellman-Ford relaxes all edges V&minus;1 times. Works with
+          <strong>negative weights</strong>. A V-th relaxation pass that still
+          improves a distance indicates a <strong>negative cycle</strong>.
+          Slower than Dijkstra but more general.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">&#9749; Java &middot; Bellman-Ford</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] <span class="fn">bellmanFord</span>(<span class="kw">int</span>[][] edges, <span class="kw">int</span> n, <span class="kw">int</span> src) {
+    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, <span class="cls">Integer</span>.MAX_VALUE / <span class="num">2</span>);  <span class="cm">// /2 to avoid overflow on relaxation</span>
+    dist[src] = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n - <span class="num">1</span>; i++) {        <span class="cm">// V-1 rounds</span>
+        <span class="kw">for</span> (<span class="kw">int</span>[] e : edges) {                  <span class="cm">// each edge {u, v, w}</span>
+            <span class="kw">int</span> u = e[<span class="num">0</span>], v = e[<span class="num">1</span>], w = e[<span class="num">2</span>];
+            <span class="kw">if</span> (dist[u] + w &lt; dist[v])
+                dist[v] = dist[u] + w;
+        }
+    }
+    <span class="cm">// Optional: V-th pass to detect negative cycle</span>
+    <span class="kw">for</span> (<span class="kw">int</span>[] e : edges)
+        <span class="kw">if</span> (dist[e[<span class="num">0</span>]] + e[<span class="num">2</span>] &lt; dist[e[<span class="num">1</span>]]) {
+            <span class="cm">// negative cycle reachable from src</span>
+        }
+    <span class="ret">return</span> dist;
+}
+<span class="cm">// Time: O(V * E)  Space: O(V)</span></pre>
+        </div>
+
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong
+              >LC 787 &ldquo;Cheapest Flights Within K Stops&rdquo;:</strong
+            >
+            Use Bellman-Ford limited to K+1 rounds instead of V&minus;1. Copy
+            <code>dist</code> at the start of each round to avoid using the same
+            round&apos;s updates within the same round (the &ldquo;temp
+            array&rdquo; trick).
+          </div>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge yellow">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V &times; E)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Handles</span
+            ><span class="cx-val">Negative weights</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ FLOYD-WARSHALL ═══ -->
+        <h2 class="h1" id="floyd">&#128307; Floyd-Warshall</h2>
+        <p>
+          Floyd-Warshall computes <strong>all-pairs shortest paths</strong> in
+          O(V<sup>3</sup>) time. Works with negative weights (no negative
+          cycles). Use only when V is small (&le;&nbsp;300) and you need
+          distances between every pair of nodes.
+        </p>
+
+        <div class="pattern-banner">
+          <h4>&#127919; Floyd-Warshall Recognition Signal</h4>
+          <p>
+            "Shortest path between <em>all</em> pairs", "transitive closure",
+            "can i reach j?" for every pair, or small V (&le;&nbsp;300) with
+            negative weights &rarr; Floyd-Warshall. Single source? Use Dijkstra
+            or Bellman-Ford instead.
+          </p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Floyd-Warshall All-Pairs Shortest
+              Path</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// dist[i][j] = shortest distance from i to j</span>
+<span class="kw">int</span> INF = (<span class="kw">int</span>) <span class="num">1e9</span>;
+<span class="kw">int</span>[][] dist = <span class="kw">new</span> <span class="kw">int</span>[n][n];
+<span class="kw">for</span> (<span class="kw">int</span>[] row : dist) <span class="cls">Arrays</span>.<span class="fn">fill</span>(row, INF);
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) dist[i][i] = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span>[] e : edges) dist[e[<span class="num">0</span>]][e[<span class="num">1</span>]] = e[<span class="num">2</span>];  <span class="cm">// {u, v, weight}</span>
+
+<span class="cm">// Try every intermediate node k</span>
+<span class="kw">for</span> (<span class="kw">int</span> k = <span class="num">0</span>; k &lt; n; k++)
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++)
+            <span class="kw">if</span> (dist[i][k] &lt; INF &amp;&amp; dist[k][j] &lt; INF)
+                dist[i][j] = <span class="cls">Math</span>.<span class="fn">min</span>(dist[i][j], dist[i][k] + dist[k][j]);
+
+<span class="cm">// Negative cycle: if dist[i][i] &lt; 0 for any i, a negative cycle exists</span>
+<span class="cm">// Time: O(V³)  Space: O(V²)</span></pre>
+        </div>
+
+        <div class="callout orange">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>Overflow guard:</strong> Use
+            <code>INF&nbsp;=&nbsp;1e9</code> (not
+            <code>Integer.MAX_VALUE</code>) to avoid overflow when computing
+            <code>dist[i][k]&nbsp;+&nbsp;dist[k][j]</code>. The guard
+            <code>if (dist[i][k] &lt; INF)</code> also protects you.
+          </div>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge red">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V&sup3;)</span>
+          </div>
+          <div class="cx-badge yellow">
+            <span class="cx-label">Space</span
+            ><span class="cx-val">O(V&sup2;)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Handles</span
+            ><span class="cx-val">Negative weights</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ MST ═══ -->
+        <h2 class="h1" id="mst">&#127795; Minimum Spanning Tree (MST)</h2>
+        <p>
+          An MST connects all V nodes using exactly V&minus;1 edges with the
+          minimum total weight. Two classic algorithms, both greedily build the
+          MST.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Strategy</th>
+              <th>Data Structure</th>
+              <th>Time</th>
+              <th>Best When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Kruskal's</strong></td>
+              <td>Sort edges, add if no cycle</td>
+              <td>Union-Find</td>
+              <td>O(E log E)</td>
+              <td>Sparse graphs</td>
+            </tr>
+            <tr>
+              <td><strong>Prim's</strong></td>
+              <td>Grow MST from a node, always add cheapest reachable edge</td>
+              <td>Min-Heap</td>
+              <td>O(E log V)</td>
+              <td>Dense graphs</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="h3" id="kruskal">Kruskal&apos;s Algorithm</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Kruskal's MST (Union-Find)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// edges: {weight, u, v}; sort by weight</span>
+<span class="kw">int</span> <span class="fn">kruskal</span>(<span class="kw">int</span>[][] edges, <span class="kw">int</span> n) {
+    <span class="cls">Arrays</span>.<span class="fn">sort</span>(edges, (a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
+    <span class="kw">int</span>[] parent = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) parent[i] = i;
+
+    <span class="kw">int</span> cost = <span class="num">0</span>, edgesUsed = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span>[] e : edges) {
+        <span class="kw">int</span> w = e[<span class="num">0</span>], u = e[<span class="num">1</span>], v = e[<span class="num">2</span>];
+        <span class="kw">int</span> pu = <span class="fn">find</span>(parent, u), pv = <span class="fn">find</span>(parent, v);
+        <span class="kw">if</span> (pu != pv) {  <span class="cm">// different components — safe to add</span>
+            parent[pu] = pv;
+            cost += w;
+            <span class="kw">if</span> (++edgesUsed == n - <span class="num">1</span>) <span class="kw">break</span>;
+        }
+    }
+    <span class="ret">return</span> edgesUsed == n - <span class="num">1</span> ? cost : -<span class="num">1</span>;  <span class="cm">// -1 if not fully connected</span>
+}
+
+<span class="kw">int</span> <span class="fn">find</span>(<span class="kw">int</span>[] parent, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (parent[x] != x) parent[x] = <span class="fn">find</span>(parent, parent[x]);  <span class="cm">// path compression</span>
+    <span class="ret">return</span> parent[x];
+}</pre>
+        </div>
+
+        <h3 class="h3" id="prim">Prim&apos;s Algorithm</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Prim's MST (min-heap)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> <span class="fn">prim</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj, <span class="kw">int</span> n) {
+    <span class="kw">boolean</span>[] inMST = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+    <span class="cm">// min-heap: {edge_weight, node}</span>
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
+    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>, <span class="num">0</span>});  <span class="cm">// start from node 0</span>
+    <span class="kw">int</span> cost = <span class="num">0</span>;
+
+    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
+        <span class="kw">int</span>[] cur = pq.<span class="fn">poll</span>();
+        <span class="kw">int</span> w = cur[<span class="num">0</span>], node = cur[<span class="num">1</span>];
+        <span class="kw">if</span> (inMST[node]) <span class="kw">continue</span>;
+        inMST[node] = <span class="kw">true</span>;
+        cost += w;
+        <span class="kw">for</span> (<span class="kw">int</span>[] edge : adj.<span class="fn">get</span>(node))
+            <span class="kw">if</span> (!inMST[edge[<span class="num">0</span>]]) pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{edge[<span class="num">1</span>], edge[<span class="num">0</span>]});
+    }
+    <span class="ret">return</span> cost;
+}
+<span class="cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
+        </div>
+
+        <hr />
+
+        <!-- ═══ BIPARTITE ═══ -->
+        <h2 class="h1" id="bipartite">&#127800; Bipartite Graphs</h2>
+        <p>
+          A graph is <strong>bipartite</strong> if its nodes can be split into
+          two groups such that every edge crosses between groups (no edge within
+          a group). Equivalently: the graph is 2-colorable, equivalently:
+          contains no odd-length cycle.
+        </p>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>Check: BFS 2-coloring.</strong> Assign alternating colors
+            (0/1) during BFS. If you ever try to color a node the same color as
+            its neighbour, the graph is not bipartite.
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Bipartite Check (BFS coloring)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">boolean</span> <span class="fn">isBipartite</span>(<span class="kw">int</span>[][] graph) {
+    <span class="kw">int</span> n = graph.length;
+    <span class="kw">int</span>[] color = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.<span class="fn">fill</span>(color, -<span class="num">1</span>);
+
+    <span class="kw">for</span> (<span class="kw">int</span> start = <span class="num">0</span>; start &lt; n; start++) {
+        <span class="kw">if</span> (color[start] != -<span class="num">1</span>) <span class="kw">continue</span>;
+        color[start] = <span class="num">0</span>;
+        <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+        q.<span class="fn">offer</span>(start);
+        <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+            <span class="kw">int</span> node = q.<span class="fn">poll</span>();
+            <span class="kw">for</span> (<span class="kw">int</span> nei : graph[node]) {
+                <span class="kw">if</span> (color[nei] == -<span class="num">1</span>) {
+                    color[nei] = <span class="num">1</span> - color[node];
+                    q.<span class="fn">offer</span>(nei);
+                } <span class="kw">else if</span> (color[nei] == color[node]) {
+                    <span class="ret">return</span> <span class="kw">false</span>;  <span class="cm">// conflict</span>
+                }
+            }
+        }
+    }
+    <span class="ret">return</span> <span class="kw">true</span>;
+}</pre>
+        </div>
+
+        <hr />
+
+        <!-- ═══ TARJAN'S BRIDGES ═══ -->
+        <h2 class="h1" id="tarjan">&#128291; Tarjan&apos;s Bridge Finding</h2>
+        <p>
+          A <strong>bridge</strong> is an edge whose removal disconnects the
+          graph. Tarjan&apos;s algorithm finds all bridges in O(V&nbsp;+&nbsp;E)
+          using two DFS arrays: <code>disc[]</code> (discovery time) and
+          <code>low[]</code> (lowest discovery time reachable from the subtree
+          <em>without</em> using the parent edge).
+        </p>
+
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Key insight:</strong> Edge <code>(u,&nbsp;v)</code> is a
+            bridge when the subtree rooted at <code>v</code> cannot "look back"
+            past <code>u</code> without this edge. Formally:
+            <code>low[v] &gt; disc[u]</code>. If
+            <code>low[v] &le; disc[u]</code>, there is a back-edge in the
+            subtree that bypasses the edge &mdash; removing it won&apos;t
+            disconnect anything.
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Tarjan&apos;s Bridge Finding (LC
+              1192)</span
+            >
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] disc, low;
+<span class="kw">int</span> timer = <span class="num">0</span>;
+<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; bridges = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">criticalConnections</span>(<span class="kw">int</span> n, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; connections) {
+    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) adj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
+    <span class="kw">for</span> (<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; e : connections) {
+        adj.<span class="fn">get</span>(e.<span class="fn">get</span>(<span class="num">0</span>)).<span class="fn">add</span>(e.<span class="fn">get</span>(<span class="num">1</span>));
+        adj.<span class="fn">get</span>(e.<span class="fn">get</span>(<span class="num">1</span>)).<span class="fn">add</span>(e.<span class="fn">get</span>(<span class="num">0</span>));
+    }
+    disc = <span class="kw">new</span> <span class="kw">int</span>[n]; low = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.<span class="fn">fill</span>(disc, -<span class="num">1</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (disc[i] == -<span class="num">1</span>) <span class="fn">dfs</span>(adj, i, -<span class="num">1</span>);
+    <span class="ret">return</span> bridges;
+}
+
+<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> u, <span class="kw">int</span> parent) {
+    disc[u] = low[u] = timer++;
+    <span class="kw">for</span> (<span class="kw">int</span> v : adj.<span class="fn">get</span>(u)) {
+        <span class="kw">if</span> (v == parent) <span class="kw">continue</span>;           <span class="cm">// skip the edge we came from</span>
+        <span class="kw">if</span> (disc[v] == -<span class="num">1</span>) {                  <span class="cm">// tree edge — recurse</span>
+            <span class="fn">dfs</span>(adj, v, u);
+            low[u] = <span class="cls">Math</span>.<span class="fn">min</span>(low[u], low[v]);
+            <span class="kw">if</span> (low[v] &gt; disc[u])             <span class="cm">// bridge condition</span>
+                bridges.<span class="fn">add</span>(<span class="cls">Arrays</span>.<span class="fn">asList</span>(u, v));
+        } <span class="kw">else</span> {                              <span class="cm">// back edge — update low</span>
+            low[u] = <span class="cls">Math</span>.<span class="fn">min</span>(low[u], disc[v]);
+        }
+    }
+}
+<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>Multigraph caveat:</strong> The parent-skip
+            <code>if&nbsp;(v&nbsp;==&nbsp;parent)</code> fails when there are
+            parallel edges (e.g., two edges between u and v). For multigraphs,
+            track the parent <em>edge index</em> instead of the parent node.
+          </div>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V + E)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ PATTERNS SUMMARY ═══ -->
+        <h2 class="h1" id="patterns">&#127919; Pattern Decision Guide</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Signal in Problem</th>
+              <th>Pattern</th>
+              <th>Key Tool</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>"Shortest path" — unweighted / unit weight</td>
+              <td>BFS</td>
+              <td>Queue + visited[]</td>
+            </tr>
+            <tr>
+              <td>"Shortest path" — weighted, non-negative</td>
+              <td>Dijkstra</td>
+              <td>Min-heap PQ</td>
+            </tr>
+            <tr>
+              <td>"Shortest path" — negative weights or K-stop limit</td>
+              <td>Bellman-Ford</td>
+              <td>Edge list, V&minus;1 rounds</td>
+            </tr>
+            <tr>
+              <td>"Connected components", "number of islands"</td>
+              <td>DFS flood fill</td>
+              <td>visited[] + recursive DFS</td>
+            </tr>
+            <tr>
+              <td>"Course prerequisites", "task order", "dependency"</td>
+              <td>Topological Sort</td>
+              <td>Kahn's (in-degree) or DFS post-order</td>
+            </tr>
+            <tr>
+              <td>
+                "Can you complete all courses" = detect cycle in directed graph
+              </td>
+              <td>Cycle Detection</td>
+              <td>3-color DFS or Kahn's (idx &lt; n)</td>
+            </tr>
+            <tr>
+              <td>"Minimum cost to connect all nodes"</td>
+              <td>MST</td>
+              <td>Kruskal's (edges) or Prim's (heap)</td>
+            </tr>
+            <tr>
+              <td>"Two groups", "no conflict", "bipartite"</td>
+              <td>BFS 2-coloring</td>
+              <td>color[] alternating</td>
+            </tr>
+            <tr>
+              <td>"All-pairs shortest path" (small V)</td>
+              <td>Floyd-Warshall</td>
+              <td>3-loop DP, O(V&sup3;)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout green">
+          <span class="callout-icon">&#9989;</span>
+          <div class="callout-body">
+            <strong>The 4-question framework for any graph problem:</strong
+            ><br />
+            1. <strong>What are the nodes?</strong> (cells, words, courses,
+            …)<br />
+            2. <strong>What are the edges?</strong> (adjacent cells, one-letter
+            diff, prerequisite, …)<br />
+            3. <strong>Directed or undirected? Weighted?</strong><br />
+            4. <strong>What am I computing?</strong> (shortest path,
+            reachability, order, connectivity)
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ PRACTICE ═══ -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+
+        <!-- PROB 01 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 01 &middot;
+                <a
+                  href="https://leetcode.com/problems/number-of-islands/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 200</a
+                >
+              </div>
+              <div class="prob-title">Number of Islands</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">DFS Flood Fill</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a 2D grid of <code>'1'</code> (land) and
+                <code>'0'</code> (water), count the number of islands. An island
+                is surrounded by water and connected horizontally/vertically.
+              </p>
+              <div class="iobox">
+                Input: [["1","1","0"],["0","1","0"],["0","0","1"]] Output: 2
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                DFS from each unvisited <code>'1'</code>, marking all connected
+                land cells as <code>'0'</code> (sinking the island). Each time
+                you start a new DFS, increment the count. The grid itself acts
+                as the visited array.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 200</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">numIslands</span>(<span class="kw">char</span>[][] grid) {
+    <span class="kw">int</span> count = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; grid.length; r++)
+        <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; grid[<span class="num">0</span>].length; c++)
+            <span class="kw">if</span> (grid[r][c] == <span class="str">'1'</span>) { <span class="fn">dfs</span>(grid, r, c); count++; }
+    <span class="ret">return</span> count;
+}
+<span class="kw">void</span> <span class="fn">dfs</span>(<span class="kw">char</span>[][] g, <span class="kw">int</span> r, <span class="kw">int</span> c) {
+    <span class="kw">if</span> (r &lt; <span class="num">0</span> || r &gt;= g.length || c &lt; <span class="num">0</span> || c &gt;= g[<span class="num">0</span>].length || g[r][c] != <span class="str">'1'</span>) <span class="ret">return</span>;
+    g[r][c] = <span class="str">'0'</span>;
+    <span class="fn">dfs</span>(g,r+<span class="num">1</span>,c); <span class="fn">dfs</span>(g,r-<span class="num">1</span>,c); <span class="fn">dfs</span>(g,r,c+<span class="num">1</span>); <span class="fn">dfs</span>(g,r,c-<span class="num">1</span>);
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O(m&times;n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(m&times;n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 02 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/rotting-oranges/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 994</a
+                >
+              </div>
+              <div class="prob-title">Rotting Oranges</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Multi-Source BFS</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Grid contains <code>0</code> (empty), <code>1</code> (fresh
+                orange), <code>2</code> (rotten). Each minute a rotten orange
+                rots adjacent fresh oranges. Return the minimum minutes to rot
+                all, or -1 if impossible.
+              </p>
+              <div class="iobox">
+                Input: [[2,1,1],[1,1,0],[0,1,1]] Output: 4
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Seed <em>all</em> initially rotten oranges into the BFS queue at
+                time 0. BFS propagates one level (= one minute) per round. After
+                BFS completes, if any <code>1</code> remains in the grid, return
+                -1.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 994</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">orangesRotting</span>(<span class="kw">int</span>[][] grid) {
+    <span class="kw">int</span> rows = grid.length, cols = grid[<span class="num">0</span>].length, fresh = <span class="num">0</span>, mins = <span class="num">0</span>;
+    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> r=<span class="num">0</span>; r&lt;rows; r++) <span class="kw">for</span> (<span class="kw">int</span> c=<span class="num">0</span>; c&lt;cols; c++) {
+        <span class="kw">if</span> (grid[r][c]==<span class="num">2</span>) q.offer(<span class="kw">new</span> <span class="kw">int</span>[]{r,c});
+        <span class="kw">else if</span> (grid[r][c]==<span class="num">1</span>) fresh++;
+    }
+    <span class="kw">int</span>[][] dirs = {{<span class="num">1</span>,<span class="num">0</span>},{-<span class="num">1</span>,<span class="num">0</span>},{<span class="num">0</span>,<span class="num">1</span>},{<span class="num">0</span>,-<span class="num">1</span>}};
+    <span class="kw">while</span> (!q.isEmpty() &amp;&amp; fresh&gt;<span class="num">0</span>) {
+        mins++;
+        <span class="kw">for</span> (<span class="kw">int</span> sz=q.size(); sz&gt;<span class="num">0</span>; sz--) {
+            <span class="kw">int</span>[] cur=q.poll();
+            <span class="kw">for</span> (<span class="kw">int</span>[] d:dirs) {
+                <span class="kw">int</span> nr=cur[<span class="num">0</span>]+d[<span class="num">0</span>], nc=cur[<span class="num">1</span>]+d[<span class="num">1</span>];
+                <span class="kw">if</span> (nr&gt;=<span class="num">0</span>&amp;&amp;nr&lt;rows&amp;&amp;nc&gt;=<span class="num">0</span>&amp;&amp;nc&lt;cols&amp;&amp;grid[nr][nc]==<span class="num">1</span>) {
+                    grid[nr][nc]=<span class="num">2</span>; fresh--; q.offer(<span class="kw">new</span> <span class="kw">int</span>[]{nr,nc});
+                }
+            }
+        }
+    }
+    <span class="ret">return</span> fresh==<span class="num">0</span> ? mins : -<span class="num">1</span>;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O(m&times;n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(m&times;n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 03 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot;
+                <a
+                  href="https://leetcode.com/problems/course-schedule/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 207</a
+                >
+              </div>
+              <div class="prob-title">Course Schedule</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Topological Sort / Cycle Detection</span
+                >
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                There are <code>n</code> courses (0 to n-1).
+                <code>prerequisites[i] = [a, b]</code> means you must take
+                <code>b</code> before <code>a</code>. Return true if it is
+                possible to finish all courses.
+              </p>
+              <div class="iobox">
+                Input: n=2, prerequisites=[[1,0]] Output: true Input: n=2,
+                prerequisites=[[1,0],[0,1]] Output: false (cycle)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Build a directed graph. A cycle means a course depends on itself
+                (directly or indirectly) &mdash; impossible. Run Kahn&apos;s
+                BFS: if the number of processed nodes equals <code>n</code>, no
+                cycle.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 207</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">boolean</span> <span class="fn">canFinish</span>(<span class="kw">int</span> n, <span class="kw">int</span>[][] pre) {
+    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="kw">int</span>[] indeg = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;n; i++) adj.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
+    <span class="kw">for</span> (<span class="kw">int</span>[] p : pre) { adj.get(p[<span class="num">1</span>]).add(p[<span class="num">0</span>]); indeg[p[<span class="num">0</span>]]++; }
+    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;n; i++) <span class="kw">if</span> (indeg[i]==<span class="num">0</span>) q.offer(i);
+    <span class="kw">int</span> done = <span class="num">0</span>;
+    <span class="kw">while</span> (!q.isEmpty()) {
+        <span class="kw">int</span> node = q.poll(); done++;
+        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.get(node)) <span class="kw">if</span> (--indeg[nei]==<span class="num">0</span>) q.offer(nei);
+    }
+    <span class="ret">return</span> done == n;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O(V+E)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(V+E)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot;
+                <a
+                  href="https://leetcode.com/problems/network-delay-time/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 743</a
+                >
+              </div>
+              <div class="prob-title">Network Delay Time</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Dijkstra</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Uber</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Weighted directed graph with <code>n</code> nodes. Signal starts
+                from node <code>k</code>. Return the time for all nodes to
+                receive the signal, or -1 if any node is unreachable.
+              </p>
+              <div class="iobox">
+                Input: times=[[2,1,1],[2,3,1],[3,4,1]], n=4, k=2 Output: 2
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                Dijkstra from node <code>k</code>. Answer =
+                <code>max(dist[])</code>. If any dist remains infinity, return
+                -1. Classic single-source shortest path on a weighted graph.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 743</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">networkDelayTime</span>(<span class="kw">int</span>[][] times, <span class="kw">int</span> n, <span class="kw">int</span> k) {
+    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;=n; i++) adj.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
+    <span class="kw">for</span> (<span class="kw">int</span>[] t:times) adj.get(t[<span class="num">0</span>]).add(<span class="kw">new</span> <span class="kw">int</span>[]{t[<span class="num">1</span>],t[<span class="num">2</span>]});
+    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n+<span class="num">1</span>];
+    <span class="cls">Arrays</span>.fill(dist, <span class="cls">Integer</span>.MAX_VALUE); dist[k] = <span class="num">0</span>;
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>,k});
+    <span class="kw">while</span> (!pq.isEmpty()) {
+        <span class="kw">int</span>[] cur=pq.poll();
+        <span class="kw">if</span> (cur[<span class="num">0</span>]&gt;dist[cur[<span class="num">1</span>]]) <span class="kw">continue</span>;
+        <span class="kw">for</span> (<span class="kw">int</span>[] e:adj.get(cur[<span class="num">1</span>]))
+            <span class="kw">if</span> (dist[cur[<span class="num">1</span>]]+e[<span class="num">1</span>]&lt;dist[e[<span class="num">0</span>]]) { dist[e[<span class="num">0</span>]]=dist[cur[<span class="num">1</span>]]+e[<span class="num">1</span>]; pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{dist[e[<span class="num">0</span>]],e[<span class="num">0</span>]}); }
+    }
+    <span class="kw">int</span> ans = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">1</span>; i&lt;=n; i++) { <span class="kw">if</span> (dist[i]==<span class="cls">Integer</span>.MAX_VALUE) <span class="ret">return</span> -<span class="num">1</span>; ans=<span class="cls">Math</span>.max(ans,dist[i]); }
+    <span class="ret">return</span> ans;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O((V+E) log V)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(V+E)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/min-cost-to-connect-all-points/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 1584</a
+                >
+              </div>
+              <div class="prob-title">Min Cost to Connect All Points</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">MST &mdash; Prim's</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given <code>n</code> points on a 2D plane, return the minimum
+                cost to connect all points. Cost of connecting two points =
+                Manhattan distance. All pairs are implicitly edges.
+              </p>
+              <div class="iobox">
+                Input: [[0,0],[2,2],[3,10],[5,2],[7,0]] Output: 20
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Intuition</div>
+              <p>
+                MST on a complete graph where edge weight = Manhattan distance.
+                Prim&apos;s is efficient here: maintain a min-heap of (cost,
+                node). The <code>inMST[]</code> flag replaces the visited check.
+                Greedily add the cheapest reachable edge.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <div class="toggle-arrow">&#9654;</div>
+                Solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <span class="code-lang">&#9749; Java &middot; LC 1584</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="kw">int</span> <span class="fn">minCostConnectPoints</span>(<span class="kw">int</span>[][] pts) {
+    <span class="kw">int</span> n = pts.length;
+    <span class="kw">boolean</span>[] inMST = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+    <span class="kw">int</span>[] minDist = <span class="kw">new</span> <span class="kw">int</span>[n];
+    <span class="cls">Arrays</span>.fill(minDist, <span class="cls">Integer</span>.MAX_VALUE); minDist[<span class="num">0</span>] = <span class="num">0</span>;
+    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+    pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>,<span class="num">0</span>});
+    <span class="kw">int</span> cost = <span class="num">0</span>;
+    <span class="kw">while</span> (!pq.isEmpty()) {
+        <span class="kw">int</span>[] cur = pq.poll();
+        <span class="kw">if</span> (inMST[cur[<span class="num">1</span>]]) <span class="kw">continue</span>;
+        inMST[cur[<span class="num">1</span>]] = <span class="kw">true</span>; cost += cur[<span class="num">0</span>];
+        <span class="kw">for</span> (<span class="kw">int</span> j=<span class="num">0</span>; j&lt;n; j++) {
+            <span class="kw">if</span> (inMST[j]) <span class="kw">continue</span>;
+            <span class="kw">int</span> d = <span class="cls">Math</span>.abs(pts[cur[<span class="num">1</span>]][<span class="num">0</span>]-pts[j][<span class="num">0</span>]) + <span class="cls">Math</span>.abs(pts[cur[<span class="num">1</span>]][<span class="num">1</span>]-pts[j][<span class="num">1</span>]);
+            <span class="kw">if</span> (d &lt; minDist[j]) { minDist[j]=d; pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{d,j}); }
+        }
+    }
+    <span class="ret">return</span> cost;
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O(n² log n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ ASSIGNMENT ═══ -->
+        <h2 class="h1" id="assignment">
+          &#128221; Assignment &mdash; Company Interview Problems
+        </h2>
+        <div class="callout orange" style="margin-bottom: 18px">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Topic 17 Assignment &mdash; 30 Problems (8 Easy &middot; 15
+              Medium &middot; 7 Hard)</strong
+            ><br />
+            All 6 graph patterns covered: BFS, DFS Flood Fill, Cycle Detection,
+            Topological Sort, Dijkstra, MST. Every problem tagged with pattern,
+            company, and difficulty.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture17/Assignment.md"
+              style="
+                display: inline-block;
+                margin-top: 6px;
+                padding: 6px 16px;
+                background: var(--accent);
+                color: #fff;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+              "
+              >&#128196; Open Assignment.md &rarr;</a
+            >
+          </div>
+        </div>
+        <hr />
+
+        <!-- ═══ CHECKLIST ═══ -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>
+          Check each item before advancing to Lecture 18 (Union-Find). Be honest
+          &mdash; these are your interview readiness criteria for graphs.
+        </p>
+        <div style="margin: 14px 0">
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can build an adjacency list from a given edge list in Java
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can write BFS from memory &mdash; queue, visited[], level tracking
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can write DFS from memory &mdash; both recursive and iterative
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Understand multi-source BFS and can seed multiple start nodes
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can detect cycles: 3-color DFS for directed, parent-skip for
+              undirected
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can implement Kahn&apos;s topological sort and detect cycle via
+              <code>idx &lt; n</code>
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can implement Dijkstra&apos;s with min-heap and stale-entry skip
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Understand when to use Bellman-Ford vs Dijkstra (negative weights,
+              K-stop constraint)
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can implement Kruskal&apos;s MST with Union-Find path compression
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can check bipartiteness with BFS 2-coloring
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Know Floyd-Warshall: when to use it (all-pairs, small V) and the
+              3-loop structure
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Understand Tarjan&apos;s bridge finding: disc[], low[], and the
+              bridge condition <code>low[v] &gt; disc[u]</code>
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Can apply the 4-question framework to classify any graph problem
+              in under 30 seconds
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              Have completed all 30 assignment problems and can identify the
+              pattern within 30 seconds
+            </div>
+          </div>
+        </div>
+
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">&#11088;</span>
+          <div class="callout-body">
+            <strong
+              >You are ready for Topic 18: Union-Find (Disjoint Set
+              Union)</strong
+            ><br />
+            DSU is the data structure Kruskal&apos;s MST relies on. It answers
+            &ldquo;are these two nodes in the same component?&rdquo; in near
+            O(1). After Union-Find, you will revisit Kruskal&apos;s with the
+            full DSU implementation &mdash; no more bare <code>find()</code>
+            stubs.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div
+          style="
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+          "
+        >
+          <a
+            href="../Lecture16/lecture16_notes.html"
+            style="
+              color: var(--text2);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              text-decoration: none;
+            "
+            >&#8592; Topic 16: Heaps &amp; Priority Queues</a
+          >
+          <span style="color: var(--text3); font-size: 13px"
+            >Topic 17 of 30 &mdash; Phase 3</span
+          >
+          <a
+            href="../Lecture18/lecture18_notes.html"
+            style="
+              color: var(--accent);
+              font-weight: 600;
+              font-size: 14px;
+              padding: 8px 16px;
+              background: var(--accent-bg);
+              border: 1px solid var(--accent);
+              border-radius: 8px;
+              text-decoration: none;
+            "
+            >Topic 18: Union-Find &#8594;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Dark Mode Toggle
+      function toggleDark() {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.removeAttribute("data-theme");
+          btn.innerText = "🌙 Dark";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.innerText = "☀️ Light";
+        }
+      }
+
+      // 2. Scroll-based progress + TOC highlighting
+      document.getElementById("main").addEventListener("scroll", function () {
+        const el = this;
+        const scrollPct =
+          (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+        if (document.getElementById("progressFill")) {
+          const fillPct = scrollPct > 98.5 ? 100 : scrollPct;
+          document.getElementById("progressFill").style.width = fillPct + "%";
+        }
+        const sections = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        let current = "";
+        sections.forEach((s) => {
+          const top = s.getBoundingClientRect().top;
+          if (top < 150) current = s.id;
+        });
+        document.querySelectorAll(".toc-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.getAttribute("href") === "#" + current)
+            item.classList.add("active");
+        });
+      });
+
+      // 3. Problem card toggle
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy code
+      function copyCode(btn) {
+        const code = btn.closest(".code-block").querySelector("pre").innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const orig = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = orig;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        });
+      }
+    </script>
+  </body>
+</html>
