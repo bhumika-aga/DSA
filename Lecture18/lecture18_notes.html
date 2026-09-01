@@ -1,0 +1,3160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 18 — Two Pointers &amp; Sliding Window</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        flex-shrink: 0;
+        padding-top: 20px;
+      }
+
+      .sb-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 4px 0 12px;
+      }
+
+      .sb-foot {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 10px 0 14px;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 56px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Course-wide additions (cover every class used in any lecture) ── */
+      .footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 8px;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+
+      .stack-vis {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 14px 0;
+      }
+
+      .stack-frame {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: var(--text2);
+      }
+
+      .tag-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .cx-badge.time {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .cx-badge.space {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .gr {
+        color: #22863a;
+      }
+
+      [data-theme="dark"] .gr {
+        color: #7ee787;
+      }
+
+      /* ── Pseudocode blocks — language-neutral algorithm statements ── */
+      .code-block.pseudo {
+        border-color: var(--teal);
+      }
+
+      .code-block.pseudo .code-header {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      .code-block.pseudo pre {
+        font-family: var(--mono);
+      }
+
+      .pc-kw {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .pc-cm {
+        color: var(--text3);
+        font-style: italic;
+      }
+
+      /* ── Learning objectives ── */
+      .objectives {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0 26px;
+      }
+
+      .objectives-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .objectives ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .objectives li {
+        font-size: 14px;
+        color: var(--text2);
+        margin: 5px 0;
+      }
+
+      /* ── Graded hints on practice problems ── */
+      details.hint {
+        border-color: var(--accent-bg);
+        margin: 8px 0;
+      }
+
+      details.hint summary {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        padding: 9px 14px;
+      }
+
+      details.hint[open] summary {
+        border-bottom: 1px solid var(--border);
+      }
+
+      details.hint .details-body {
+        font-size: 13.5px;
+        color: var(--text2);
+      }
+
+      details.hint .details-body p {
+        margin: 0;
+      }
+
+      .tag-concept {
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border2);
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+
+        .breadcrumb {
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .topbar-right {
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .topbar-right > span {
+          display: none;
+        }
+
+        .progress-bar {
+          width: 56px;
+        }
+      }
+
+      /* ── Bottom-of-page navigation ── */
+      .page-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text2);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+
+      .page-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .page-nav a.next {
+        margin-left: auto;
+        text-align: right;
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      @media (max-width: 560px) {
+        .page-nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .page-nav a,
+        .page-nav a.next {
+          margin-left: 0;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Two Pointers &amp; Sliding Window</div>
+        <div class="sb-meta">
+          Lecture 18 of 38 &middot; Phase 3 &mdash; Core Patterns
+        </div>
+      </div>
+      <div class="sb-scroll">
+        <div class="toc-label">On this page</div>
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127757;</span>Introduction</a
+        >
+        <a class="toc-item" href="#decide"
+          ><span class="toc-icon">&#129517;</span>Decision Guide</a
+        >
+        <a class="toc-item" href="#opposite"
+          ><span class="toc-icon">&#8596;&#65039;</span>Opposite Ends</a
+        >
+        <a class="toc-item toc-sub" href="#os-3sum">3Sum &amp; 4Sum</a>
+        <a class="toc-item toc-sub" href="#os-water">Both Ends Decide</a>
+        <a class="toc-item" href="#fixed"
+          ><span class="toc-icon">&#129695;</span>Fixed Window</a
+        >
+        <a class="toc-item" href="#variable"
+          ><span class="toc-icon">&#127898;&#65039;</span>Variable Window</a
+        >
+        <a class="toc-item toc-sub" href="#var-longest">Longest</a>
+        <a class="toc-item toc-sub" href="#var-shortest">Shortest</a>
+        <a class="toc-item" href="#same-dir"
+          ><span class="toc-icon">&#128034;</span>Same Direction</a
+        >
+        <a class="toc-item" href="#atmost"
+          ><span class="toc-icon">&#127919;</span>At-Most Trick</a
+        >
+        <a class="toc-item" href="#complexity"
+          ><span class="toc-icon">&#9201;</span>Complexity &amp; Bugs</a
+        >
+        <a class="toc-item" href="#practice"
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+        >
+        <a class="toc-item" href="#assignment"
+          ><span class="toc-icon">&#128221;</span>Assignment</a
+        >
+        <a class="toc-item" href="#checklist"
+          ><span class="toc-icon">&#9989;</span>Checklist</a
+        >
+      </div>
+      <div class="sb-foot">
+        <div class="toc-label">Navigate</div>
+        <a class="toc-item" href="../Lecture17/lecture17_notes.html"
+          >&larr; Lecture 17 &middot; Graphs</a
+        >
+        <a class="toc-item" href="../dsa_study_plan.html"
+          >&rarr; Lecture 19 &middot; not written yet</a
+        >
+        <a class="toc-item" href="../dsa_study_plan.html"
+          >&uarr; All 38 lectures</a
+        >
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../dsa_study_plan.html#phase3">Phase 3</a
+          ><span>&rsaquo;</span>
+          <span>Lecture 18 &mdash; Two Pointers &amp; Sliding Window</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#127919;</span>
+          <h1 class="page-title">Two Pointers &amp; Sliding Window</h1>
+          <p class="page-sub">
+            &ldquo;Stop re-reading the same elements. Every pattern here is one
+            idea &mdash; touch each item a constant number of times, and
+            O(n&sup2;) collapses to O(n).&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 18 of 38</span>
+            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip yellow">&#9201; 6 days</span>
+            <span class="meta-chip green">&#127919; 30 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              Uber</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            You have already met these pointers piecemeal &mdash; in Arrays, in
+            Searching, in Linked Lists. This lecture puts them in one place so
+            they stop being five tricks and become one decision. Between them,
+            two pointers and sliding windows cover a very large slice of the
+            array and string questions asked at every company on this page, and
+            they are the difference between a solution that passes and one that
+            times out.
+          </div>
+        </div>
+
+        <div class="objectives">
+          <div class="objectives-title">By the end of this lecture you can</div>
+          <ul>
+            <li>
+              Consolidate every two-pointer and sliding-window pattern into one
+              mental model
+            </li>
+            <li>
+              Recognise which shape a problem needs within twenty seconds of
+              reading it
+            </li>
+            <li>
+              Write the expand/shrink template from memory, for both longest and
+              shortest
+            </li>
+            <li>
+              Handle multi-pointer problems: 3Sum, 4Sum and beyond, including
+              deduplication
+            </li>
+            <li>
+              Use the at-most trick to count &ldquo;exactly k&rdquo; without a
+              second algorithm
+            </li>
+          </ul>
+        </div>
+
+        <h2 class="h1" id="decide">&#129517; The Decision Guide</h2>
+        <p>
+          Everything in this lecture is one idea:
+          <strong>stop re-reading the same elements</strong>. A brute-force pair
+          loop reads every element n times. Two pointers and sliding windows
+          read each element a constant number of times, which turns O(n&sup2;)
+          into O(n). The only skill worth drilling is picking the right shape in
+          the first twenty seconds.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>What the problem says</th>
+                <th>Shape to reach for</th>
+                <th>Signature move</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&ldquo;sorted array&rdquo; + find a pair / triple</td>
+                <td><strong>Opposite ends</strong></td>
+                <td>lo = 0, hi = n-1, move the one that helps</td>
+              </tr>
+              <tr>
+                <td>&ldquo;subarray of size exactly k&rdquo;</td>
+                <td><strong>Fixed window</strong></td>
+                <td>add right, remove left, every step</td>
+              </tr>
+              <tr>
+                <td>
+                  &ldquo;longest / shortest subarray such that &hellip;&rdquo;
+                </td>
+                <td><strong>Variable window</strong></td>
+                <td>expand right, shrink left while invalid</td>
+              </tr>
+              <tr>
+                <td>&ldquo;in-place, keep order, drop some&rdquo;</td>
+                <td><strong>Same direction</strong></td>
+                <td>slow writes, fast reads</td>
+              </tr>
+              <tr>
+                <td>&ldquo;exactly k distinct / exactly k odds&rdquo;</td>
+                <td><strong>At-most trick</strong></td>
+                <td>atMost(k) &minus; atMost(k&minus;1)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>The one precondition people forget</strong><br />Sliding
+            windows need the answer to be <em>monotonic</em> as the window grows
+            &mdash; adding an element must never make an invalid window valid
+            again. That holds for positive numbers, distinct-character counts
+            and frequency caps. It <strong>breaks</strong> the moment negatives
+            enter, which is why <em>Subarray Sum Equals K</em> is a prefix-sum
+            problem, not a window problem.
+          </div>
+        </div>
+        <h2 class="h1" id="opposite">
+          &#8596;&#65039; Opposite Ends &mdash; Converging Pointers
+        </h2>
+        <p>
+          Start wide, walk inwards. Each step throws away a candidate you can
+          prove is useless, so n steps settle the whole problem. This only works
+          when the array is <strong>sorted</strong>, or when the quantity you
+          are optimising depends on the two ends alone.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Converging Pointers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// The array is sorted, so the sum moves predictably:</span>
+<span class="pc-cm">//   move lo right  -> sum increases</span>
+<span class="pc-cm">//   move hi left   -> sum decreases</span>
+lo <span class="pc-kw">&larr;</span> 0
+hi <span class="pc-kw">&larr;</span> length(a) - 1
+
+<span class="pc-kw">while</span> lo &lt; hi:
+    sum <span class="pc-kw">&larr;</span> a[lo] + a[hi]
+    <span class="pc-kw">if</span> sum = target: <span class="pc-kw">return</span> (lo, hi)
+    <span class="pc-kw">if</span> sum &lt; target: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// need more</span>
+    <span class="pc-kw">else</span>:              hi <span class="pc-kw">&larr;</span> hi - 1     <span class="pc-cm">// need less</span>
+
+<span class="pc-kw">return</span> NOT_FOUND</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Two Sum II (LC 167)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = a.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo &lt; hi) {
+        <span class="kw">int</span> sum = a[lo] + a[hi];
+        <span class="kw">if</span> (sum == target) <span class="ret">return</span> <span class="kw">new</span> <span class="kw">int</span>[] { lo + <span class="num">1</span>, hi + <span class="num">1</span> };
+        <span class="kw">if</span> (sum &lt; target) lo++;
+        <span class="kw">else</span> hi--;
+    }
+    <span class="ret">return</span> <span class="kw">new</span> <span class="kw">int</span>[] { -<span class="num">1</span>, -<span class="num">1</span> };
+}</pre>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val"
+              >O(n) &mdash; each index visited once</span
+            ></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(1)</span></span
+          >
+        </div>
+        <h3 class="h3" id="os-3sum">Scaling Up: 3Sum and 4Sum</h3>
+        <p>
+          A k-sum problem is a (k&minus;1)-sum problem with one number pinned.
+          Sort once, fix the outer index, then run the converging pair inside.
+          Each extra level costs one more loop: 3Sum is O(n&sup2;), 4Sum is
+          O(n&sup3;).
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; 3Sum &mdash; anchor + converging
+              pair</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>sort(a)
+result <span class="pc-kw">&larr;</span> empty list
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 3:
+    <span class="pc-kw">if</span> i > 0 <span class="pc-kw">and</span> a[i] = a[i-1]: <span class="pc-kw">continue</span>   <span class="pc-cm">// skip duplicate anchors</span>
+
+    lo <span class="pc-kw">&larr;</span> i + 1;  hi <span class="pc-kw">&larr;</span> n - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        s <span class="pc-kw">&larr;</span> a[i] + a[lo] + a[hi]
+        <span class="pc-kw">if</span> s = 0:
+            record (a[i], a[lo], a[hi])
+            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[lo] = a[lo+1]: lo <span class="pc-kw">&larr;</span> lo + 1
+            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[hi] = a[hi-1]: hi <span class="pc-kw">&larr;</span> hi - 1
+            lo <span class="pc-kw">&larr;</span> lo + 1;  hi <span class="pc-kw">&larr;</span> hi - 1
+        <span class="pc-kw">else if</span> s &lt; 0: lo <span class="pc-kw">&larr;</span> lo + 1
+        <span class="pc-kw">else</span>:          hi <span class="pc-kw">&larr;</span> hi - 1
+
+<span class="pc-kw">return</span> result</pre>
+        </div>
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Duplicates are the whole difficulty</strong><br />3Sum is
+            not hard because of the pointers &mdash; it is hard because the
+            answer must contain no repeated triple. Skip a duplicate
+            <em>anchor</em> before the inner loop, and skip duplicate
+            <em>lo</em>/<em>hi</em> values only after recording a hit. Sorting
+            first is what makes both skips a single comparison.
+          </div>
+        </div>
+        <h3 class="h3" id="os-water">When Both Ends Decide the Answer</h3>
+        <p>
+          Container With Most Water and Trapping Rain Water are not sorted, yet
+          converging pointers still work &mdash; because the quantity being
+          measured (width &times; shorter wall) depends only on the two ends.
+          Always move the pointer at the <em>shorter</em> wall: the width
+          shrinks either way, so moving the taller one can never improve the
+          answer.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Container With Most Water</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Area is width x the SHORTER wall, so the short side is the bottleneck.</span>
+lo <span class="pc-kw">&larr;</span> 0;  hi <span class="pc-kw">&larr;</span> n - 1;  best <span class="pc-kw">&larr;</span> 0
+
+<span class="pc-kw">while</span> lo &lt; hi:
+    best <span class="pc-kw">&larr;</span> max(best, (hi - lo) &times; min(h[lo], h[hi]))
+    <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// only raising the short wall can help</span>
+    <span class="pc-kw">else</span>:               hi <span class="pc-kw">&larr;</span> hi - 1
+
+<span class="pc-kw">return</span> best</pre>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val">O(n)</span></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(1)</span></span
+          >
+        </div>
+        <h2 class="h1" id="fixed">&#129695; Fixed-Size Window</h2>
+        <p>
+          The simplest window: size never changes. Build the first k elements,
+          then for every step add one on the right and drop one on the left. The
+          work per step is O(1), so the whole scan is O(n) no matter how big k
+          is.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Fixed Window &mdash; roll, don't
+              rebuild</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Build the first window, then roll it along.</span>
+sum <span class="pc-kw">&larr;</span> sum of a[0 .. k-1]
+best <span class="pc-kw">&larr;</span> sum
+
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> k <span class="pc-kw">to</span> n - 1:
+    sum <span class="pc-kw">&larr;</span> sum + a[right] - a[right - k]   <span class="pc-cm">// add new, drop old</span>
+    best <span class="pc-kw">&larr;</span> max(best, sum)
+
+<span class="pc-kw">return</span> best</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Maximum Sum Subarray of Size K</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> <span class="fn">maxSum</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> k) {
+    <span class="kw">int</span> sum = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; k; i++) sum += a[i];
+
+    <span class="kw">int</span> best = sum;
+    <span class="kw">for</span> (<span class="kw">int</span> r = k; r &lt; a.length; r++) {
+        sum += a[r] - a[r - k];      <span class="cm">// the whole trick, in one line</span>
+        best = Math.<span class="fn">max</span>(best, sum);
+    }
+    <span class="ret">return</span> best;
+}</pre>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val">O(n)</span></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(1)</span></span
+          >
+        </div>
+
+        <h2 class="h1" id="variable">
+          &#127898;&#65039; Variable-Size Window &mdash; Expand and Shrink
+        </h2>
+        <p>
+          This is the one to memorise. Nearly every &ldquo;longest / shortest
+          subarray such that&hellip;&rdquo; question is the same eight lines:
+          the right pointer always moves forward, and the left pointer only
+          catches up when the window breaks the rule. Each index enters once and
+          leaves once, so it is O(n) even though there are two loops.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Universal Sliding-Window
+              Template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// The universal template. Only the three marked lines change.</span>
+left <span class="pc-kw">&larr;</span> 0
+best <span class="pc-kw">&larr;</span> 0
+state <span class="pc-kw">&larr;</span> empty        <span class="pc-cm">// counts, a sum, a frequency map ...</span>
+
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    add a[right] to state              <span class="pc-cm">// &lt;-- 1. grow</span>
+
+    <span class="pc-kw">while</span> state is invalid:               <span class="pc-cm">// &lt;-- 2. the rule</span>
+        remove a[left] from state
+        left <span class="pc-kw">&larr;</span> left + 1
+
+    best <span class="pc-kw">&larr;</span> max(best, right - left + 1)   <span class="pc-cm">// &lt;-- 3. what you want</span>
+
+<span class="pc-kw">return</span> best
+
+<span class="pc-cm">// Longest valid window  -> record AFTER the while loop (as above).</span>
+<span class="pc-cm">// Shortest valid window -> record INSIDE the while loop, before shrinking,</span>
+<span class="pc-cm">//                          and invert the condition to 'while state is VALID'.</span></pre>
+        </div>
+        <h3 class="h3" id="var-longest">Longest: Record After Shrinking</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Longest Substring Without Repeating
+              Characters (LC 3)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">int</span> <span class="fn">lengthOfLongestSubstring</span>(<span class="cls">String</span> s) {
+    <span class="kw">int</span>[] last = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">128</span>];      <span class="cm">// last index of each char, +1</span>
+    <span class="kw">int</span> left = <span class="num">0</span>, best = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> right = <span class="num">0</span>; right &lt; s.length(); right++) {
+        <span class="kw">char</span> c = s.<span class="fn">charAt</span>(right);
+        left = Math.<span class="fn">max</span>(left, last[c]);   <span class="cm">// jump past the previous copy</span>
+        best = Math.<span class="fn">max</span>(best, right - left + <span class="num">1</span>);
+        last[c] = right + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> best;
+}</pre>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val"
+              >O(n) &mdash; right advances n times, left never rewinds</span
+            ></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(1) &mdash; fixed alphabet</span></span
+          >
+        </div>
+        <h3 class="h3" id="var-shortest">Shortest: Record Before Shrinking</h3>
+        <p>
+          Flip the template and the same machinery finds the <em>smallest</em>
+          window instead. Minimum Window Substring is the canonical hard
+          version: keep a
+          <code>need</code> map and a counter of how many required characters
+          are still missing. The window is valid the moment that counter hits
+          zero.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Minimum Window Substring (LC
+              76)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>need <span class="pc-kw">&larr;</span> frequency map of t
+missing <span class="pc-kw">&larr;</span> length(t)
+left <span class="pc-kw">&larr;</span> 0;  bestLen <span class="pc-kw">&larr;</span> infinity
+
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">if</span> need[s[right]] > 0: missing <span class="pc-kw">&larr;</span> missing - 1
+    need[s[right]] <span class="pc-kw">&larr;</span> need[s[right]] - 1
+
+    <span class="pc-kw">while</span> missing = 0:                  <span class="pc-cm">// window is VALID -> try to shrink</span>
+        <span class="pc-kw">if</span> right - left + 1 &lt; bestLen:
+            bestLen <span class="pc-kw">&larr;</span> right - left + 1;  bestStart <span class="pc-kw">&larr;</span> left
+        need[s[left]] <span class="pc-kw">&larr;</span> need[s[left]] + 1
+        <span class="pc-kw">if</span> need[s[left]] > 0: missing <span class="pc-kw">&larr;</span> missing + 1
+        left <span class="pc-kw">&larr;</span> left + 1
+
+<span class="pc-kw">return</span> substring at bestStart of length bestLen</pre>
+        </div>
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Why one counter beats comparing two maps</strong
+            ><br />Re-checking &ldquo;does the window contain every character of
+            t?&rdquo; costs O(52) per step. Tracking a single
+            <code>missing</code> integer makes the validity test O(1).
+            Characters not in t go negative in the map and are simply never
+            counted &mdash; that is what the <code>&gt; 0</code> guards are
+            doing.
+          </div>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val">O(|s| + |t|)</span></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(|t|)</span></span
+          >
+        </div>
+        <h2 class="h1" id="same-dir">
+          &#128034; Same Direction &mdash; Slow Writes, Fast Reads
+        </h2>
+        <p>
+          When a problem says &ldquo;in place, keep the relative order, remove
+          the ones that don't qualify&rdquo;, use two pointers moving the same
+          way. The fast pointer reads every element; the slow pointer marks
+          where the next keeper belongs. Everything before <code>slow</code> is
+          finished and correct.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Read/Write Two Pointers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// slow = write cursor, fast = read cursor</span>
+slow <span class="pc-kw">&larr;</span> 0
+
+<span class="pc-kw">for</span> fast <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">if</span> keep(a[fast]):
+        a[slow] <span class="pc-kw">&larr;</span> a[fast]
+        slow <span class="pc-kw">&larr;</span> slow + 1
+
+<span class="pc-kw">return</span> slow                 <span class="pc-cm">// length of the cleaned prefix</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#9749; Java &middot; Move Zeroes (LC 283)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="cm">// Move Zeroes (LC 283) — keep order, push zeros to the back</span>
+<span class="kw">void</span> <span class="fn">moveZeroes</span>(<span class="kw">int</span>[] a) {
+    <span class="kw">int</span> slow = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> fast = <span class="num">0</span>; fast &lt; a.length; fast++)
+        <span class="kw">if</span> (a[fast] != <span class="num">0</span>) a[slow++] = a[fast];
+
+    <span class="kw">while</span> (slow &lt; a.length) a[slow++] = <span class="num">0</span>;
+}</pre>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val">O(n)</span></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(1)</span></span
+          >
+        </div>
+        <h2 class="h1" id="atmost">&#127919; The At-Most Trick</h2>
+        <p>
+          A sliding window can count subarrays with <em>at most</em> k of
+          something, because that property is monotonic &mdash; shrink the
+          window and it stays true. It cannot directly count <em>exactly</em> k,
+          because that is not monotonic. The fix is arithmetic, not algorithmic:
+        </p>
+        <div class="callout green">
+          <span class="callout-icon">&#129518;</span>
+          <div class="callout-body">
+            <strong>exactly(k) = atMost(k) &minus; atMost(k&minus;1)</strong
+            ><br />Every subarray with at most k distinct values is either one
+            with at most k&minus;1, or one with exactly k. Subtract and only the
+            exact ones survive. You write the window <em>once</em> and call it
+            twice.
+          </div>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Subarrays with K Different Integers
+              (LC 992)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> exactly(k):
+    <span class="pc-kw">return</span> atMost(k) - atMost(k - 1)
+
+<span class="pc-kw">function</span> atMost(k):
+    count <span class="pc-kw">&larr;</span> 0;  left <span class="pc-kw">&larr;</span> 0;  freq <span class="pc-kw">&larr;</span> empty map
+
+    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> freq[a[right]] = 0: k <span class="pc-kw">&larr;</span> k - 1
+        freq[a[right]] <span class="pc-kw">&larr;</span> freq[a[right]] + 1
+
+        <span class="pc-kw">while</span> k &lt; 0:                     <span class="pc-cm">// too many distinct -> shrink</span>
+            freq[a[left]] <span class="pc-kw">&larr;</span> freq[a[left]] - 1
+            <span class="pc-kw">if</span> freq[a[left]] = 0: k <span class="pc-kw">&larr;</span> k + 1
+            left <span class="pc-kw">&larr;</span> left + 1
+
+        count <span class="pc-kw">&larr;</span> count + (right - left + 1)   <span class="pc-cm">// every window ending at right</span>
+
+    <span class="pc-kw">return</span> count</pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Why <code>right - left + 1</code>?</strong><br />When the
+            window [left, right] is valid, every subarray that <em>ends</em> at
+            <code>right</code> and starts anywhere from
+            <code>left</code> onwards is also valid. That is exactly
+            <code>right - left + 1</code> subarrays &mdash; so you count them
+            all in O(1) instead of enumerating them.
+          </div>
+        </div>
+        <div class="complexity-row">
+          <span class="cx-badge time"
+            ><span class="cx-label">Time</span
+            ><span class="cx-val"
+              >O(n) &mdash; two passes of the same window</span
+            ></span
+          >
+          <span class="cx-badge space"
+            ><span class="cx-label">Space</span
+            ><span class="cx-val">O(k)</span></span
+          >
+        </div>
+        <h2 class="h1" id="complexity">
+          &#9201; Complexity &amp; The Four Classic Bugs
+        </h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>What you see</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Recording in the wrong place</td>
+                <td>Off-by-one on every answer</td>
+                <td>
+                  Longest &rarr; record after the while; shortest &rarr; inside
+                  it
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Shrinking with <code>if</code> instead of <code>while</code>
+                </td>
+                <td>Passes small tests, fails big ones</td>
+                <td>
+                  One step may not restore validity &mdash; loop until it does
+                </td>
+              </tr>
+              <tr>
+                <td>Forgetting to undo state on shrink</td>
+                <td>Counts drift, window never reopens</td>
+                <td>
+                  Every add on the right needs a matching remove on the left
+                </td>
+              </tr>
+              <tr>
+                <td>Using a window with negative numbers</td>
+                <td>Wrong answers, no crash</td>
+                <td>
+                  Not monotonic &mdash; switch to prefix sums (Lecture 19)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128200;</span>
+          <div class="callout-body">
+            <strong>Why two nested loops are still O(n)</strong><br />The inner
+            <code>while</code> looks like it makes this quadratic. It doesn't:
+            <code>left</code> only ever moves forward and can advance at most n
+            times <em>in total</em> across the whole run. Amortised, every index
+            is added once and removed once &mdash; 2n operations.
+          </div>
+        </div>
+
+        <!-- PRACTICE -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <div class="callout blue">
+          <span class="callout-icon">&#128218;</span>
+          <div class="callout-body">
+            <strong>Eight problems, one per shape.</strong> Try each yourself
+            before opening a hint. The goal: within thirty seconds of reading a
+            new problem, name the shape it needs.
+          </div>
+        </div>
+
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 01 &middot;
+                <a
+                  href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 167</a
+                >
+              </div>
+              <div class="prob-title">Two Sum II — Input Array Is Sorted</div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Opposite Ends</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Adobe</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a <strong>1-indexed sorted</strong> array and a target,
+                return the indices of the two numbers that add up to it. Exactly
+                one solution exists, and you may not use extra space.
+              </p>
+              <div class="iobox">
+                Input: [2,7,11,15], target=9 → Output: [1,2]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The array is sorted &mdash; that is the whole gift. What
+                    happens to the sum if you move the left pointer right? What
+                    about moving the right pointer left?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Start at both ends. If the sum is too small the only way to
+                    grow it is <code>lo++</code>; if it is too big the only way
+                    to shrink it is <code>hi--</code>. Neither move can skip the
+                    answer.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                A HashMap would work but costs O(n) space, and the sorted input
+                makes it unnecessary. Converging pointers solve it in constant
+                space.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; Two Sum II</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = a.length - <span class="num">1</span>;
+    <span class="kw">while</span> (lo &lt; hi) {
+        <span class="kw">int</span> sum = a[lo] + a[hi];
+        <span class="kw">if</span> (sum == target) <span class="ret">return</span> <span class="kw">new</span> <span class="kw">int</span>[] { lo + <span class="num">1</span>, hi + <span class="num">1</span> };
+        <span class="kw">if</span> (sum &lt; target) lo++; <span class="kw">else</span> hi--;
+    }
+    <span class="ret">return</span> <span class="kw">new</span> <span class="kw">int</span>[]{};
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/container-with-most-water/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 11</a
+                >
+              </div>
+              <div class="prob-title">Container With Most Water</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Opposite Ends</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta &middot; Bloomberg</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given heights of vertical lines, find two that together with the
+                x-axis hold the most water.
+              </p>
+              <div class="iobox">Input: [1,8,6,2,5,4,8,3,7] → Output: 49</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Area is width &times; the <em>shorter</em> of the two walls.
+                    Start as wide as possible &mdash; then every move you make
+                    loses width.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Since width only shrinks, the only way to win is a taller
+                    wall. Always move the pointer at the shorter wall; moving
+                    the taller one can never help.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Greedy converging pointers. The proof: whichever wall is shorter
+                caps the area, so keeping it and moving the tall one strictly
+                loses.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang"
+                    >&#9749; Java &middot; Container With Most Water</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span> <span class="fn">maxArea</span>(<span class="kw">int</span>[] h) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = h.length - <span class="num">1</span>, best = <span class="num">0</span>;
+    <span class="kw">while</span> (lo &lt; hi) {
+        best = Math.<span class="fn">max</span>(best, (hi - lo) * Math.<span class="fn">min</span>(h[lo], h[hi]));
+        <span class="kw">if</span> (h[lo] &lt; h[hi]) lo++; <span class="kw">else</span> hi--;
+    }
+    <span class="ret">return</span> best;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot;
+                <a
+                  href="https://leetcode.com/problems/3sum/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 15</a
+                >
+              </div>
+              <div class="prob-title">3Sum</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Anchor + Converging Pair</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Meta &middot; Google &middot; Adobe</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return all unique triplets that sum to zero. The answer must
+                contain no duplicate triplets.
+              </p>
+              <div class="iobox">
+                Input: [-1,0,1,2,-1,-4] → Output: [[-1,-1,2],[-1,0,1]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Fix one number and the problem collapses to Two Sum on the
+                    rest. What must you do first to make that inner search O(n)?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Sort, then for each anchor <code>i</code> run converging
+                    pointers on <code>i+1 .. n-1</code>. The hard part is
+                    duplicates: skip repeated anchors, and after recording a hit
+                    skip repeated <code>lo</code>/<code>hi</code> values.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Sorting costs O(n log n) but buys both the pointer walk and
+                cheap deduplication. Total O(n²).
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; 3Sum</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">threeSum</span>(<span class="kw">int</span>[] a) {
+    Arrays.<span class="fn">sort</span>(a);
+    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; out = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; a.length - <span class="num">2</span>; i++) {
+        <span class="kw">if</span> (i &gt; <span class="num">0</span> &amp;&amp; a[i] == a[i - <span class="num">1</span>]) <span class="kw">continue</span>;   <span class="cm">// duplicate anchor</span>
+        <span class="kw">int</span> lo = i + <span class="num">1</span>, hi = a.length - <span class="num">1</span>;
+
+        <span class="kw">while</span> (lo &lt; hi) {
+            <span class="kw">int</span> s = a[i] + a[lo] + a[hi];
+            <span class="kw">if</span> (s == <span class="num">0</span>) {
+                out.<span class="fn">add</span>(Arrays.<span class="fn">asList</span>(a[i], a[lo], a[hi]));
+                <span class="kw">while</span> (lo &lt; hi &amp;&amp; a[lo] == a[lo + <span class="num">1</span>]) lo++;
+                <span class="kw">while</span> (lo &lt; hi &amp;&amp; a[hi] == a[hi - <span class="num">1</span>]) hi--;
+                lo++; hi--;
+            } <span class="kw">else</span> <span class="kw">if</span> (s &lt; <span class="num">0</span>) lo++; <span class="kw">else</span> hi--;
+        }
+    }
+    <span class="ret">return</span> out;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n²)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1) beyond the output</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot;
+                <a
+                  href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 3</a
+                >
+              </div>
+              <div class="prob-title">
+                Longest Substring Without Repeating Characters
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Variable Window</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta &middot; Bloomberg</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the length of the longest substring with no repeated
+                characters.
+              </p>
+              <div class="iobox">Input: "abcabcbb" → Output: 3 ("abc")</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Walk the right edge forward one character at a time. When
+                    does the window stop being valid, and which pointer must
+                    move to fix it?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Keep the last index of every character. On a repeat, jump
+                    <code>left</code> to just past that previous copy &mdash;
+                    never backwards, or you will double-count.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The <code>Math.max</code> on left is what keeps it correct: a
+                stale duplicate from before the current window must not drag
+                left backwards.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; LC 3</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span> <span class="fn">lengthOfLongestSubstring</span>(<span class="cls">String</span> s) {
+    <span class="kw">int</span>[] last = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">128</span>];
+    <span class="kw">int</span> left = <span class="num">0</span>, best = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; s.length(); r++) {
+        <span class="kw">char</span> c = s.<span class="fn">charAt</span>(r);
+        left = Math.<span class="fn">max</span>(left, last[c]);
+        best = Math.<span class="fn">max</span>(best, r - left + <span class="num">1</span>);
+        last[c] = r + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> best;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/longest-repeating-character-replacement/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 424</a
+                >
+              </div>
+              <div class="prob-title">
+                Longest Repeating Character Replacement
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Variable Window</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                You may change at most k characters. Find the longest substring
+                of one repeated letter you can produce.
+              </p>
+              <div class="iobox">Input: s="AABABBA", k=1 → Output: 4</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A window is valid when the characters you would have to
+                    replace fit inside k. How do you compute &ldquo;replacements
+                    needed&rdquo; from the window's letter counts?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Replacements needed = window length &minus; count of the
+                    most frequent letter. Shrink while that exceeds k.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                You do not need to recompute the max frequency when shrinking
+                &mdash; letting it go stale only ever <em>under</em>-estimates
+                the window, which never produces a wrong maximum.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; LC 424</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span> <span class="fn">characterReplacement</span>(<span class="cls">String</span> s, <span class="kw">int</span> k) {
+    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
+    <span class="kw">int</span> left = <span class="num">0</span>, most = <span class="num">0</span>, best = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; s.length(); r++) {
+        most = Math.<span class="fn">max</span>(most, ++cnt[s.<span class="fn">charAt</span>(r) - <span class="cls">'A'</span>]);
+        <span class="kw">while</span> (r - left + <span class="num">1</span> - most &gt; k)
+            cnt[s.<span class="fn">charAt</span>(left++) - <span class="cls">'A'</span>]--;
+        best = Math.<span class="fn">max</span>(best, r - left + <span class="num">1</span>);
+    }
+    <span class="ret">return</span> best;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 06 &middot;
+                <a
+                  href="https://leetcode.com/problems/minimum-window-substring/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 76</a
+                >
+              </div>
+              <div class="prob-title">Minimum Window Substring</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Variable Window (shortest)</span>
+                <span class="tag tag-co"
+                  >Meta &middot; Amazon &middot; Google &middot; Uber</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the smallest substring of s containing every character of
+                t, including duplicates.
+              </p>
+              <div class="iobox">
+                Input: s="ADOBECODEBANC", t="ABC" → Output: "BANC"
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    This asks for the <em>shortest</em> valid window, not the
+                    longest. That flips where you record the answer relative to
+                    the shrink loop.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Keep a <code>need</code> map and one
+                    <code>missing</code> counter. When <code>missing</code> hits
+                    0 the window is valid &mdash; record it, then shrink from
+                    the left and keep recording while it stays valid.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The single counter makes validity O(1). Characters outside t go
+                negative in the map, so the <code>&gt; 0</code> guards naturally
+                ignore them.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; LC 76</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="cls">String</span> <span class="fn">minWindow</span>(<span class="cls">String</span> s, <span class="cls">String</span> t) {
+    <span class="kw">int</span>[] need = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">128</span>];
+    <span class="kw">for</span> (<span class="kw">char</span> c : t.<span class="fn">toCharArray</span>()) need[c]++;
+
+    <span class="kw">int</span> missing = t.length(), left = <span class="num">0</span>, bs = <span class="num">0</span>, bl = Integer.MAX_VALUE;
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; s.length(); r++) {
+        <span class="kw">if</span> (need[s.<span class="fn">charAt</span>(r)]-- &gt; <span class="num">0</span>) missing--;
+
+        <span class="kw">while</span> (missing == <span class="num">0</span>) {
+            <span class="kw">if</span> (r - left + <span class="num">1</span> &lt; bl) { bl = r - left + <span class="num">1</span>; bs = left; }
+            <span class="kw">if</span> (++need[s.<span class="fn">charAt</span>(left++)] &gt; <span class="num">0</span>) missing++;
+        }
+    }
+    <span class="ret">return</span> bl == Integer.MAX_VALUE ? <span class="cls">""</span> : s.<span class="fn">substring</span>(bs, bs + bl);
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(|s| + |t|)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(|t|)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 07 &middot;
+                <a
+                  href="https://leetcode.com/problems/subarrays-with-k-different-integers/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 992</a
+                >
+              </div>
+              <div class="prob-title">Subarrays with K Different Integers</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">At-Most Trick</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>Count the subarrays containing exactly k distinct integers.</p>
+              <div class="iobox">Input: [1,2,1,2,3], k=2 → Output: 7</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A window can answer &ldquo;at most k distinct&rdquo; easily,
+                    because shrinking always keeps that true. &ldquo;Exactly
+                    k&rdquo; is not monotonic &mdash; so don't try to window it
+                    directly.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    exactly(k) = atMost(k) &minus; atMost(k&minus;1). Write the
+                    at-most window once and call it twice.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Inside <code>atMost</code>, every valid window ending at
+                <code>right</code> contributes
+                <code>right - left + 1</code> subarrays, counted in O(1).
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; LC 992</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span> <span class="fn">subarraysWithKDistinct</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> k) {
+    <span class="ret">return</span> <span class="fn">atMost</span>(a, k) - <span class="fn">atMost</span>(a, k - <span class="num">1</span>);
+}
+
+<span class="kw">int</span> <span class="fn">atMost</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> k) {
+    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+    <span class="kw">int</span> left = <span class="num">0</span>, count = <span class="num">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; a.length; r++) {
+        <span class="kw">if</span> (freq.<span class="fn">merge</span>(a[r], <span class="num">1</span>, Integer::sum) == <span class="num">1</span>) k--;
+        <span class="kw">while</span> (k &lt; <span class="num">0</span>)
+            <span class="kw">if</span> (freq.<span class="fn">merge</span>(a[left++], -<span class="num">1</span>, Integer::sum) == <span class="num">0</span>) k++;
+        count += r - left + <span class="num">1</span>;
+    }
+    <span class="ret">return</span> count;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(k)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 08 &middot;
+                <a
+                  href="https://leetcode.com/problems/trapping-rain-water/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 42</a
+                >
+              </div>
+              <div class="prob-title">Trapping Rain Water</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Opposite Ends</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an elevation map, compute how much rain water it can trap.
+              </p>
+              <div class="iobox">
+                Input: [0,1,0,2,1,0,1,3,2,1,2,1] → Output: 6
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Water above any single bar is
+                    <code>min(tallestLeft, tallestRight) - height</code>. The
+                    O(n)-space answer precomputes both. Can you avoid storing
+                    them?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Walk from both ends keeping <code>leftMax</code> and
+                    <code>rightMax</code>. Whichever side is shorter is the
+                    binding constraint, so that side's water is already decided
+                    &mdash; settle it and step inwards.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The insight is that you never need the exact other-side maximum,
+                only the knowledge that it is at least as tall as the side you
+                are settling.
+              </p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">&#9749; Java &middot; LC 42</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
+                    Copy
+                  </button>
+                </div>
+                <pre><span class="kw">int</span> <span class="fn">trap</span>(<span class="kw">int</span>[] h) {
+    <span class="kw">int</span> lo = <span class="num">0</span>, hi = h.length - <span class="num">1</span>;
+    <span class="kw">int</span> leftMax = <span class="num">0</span>, rightMax = <span class="num">0</span>, water = <span class="num">0</span>;
+
+    <span class="kw">while</span> (lo &lt; hi) {
+        <span class="kw">if</span> (h[lo] &lt; h[hi]) {           <span class="cm">// left side is the bottleneck</span>
+            leftMax = Math.<span class="fn">max</span>(leftMax, h[lo]);
+            water += leftMax - h[lo++];
+        } <span class="kw">else</span> {
+            rightMax = Math.<span class="fn">max</span>(rightMax, h[hi]);
+            water += rightMax - h[hi--];
+        }
+    }
+    <span class="ret">return</span> water;
+}</pre>
+              </div>
+              <div class="complexity-row">
+                <span class="cx-badge time"
+                  ><span class="cx-label">Time</span
+                  ><span class="cx-val">O(n)</span></span
+                >
+                <span class="cx-badge space"
+                  ><span class="cx-label">Space</span
+                  ><span class="cx-val">O(1)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Lecture 18 Assignment &mdash; 30 Problems (10 Easy &middot; 15
+              Medium &middot; 5 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by the
+            shape it needs. Complete it before moving to Lecture 19.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture18/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 19.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can name the five shapes and say which clue in a problem selects
+            each one
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write the variable-window template from memory, without
+            looking
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know why longest records after the shrink loop and shortest
+            records inside it
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain why two nested loops are still O(n) here
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can solve 3Sum including full duplicate handling
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can derive exactly(k) = atMost(k) &minus; atMost(k&minus;1) and
+            say why it is needed
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know why sliding windows break on negative numbers
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I completed all 30 assignment problems and can name the pattern for
+            each
+          </div>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128640;</span>
+          <div class="callout-body">
+            <strong
+              >You're ready for Lecture 19: Prefix Sums &amp; Difference
+              Arrays</strong
+            ><br />
+            The last row of the bug table is the handover: the moment negative
+            numbers appear, a sliding window is the wrong tool. Prefix sums pick
+            up exactly where windows stop working.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="page-nav">
+          <a href="../Lecture17/lecture17_notes.html"
+            >&larr; Lecture 17 &middot; Graphs</a
+          >
+          <a class="next" href="../dsa_study_plan.html"
+            >Lecture 19 &middot; coming soon &rarr;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Theme toggle — remembered across pages of the course
+      function applyTheme(theme) {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (theme === "dark") html.setAttribute("data-theme", "dark");
+        else html.removeAttribute("data-theme");
+        if (btn)
+          btn.innerText =
+            theme === "dark" ? "\u2600\ufe0f Light" : "\ud83c\udf19 Dark";
+      }
+
+      function toggleDark() {
+        const next =
+          document.documentElement.getAttribute("data-theme") === "dark"
+            ? "light"
+            : "dark";
+        applyTheme(next);
+        try {
+          localStorage.setItem("dsa-notes-theme", next);
+        } catch (e) {
+          /* private browsing — the toggle still works for this page */
+        }
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("dsa-notes-theme");
+        } catch (e) {
+          /* ignore */
+        }
+        applyTheme(saved === "dark" ? "dark" : "light");
+      })();
+
+      // 2. Reading progress + active table-of-contents entry
+      (function initScrollSync() {
+        const main = document.getElementById("main");
+        if (!main) return;
+        const fill = document.getElementById("progressFill");
+        const headings = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const tocItems = document.querySelectorAll(".toc-item");
+
+        main.addEventListener("scroll", function () {
+          const range = main.scrollHeight - main.clientHeight;
+          if (fill && range > 0) {
+            const pct = (main.scrollTop / range) * 100;
+            fill.style.width = (pct > 98.5 ? 100 : pct) + "%";
+          }
+          let current = "";
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top < 150) current = h.id;
+          });
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              item.getAttribute("href") === "#" + current,
+            );
+          });
+        });
+      })();
+
+      // 3. Practice-problem cards expand and collapse
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy a code block
+      function copyCode(btn) {
+        const block = btn.closest(".code-block");
+        const pre = block && block.querySelector("pre");
+        if (!pre) return;
+        const done = () => {
+          const original = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(done, () => {
+            btn.innerText = "Press Ctrl+C";
+          });
+        } else {
+          btn.innerText = "Press Ctrl+C";
+        }
+      }
+
+      // 5. Disclosure arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

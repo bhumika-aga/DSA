@@ -14,7 +14,7 @@
 | **Study Days**     | 202 days of content                                  |
 | **Duration**       | ~31 weeks at one lecture block at a time             |
 | **Total Problems** | 976                                                  |
-| **Written So Far** | 17 lectures · 515 problems                           |
+| **Written So Far** | 18 lectures · 545 problems                           |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 ### How to Use This Plan
@@ -838,13 +838,14 @@
 
 ### Lecture 18: 🎯 Two Pointers & Sliding Window
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 6 days                       |
-| **Problems**         | 30                           |
-| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard |
-| **Prerequisites**    | Lectures 8–10                |
-| **Status**           | 📝 Planned                   |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 30                                                                                      |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard                                                            |
+| **Prerequisites**    | Lectures 8–10                                                                           |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture18/lecture18_notes.html) · [Assignment](Lecture18/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
