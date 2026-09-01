@@ -21,25 +21,12 @@ _Focus on implementing pure logic, counting swaps, and in-place sorting._
    **🔗 [LC 912](https://leetcode.com/problems/sort-an-array/)** · **Companies:** Amazon, Adobe
 4. **[Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/) (LC 88)** — Merge two arrays from the back.
    `[Companies: Amazon, Microsoft, Meta]`
-5. **[Missing Number](https://leetcode.com/problems/missing-number/) (LC 268)** — Solve using **Cyclic Sort** only.
-
-**Companies:** Amazon, Google, Microsoft
-`[Pattern: Cyclic] [LC Easy]` 6. **[Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/) (LC 448)** — All missing.
-
-**Companies:** Amazon, Google, Apple
-`[Pattern: Cyclic] [LC Easy]` 7. **[Set Mismatch](https://leetcode.com/problems/set-mismatch/) (LC 645)** — Duplicate + Missing.
-
-**Companies:** Amazon, Google
-`[Pattern: Cyclic] [LC Easy]` 8. **[Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) (LC 217)** — Solve with $O (N \log N)$ sort
-
-**Companies:** Amazon, Google, Apple
-first. `[LC Easy]` 9. **[Squares of a Sorted Array](https://leetcode.com/problems/squares-of-a-sorted-array/) (LC 977)** — Two pointers or
-
-**Companies:** Amazon, Meta, Google
-sort? `[LC Easy]` 10. **[Sort Array By Parity](https://leetcode.com/problems/sort-array-by-parity/) (LC 905)** — Fundamental partitioning.
-
-**Companies:** Amazon, Google
-`[LC Easy]`
+5. **[Missing Number](https://leetcode.com/problems/missing-number/) (LC 268)** — Solve using **Cyclic Sort** only. `[Pattern: Cyclic] [LC Easy]` `[Companies: Amazon, Google, Microsoft]`
+6. **[Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/) (LC 448)** — All missing. `[Pattern: Cyclic] [LC Easy]` `[Companies: Amazon, Google, Apple]`
+7. **[Set Mismatch](https://leetcode.com/problems/set-mismatch/) (LC 645)** — Duplicate + Missing. `[Pattern: Cyclic] [LC Easy]` `[Companies: Amazon, Google]`
+8. **[Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) (LC 217)** — Solve with $O (N \log N)$ sort first. `[LC Easy]` `[Companies: Amazon, Google, Apple]`
+9. **[Squares of a Sorted Array](https://leetcode.com/problems/squares-of-a-sorted-array/) (LC 977)** — Two pointers or sort? `[LC Easy]` `[Companies: Amazon, Meta, Google]`
+10. **[Sort Array By Parity](https://leetcode.com/problems/sort-array-by-parity/) (LC 905)** — Fundamental partitioning. `[LC Easy]` `[Companies: Amazon, Google]`
 
 ---
 
@@ -47,37 +34,16 @@ sort? `[LC Easy]` 10. **[Sort Array By Parity](https://leetcode.com/problems/sor
 
 _Focus on complexity, stable merging, and randomized pivoting._
 
-1. **[Sort Colors](https://leetcode.com/problems/sort-colors/) (LC 75)** — **Dutch National Flag** (3-way partition).
-
-**Companies:** Microsoft, Amazon, Meta
-`[Pattern: Two Pointers] [LC Medium]` 2. **[Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (LC 287)** — Solve via Cyclic
-
-**Companies:** Amazon, Google, Meta, Microsoft
-Sort. `[Pattern: Cyclic] [LC Medium]` 3. **[Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/) (LC 442)** — Use
-
-**Companies:** Amazon, Google, Meta
-the Negative Marking trick. `[Pattern: Cyclic] [LC Medium]` 4. **[Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) (LC 215)** —
-
-**Companies:** Meta, Amazon, Google, Microsoft
-Solve using **QuickSelect** ($O (N)$ Avg). `[Pattern: Partitioning] [LC Medium]` 5. **[Largest Number](https://leetcode.com/problems/largest-number/) (LC 179)** — Custom comparator logic for combined
-
-**Companies:** Google, Amazon, Microsoft
-strings. `[Companies: Google, Amazon, Microsoft]` 6. **[Merge Intervals](https://leetcode.com/problems/merge-intervals/) (LC 56)** — Sort by start time then merge.
-
-**Companies:** Google, Amazon, Meta, Microsoft
-`[Pattern: Intervals] [LC Medium]` 7. **[Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) (LC 347)** — **Bucket Sort** or
-
-**Companies:** Amazon, Meta, Google
-Priority Queue. `[Pattern: Bucket Sort] [LC Medium]` 8. **[Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/) (LC 280)** — $O (N)$ Greedy local-parity swapping.
-
-**Companies:** Google, Amazon, Meta
-`[Pattern: Greedy] [LC Medium]` 9. **[Sort List](https://leetcode.com/problems/sort-list/) (LC 148)** — Merge Sort on Linked Lists.
-
-**Companies:** Amazon, Google, Meta, Microsoft
-`[Pattern: D&C] [LC Medium]` 10. **[Custom Sort String](https://leetcode.com/problems/custom-sort-string/) (LC 791)** — Frequency maps as custom
-
-**Companies:** Meta, Amazon, Google
-order. `[LC Medium]`
+1. **[Sort Colors](https://leetcode.com/problems/sort-colors/) (LC 75)** — **Dutch National Flag** (3-way partition). `[Pattern: Two Pointers] [LC Medium]` `[Companies: Microsoft, Amazon, Meta]`
+2. **[Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (LC 287)** — Solve via Cyclic Sort. `[Pattern: Cyclic] [LC Medium]` `[Companies: Amazon, Google, Meta, Microsoft]`
+3. **[Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/) (LC 442)** — Use the Negative Marking trick. `[Pattern: Cyclic] [LC Medium]` `[Companies: Amazon, Google, Meta]`
+4. **[Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) (LC 215)** — Solve using **QuickSelect** ($O (N)$ Avg). `[Pattern: Partitioning] [LC Medium]` `[Companies: Meta, Amazon, Google, Microsoft]`
+5. **[Largest Number](https://leetcode.com/problems/largest-number/) (LC 179)** — Custom comparator logic for combined strings. `[Companies: Google, Amazon, Microsoft]` `[Companies: Google, Amazon, Microsoft]`
+6. **[Merge Intervals](https://leetcode.com/problems/merge-intervals/) (LC 56)** — Sort by start time then merge. `[Pattern: Intervals] [LC Medium]` `[Companies: Google, Amazon, Meta, Microsoft]`
+7. **[Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) (LC 347)** — **Bucket Sort** or Priority Queue. `[Pattern: Bucket Sort] [LC Medium]` `[Companies: Amazon, Meta, Google]`
+8. **[Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/) (LC 280)** — $O (N)$ Greedy local-parity swapping. `[Pattern: Greedy] [LC Medium]` `[Companies: Google, Amazon, Meta]`
+9. **[Sort List](https://leetcode.com/problems/sort-list/) (LC 148)** — Merge Sort on Linked Lists. `[Pattern: D&C] [LC Medium]` `[Companies: Amazon, Google, Meta, Microsoft]`
+10. **[Custom Sort String](https://leetcode.com/problems/custom-sort-string/) (LC 791)** — Frequency maps as custom order. `[LC Medium]` `[Companies: Meta, Amazon, Google]`
 
 ---
 
@@ -85,23 +51,15 @@ order. `[LC Medium]`
 
 _Focus on O (1) space constraints and optimal sorting pivots._
 
-1. **[First Missing Positive](https://leetcode.com/problems/first-missing-positive/) (LC 41)** — Ultimate Cyclic Sort
-   **Companies:** Google, Amazon, Meta, Microsoft
-   challenge. `[Pattern: Cyclic] [LC Hard]`
+1. **[First Missing Positive](https://leetcode.com/problems/first-missing-positive/) (LC 41)** — Ultimate Cyclic Sort challenge. `[Pattern: Cyclic] [LC Hard]` `[Companies: Google, Amazon, Meta, Microsoft]`
 
-2. **[Maximum Gap](https://leetcode.com/problems/maximum-gap/) (LC 164)** — Solve in $O (N)$ using \*\*Bucket/Radix
-   **Companies:** Apple, Amazon, Google
-   Sort\*\*. `[LC Hard]`
+2. **[Maximum Gap](https://leetcode.com/problems/maximum-gap/) (LC 164)** — Solve in $O (N)$ using **Bucket/Radix Sort**. `[LC Hard]` `[Companies: Apple, Amazon, Google]`
 
-3. **[Reverse Pairs](https://leetcode.com/problems/reverse-pairs/) (LC 493)\*\* — Merge Sort "Modification" to count
-   **Companies:\*\* Google, Amazon, Meta
-   pairs. `[Pattern: D&C] [LC Hard]`
+3. **[Reverse Pairs](https://leetcode.com/problems/reverse-pairs/) (LC 493)** — Merge Sort "Modification" to count pairs. `[Pattern: D&C] [LC Hard]` `[Companies: Google, Amazon, Meta]`
 
 4. **[Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/) (LC 315)** — Merge Sort or BIT? `[LC Hard]` `[Companies: Google, Amazon, Meta]`
 
-5. **[Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) (LC 373)** —
-   **Companies:** Google, Amazon, Meta
-   Sorting vs Multi-pointer. `[LC Hard]`
+5. **[Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) (LC 373)** — Sorting vs Multi-pointer. `[LC Hard]` `[Companies: Google, Amazon, Meta]`
 
 ---
 

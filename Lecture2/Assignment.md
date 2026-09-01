@@ -292,20 +292,11 @@ consistent with `hashCode()`. What happens if you modify the `name` of a Student
 - **P31: Design Task Scheduler O (1)**: Implement a system that can add task, remove random task, and get random task  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Oracle, Goldman Sachs]`
   all in O (1). (Hint: Map + Dynamic Array).
-- **P32: K-th Smallest in Matrix** ([LC 378](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)) -
+- **P32: K-th Smallest in Matrix** ([LC 378](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)) - Use `PriorityQueue` vs Binary Search. `[Companies: Amazon, Google, Meta]`
 
-**Companies:** Amazon, Google, Meta
-Use `PriorityQueue` vs Binary Search.
+- **P33: Merge K Sorted Lists** ([LC 23](https://leetcode.com/problems/merge-k-sorted-lists/)) - The classic HEAP problem. `[Companies: Amazon, Google, Meta, Uber]`
 
-- **P33: Merge K Sorted Lists** ([LC 23](https://leetcode.com/problems/merge-k-sorted-lists/)) - The classic HEAP
-
-**Companies:** Amazon, Google, Meta, Uber
-problem.
-
-- **P34: Smallest String With Swaps** ([LC 1202](https://leetcode.com/problems/smallest-string-with-swaps/)) - DFS + Map
-
-**Companies:** Amazon, Google, Meta
-grouping.
+- **P34: Smallest String With Swaps** ([LC 1202](https://leetcode.com/problems/smallest-string-with-swaps/)) - DFS + Map grouping. `[Companies: Amazon, Google, Meta]`
 
 - **P35: Custom Object Collision**: Write a `BadHashCode` object where `hashCode()` always returns `1`. Measure  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Oracle, Goldman Sachs]`

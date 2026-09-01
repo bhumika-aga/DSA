@@ -239,13 +239,10 @@ as current node → not bipartite. Must handle disconnected graphs (loop all nod
 
 ### M13 · Find the City With the Smallest Number of Neighbors ⭐
 
-- \*🔗 [LC 1334](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
-  \*\*
-  **Pattern:** Floyd-Warshall (all-pairs shortest path) | **Companies:** Google, Amazon
+**🔗 [LC 1334](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)**
+**Pattern:** Floyd-Warshall (all-pairs shortest path) | **Companies:** Google, Amazon
 
-  **Hint:** Run Floyd-Warshall to compute all-pairs shortest paths. For each city, count how many other cities are
-  reachable within `distanceThreshold`. Return the city with the fewest reachable neighbors (ties broken by largest city
-  index). Floyd-Warshall fits here because n ≤ 100.
+**Hint:** Run Floyd-Warshall to compute all-pairs shortest paths. For each city, count how many other cities are reachable within `distanceThreshold`. Return the city with the fewest reachable neighbors (ties broken by largest city index). Floyd-Warshall fits here because n ≤ 100.
 
 ---
 

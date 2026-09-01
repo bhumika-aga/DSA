@@ -240,23 +240,14 @@ Change the engine details in the clone. Does it affect the original?
 
 ### P31-35: Design Architectures
 
-- **P31: Design an LRU Cache** ([LC 146](https://leetcode.com/problems/lru-cache/)) - The ultimate JCF + OOP test. O (1)
-
-**Companies:** Amazon, Microsoft, Meta, Google
-time complexity requirement.
+- **P31: Design an LRU Cache** ([LC 146](https://leetcode.com/problems/lru-cache/)) - The ultimate JCF + OOP test. O (1) time complexity requirement. `[Companies: Amazon, Microsoft, Meta, Google]`
 
 - **P32: Generic `MyLinkedList<T>`**: Implement a doubly linked list with Generics. Support `Iterator`, `Generic types`,  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
   and `O(1) size access`.
-- **P33: Frequency Stack** ([LC 895](https://leetcode.com/problems/maximum-frequency-stack/)) - A stack that pops the
+- **P33: Frequency Stack** ([LC 895](https://leetcode.com/problems/maximum-frequency-stack/)) - A stack that pops the most frequent element. `[Companies: Amazon, Google, Meta]`
 
-**Companies:** Amazon, Google, Meta
-most frequent element.
-
-- **P34: Design Browser History** ([LC 1470](https://leetcode.com/problems/design-browser-history/)) - Using two stacks
-
-**Companies:** Amazon, Google, Bloomberg
-or a doubly linked list.
+- **P34: Design Browser History** ([LC 1470](https://leetcode.com/problems/design-browser-history/)) - Using two stacks or a doubly linked list. `[Companies: Amazon, Google, Bloomberg]`
 
 - **P35: Dependency Injection Preview**: Write a `EngineInterface` and two implementations: `ElectricEngine` and  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
