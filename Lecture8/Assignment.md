@@ -191,45 +191,24 @@
 
 ---
 
-- **P26: Trapping Rain Water** ([LC 42](https://leetcode.com/problems/trapping-rain-water/))
+- **P26: Trapping Rain Water** ([LC 42](https://leetcode.com/problems/trapping-rain-water/)) `[Pattern: Prefix / Suffix Max]` — Amazon Hard `[Companies: Google, Amazon, Meta, Microsoft]`
 
-**Companies:** Google, Amazon, Meta, Microsoft
-`[Pattern: Prefix / Suffix Max]` — Amazon Hard
-
-- **P27: First Missing Positive** ([LC 41](https://leetcode.com/problems/first-missing-positive/))
-
-**Companies:** Google, Amazon, Meta, Microsoft
-`[Pattern: Cyclic Sort / In-place Hashing]` — Microsoft Hard
+- **P27: First Missing Positive** ([LC 41](https://leetcode.com/problems/first-missing-positive/)) `[Pattern: Cyclic Sort / In-place Hashing]` — Microsoft Hard `[Companies: Google, Amazon, Meta, Microsoft]`
 
 - **P28: Maximum Sum Submatrix**  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google]`
   ([Practice GFG](https://www.geeksforgeeks.org/maximum-sum-rectangle-in-a-2d-matrix-dp-27/))
   `[Pattern: Kadane’s on 2D]`
-- **P29: Shortest Palindrome** ([LC 214](https://leetcode.com/problems/shortest-palindrome/))
+- **P29: Shortest Palindrome** ([LC 214](https://leetcode.com/problems/shortest-palindrome/)) `[Pattern: Rolling Hash / KMP]` `[Companies: Google, Amazon, Meta]`
 
-**Companies:** Google, Amazon, Meta
-`[Pattern: Rolling Hash / KMP]`
-
-- **P30: String Transforms Into Another String**
-
-**Companies:** Google, Amazon
-([LC 1153](https://leetcode.com/problems/string-transforms-into-another-string/)) `[Pattern: Character Mapping]`
+- **P30: String Transforms Into Another String** ([LC 1153](https://leetcode.com/problems/string-transforms-into-another-string/)) `[Pattern: Character Mapping]` `[Companies: Google, Amazon]`
 
 - **P31: 3Sum** ([LC 15](https://leetcode.com/problems/3sum/)) `[Pattern: Sort + Two Pointers]` `[Companies: Amazon, Meta, Google, Adobe]`
-- **P32: Container With Most Water** ([LC 11](https://leetcode.com/problems/container-with-most-water/))
+- **P32: Container With Most Water** ([LC 11](https://leetcode.com/problems/container-with-most-water/)) `[Pattern: Two Pointers (Converging)]` `[Companies: Google, Amazon, Meta, Bloomberg]`
 
-**Companies:** Google, Amazon, Meta, Bloomberg
-`[Pattern: Two Pointers (Converging)]`
+- **P33: Game of Life** ([LC 289](https://leetcode.com/problems/game-of-life/)) `[Pattern: In-Place State Transformation]` `[Companies: Google, Amazon, Meta, Dropbox]`
 
-- **P33: Game of Life** ([LC 289](https://leetcode.com/problems/game-of-life/))
-
-**Companies:** Google, Amazon, Meta, Dropbox
-`[Pattern: In-Place State Transformation]`
-
-- **P34: Longest Substring Without Repeating Characters**
-
-**Companies:** Amazon, Google, Meta, Bloomberg
-([LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)) `[Pattern: Sliding Window]`
+- **P34: Longest Substring Without Repeating Characters** ([LC 3](https://leetcode.com/problems/longest-substring-without-repeating-characters/)) `[Pattern: Sliding Window]` `[Companies: Amazon, Google, Meta, Bloomberg]`
 
 - **P35: Wiggle Sort II** ([LC 324](https://leetcode.com/problems/wiggle-sort-ii/)) `[Pattern: Virtual Indexing]` `[Companies: Google, Amazon, Meta]`
 

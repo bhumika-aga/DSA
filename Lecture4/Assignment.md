@@ -177,10 +177,7 @@ Convert `int[] nums = {1, 2, 3, 4, 5}` into a stream. Use `.map(n -> n * n)` to 
 
 ### P21-25: Real-World Scenarios
 
-- **P21: Top K Frequent Words** ([LC 692](https://leetcode.com/problems/top-k-frequent-words/)) - Use
-
-**Companies:** Amazon, Google, Uber
-`Collectors.groupingBy` and then sort by `Entry.getValue()` DESC and `Entry.getKey()` ASC.
+- **P21: Top K Frequent Words** ([LC 692](https://leetcode.com/problems/top-k-frequent-words/)) - Use `Collectors.groupingBy` and then sort by `Entry.getValue()` DESC and `Entry.getKey()` ASC. `[Companies: Amazon, Google, Uber]`
 
 - **P22: Custom Collector**: Implement a custom collector that computes the **standard deviation** of a stream of  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`

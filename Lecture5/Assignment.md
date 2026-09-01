@@ -221,24 +221,13 @@
 
 ### P31-35: The Expert Tier
 
-- **P31: N-Queens** ([LC 51](https://leetcode.com/problems/n-queens/)) - The classic backtracking problem. Use sets for
+- **P31: N-Queens** ([LC 51](https://leetcode.com/problems/n-queens/)) - The classic backtracking problem. Use sets for columns, row-sum, and row-diff diagonals. `[Companies: Google, Amazon, Meta]`
 
-**Companies:** Google, Amazon, Meta
-columns, row-sum, and row-diff diagonals.
+- **P32: Sudoku Solver** ([LC 37](https://leetcode.com/problems/sudoku-solver/)) - Hard constraints. Return boolean to stop recursion immediately. `[Companies: Google, Amazon, Uber]`
 
-- **P32: Sudoku Solver** ([LC 37](https://leetcode.com/problems/sudoku-solver/)) - Hard constraints. Return boolean to
+- **P33: Word Break II** ([LC 140](https://leetcode.com/problems/word-break-ii/)) - Backtracking + Memoization. `[Companies: Google, Amazon, Meta, Uber]`
 
-**Companies:** Google, Amazon, Uber
-stop recursion immediately.
-
-- **P33: Word Break II** ([LC 140](https://leetcode.com/problems/word-break-ii/)) - Backtracking + Memoization.
-
-**Companies:** Google, Amazon, Meta, Uber
-
-- **P34: Expression Add Operators** ([LC 282](https://leetcode.com/problems/expression-add-operators/)) - Complexity
-
-**Companies:** Google, Meta, Amazon
-intensive.
+- **P34: Expression Add Operators** ([LC 282](https://leetcode.com/problems/expression-add-operators/)) - Complexity intensive. `[Companies: Google, Meta, Amazon]`
 
 - **P35: Rat in a Maze** ([GFG](https://www.geeksforgeeks.org/problems/rat-in-a-maze-problem/1)) - Standard FAANG  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`

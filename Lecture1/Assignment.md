@@ -250,46 +250,22 @@
 
 ---
 
-- **P31: Find Duplicate in Array** ([LC 287](https://leetcode.com/problems/find-the-duplicate-number/))
+- **P31: Find Duplicate in Array** ([LC 287](https://leetcode.com/problems/find-the-duplicate-number/)) `[Pattern: Floyd's Cycle Detection]` — Only O (1) extra space allowed `[Companies: Amazon, Google, Meta, Microsoft]`
 
-**Companies:** Amazon, Google, Meta, Microsoft
-`[Pattern: Floyd's Cycle Detection]` — Only O (1) extra space allowed
+- **P32: Trapping Rain Water** ([LC 42](https://leetcode.com/problems/trapping-rain-water/)) `[Pattern: Two Pointers / Precomputation]` — Google/Amazon favourite `[Companies: Google, Amazon, Meta, Microsoft]`
 
-- **P32: Trapping Rain Water** ([LC 42](https://leetcode.com/problems/trapping-rain-water/))
+- **P33: Max Product Subarray** ([LC 152](https://leetcode.com/problems/maximum-product-subarray/)) `[Pattern: Track min AND max]` — Sign-flip trick `[Companies: Amazon, Google, LinkedIn]`
 
-**Companies:** Google, Amazon, Meta, Microsoft
-`[Pattern: Two Pointers / Precomputation]` — Google/Amazon favourite
+- **P34: Merge Intervals** ([LC 56](https://leetcode.com/problems/merge-intervals/)) `[Pattern: Sort + Greedy Merge]` — Sort by start, merge overlapping `[Companies: Google, Amazon, Meta, Microsoft]`
 
-- **P33: Max Product Subarray** ([LC 152](https://leetcode.com/problems/maximum-product-subarray/))
+- **P35: Longest Consecutive Sequence** ([LC 128](https://leetcode.com/problems/longest-consecutive-sequence/)) `[Pattern: HashSet Lookup O(n)]` `[Companies: Google, Amazon, Meta]`
 
-**Companies:** Amazon, Google, LinkedIn
-`[Pattern: Track min AND max]` — Sign-flip trick
-
-- **P34: Merge Intervals** ([LC 56](https://leetcode.com/problems/merge-intervals/)) `[Pattern: Sort + Greedy Merge]` —
-
-**Companies:** Google, Amazon, Meta, Microsoft
-Sort by start, merge overlapping
-
-- **P35: Longest Consecutive Sequence** ([LC 128](https://leetcode.com/problems/longest-consecutive-sequence/))
-
-**Companies:** Google, Amazon, Meta
-`[Pattern: HashSet Lookup O(n)]`
-
-- **P36: 3Sum** ([LC 15](https://leetcode.com/problems/3sum/)) `[Pattern: Sort + Two Pointers]` — Handle duplicates
-
-**Companies:** Amazon, Meta, Google, Adobe
-carefully
+- **P36: 3Sum** ([LC 15](https://leetcode.com/problems/3sum/)) `[Pattern: Sort + Two Pointers]` — Handle duplicates carefully `[Companies: Amazon, Meta, Google, Adobe]`
 
 - **P37: Spiral Matrix** ([LC 54](https://leetcode.com/problems/spiral-matrix/)) `[Pattern: Layer-by-layer traversal]` `[Companies: Google, Amazon, Microsoft, Meta]`
-- **P38: Set Matrix Zeroes** ([LC 73](https://leetcode.com/problems/set-matrix-zeroes/)) `[Pattern: In-place marking]` —
+- **P38: Set Matrix Zeroes** ([LC 73](https://leetcode.com/problems/set-matrix-zeroes/)) `[Pattern: In-place marking]` — O (1) space version `[Companies: Amazon, Microsoft, Meta]`
 
-**Companies:** Amazon, Microsoft, Meta
-O (1) space version
-
-- **P39: Jump Game** ([LC 55](https://leetcode.com/problems/jump-game/)) `[Pattern: Greedy reach tracking]` —
-
-**Companies:** Amazon, Google, Meta, Microsoft
-Amazon/Google
+- **P39: Jump Game** ([LC 55](https://leetcode.com/problems/jump-game/)) `[Pattern: Greedy reach tracking]` — Amazon/Google `[Companies: Amazon, Google, Meta, Microsoft]`
 
 - **P40: Pascal's Triangle** ([LC 118](https://leetcode.com/problems/pascals-triangle/)) `[Pattern: 2D DP]` `[Companies: Amazon, Google, Adobe]`
 

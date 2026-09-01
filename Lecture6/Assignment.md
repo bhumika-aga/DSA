@@ -192,22 +192,13 @@ cements the base-2 understanding.
 
 ### P26-30: The FAANG Tier
 
-- **P26: Missing Number** ([LC 268](https://leetcode.com/problems/missing-number/)) - Solve using XOR.
+- **P26: Missing Number** ([LC 268](https://leetcode.com/problems/missing-number/)) - Solve using XOR. `[Companies: Amazon, Google, Microsoft]`
 
-**Companies:** Amazon, Google, Microsoft
+- **P27: Reverse Bits** ([LC 190](https://leetcode.com/problems/reverse-bits/)) - O (1) time processing via bitwise. `[Companies: Amazon, Apple, Adobe]`
 
-- **P27: Reverse Bits** ([LC 190](https://leetcode.com/problems/reverse-bits/)) - O (1) time processing via bitwise.
+- **P28: UTF-8 Validation** ([LC 393](https://leetcode.com/problems/utf-8-validation/)) - Masking complex bits. `[Companies: Google, Amazon, Meta]`
 
-**Companies:** Amazon, Apple, Adobe
-
-- **P28: UTF-8 Validation** ([LC 393](https://leetcode.com/problems/utf-8-validation/)) - Masking complex bits.
-
-**Companies:** Google, Amazon, Meta
-
-- **P29: Count Triplets XOR**
-
-**Companies:** Google, Amazon
-([LC 1442](https://leetcode.com/problems/count-triplets-that-can-form-two-arrays-of-equal-xor/)) - Prefix XOR.
+- **P29: Count Triplets XOR** ([LC 1442](https://leetcode.com/problems/count-triplets-that-can-form-two-arrays-of-equal-xor/)) - Prefix XOR. `[Companies: Google, Amazon]`
 
 - **P30: Bitwise XOR of all Subsets Sum**: Challenging mathematical logic using bit frequencies.  
   `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Apple]`
