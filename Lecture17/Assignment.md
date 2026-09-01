@@ -11,7 +11,7 @@
 ## 🗺️ Pattern Recognition — Read Before Starting
 
 | Signal Phrase                                            | Pattern            | Tool                               |
-|----------------------------------------------------------|--------------------|------------------------------------|
+| -------------------------------------------------------- | ------------------ | ---------------------------------- |
 | "Shortest path", "minimum steps/hops" — unweighted       | BFS                | Queue + visited[]                  |
 | "Connected components", "number of islands", "regions"   | DFS flood fill     | visited[] + recursive DFS          |
 | "Can complete all tasks", "detect cycle"                 | Cycle Detection    | 3-color DFS (directed) or Kahn's   |
@@ -53,8 +53,8 @@ update it and recurse into 4 neighbors. Early exit if `newColor == oldColor` to 
 **🔗 [LC 323](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)**
 **Pattern:** DFS connected components | **Companies:** LinkedIn, Amazon
 
-**Hint:** For each unvisited node run DFS/BFS and increment a counter. *(Union-Find is an alternative — covered in
-Lecture 18.)*
+**Hint:** For each unvisited node run DFS/BFS and increment a counter. _(Union-Find is an alternative — covered in
+Lecture 18.)_
 
 ---
 
@@ -197,6 +197,7 @@ create a new node, add to map, then clone all neighbors recursively.
 
 **🔗 [LC 127](https://leetcode.com/problems/word-ladder/)**
 **Pattern:** BFS on implicit graph | **Companies:** Google, Amazon, Facebook, Microsoft
+
 > ⚠️ LeetCode rates this **Hard** — the core BFS concept is Medium; the challenge is the implicit graph construction and
 > avoiding TLE.
 
@@ -238,15 +239,13 @@ as current node → not bipartite. Must handle disconnected graphs (loop all nod
 
 ### M13 · Find the City With the Smallest Number of Neighbors ⭐
 
-*
+- \*🔗 [LC 1334](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
+  \*\*
+  **Pattern:** Floyd-Warshall (all-pairs shortest path) | **Companies:** Google, Amazon
 
-*🔗 [LC 1334](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)
-**
-**Pattern:** Floyd-Warshall (all-pairs shortest path) | **Companies:** Google, Amazon
-
-**Hint:** Run Floyd-Warshall to compute all-pairs shortest paths. For each city, count how many other cities are
-reachable within `distanceThreshold`. Return the city with the fewest reachable neighbors (ties broken by largest city
-index). Floyd-Warshall fits here because n ≤ 100.
+  **Hint:** Run Floyd-Warshall to compute all-pairs shortest paths. For each city, count how many other cities are
+  reachable within `distanceThreshold`. Return the city with the fewest reachable neighbors (ties broken by largest city
+  index). Floyd-Warshall fits here because n ≤ 100.
 
 ---
 
@@ -292,7 +291,7 @@ requirement without TLE.
 
 ### H2 · Alien Dictionary
 
-**🔗 [LC 269](https://leetcode.com/problems/alien-dictionary/)** ⚠️ *LeetCode Premium*
+**🔗 [LC 269](https://leetcode.com/problems/alien-dictionary/)** ⚠️ _LeetCode Premium_
 **Pattern:** Topological sort on character ordering | **Companies:** Google, Amazon, Facebook, Microsoft
 
 **Hint:** Compare adjacent words character by character to find ordering constraints (e.g., `'t' → 'f'`). Build directed
@@ -391,7 +390,7 @@ visited must track k too).
 ## 🏢 Company Focus Table
 
 | Company       | Must-Know Problems                                                                                      |
-|---------------|---------------------------------------------------------------------------------------------------------|
+| ------------- | ------------------------------------------------------------------------------------------------------- |
 | **Amazon**    | Number of Islands (LC 200), Course Schedule (LC 207), Word Ladder (LC 127), Clone Graph (LC 133)        |
 | **Google**    | Word Ladder (LC 127), Pacific Atlantic (LC 417), Critical Connections (LC 1192), Swim in Water (LC 778) |
 | **Meta**      | Number of Islands (LC 200), Course Schedule II (LC 210), Clone Graph (LC 133), Rotting Oranges (LC 994) |
@@ -402,18 +401,18 @@ visited must track k too).
 
 ## ✅ Completion Checklist
 
-* [ ] Completed all 8 Easy problems
-* [ ] Completed all 15 Medium problems (including LC 1334 Floyd-Warshall)
-* [ ] Attempted all 7 Hard problems
-* [ ] Can answer all 7 Conceptual Check questions verbally
-* [ ] Can write BFS shortest path template from memory
-* [ ] Can write DFS flood fill template from memory
-* [ ] Can write Kahn's topological sort from memory
-* [ ] Can write Dijkstra's with min-heap from memory
-* [ ] Can write Floyd-Warshall 3-loop DP from memory and know when V is small enough to use it
-* [ ] Understand Tarjan's bridge condition (`low[v] > disc[u]`) and can implement it for LC 1192
-* [ ] Know when to use BFS vs DFS vs Dijkstra vs Bellman-Ford vs Floyd-Warshall without hesitation
-* [ ] Can apply the 4-question framework (nodes, edges, directed?, computing what?) to any new graph problem
+- [ ] Completed all 8 Easy problems
+- [ ] Completed all 15 Medium problems (including LC 1334 Floyd-Warshall)
+- [ ] Attempted all 7 Hard problems
+- [ ] Can answer all 7 Conceptual Check questions verbally
+- [ ] Can write BFS shortest path template from memory
+- [ ] Can write DFS flood fill template from memory
+- [ ] Can write Kahn's topological sort from memory
+- [ ] Can write Dijkstra's with min-heap from memory
+- [ ] Can write Floyd-Warshall 3-loop DP from memory and know when V is small enough to use it
+- [ ] Understand Tarjan's bridge condition (`low[v] > disc[u]`) and can implement it for LC 1192
+- [ ] Know when to use BFS vs DFS vs Dijkstra vs Bellman-Ford vs Floyd-Warshall without hesitation
+- [ ] Can apply the 4-question framework (nodes, edges, directed?, computing what?) to any new graph problem
 
 ---
 
