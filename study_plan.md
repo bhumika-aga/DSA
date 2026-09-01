@@ -1,44 +1,103 @@
-# 🎯 DSA Mastery — Complete Study Plan
+# 🎯 DSA Mastery — Zero to Hero Study Plan
 
-> **Inspired by Kunal Kushwaha's DSA in Java Lectures**
-> Pattern-first · Intuition-before-code · Company-tagged problems
+> **A complete Java DSA course.** Start with no computer-science background, finish able to name and solve the pattern
+> behind any interview question.
 
 ---
 
 ## 📊 Overview
 
-| Metric             | Value                    |
-| ------------------ | ------------------------ |
-| **Total Topics**   | 30 (Updated)             |
-| **Phases**         | 4                        |
-| **Duration**       | 22–26 Weeks              |
-| **Total Problems** | 600+                     |
-| **Approach**       | Pattern-based, bottom-up |
+| Metric             | Value                                                |
+| ------------------ | ---------------------------------------------------- |
+| **Total Lectures** | 38                                                   |
+| **Phases**         | 6                                                    |
+| **Study Days**     | 202 days of content                                  |
+| **Duration**       | ~31 weeks at one lecture block at a time             |
+| **Total Problems** | 976                                                  |
+| **Written So Far** | 17 lectures · 515 problems                           |
+| **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 ### How to Use This Plan
 
-1. **Follow the phases in order** — each builds on the previous
-2. **Master patterns, not problems** — recognize the pattern, then solve any variant
-3. **Think before you code** — Mantra: understand the intuition first
-4. **Practice daily** — consistency beats intensity
-5. **Tag your solves** — track which patterns and companies you've covered
+1. **Follow the phases in order.** Each one assumes the last. Skipping ahead to DP is the classic mistake.
+2. **One topic at a time.** Read the notes, then do the assignment before moving on.
+3. **Master patterns, not problems.** Recognise the pattern and every variant becomes the same question.
+4. **Think before you type.** Say the brute-force answer out loud, then improve it.
+5. **Tag every solve** with its pattern and the company that asks it. Your log becomes your revision plan in Lecture 37.
+6. **Re-solve, don't re-read.** A problem you have only read is a problem you cannot do.
+
+### 🚦 Status Key
+
+| Symbol | Meaning                                                                |
+| ------ | ---------------------------------------------------------------------- |
+| ✅     | Lecture notes and assignment are written and linked                    |
+| 📝     | Planned — the syllabus below is fixed, the material is not written yet |
+
+---
+
+## 🗂 Lecture Index
+
+| #   | Lecture                                                     | Phase   | Days | Problems | Status |
+| --- | ----------------------------------------------------------- | ------- | ---- | -------- | ------ |
+| 1   | ⚙️ Java & Programming Fundamentals                          | Phase 1 | 5d   | 40       | ✅     |
+| 2   | 🧠 Java Memory Management                                   | Phase 1 | 4d   | 35       | ✅     |
+| 3   | 🏗️ OOP & Java Collections Deep Dive                         | Phase 1 | 4d   | 35       | ✅     |
+| 4   | ⚡ Java 8+ Modern Features                                  | Phase 1 | 3d   | 25       | ✅     |
+| 5   | 🔁 Recursion & Backtracking                                 | Phase 1 | 7d   | 35       | ✅     |
+| 6   | 🔣 Bit Manipulation                                         | Phase 1 | 4d   | 30       | ✅     |
+| 7   | 🔢 Mathematics for DSA                                      | Phase 1 | 4d   | 30       | ✅     |
+| 8   | 📋 Arrays & Strings                                         | Phase 2 | 7d   | 35       | ✅     |
+| 9   | 🔀 Sorting Algorithms                                       | Phase 2 | 4d   | 25       | ✅     |
+| 10  | 🔎 Searching Algorithms                                     | Phase 2 | 5d   | 28       | ✅     |
+| 11  | 🗂️ Linked Lists                                             | Phase 2 | 6d   | 28       | ✅     |
+| 12  | 📚 Stacks & Queues                                          | Phase 2 | 5d   | 25       | ✅     |
+| 13  | 🗃️ HashMap & HashSet                                        | Phase 2 | 4d   | 25       | ✅     |
+| 14  | 🧮 Matrix Problems                                          | Phase 2 | 4d   | 24       | ✅     |
+| 15  | 🌳 Trees (Binary Trees & BST)                               | Phase 2 | 10d  | 45       | ✅     |
+| 16  | ⛰️ Heaps & Priority Queues                                  | Phase 2 | 5d   | 20       | ✅     |
+| 17  | 🕸️ Graphs                                                   | Phase 2 | 12d  | 30       | ✅     |
+| 18  | 🎯 Two Pointers & Sliding Window                            | Phase 3 | 6d   | 30       | 📝     |
+| 19  | 🧾 Prefix Sums & Difference Arrays                          | Phase 3 | 4d   | 20       | 📝     |
+| 20  | 📉 Monotonic Stack & Queue                                  | Phase 3 | 4d   | 20       | 📝     |
+| 21  | 📐 Intervals & Sweep Line                                   | Phase 3 | 4d   | 18       | 📝     |
+| 22  | 💡 Greedy Algorithms                                        | Phase 3 | 5d   | 25       | 📝     |
+| 23  | 🔍 Divide & Conquer                                         | Phase 3 | 4d   | 18       | 📝     |
+| 24  | 🔗 Union-Find (Disjoint Set Union)                          | Phase 3 | 4d   | 20       | 📝     |
+| 25  | 🧩 Dynamic Programming I — Foundations & 1D                 | Phase 4 | 6d   | 25       | 📝     |
+| 26  | 🧱 Dynamic Programming II — Grids & Strings                 | Phase 4 | 7d   | 30       | 📝     |
+| 27  | 🎒 Dynamic Programming III — Knapsack & Subsets             | Phase 4 | 6d   | 25       | 📝     |
+| 28  | 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit | Phase 4 | 7d   | 25       | 📝     |
+| 29  | 🔤 Tries (Prefix Trees)                                     | Phase 5 | 4d   | 18       | 📝     |
+| 30  | 📶 Segment Trees & Fenwick Trees                            | Phase 5 | 6d   | 22       | 📝     |
+| 31  | 🪵 Square Root Decomposition & Mo's Algorithm               | Phase 5 | 3d   | 12       | 📝     |
+| 32  | 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)         | Phase 5 | 5d   | 20       | 📝     |
+| 33  | 🕳️ Advanced Graph Algorithms                                | Phase 5 | 6d   | 22       | 📝     |
+| 34  | 🎚️ Balanced BSTs & Ordered Structures                       | Phase 5 | 4d   | 18       | 📝     |
+| 35  | 🎲 Advanced Math & Game Theory                              | Phase 5 | 4d   | 18       | 📝     |
+| 36  | 🛠️ Design Data Structures                                   | Phase 6 | 5d   | 20       | 📝     |
+| 37  | ⏱️ Company Pattern Drills                                   | Phase 6 | 8d   | 40       | 📝     |
+| 38  | 🎓 Mock Interviews & System Thinking                        | Phase 6 | 7d   | 15       | 📝     |
 
 ---
 
 ## 🟣 Phase 1 — Foundations (Weeks 1–5)
 
-> Build the mental models. Learn to think recursively. Understand how the computer thinks.
+> Learn to think like a program. Java, memory, recursion, and the maths underneath everything else.
+
+**7 lectures · 31 days · 230 problems**
 
 ---
 
-### Topic 1: ⚙️ Java & Programming Fundamentals
+### Lecture 1: ⚙️ Java & Programming Fundamentals
 
-| Detail               | Value              |
-| -------------------- | ------------------ |
-| **Duration**         | 5 days             |
-| **Problems**         | 20                 |
-| **Difficulty Split** | 15 Easy · 5 Medium |
-| **Prerequisites**    | None               |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 5 days                                                                               |
+| **Problems**         | 40                                                                                   |
+| **Difficulty Split** | 20 Easy · 10 Medium · 10 Hard                                                        |
+| **Prerequisites**    | None                                                                                 |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture1/lecture1_notes.html) · [Assignment](Lecture1/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -63,7 +122,7 @@
 2. **Day 2:** Operators, control flow (if/else, switch), loops (for, while, do-while, enhanced-for)
 3. **Day 3:** Methods, parameter passing (by value vs reference), scope, the call stack, overloading
 4. **Day 4:** OOP — Classes, objects, constructors, `this` keyword, `static` vs instance, inheritance, polymorphism
-5. **Day 5:** Introduction to Big-O — O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ), O(n!), space complexity
+5. **Day 5:** Introduction to Big-O — O (1), O (log n), O (n), O (n log n), O (n²), O (2ⁿ), O (n!), space complexity
 
 #### 🏢 Companies That Ask These
 
@@ -71,14 +130,16 @@
 
 ---
 
-### Topic 2: 🧠 Java Memory Management
+### Lecture 2: 🧠 Java Memory Management
 
-| Detail               | Value              |
-| -------------------- | ------------------ |
-| **Duration**         | 2 days             |
-| **Problems**         | 5 (Conceptual)     |
-| **Difficulty Split** | 5 Easy             |
-| **Prerequisites**    | Programming Basics |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 4 days                                                                               |
+| **Problems**         | 35                                                                                   |
+| **Difficulty Split** | 15 Easy · 15 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lecture 1                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture2/lecture2_notes.html) · [Assignment](Lecture2/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -107,14 +168,16 @@
 
 ---
 
-### Topic 3: 🏗️ OOP & Java Collections Deep Dive
+### Lecture 3: 🏗️ OOP & Java Collections Deep Dive
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 8 Easy · 5 Medium · 2 Hard |
-| **Prerequisites**    | Java Fundamentals          |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 4 days                                                                               |
+| **Problems**         | 35                                                                                   |
+| **Difficulty Split** | 15 Easy · 15 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lectures 1–2                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture3/lecture3_notes.html) · [Assignment](Lecture3/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -147,14 +210,16 @@
 
 ---
 
-### Topic 4: ⚡ Java 8+ Modern Features
+### Lecture 4: ⚡ Java 8+ Modern Features
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 10                         |
-| **Difficulty Split** | 4 Easy · 4 Medium · 2 Hard |
-| **Prerequisites**    | OOP & Collections          |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 3 days                                                                               |
+| **Problems**         | 25                                                                                   |
+| **Difficulty Split** | 10 Easy · 10 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lecture 3                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture4/lecture4_notes.html) · [Assignment](Lecture4/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -184,14 +249,16 @@
 
 ---
 
-### Topic 5: 🔁 Recursion & Backtracking
+### Lecture 5: 🔁 Recursion & Backtracking
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 7 days                      |
-| **Problems**         | 30                          |
-| **Difficulty Split** | 8 Easy · 15 Medium · 7 Hard |
-| **Prerequisites**    | Java Fundamentals           |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 7 days                                                                               |
+| **Problems**         | 35                                                                                   |
+| **Difficulty Split** | 15 Easy · 15 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lecture 1                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture5/lecture5_notes.html) · [Assignment](Lecture5/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -227,21 +294,23 @@
 
 ---
 
-### Topic 6: 📊 Bit Manipulation
+### Lecture 6: 🔣 Bit Manipulation
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 8 Easy · 5 Medium · 2 Hard |
-| **Prerequisites**    | Java Fundamentals          |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 4 days                                                                               |
+| **Problems**         | 30                                                                                   |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lecture 1                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture6/lecture6_notes.html) · [Assignment](Lecture6/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Understand binary representation and bitwise operators (AND, OR, XOR, NOT, shifts)
 - Learn bit tricks that appear in interviews
-- Solve problems in O(1) space using bit manipulation
-- Understand bitmask DP setup (used in Phase 3)
+- Solve problems in O (1) space using bit manipulation
+- Understand bitmask DP setup (used in Lecture 28)
 
 #### 🔑 Key Patterns
 
@@ -265,14 +334,16 @@
 
 ---
 
-### Topic 7: 🏆 Math & Number Theory
+### Lecture 7: 🔢 Mathematics for DSA
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 6 Easy · 6 Medium · 3 Hard |
-| **Prerequisites**    | Java Fundamentals          |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 4 days                                                                               |
+| **Problems**         | 30                                                                                   |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lectures 1, 6                                                                        |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture7/lecture7_notes.html) · [Assignment](Lecture7/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -293,8 +364,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** GCD (Euclidean), LCM, prime factorization, Sieve of Eratosthenes, prime test O(√n)
-2. **Day 2:** Fast exponentiation, modular arithmetic, modular inverse (Fermat's little theorem), Pow(x, n), Sqrt(x)
+1. **Day 1:** GCD (Euclidean), LCM, prime factorization, Sieve of Eratosthenes, prime test O (√n)
+2. **Day 2:** Fast exponentiation, modular arithmetic, modular inverse (Fermat's little theorem), Pow (x, n), Sqrt (x)
 3. **Day 3:** Number theory problems — Count Primes, Happy Number, Excel Sheet Column, Ugly Number I/II
 4. **Day 4:** Combinatorics — Pascal's Triangle, Unique Paths (math), Catalan Numbers, nCr mod p
 
@@ -304,27 +375,31 @@
 
 ---
 
-## 🟢 Phase 2 — Core Data Structures (Weeks 6–13)
+## 🟢 Phase 2 — Core Data Structures (Weeks 6–14)
 
-> The bread and butter. These topics make up 60–70% of coding interviews.
+> The structures every interview is built from — arrays through graphs, each with its own notes and assignment.
+
+**10 lectures · 62 days · 285 problems**
 
 ---
 
-### Topic 8: 📋 Arrays & Strings
+### Lecture 8: 📋 Arrays & Strings
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 8 days                       |
-| **Problems**         | 40                           |
-| **Difficulty Split** | 10 Easy · 22 Medium · 8 Hard |
-| **Prerequisites**    | Recursion basics, Big-O      |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 7 days                                                                               |
+| **Problems**         | 35                                                                                   |
+| **Difficulty Split** | 10 Easy · 15 Medium · 10 Hard                                                        |
+| **Prerequisites**    | Lectures 1–5                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture8/lecture8_notes.html) · [Assignment](Lecture8/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Master in-place array manipulation techniques
 - Learn two-pointer technique for sorted/unsorted arrays
 - Understand sliding window for subarray/substring problems
-- Use prefix sums for O(1) range query optimization
+- Use prefix sums for O (1) range query optimization
 - Apply Kadane's algorithm for maximum subarray problems
 
 #### 🔑 Key Patterns
@@ -347,7 +422,8 @@
 5. **Day 5:** Sliding window (variable) — Longest Substring Without Repeating, Minimum Window Substring
 6. **Day 6:** Prefix sum — Range Sum Query, Subarray Sum Equals K, Product of Array Except Self
 7. **Day 7:** Kadane's — Maximum Subarray, Maximum Product Subarray, Circular Subarray Sum
-8. **Day 8:** Mixed mastery — Rotate Array, Next Permutation, Majority Element (Boyer-Moore), Longest Consecutive Sequence
+8. **Day 8:** Mixed mastery — Rotate Array, Next Permutation, Majority Element (Boyer-Moore), Longest Consecutive
+   Sequence
 
 #### 🏢 Companies That Ask These
 
@@ -355,21 +431,23 @@
 
 ---
 
-### Topic 9: ⚡ Sorting Algorithms
+### Lecture 9: 🔀 Sorting Algorithms
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 4 days                       |
-| **Problems**         | 25                           |
-| **Difficulty Split** | 10 Easy · 10 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Recursion            |
+| Detail               | Value                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| **Duration**         | 4 days                                                                               |
+| **Problems**         | 25                                                                                   |
+| **Difficulty Split** | 10 Easy · 10 Medium · 5 Hard                                                         |
+| **Prerequisites**    | Lectures 5, 8                                                                        |
+| **Status**           | ✅ Notes + assignment written                                                        |
+| **Material**         | [Lecture Notes](Lecture9/lecture9_notes.html) · [Assignment](Lecture9/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Implement all major sorting algorithms from scratch
 - Know stability, in-place, and worst-case trade-offs for each sort
 - Apply sort as preprocessing to unlock faster algorithms
-- Understand counting/radix sort for O(n) on bounded-range inputs
+- Understand counting/radix sort for O (n) on bounded-range inputs
 
 #### 🔑 Key Patterns
 
@@ -383,10 +461,12 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** O(n²) sorts — Bubble Sort (stable), Selection Sort (unstable), Insertion Sort (adaptive, stable)
-2. **Day 2:** O(n log n) sorts — Merge Sort (stable, D&C), Quick Sort (partition, pivot selection, unstable)
-3. **Day 3:** Non-comparison sorts — Counting Sort, Radix Sort, Bucket Sort. **Cyclic Sort** pattern for range-limited arrays.
-4. **Day 4:** Interview problems — Custom Comparators (Largest Number, Wiggle Sort), QuickSelect for Kth Largest, Merge Sort for Inversions.
+1. **Day 1:** O (n²) sorts — Bubble Sort (stable), Selection Sort (unstable), Insertion Sort (adaptive, stable)
+2. **Day 2:** O (n log n) sorts — Merge Sort (stable, D&C), Quick Sort (partition, pivot selection, unstable)
+3. **Day 3:** Non-comparison sorts — Counting Sort, Radix Sort, Bucket Sort. **Cyclic Sort** pattern for range-limited
+   arrays.
+4. **Day 4:** Interview problems — Custom Comparators (Largest Number, Wiggle Sort), QuickSelect for Kth Largest, Merge
+   Sort for Inversions.
 
 #### 🏢 Companies That Ask These
 
@@ -394,18 +474,20 @@
 
 ---
 
-### Topic 10: 🔎 Searching Algorithms
+### Lecture 10: 🔎 Searching Algorithms
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 28                          |
-| **Difficulty Split** | 8 Easy · 13 Medium · 7 Hard |
-| **Prerequisites**    | Arrays, Sorting             |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 28                                                                                      |
+| **Difficulty Split** | 8 Easy · 13 Medium · 7 Hard                                                             |
+| **Prerequisites**    | Lectures 8–9                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture10/lecture10_notes.html) · [Assignment](Lecture10/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
-- Understand the limits of $O(N)$ Linear Search against $O(\log N)$ Binary Search scaling.
+- Understand the limits of $O (N)$ Linear Search against $O (\log N)$ Binary Search scaling.
 - Implement Binary Search perfectly — get boundaries right every single time.
 - Recognize disguised binary search problems that aren't initially obvious.
 - Apply "binary search on answer space" for monotonic optimization scenarios.
@@ -424,7 +506,7 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Searching Basics — Linear Search ($O(N)$) vs Binary Search introduction, constraints and capabilities.
+1. **Day 1:** Searching Basics — Linear Search ($O (N)$) vs Binary Search introduction, constraints and capabilities.
 2. **Day 2:** Classic Binary Strategy — The `lo/hi/mid` template, overflow bugs, when to safely use `<` vs `<=`.
 3. **Day 3:** Rotated Arrays & Bounds — Searching in Rotated Sorted Arrays, First/Last Occurrences, Find Peak.
 4. **Day 4:** Answer Space Optimization — "Binary Search on Answer" structure (Koko Eating Bananas, Capacity to Ship).
@@ -436,14 +518,16 @@
 
 ---
 
-### Topic 11: 🗂️ Linked Lists
+### Lecture 11: 🗂️ Linked Lists
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 6 days                       |
-| **Problems**         | 28                           |
-| **Difficulty Split** | 10 Easy · 13 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Pointers/References  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 28                                                                                      |
+| **Difficulty Split** | 10 Easy · 13 Medium · 5 Hard                                                            |
+| **Prerequisites**    | Lectures 2, 5                                                                           |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture11/lecture11_notes.html) · [Assignment](Lecture11/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -470,7 +554,7 @@
 3. **Day 3:** Fast & slow pointers — find middle, detect cycle, find cycle start, nth from end
 4. **Day 4:** Advanced re-linking — Reverse in-place (iterative/recursive), Reverse in K-Groups
 5. **Day 5:** Specialized variations — Flattening multilevel lists, Copy with random pointer
-6. **Day 6:** Cache Design — LRU Cache & O(1) LFU Cache implementation logic
+6. **Day 6:** Cache Design — LRU Cache & O (1) LFU Cache implementation logic
 
 #### 🏢 Companies That Ask These
 
@@ -478,21 +562,23 @@
 
 ---
 
-### Topic 12: 📚 Stacks & Queues
+### Lecture 12: 📚 Stacks & Queues
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 25                          |
-| **Difficulty Split** | 8 Easy · 12 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Linked Lists        |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 8 Easy · 12 Medium · 5 Hard                                                             |
+| **Prerequisites**    | Lectures 8, 11                                                                          |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture12/lecture12_notes.html) · [Assignment](Lecture12/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Understand LIFO (stack) and FIFO (queue) principles and their implementations
 - Master monotonic stack for next greater/smaller element problems
 - Use queues for BFS and level-order traversals
-- Master deque for O(n) sliding window min/max problems
+- Master deque for O (n) sliding window min/max problems
 
 #### 🔑 Key Patterns
 
@@ -518,20 +604,22 @@
 
 ---
 
-### Topic 13: 🗃️ HashMap & HashSet
+### Lecture 13: 🗃️ HashMap & HashSet
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 6 Easy · 10 Medium · 4 Hard |
-| **Prerequisites**    | Arrays, Strings             |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 7 Easy · 13 Medium · 5 Hard                                                             |
+| **Prerequisites**    | Lectures 2–3                                                                            |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture13/lecture13_notes.html) · [Assignment](Lecture13/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Understand hashing, hash functions, and collision resolution internals
 - Use frequency maps for counting, grouping, and top-K problems
-- Apply complement lookup for pair-sum patterns in O(1)
+- Apply complement lookup for pair-sum patterns in O (1)
 - Know when to use TreeMap (sorted), LinkedHashMap (ordered), vs HashMap (fastest)
 
 #### 🔑 Key Patterns
@@ -557,14 +645,16 @@
 
 ---
 
-### Topic 14: 🧮 Matrix Problems
+### Lecture 14: 🧮 Matrix Problems
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 5 Easy · 10 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, BFS/DFS basics      |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 24                                                                                      |
+| **Difficulty Split** | 5 Easy · 14 Medium · 5 Hard                                                             |
+| **Prerequisites**    | Lectures 8, 12                                                                          |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture14/lecture14_notes.html) · [Assignment](Lecture14/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -596,20 +686,22 @@
 
 ---
 
-### Topic 15: 🌳 Trees (Binary Trees & BST)
+### Lecture 15: 🌳 Trees (Binary Trees & BST)
 
-| Detail               | Value                         |
-| -------------------- | ----------------------------- |
-| **Duration**         | 10 days                       |
-| **Problems**         | 45                            |
-| **Difficulty Split** | 12 Easy · 23 Medium · 10 Hard |
-| **Prerequisites**    | Recursion, Stacks & Queues    |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 10 days                                                                                 |
+| **Problems**         | 45                                                                                      |
+| **Difficulty Split** | 12 Easy · 23 Medium · 10 Hard                                                           |
+| **Prerequisites**    | Lectures 5, 11–12                                                                       |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture15/lecture15_notes.html) · [Assignment](Lecture15/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Master all traversals (pre, in, post, level-order, Morris traversal)
 - Think recursively — every tree problem is root + left sub-problem + right sub-problem
-- Leverage BST property for O(log n) operations
+- Leverage BST property for O (log n) operations
 - Solve path-sum, ancestor, construction, and serialization problems
 
 #### 🔑 Key Patterns
@@ -634,7 +726,7 @@
 7. **Day 7:** BST ops — search, insert, delete, validate BST, kth smallest, successor/predecessor
 8. **Day 8:** LCA — LCA of binary tree, LCA of BST, distance between two nodes
 9. **Day 9:** Views — serialize/deserialize BT, vertical/top/bottom/boundary view
-10. **Day 10:** Advanced — flatten BT to LL, Morris traversal O(1) space, count complete tree nodes
+10. **Day 10:** Advanced — flatten BT to LL, Morris traversal O (1) space, count complete tree nodes
 
 #### 🏢 Companies That Ask These
 
@@ -642,21 +734,23 @@
 
 ---
 
-### Topic 16: ⛰️ Heaps & Priority Queues
+### Lecture 16: ⛰️ Heaps & Priority Queues
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 5 Easy · 10 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Trees (concepts)    |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 5 Easy · 10 Medium · 5 Hard                                                             |
+| **Prerequisites**    | Lectures 9, 15                                                                          |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture16/lecture16_notes.html) · [Assignment](Lecture16/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
 - Understand heap property (min-heap, max-heap) and heapify operation
 - Implement a heap from scratch using array representation
 - Solve Top-K problems efficiently with a size-K min-heap
-- Use two heaps for dynamic median computation in O(log n) per element
+- Use two heaps for dynamic median computation in O (log n) per element
 
 #### 🔑 Key Patterns
 
@@ -670,8 +764,9 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Heap property, array representation (parent=i, left=2i+1, right=2i+2), sift-up, sift-down, build heap O(n)
-2. **Day 2:** Heap sort O(n log n), PriorityQueue in Java — custom comparators, objects in heap
+1. **Day 1:** Heap property, array representation (parent=i, left=2i+1, right=2i+2), sift-up, sift-down, build heap O
+   (n)
+2. **Day 2:** Heap sort O (n log n), PriorityQueue in Java — custom comparators, objects in heap
 3. **Day 3:** Top K — Kth Largest Element, K Closest Points, Top K Frequent, Sort K Sorted Array
 4. **Day 4:** Two heaps — Find Median from Data Stream, Sliding Window Median
 5. **Day 5:** K-way merge — Merge K Sorted Lists, Smallest Range Covering Elements, Task Scheduler, Reorganize String
@@ -682,20 +777,16 @@
 
 ---
 
-## 🟠 Phase 3 — Advanced Structures & Algorithms (Weeks 14–20)
+### Lecture 17: 🕸️ Graphs
 
-> The differentiators. These topics separate good from great in interviews.
-
----
-
-### Topic 17: 🕸️ Graphs
-
-| Detail               | Value                                  |
-| -------------------- | -------------------------------------- |
-| **Duration**         | 12 days                                |
-| **Problems**         | 45                                     |
-| **Difficulty Split** | 8 Easy · 25 Medium · 12 Hard           |
-| **Prerequisites**    | Recursion, BFS/DFS from Trees, HashMap |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 12 days                                                                                 |
+| **Problems**         | 30                                                                                      |
+| **Difficulty Split** | 8 Easy · 15 Medium · 7 Hard                                                             |
+| **Prerequisites**    | Lectures 12, 15–16                                                                      |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture17/lecture17_notes.html) · [Assignment](Lecture17/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -737,52 +828,181 @@
 
 ---
 
-### Topic 18: 🔗 Union-Find (Disjoint Set Union)
+## 🟡 Phase 3 — Core Patterns (Weeks 15–19)
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 3 Easy · 8 Medium · 4 Hard |
-| **Prerequisites**    | Arrays, Graphs basics      |
+> The reusable techniques. Once these click, most medium problems stop being new problems.
 
-#### 🎓 Learning Objectives
-
-- Understand DSU as a data structure for tracking dynamic connectivity
-- Implement with path compression + union by rank for near-O(1) per operation
-- Apply to connected components, cycle detection, and set-merging problems
-- Know when DSU is better than BFS/DFS (online queries, dynamic edges)
-
-#### 🔑 Key Patterns
-
-| Pattern                  | Description                                   | Example Problem                      |
-| ------------------------ | --------------------------------------------- | ------------------------------------ |
-| **Path Compression**     | Flatten the find() tree — near O(1) amortized | Standard DSU find()                  |
-| **Union by Rank/Size**   | Always attach smaller tree to larger          | Standard DSU union()                 |
-| **Connected Components** | Count or query connectivity dynamically       | Number of Provinces, Friend Circles  |
-| **Cycle Detection**      | If both nodes already in same set → cycle     | Redundant Connection                 |
-| **Dynamic Merging**      | Merge sets over time, query connectivity      | Accounts Merge, Number of Islands II |
-
-#### 📝 Sub-Topics & Lecture Flow
-
-1. **Day 1:** DSU fundamentals — naive, path compression, union by rank, Inverse Ackermann O(α) proof
-2. **Day 2:** Classic problems — Number of Provinces, Redundant Connection, Graph Valid Tree, Connecting Cities
-3. **Day 3:** Advanced — Accounts Merge, Number of Islands II (online), Largest Color Value in a DAG
-
-#### 🏢 Companies That Ask These
-
-`Google` `Facebook/Meta` `Amazon` `Microsoft`
+**7 lectures · 31 days · 151 problems**
 
 ---
 
-### Topic 19: 💡 Greedy Algorithms
+### Lecture 18: 🎯 Two Pointers & Sliding Window
+
+| Detail               | Value                        |
+| -------------------- | ---------------------------- |
+| **Duration**         | 6 days                       |
+| **Problems**         | 30                           |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard |
+| **Prerequisites**    | Lectures 8–10                |
+| **Status**           | 📝 Planned                   |
+
+#### 🎓 Learning Objectives
+
+- Consolidate all two-pointer and sliding window patterns in a single mental model
+- Shift from "which algorithm?" to _instantly recognizing_ the pattern to use
+- Master the general expand/shrink template for variable window problems
+- Handle all multi-pointer cases: 3-sum, 4-sum, and beyond
+
+#### 🔑 Key Patterns
+
+| Pattern             | Description                                      | Example Problem                         |
+| ------------------- | ------------------------------------------------ | --------------------------------------- |
+| **Fixed Window**    | Window of constant size K                        | Max Sum Subarray of Size K              |
+| **Variable Window** | Expand until condition breaks, shrink to restore | Minimum Window Substring                |
+| **Opposite Ends**   | Left + right converge for sorted-array problems  | 3Sum, Trapping Rain Water               |
+| **Same Direction**  | Slow + fast in same direction                    | Longest Repeating Character Replacement |
+| **At-Most Trick**   | f(exactly K) = f(at most K) - f(at most K-1)     | Subarrays with K Different Integers     |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Opposite-ends patterns — Two Sum II, 3Sum, 4Sum, Container with Most Water, Trapping Rain Water
+2. **Day 2:** Variable window — Min Window Substring, Longest Repeating Char Replacement, Fruit Into Baskets
+3. **Day 3:** Advanced — Subarrays with K Different Integers (at-most trick), Count of Substrings
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Facebook/Meta` `Uber`
+
+---
+
+### Lecture 19: 🧾 Prefix Sums & Difference Arrays
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 4 days                     |
+| **Problems**         | 20                         |
+| **Difficulty Split** | 7 Easy · 9 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 8, 13             |
+| **Status**           | 📝 Planned                 |
+
+#### 🎓 Learning Objectives
+
+- Build a prefix-sum array and answer any range-sum query in O (1)
+- Combine prefix sums with a HashMap to count subarrays matching a target
+- Apply many range updates in O (1) each using a difference array
+- Extend both ideas to 2D grids (integral images)
+- Recognise prefix-XOR and prefix-product as the same shape of trick
+
+#### 🔑 Key Patterns
+
+| Pattern              | Description                                                 | Example Problem               |
+| -------------------- | ----------------------------------------------------------- | ----------------------------- |
+| **Prefix sum array** | Precompute cumulative totals; answer a range by subtraction | Range Sum Query — Immutable   |
+| **Prefix + HashMap** | Store seen prefix values to count subarrays summing to k    | Subarray Sum Equals K         |
+| **Difference array** | Mark +v at start, −v after end, prefix once at the end      | Corporate Flight Bookings     |
+| **2D prefix sum**    | Inclusion–exclusion over four corners of a rectangle        | Range Sum Query 2D            |
+| **Prefix XOR**       | XOR is its own inverse, so subtraction becomes XOR          | Count Triplets With Equal XOR |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** 1D prefix sums — build, query, and the off-by-one discipline. Running sum vs stored array.
+2. **Day 2:** Prefix + HashMap — Subarray Sum Equals K, Subarray Sums Divisible by K, Longest Zero-Sum Subarray.
+3. **Day 3:** Difference arrays — range increment in O (1), Car Pooling, Meeting Room capacity, 2D difference arrays.
+4. **Day 4:** 2D prefix sums — matrix region sums, Max Sum Submatrix; then the prefix-XOR family.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Facebook/Meta` `Microsoft`
+
+---
+
+### Lecture 20: 📉 Monotonic Stack & Queue
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 4 days                      |
+| **Problems**         | 20                          |
+| **Difficulty Split** | 5 Easy · 11 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 12, 18             |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Internalize all 4 monotonic stack variants as a single unified template
+- Apply the contribution technique to solve range min/max sum problems
+- Use monotone deque for O (n) sliding window extremes
+- Recognize problems solvable only with monotonic structures
+
+#### 🔑 Key Patterns
+
+| Pattern                      | Description                                  | Example Problem                |
+| ---------------------------- | -------------------------------------------- | ------------------------------ |
+| **Next Greater Element**     | Pop when current > top; stack stores indices | Daily Temperatures, NGE I/II   |
+| **Previous Greater Element** | Same stack, different traversal direction    | Stock Span Problem             |
+| **Next Smaller Element**     | Pop when current < top                       | Largest Rectangle in Histogram |
+| **Contribution Technique**   | Each element as min/max of some subarray     | Sum of Subarray Minimums       |
+| **Monotone Deque**           | Sliding window min/max in O(n)               | Sliding Window Maximum         |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Unified template for all 4 variants — NGE, NSE, PGE, PSE — with direction analysis
+2. **Day 2:** Area problems — Largest Rectangle in Histogram, Maximal Rectangle in Binary Matrix
+3. **Day 3:** Contribution technique — Sum of Subarray Minimums, Sum of Subarray Maximums, Subarray Ranges
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Facebook/Meta`
+
+---
+
+### Lecture 21: 📐 Intervals & Sweep Line
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 4 days                      |
+| **Problems**         | 18                          |
+| **Difficulty Split** | 5 Easy · 10 Medium · 3 Hard |
+| **Prerequisites**    | Lectures 9, 19              |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Recognize intervals as a distinct pattern family beyond basic merge/overlap
+- Apply sweep line algorithm for event-processing problems
+- Use difference arrays for O (1) per range update
+- Handle Skyline Problem and rectangle area union
+
+#### 🔑 Key Patterns
+
+| Pattern                 | Description                                  | Example Problem                        |
+| ----------------------- | -------------------------------------------- | -------------------------------------- |
+| **Event Sweep**         | Convert intervals to events, sort, process   | Meeting Rooms II (minimum rooms)       |
+| **Difference Array**    | Range increment O(1), reconstruct in O(n)    | Car Pooling, Corporate Flight Bookings |
+| **Interval Merging**    | Sort by start, merge overlapping intervals   | Merge Intervals, Insert Interval       |
+| **Sweep Line**          | Sweep a vertical line, track active segments | Skyline Problem, Rectangle Area Union  |
+| **Coordinate Compress** | Map large sparse coordinates to dense range  | Count Smaller Numbers After Self       |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Interval fundamentals — overlap check (a.end > b.start), merge, insert, min meeting rooms
+2. **Day 2:** Difference array — range increment/decrement O (1), car pooling, corporate flight bookings
+3. **Day 3:** Sweep line — Skyline Problem, Rectangle Area Union, Employee Free Time
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Microsoft` `Uber`
+
+---
+
+### Lecture 22: 💡 Greedy Algorithms
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
 | **Duration**         | 5 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 5 Easy · 10 Medium · 5 Hard |
-| **Prerequisites**    | Sorting, Arrays             |
+| **Problems**         | 25                          |
+| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 9, 16              |
+| **Status**           | 📝 Planned                  |
 
 #### 🎓 Learning Objectives
 
@@ -815,110 +1035,290 @@
 
 ---
 
-### Topic 20: 📐 Intervals & Sweep Line
-
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 12                         |
-| **Difficulty Split** | 3 Easy · 6 Medium · 3 Hard |
-| **Prerequisites**    | Arrays, Sorting, Greedy    |
-
-#### 🎓 Learning Objectives
-
-- Recognize intervals as a distinct pattern family beyond basic merge/overlap
-- Apply sweep line algorithm for event-processing problems
-- Use difference arrays for O(1) per range update
-- Handle Skyline Problem and rectangle area union
-
-#### 🔑 Key Patterns
-
-| Pattern                 | Description                                  | Example Problem                        |
-| ----------------------- | -------------------------------------------- | -------------------------------------- |
-| **Event Sweep**         | Convert intervals to events, sort, process   | Meeting Rooms II (minimum rooms)       |
-| **Difference Array**    | Range increment O(1), reconstruct in O(n)    | Car Pooling, Corporate Flight Bookings |
-| **Interval Merging**    | Sort by start, merge overlapping intervals   | Merge Intervals, Insert Interval       |
-| **Sweep Line**          | Sweep a vertical line, track active segments | Skyline Problem, Rectangle Area Union  |
-| **Coordinate Compress** | Map large sparse coordinates to dense range  | Count Smaller Numbers After Self       |
-
-#### 📝 Sub-Topics & Lecture Flow
-
-1. **Day 1:** Interval fundamentals — overlap check (a.end > b.start), merge, insert, min meeting rooms
-2. **Day 2:** Difference array — range increment/decrement O(1), car pooling, corporate flight bookings
-3. **Day 3:** Sweep line — Skyline Problem, Rectangle Area Union, Employee Free Time
-
-#### 🏢 Companies That Ask These
-
-`Google` `Amazon` `Microsoft` `Uber`
-
----
-
-### Topic 21: 🧩 Dynamic Programming
-
-| Detail               | Value                                 |
-| -------------------- | ------------------------------------- |
-| **Duration**         | 15 days                               |
-| **Problems**         | 55                                    |
-| **Difficulty Split** | 8 Easy · 30 Medium · 17 Hard          |
-| **Prerequisites**    | Recursion & Backtracking, Memoization |
-
-#### 🎓 Learning Objectives
-
-- Transform recursive solution → memoization → tabulation systematically
-- Recognize DP: choices at each step + overlapping subproblems + optimal substructure
-- Master the "state → transition → base case" framework for any DP problem
-- Space-optimize 2D DP to 1D using rolling arrays
-
-#### 🔑 Key Patterns
-
-| Pattern                | Description                                      | Example Problem                                  |
-| ---------------------- | ------------------------------------------------ | ------------------------------------------------ |
-| **0/1 Knapsack**       | Include or exclude each item exactly once        | 0/1 Knapsack, Subset Sum, Partition Equal Subset |
-| **Unbounded Knapsack** | Item can be used unlimited times                 | Coin Change I/II, Rod Cutting                    |
-| **LCS / LIS**          | Longest common / increasing subsequence          | LCS, Edit Distance, LIS, Russian Doll Envelopes  |
-| **Matrix DP**          | Fill 2D table cell by cell with transitions      | Unique Paths, Min Path Sum, Maximal Square       |
-| **Interval DP**        | Optimize over subranges [i..j]                   | Burst Balloons, Palindrome Partitioning II       |
-| **DP on Trees**        | State transitions follow tree parent→child edges | House Robber III, Max Path Sum                   |
-| **Bitmask DP**         | Represent subset as bitmask in DP state          | TSP, Minimum XOR Sum of Two Arrays               |
-| **Stock DP**           | State = day × holding status × transactions left | Buy & Sell Stock I/II/III/IV with Cooldown/Fee   |
-
-#### 📝 Sub-Topics & Lecture Flow
-
-1. **Day 1:** Fundamentals — recursion → memoization → tabulation. Fibonacci comparison, Climbing Stairs
-2. **Day 2:** 1D DP — House Robber I/II, Decode Ways, Word Break, Min Cost Climbing Stairs
-3. **Day 3:** 0/1 Knapsack family — 0/1 Knapsack, Subset Sum, Partition Equal Subset, Target Sum
-4. **Day 4:** Unbounded Knapsack — Coin Change I (min coins), Coin Change II (ways), Rod Cutting
-5. **Day 5:** LIS family — O(n²) DP, O(n log n) patience sort, Russian Doll Envelopes
-6. **Day 6:** LCS family — LCS, Shortest Common Supersequence, Edit Distance, Print LCS
-7. **Day 7:** String DP — Longest Palindromic Subsequence, Distinct Subsequences, Palindrome Partitioning
-8. **Day 8:** Matrix / Grid DP — Unique Paths I/II, Min Path Sum, Maximal Square, Dungeon Game
-9. **Day 9:** Interval DP — Matrix Chain Multiplication, Burst Balloons, Min Cost Tree From Leaf Values
-10. **Day 10:** Stock problems — Buy & Sell I/II/III/IV, with Cooldown, with Transaction Fee
-11. **Day 11:** More subsequences — Longest Common Substring, Count Distinct Subsequences
-12. **Day 12:** DP on trees — House Robber III, Maximum Path Sum (DP view), Diameter
-13. **Day 13:** Bitmask DP — Traveling Salesman intro, Minimum XOR Sum of Two Arrays, Assign Tasks
-14. **Day 14:** Space optimization — rolling array, reduce 2D DP to O(n) or O(1) space
-15. **Day 15:** Hard problems — Regular Expression Matching, Wildcard Matching, Interleaving String
-
-#### 🏢 Companies That Ask These
-
-`Google` `Amazon` `Facebook/Meta` `Microsoft` `Apple` `Uber`
-
----
-
-### Topic 22: 🔤 Tries
+### Lecture 23: 🔍 Divide & Conquer
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
 | **Duration**         | 4 days                      |
-| **Problems**         | 15                          |
-| **Difficulty Split** | 3 Easy · 8 Medium · 4 Hard  |
-| **Prerequisites**    | Strings, HashMap, Recursion |
+| **Problems**         | 18                          |
+| **Difficulty Split** | 4 Easy · 10 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 5, 9               |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Formally analyze recursive algorithms using the Master Theorem
+- Apply QuickSelect for O (n) average-case selection
+- Identify when divide-and-conquer beats brute force
+- Solve hard problems by splitting the problem space
+
+#### 🔑 Key Patterns
+
+| Pattern                  | Description                               | Example Problem              |
+| ------------------------ | ----------------------------------------- | ---------------------------- |
+| **D&C on Sorted Arrays** | Divide sorted structure, combine results  | Median of Two Sorted Arrays  |
+| **QuickSelect**          | Partition-based O(n) average selection    | Kth Largest Element in Array |
+| **Fast Exponentiation**  | Compute pow(x, n) by squaring — O(log n)  | Pow(x, n)                    |
+| **Merge Sort Variants**  | Count useful properties during merge step | Count Inversions             |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Master Theorem, recurrence relations, analyzing T (n) = aT (n/b) + f (n)
+2. **Day 2:** QuickSelect — Kth Largest/Smallest, worst case O (n²) vs average O (n)
+3. **Day 3:** Merge sort variants — Count Inversions, Count of Smaller Numbers After Self
+4. **Day 4:** Median of Two Sorted Arrays, different ways to add parentheses, expression evaluation
+
+#### 🏢 Companies That Ask These
+
+`Google` `Facebook/Meta` `Amazon`
+
+---
+
+### Lecture 24: 🔗 Union-Find (Disjoint Set Union)
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 4 days                      |
+| **Problems**         | 20                          |
+| **Difficulty Split** | 6 Easy · 10 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 15, 17             |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Understand DSU as a data structure for tracking dynamic connectivity
+- Implement with path compression + union by rank for near-O (1) per operation
+- Apply to connected components, cycle detection, and set-merging problems
+- Know when DSU is better than BFS/DFS (online queries, dynamic edges)
+
+#### 🔑 Key Patterns
+
+| Pattern                  | Description                                   | Example Problem                      |
+| ------------------------ | --------------------------------------------- | ------------------------------------ |
+| **Path Compression**     | Flatten the find() tree — near O(1) amortized | Standard DSU find()                  |
+| **Union by Rank/Size**   | Always attach smaller tree to larger          | Standard DSU union()                 |
+| **Connected Components** | Count or query connectivity dynamically       | Number of Provinces, Friend Circles  |
+| **Cycle Detection**      | If both nodes already in same set → cycle     | Redundant Connection                 |
+| **Dynamic Merging**      | Merge sets over time, query connectivity      | Accounts Merge, Number of Islands II |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** DSU fundamentals — naive, path compression, union by rank, Inverse Ackermann O (α) proof
+2. **Day 2:** Classic problems — Number of Provinces, Redundant Connection, Graph Valid Tree, Connecting Cities
+3. **Day 3:** Advanced — Accounts Merge, Number of Islands II (online), Largest Color Value in a DAG
+
+#### 🏢 Companies That Ask These
+
+`Google` `Facebook/Meta` `Amazon` `Microsoft`
+
+---
+
+## 🔴 Phase 4 — Dynamic Programming (Weeks 20–23)
+
+> The topic that decides most offers, split into four graded steps instead of one wall.
+
+**4 lectures · 26 days · 105 problems**
+
+---
+
+### Lecture 25: 🧩 Dynamic Programming I — Foundations & 1D
+
+| Detail               | Value                        |
+| -------------------- | ---------------------------- |
+| **Duration**         | 6 days                       |
+| **Problems**         | 25                           |
+| **Difficulty Split** | 10 Easy · 12 Medium · 3 Hard |
+| **Prerequisites**    | Lectures 5, 8                |
+| **Status**           | 📝 Planned                   |
+
+#### 🎓 Learning Objectives
+
+- Recognise the two DP signals: overlapping subproblems and optimal substructure
+- Convert any recursion into memoized top-down DP mechanically
+- Convert top-down into bottom-up tabulation, then into O (1) space
+- Define a state precisely — say what dp[i] means in one sentence
+- Solve the 1D families: climbing, robbing, jumping, LIS
+
+#### 🔑 Key Patterns
+
+| Pattern                | Description                                            | Example Problem                |
+| ---------------------- | ------------------------------------------------------ | ------------------------------ |
+| **Memoization**        | Cache recursion results in an array keyed by state     | Climbing Stairs                |
+| **Tabulation**         | Fill states bottom-up in dependency order              | House Robber                   |
+| **Space optimisation** | Keep only the last k states instead of the whole table | Fibonacci in O(1) space        |
+| **Take / skip**        | At every index choose include or exclude               | House Robber II                |
+| **LIS (patience)**     | Binary search on a tails array for O(n log n)          | Longest Increasing Subsequence |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** What makes a problem DP — draw the recursion tree, spot the repeats, add a memo array. Fibonacci as the
+   lab rat.
+2. **Day 2:** The three-step conversion — brute recursion → memo → tabulation → space-optimised. Climbing Stairs, Min
+   Cost Climbing Stairs.
+3. **Day 3:** Take/skip family — House Robber I & II, Delete and Earn, Maximum Alternating Subsequence Sum.
+4. **Day 4:** Jump & reach family — Jump Game I & II, Minimum Jumps, Frog Jump with K distances.
+5. **Day 5:** LIS family — O (n²) DP, then O (n log n) patience sorting, Russian Doll Envelopes, Number of LIS.
+6. **Day 6:** Decode Ways, Word Break, Perfect Squares, Coin Change as 1D. Write your own state-definition checklist.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Microsoft` `Facebook/Meta` `Adobe`
+
+---
+
+### Lecture 26: 🧱 Dynamic Programming II — Grids & Strings
+
+| Detail               | Value                        |
+| -------------------- | ---------------------------- |
+| **Duration**         | 7 days                       |
+| **Problems**         | 30                           |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard |
+| **Prerequisites**    | Lecture 25                   |
+| **Status**           | 📝 Planned                   |
+
+#### 🎓 Learning Objectives
+
+- Set up a 2D dp table and reason about which cell depends on which
+- Solve the grid-path family with obstacles, costs and constraints
+- Derive LCS and edit distance from the same match/mismatch recurrence
+- Handle palindromic substructure by iterating over substring length
+- Roll a 2D table down to two rows (or one) for linear space
+
+#### 🔑 Key Patterns
+
+| Pattern              | Description                                      | Example Problem               |
+| -------------------- | ------------------------------------------------ | ----------------------------- |
+| **Grid path DP**     | dp[i][j] built from its top and left neighbours  | Unique Paths                  |
+| **Match / mismatch** | Chars equal → diagonal + 1, else best of the two | Longest Common Subsequence    |
+| **Edit distance**    | Insert, delete and replace as three transitions  | Edit Distance                 |
+| **Palindrome DP**    | Iterate over substring length, not index         | Longest Palindromic Substring |
+| **Row rolling**      | Keep the previous row only, dropping a dimension | LCS in O(n) space             |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** 2D state design — Unique Paths, Unique Paths II, Minimum Path Sum.
+2. **Day 2:** Grid variants — Triangle, Falling Path Sum, Cherry Pickup, Dungeon Game.
+3. **Day 3:** LCS core — Longest Common Subsequence and Substring, plus printing the actual subsequence.
+4. **Day 4:** LCS family — Shortest Common Supersequence, Delete Operation, Minimum Insertions for Palindrome.
+5. **Day 5:** Edit Distance, Distinct Subsequences, Wildcard Matching, Regular Expression Matching.
+6. **Day 6:** Palindromic DP — Longest Palindromic Substring & Subsequence, counting Palindromic Substrings.
+7. **Day 7:** Space-optimisation drill — convert three of the week's tables to two-row form.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Microsoft` `Facebook/Meta` `Apple`
+
+---
+
+### Lecture 27: 🎒 Dynamic Programming III — Knapsack & Subsets
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 6 days                      |
+| **Problems**         | 25                          |
+| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard |
+| **Prerequisites**    | Lecture 25                  |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Spot the knapsack skeleton hiding inside a word problem
+- Tell 0/1, unbounded and bounded knapsack apart by their loop order
+- Translate subset-sum, partition and target-sum into knapsack form
+- Count ways and optimise value using the same table
+- Compress a 2D knapsack table into one 1D array without corrupting it
+
+#### 🔑 Key Patterns
+
+| Pattern                | Description                                               | Example Problem            |
+| ---------------------- | --------------------------------------------------------- | -------------------------- |
+| **0/1 knapsack**       | Each item used at most once — iterate capacity descending | Partition Equal Subset Sum |
+| **Unbounded knapsack** | Item reusable — iterate capacity ascending                | Coin Change II             |
+| **Subset sum**         | Boolean knapsack over achievable totals                   | Subset Sum                 |
+| **Count-the-ways**     | Sum instead of max over identical transitions             | Target Sum                 |
+| **1D compression**     | Reuse one row; loop direction decides reuse               | Coin Change (1D)           |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** The knapsack skeleton — items, capacity, choose/skip. 0/1 Knapsack in full 2D.
+2. **Day 2:** Subset Sum, Equal Subset Partition, Minimum Subset Sum Difference.
+3. **Day 3:** Count of Subsets with a Given Sum, Target Sum, Number of Dice Rolls With Target Sum.
+4. **Day 4:** Unbounded knapsack — Rod Cutting, Coin Change I (minimum) and II (count).
+5. **Day 5:** Loop-order lab — why 0/1 goes descending and unbounded ascending. Convert everything to 1D.
+6. **Day 6:** Word Break II, Combination Sum IV, Ones and Zeroes (a two-capacity knapsack).
+
+#### 🏢 Companies That Ask These
+
+`Amazon` `Google` `Microsoft` `Goldman Sachs`
+
+---
+
+### Lecture 28: 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 7 days                      |
+| **Problems**         | 25                          |
+| **Difficulty Split** | 5 Easy · 12 Medium · 8 Hard |
+| **Prerequisites**    | Lectures 15, 17, 25–27      |
+| **Status**           | 📝 Planned                  |
+
+#### 🎓 Learning Objectives
+
+- Solve interval DP by iterating over length and splitting at a pivot
+- Carry DP up a tree by returning several values from a post-order walk
+- Encode a subset of at most ~20 items as a bitmask state
+- Count numbers with a property using digit DP and a tight flag
+- Run DP over a DAG, and notice when a graph problem is really DP
+
+#### 🔑 Key Patterns
+
+| Pattern         | Description                                          | Example Problem                     |
+| --------------- | ---------------------------------------------------- | ----------------------------------- |
+| **Interval DP** | dp[i][j] over a range, split at every k between them | Burst Balloons                      |
+| **Tree DP**     | Post-order return of (take, skip) for each node      | House Robber III                    |
+| **Bitmask DP**  | State is a subset bitmask; viable while n ≤ 20       | Shortest Path Visiting All Nodes    |
+| **Digit DP**    | Build the number digit by digit with a tight flag    | Numbers With Repeated Digits        |
+| **DP on a DAG** | Longest path in topological order                    | Longest Increasing Path in a Matrix |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Interval DP setup — Matrix Chain Multiplication, Minimum Cost to Cut a Stick.
+2. **Day 2:** Burst Balloons, Palindrome Partitioning II, Boolean Parenthesisation.
+3. **Day 3:** Tree DP — House Robber III, Diameter, Binary Tree Maximum Path Sum, Distribute Coins.
+4. **Day 4:** Bitmask basics — Partition to K Equal Sum Subsets, Shortest Path Visiting All Nodes.
+5. **Day 5:** Bitmask assignment problems — Number of Ways to Wear Different Hats, Travelling Salesman.
+6. **Day 6:** Digit DP — counting numbers ≤ N with a digit property, with and without leading zeros.
+7. **Day 7:** State machines & DP on DAGs — Best Time to Buy and Sell Stock with cooldown, fee, and k transactions.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Facebook/Meta` `Amazon` `Microsoft` `Uber`
+
+---
+
+## 🔵 Phase 5 — Advanced Structures & Algorithms (Weeks 24–28)
+
+> The differentiators: range queries, string algorithms, hard graphs, ordered structures, advanced maths.
+
+**7 lectures · 32 days · 130 problems**
+
+---
+
+### Lecture 29: 🔤 Tries (Prefix Trees)
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 4 days                     |
+| **Problems**         | 18                         |
+| **Difficulty Split** | 5 Easy · 9 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 13, 15            |
+| **Status**           | 📝 Planned                 |
 
 #### 🎓 Learning Objectives
 
 - Understand prefix trees as a specialized string search structure
-- Implement insert, search, startsWith from scratch in O(L) time
+- Implement insert, search, startsWith from scratch in O (L) time
 - Apply tries for autocomplete, dictionary, and multi-word grid search
 - Learn XOR tries for efficient maximum XOR queries
 
@@ -945,19 +1345,20 @@
 
 ---
 
-### Topic 23: 📐 Segment Trees & Binary Indexed Trees
+### Lecture 30: 📶 Segment Trees & Fenwick Trees
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 5 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 2 Easy · 8 Medium · 5 Hard |
-| **Prerequisites**    | Arrays, Trees, Recursion   |
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 6 days                      |
+| **Problems**         | 22                          |
+| **Difficulty Split** | 3 Easy · 12 Medium · 7 Hard |
+| **Prerequisites**    | Lectures 15, 19             |
+| **Status**           | 📝 Planned                  |
 
 #### 🎓 Learning Objectives
 
 - Understand why static prefix sums fail when elements can be updated
-- Build segment trees for O(log n) range query and point update
+- Build segment trees for O (log n) range query and point update
 - Learn lazy propagation to batch range updates efficiently
 - Implement Fenwick Tree (BIT) — simpler and cache-friendly for prefix sums
 
@@ -974,28 +1375,31 @@
 #### 📝 Sub-Topics & Lecture Flow
 
 1. **Day 1:** Motivation — static prefix sum breaks on updates; square-root decomposition as bridge
-2. **Day 2:** Segment tree — build O(n), range query O(log n), point update O(log n)
-3. **Day 3:** Lazy propagation — range update + range query in O(log n) each
-4. **Day 4:** Fenwick Tree (BIT) — build, prefix sum query, point update — all O(log n)
+2. **Day 2:** Segment tree — build O (n), range query O (log n), point update O (log n)
+3. **Day 3:** Lazy propagation — range update + range query in O (log n) each
+4. **Day 4:** Fenwick Tree (BIT) — build, prefix sum query, point update — all O (log n)
 5. **Day 5:** Problems — Range Sum Query Mutable, Count of Smaller Numbers After Self, Reverse Pairs
 
 #### 🏢 Companies That Ask These
 
 `Google` `Amazon` `Microsoft`
 
-### Topic 24: 🪵 Square Root Decomposition (NEW)
+---
+
+### Lecture 31: 🪵 Square Root Decomposition & Mo's Algorithm
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
 | **Duration**         | 3 days                     |
-| **Problems**         | 10                         |
-| **Difficulty Split** | 2 Easy · 5 Medium · 3 Hard |
-| **Prerequisites**    | Segment Trees, Arrays      |
+| **Problems**         | 12                         |
+| **Difficulty Split** | 2 Easy · 6 Medium · 4 Hard |
+| **Prerequisites**    | Lecture 30                 |
+| **Status**           | 📝 Planned                 |
 
 #### 🎓 Learning Objectives
 
 - Understand the "block-based" strategy to optimize range queries when full trees are overkill
-- Master the O(√N) query and O(1) or O(√N) update trade-offs
+- Master the O (√N) query and O (1) or O (√N) update trade-offs
 - Learn Mo’s Algorithm for offline range queries
 - Handle problems involving frequency counting in specific ranges
 
@@ -1010,8 +1414,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** SQRT fundamentals — partitioning array into blocks, Range Sum/Min query in O(√N)
-2. **Day 2:** Update operations — point update O(1) vs. range query O(√N), block-based optimizations
+1. **Day 1:** SQRT fundamentals — partitioning array into blocks, Range Sum/Min query in O (√N)
+2. **Day 2:** Update operations — point update O (1) vs. range query O (√N), block-based optimizations
 3. **Day 3:** Mo’s Algorithm — query sorting basics, offline range processing, solving Range Distinct Elements
 
 #### 🏢 Companies That Ask These
@@ -1020,103 +1424,22 @@
 
 ---
 
-## 🔴 Phase 4 — Interview Patterns & Mock Prep (Weeks 21–26)
-
-> Consolidate, speed up, and simulate real FAANG-style interviews.
-
----
-
-### Topic 25: 🔍 Advanced Recursion & Divide and Conquer
-
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 3 Easy · 7 Medium · 5 Hard |
-| **Prerequisites**    | Recursion, Sorting         |
-
-#### 🎓 Learning Objectives
-
-- Formally analyze recursive algorithms using the Master Theorem
-- Apply QuickSelect for O(n) average-case selection
-- Identify when divide-and-conquer beats brute force
-- Solve hard problems by splitting the problem space
-
-#### 🔑 Key Patterns
-
-| Pattern                  | Description                               | Example Problem              |
-| ------------------------ | ----------------------------------------- | ---------------------------- |
-| **D&C on Sorted Arrays** | Divide sorted structure, combine results  | Median of Two Sorted Arrays  |
-| **QuickSelect**          | Partition-based O(n) average selection    | Kth Largest Element in Array |
-| **Fast Exponentiation**  | Compute pow(x, n) by squaring — O(log n)  | Pow(x, n)                    |
-| **Merge Sort Variants**  | Count useful properties during merge step | Count Inversions             |
-
-#### 📝 Sub-Topics & Lecture Flow
-
-1. **Day 1:** Master Theorem, recurrence relations, analyzing T(n) = aT(n/b) + f(n)
-2. **Day 2:** QuickSelect — Kth Largest/Smallest, worst case O(n²) vs average O(n)
-3. **Day 3:** Merge sort variants — Count Inversions, Count of Smaller Numbers After Self
-4. **Day 4:** Median of Two Sorted Arrays, different ways to add parentheses, expression evaluation
-
-#### 🏢 Companies That Ask These
-
-`Google` `Facebook/Meta` `Amazon`
-
----
-
-### Topic 26: 🎯 Two Pointers & Sliding Window (Deep Dive)
+### Lecture 32: 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)
 
 | Detail               | Value                       |
 | -------------------- | --------------------------- |
-| **Duration**         | 3 days                      |
+| **Duration**         | 5 days                      |
 | **Problems**         | 20                          |
-| **Difficulty Split** | 4 Easy · 12 Medium · 4 Hard |
-| **Prerequisites**    | Arrays & Strings, HashMap   |
+| **Difficulty Split** | 3 Easy · 10 Medium · 7 Hard |
+| **Prerequisites**    | Lectures 8, 29              |
+| **Status**           | 📝 Planned                  |
 
 #### 🎓 Learning Objectives
 
-- Consolidate all two-pointer and sliding window patterns in a single mental model
-- Shift from "which algorithm?" to _instantly recognizing_ the pattern to use
-- Master the general expand/shrink template for variable window problems
-- Handle all multi-pointer cases: 3-sum, 4-sum, and beyond
-
-#### 🔑 Key Patterns
-
-| Pattern             | Description                                      | Example Problem                         |
-| ------------------- | ------------------------------------------------ | --------------------------------------- |
-| **Fixed Window**    | Window of constant size K                        | Max Sum Subarray of Size K              |
-| **Variable Window** | Expand until condition breaks, shrink to restore | Minimum Window Substring                |
-| **Opposite Ends**   | Left + right converge for sorted-array problems  | 3Sum, Trapping Rain Water               |
-| **Same Direction**  | Slow + fast in same direction                    | Longest Repeating Character Replacement |
-| **At-Most Trick**   | f(exactly K) = f(at most K) - f(at most K-1)     | Subarrays with K Different Integers     |
-
-#### 📝 Sub-Topics & Lecture Flow
-
-1. **Day 1:** Opposite-ends patterns — Two Sum II, 3Sum, 4Sum, Container with Most Water, Trapping Rain Water
-2. **Day 2:** Variable window — Min Window Substring, Longest Repeating Char Replacement, Fruit Into Baskets
-3. **Day 3:** Advanced — Subarrays with K Different Integers (at-most trick), Count of Substrings
-
-#### 🏢 Companies That Ask These
-
-`Google` `Amazon` `Facebook/Meta` `Uber`
-
----
-
-### Topic 27: 🔗 String Algorithms (KMP/Z-Algo)
-
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 2 Easy · 8 Medium · 5 Hard |
-| **Prerequisites**    | Strings, HashMap           |
-
-#### 🎓 Learning Objectives
-
-- Implement KMP for O(n+m) guaranteed pattern matching
-- Use Rabin-Karp rolling hash for average O(n) matching
+- Implement KMP for O (n+m) guaranteed pattern matching
+- Use Rabin-Karp rolling hash for average O (n) matching
 - Apply Z-algorithm for linear prefix-matching queries
-- Use Manacher's for O(n) palindromic substring discovery
+- Use Manacher's for O (n) palindromic substring discovery
 
 #### 🔑 Key Patterns
 
@@ -1132,7 +1455,7 @@
 1. **Day 1:** KMP — prefix function / failure function construction, pattern matching, Repeated Substring Pattern
 2. **Day 2:** Rabin-Karp — polynomial rolling hash, modular arithmetic, collision handling
 3. **Day 3:** Z-algorithm — Z-array construction and applications for pattern matching
-4. **Day 4:** Palindromes — expand around center O(n²), Manacher's O(n), Shortest Palindrome
+4. **Day 4:** Palindromes — expand around center O (n²), Manacher's O (n), Shortest Palindrome
 
 #### 🏢 Companies That Ask These
 
@@ -1140,59 +1463,157 @@
 
 ---
 
-### Topic 28: 📊 Monotonic Patterns (Deep Dive)
+### Lecture 33: 🕳️ Advanced Graph Algorithms
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 2 Easy · 8 Medium · 5 Hard |
-| **Prerequisites**    | Stacks & Queues            |
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 6 days                      |
+| **Problems**         | 22                          |
+| **Difficulty Split** | 4 Easy · 11 Medium · 7 Hard |
+| **Prerequisites**    | Lectures 17, 24             |
+| **Status**           | 📝 Planned                  |
 
 #### 🎓 Learning Objectives
 
-- Internalize all 4 monotonic stack variants as a single unified template
-- Apply the contribution technique to solve range min/max sum problems
-- Use monotone deque for O(n) sliding window extremes
-- Recognize problems solvable only with monotonic structures
+- Find strongly connected components with both Kosaraju and Tarjan
+- Locate bridges and articulation points using discovery and low times
+- Reach for 0-1 BFS or a stateful Dijkstra when edge weights are special
+- Model a problem as max flow / min cut and run Edmonds-Karp
+- Recognise bipartite matching as a flow problem in disguise
 
 #### 🔑 Key Patterns
 
-| Pattern                      | Description                                  | Example Problem                |
-| ---------------------------- | -------------------------------------------- | ------------------------------ |
-| **Next Greater Element**     | Pop when current > top; stack stores indices | Daily Temperatures, NGE I/II   |
-| **Previous Greater Element** | Same stack, different traversal direction    | Stock Span Problem             |
-| **Next Smaller Element**     | Pop when current < top                       | Largest Rectangle in Histogram |
-| **Contribution Technique**   | Each element as min/max of some subarray     | Sum of Subarray Minimums       |
-| **Monotone Deque**           | Sliding window min/max in O(n)               | Sliding Window Maximum         |
+| Pattern                | Description                                       | Example Problem                          |
+| ---------------------- | ------------------------------------------------- | ---------------------------------------- |
+| **Kosaraju SCC**       | Two DFS passes — one on G, one on its reverse     | Strongly Connected Components            |
+| **Tarjan low-link**    | disc[] and low[] computed in a single DFS         | Critical Connections in a Network        |
+| **0-1 BFS**            | A deque replaces the heap when weights are 0 or 1 | Minimum Obstacle Removal to Reach Corner |
+| **Max flow / min cut** | Push augmenting paths until none remain           | Maximum Bipartite Matching               |
+| **Eulerian path**      | Degree parity plus Hierholzer's algorithm         | Reconstruct Itinerary                    |
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Unified template for all 4 variants — NGE, NSE, PGE, PSE — with direction analysis
-2. **Day 2:** Area problems — Largest Rectangle in Histogram, Maximal Rectangle in Binary Matrix
-3. **Day 3:** Contribution technique — Sum of Subarray Minimums, Sum of Subarray Maximums, Subarray Ranges
+1. **Day 1:** Low-link theory — discovery times, tree vs back edges, and why low[] works at all.
+2. **Day 2:** Bridges & articulation points — Critical Connections, network reliability questions.
+3. **Day 3:** SCC — Kosaraju's two passes, Tarjan's single pass, the condensation graph, a 2-SAT preview.
+4. **Day 4:** Weighted variants — 0-1 BFS with a deque, Dijkstra carrying extra state (Cheapest Flights With K Stops),
+   A\* intuition.
+5. **Day 5:** Max flow — Ford-Fulkerson and Edmonds-Karp, min-cut duality, bipartite matching.
+6. **Day 6:** Eulerian path and circuit via Hierholzer; Reconstruct Itinerary; where Hamiltonian paths become NP-hard.
 
 #### 🏢 Companies That Ask These
 
-`Google` `Amazon` `Facebook/Meta`
+`Google` `Facebook/Meta` `Uber` `Amazon`
 
 ---
 
-### Topic 29: 🏗️ Design Data Structures
+### Lecture 34: 🎚️ Balanced BSTs & Ordered Structures
 
 | Detail               | Value                      |
 | -------------------- | -------------------------- |
-| **Duration**         | 5 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 3 Easy · 7 Medium · 5 Hard |
-| **Prerequisites**    | All Core DS Topics         |
+| **Duration**         | 4 days                     |
+| **Problems**         | 18                         |
+| **Difficulty Split** | 5 Easy · 9 Medium · 4 Hard |
+| **Prerequisites**    | Lectures 15, 16            |
+| **Status**           | 📝 Planned                 |
+
+#### 🎓 Learning Objectives
+
+- Use TreeMap and TreeSet floor, ceiling, higher, lower and subMap fluently
+- Explain why a BST degenerates and how rotations repair it
+- Sketch the AVL and red-black invariants without memorising full code
+- Answer k-th smallest and rank queries with an order-statistic tree
+- Choose between TreeMap, PriorityQueue and a sorted array under real constraints
+
+#### 🔑 Key Patterns
+
+| Pattern                    | Description                                          | Example Problem               |
+| -------------------------- | ---------------------------------------------------- | ----------------------------- |
+| **Floor / ceiling query**  | Jump to the nearest key on either side of a value    | My Calendar I                 |
+| **Ordered sliding window** | A TreeMap acting as a multiset inside a window       | Sliding Window Median         |
+| **Rotation**               | Left and right rotations restore height balance      | AVL insert                    |
+| **Order statistics**       | Subtree sizes give rank and the k-th element         | Kth Smallest Element in a BST |
+| **Skip list**              | Probabilistic levels give O(log n) without rotations | Design Skiplist               |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Java's ordered API — TreeMap, TreeSet, NavigableMap, subMap, and their genuine complexities.
+2. **Day 2:** Why balance matters — degenerate BSTs, left/right rotations, the AVL height invariant, red-black rules at
+   a glance.
+3. **Day 3:** Ordered-structure problems — My Calendar I/II/III, Sliding Window Median, Contains Duplicate III.
+4. **Day 4:** Order-statistic trees, Design Skiplist, and a decision table: TreeMap vs heap vs sorted array.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Bloomberg` `Microsoft`
+
+---
+
+### Lecture 35: 🎲 Advanced Math & Game Theory
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 4 days                     |
+| **Problems**         | 18                         |
+| **Difficulty Split** | 4 Easy · 9 Medium · 5 Hard |
+| **Prerequisites**    | Lectures 7, 25             |
+| **Status**           | 📝 Planned                 |
+
+#### 🎓 Learning Objectives
+
+- Compute linear recurrences in O (log n) with matrix exponentiation
+- Count arrangements with nCr, Pascal's triangle and modular inverse
+- Reason about expected value using linearity and indicator variables
+- Decide win/lose positions with the Sprague-Grundy theorem
+- Apply inclusion–exclusion to counting problems
+
+#### 🔑 Key Patterns
+
+| Pattern                   | Description                                        | Example Problem             |
+| ------------------------- | -------------------------------------------------- | --------------------------- |
+| **Matrix exponentiation** | Write the recurrence as a matrix and fast-power it | Fibonacci mod M for huge N  |
+| **nCr mod p**             | Factorials plus a Fermat's-little-theorem inverse  | Unique Paths on a huge grid |
+| **Inclusion–exclusion**   | Add singles, subtract pairs, add triples           | Numbers divisible by a or b |
+| **Expected value**        | Linearity of expectation over indicator variables  | Soup Servings               |
+| **Grundy numbers**        | mex of reachable states decides win or lose        | Nim Game, Stone Game        |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Matrix exponentiation — fast power on matrices, linear recurrences, tiling counts.
+2. **Day 2:** Combinatorics — nCr, Pascal's triangle, modular inverse, Catalan numbers, derangements.
+3. **Day 3:** Probability & expectation — linearity, indicator variables, weighted random pick, reservoir sampling.
+4. **Day 4:** Game theory — Nim, Grundy numbers, Sprague-Grundy, the Stone Game family, minimax as DP.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Goldman Sachs` `Amazon` `Adobe`
+
+---
+
+## 🟦 Phase 6 — Interview Mastery (Weeks 29–31)
+
+> Stop learning, start performing. Design rounds, timed drills, and full mock interviews.
+
+**3 lectures · 20 days · 75 problems**
+
+---
+
+### Lecture 36: 🛠️ Design Data Structures
+
+| Detail               | Value                       |
+| -------------------- | --------------------------- |
+| **Duration**         | 5 days                      |
+| **Problems**         | 20                          |
+| **Difficulty Split** | 4 Easy · 11 Medium · 5 Hard |
+| **Prerequisites**    | Lectures 11–16, 34          |
+| **Status**           | 📝 Planned                  |
 
 #### 🎓 Learning Objectives
 
 - Design custom data structures by combining primitive structures
-- Understand trade-offs: O(1) read vs O(1) write, space vs time
+- Understand trade-offs: O (1) read vs O (1) write, space vs time
 - Implement LRU and LFU cache eviction policies
-- Design for O(1) get/put/delete/random simultaneously
+- Design for O (1) get/put/delete/random simultaneously
 
 #### 🔑 Key Patterns
 
@@ -1206,8 +1627,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** LRU Cache — HashMap + Doubly Linked List. Why this pair achieves O(1) get/put/evict
-2. **Day 2:** LFU Cache — two HashMaps + DLL per frequency. O(1) all operations analysis
+1. **Day 1:** LRU Cache — HashMap + Doubly Linked List. Why this pair achieves O (1) get/put/evict
+2. **Day 2:** LFU Cache — two HashMaps + DLL per frequency. O (1) all operations analysis
 3. **Day 3:** Min Stack, Max Stack (two-stack trick), Median Stream (two heaps), RandomizedSet
 4. **Day 4:** Design Search Autocomplete System, Time-Based Key-Value Store, Snapshot Array
 5. **Day 5:** Advanced — Design Twitter (heap + lists), In-Memory File System, Skip List
@@ -1218,13 +1639,60 @@
 
 ---
 
-### Topic 30: 🧠 Mock Interviews & System Thinking
+### Lecture 37: ⏱️ Company Pattern Drills
 
-| Detail            | Value               |
-| ----------------- | ------------------- |
-| **Duration**      | 7 days              |
-| **Problems**      | Mixed review        |
-| **Prerequisites** | All previous topics |
+| Detail               | Value                         |
+| -------------------- | ----------------------------- |
+| **Duration**         | 8 days                        |
+| **Problems**         | 40                            |
+| **Difficulty Split** | 10 Easy · 20 Medium · 10 Hard |
+| **Prerequisites**    | Phases 1–5                    |
+| **Status**           | 📝 Planned                    |
+
+#### 🎓 Learning Objectives
+
+- Solve under a 30–45 minute clock without looking anything up
+- Name the pattern behind a cold problem in under two minutes
+- Track and close your own weakest three patterns
+- Build a personal cheat sheet you can revise in half an hour
+- Practise the highest-frequency question sets company by company
+
+#### 🔑 Key Patterns
+
+| Pattern                       | Description                                             | Example Problem    |
+| ----------------------------- | ------------------------------------------------------- | ------------------ |
+| **Pattern-first triage**      | Read the constraints, name the pattern, then write code | Any cold problem   |
+| **Timed set**                 | Four problems, ninety minutes, no hints                 | Weekly drill       |
+| **Spaced repetition**         | Re-solve a problem after 1, 7 and 30 days               | Retention          |
+| **Weak-pattern targeting**    | Sort your log by failure rate; drill the top three      | Personal gap list  |
+| **Brute → optimal narration** | Say the naive answer out loud, then improve it          | Interview delivery |
+
+#### 📝 Sub-Topics & Lecture Flow
+
+1. **Day 1:** Build the log — tag every problem you have solved with pattern, company and outcome.
+2. **Day 2:** Google set — graphs, DP, matrices. Two timed rounds.
+3. **Day 3:** Amazon set — arrays, heaps, trees, design. Two timed rounds.
+4. **Day 4:** Meta set — strings, sliding window, BFS. Two timed rounds.
+5. **Day 5:** Microsoft & Apple sets — linked lists, trees, OOP design.
+6. **Day 6:** Weak-pattern day — the three patterns you fail most, eight problems.
+7. **Day 7:** Speed day — ten easy/medium problems in three hours, no IDE hints.
+8. **Day 8:** Write the one-page cheat sheet: templates, complexities, edge cases.
+
+#### 🏢 Companies That Ask These
+
+`Google` `Amazon` `Facebook/Meta` `Microsoft` `Apple` `Uber`
+
+---
+
+### Lecture 38: 🎓 Mock Interviews & System Thinking
+
+| Detail               | Value                      |
+| -------------------- | -------------------------- |
+| **Duration**         | 7 days                     |
+| **Problems**         | 15                         |
+| **Difficulty Split** | 3 Easy · 7 Medium · 5 Hard |
+| **Prerequisites**    | Lectures 1–37              |
+| **Status**           | 📝 Planned                 |
 
 #### 🎓 Learning Objectives
 
@@ -1232,6 +1700,16 @@
 - Practice the UMPIRE framework: Understand, Match, Plan, Implement, Review, Evaluate
 - Build the discipline of clarifying requirements _before_ touching code
 - Develop the verbal articulation and dry-run habits of a senior engineer
+
+#### 🔑 Key Patterns
+
+| Pattern                | Description                                               | Example Problem              |
+| ---------------------- | --------------------------------------------------------- | ---------------------------- |
+| **Clarify first**      | Restate the problem and pin the constraints before coding | Any interview opener         |
+| **Brute → optimal**    | State the naive solution, then improve it out loud        | Two Sum → HashMap            |
+| **Think aloud**        | Narrate the trade-off you are making and why              | Time vs space decisions      |
+| **Test your own code** | Walk one normal case and two edge cases by hand           | Empty input, single element  |
+| **STAR stories**       | Situation, Task, Action, Result for behavioural rounds    | Conflict & ownership stories |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1249,28 +1727,35 @@
 
 ## 📅 Weekly Schedule Template
 
-| Day          | Activity                                      | Time    |
-| ------------ | --------------------------------------------- | ------- |
-| **Mon–Fri**  | Lecture notes + 3–5 focused practice problems | 3–4 hrs |
-| **Saturday** | Weekly assignment (10–12 problems, timed)     | 4–5 hrs |
-| **Sunday**   | Review weak areas, update cheat sheet, rest   | 2–3 hrs |
+| Day          | Activity                                                    | Time    |
+| ------------ | ----------------------------------------------------------- | ------- |
+| **Mon–Fri**  | Lecture notes + 3–5 focused practice problems               | 3–4 hrs |
+| **Saturday** | The topic assignment, timed                                 | 4–5 hrs |
+| **Sunday**   | Re-solve last week's failures, update the cheat sheet, rest | 2–3 hrs |
 
-## 🎯 Our Learning Principles
+## 🎯 Learning Principles
 
-1. **Don't memorize — understand.** Explain it like you'd teach a 5-year-old.
+1. **Don't memorise — understand.** If you can't explain it simply, you don't have it yet.
 2. **Draw it out.** Every recursion tree, every pointer move, every state transition.
-3. **Brute force first.** Start simple, then optimize one step at a time.
-4. **Identify the pattern.** 95% of interview problems are variants of ~20 patterns.
-5. **Teach it.** The deepest learning comes from explaining to others.
-6. **Consistency > intensity.** 2 hours daily beats 14 hours on Saturday.
-7. **Track everything.** Note which patterns you struggle with; revisit weekly.
+3. **Brute force first.** Start simple, then optimise one step at a time.
+4. **Identify the pattern.** Almost every interview problem is a variant of about twenty patterns.
+5. **Teach it.** The deepest learning comes from explaining it to someone else.
+6. **Consistency beats intensity.** Two hours daily beats fourteen hours on Saturday.
+7. **Track everything.** Note which patterns you struggle with; revisit them weekly.
 
 ## 📊 Complete Phase Summary
 
-| Phase                   | Topics                                                                   | Weeks           | Key Focus               | Problems          |
-| ----------------------- | ------------------------------------------------------------------------ | --------------- | ----------------------- | ----------------- |
-| **1 — Foundations**     | Java, OOP, Recursion, Bit Manipulation, Math                             | 1–5             | Build thinking patterns | ~110              |
-| **2 — Core DS**         | Arrays, Sorting, Binary Search, LL, Stack, HashMap, Matrix, Trees, Heaps | 6–13            | Core interview topics   | ~243              |
-| **3 — Advanced**        | Graphs, Union-Find, Greedy, Intervals, DP, Tries, Segment Trees, SQRT    | 14–20           | Differentiators         | ~187              |
-| **4 — Patterns & Prep** | D&C, Two Pointers, String Algos, Monotonic, Design DS, Mocks             | 21–26           | Speed + Polish          | ~80               |
-| **Total**               | **30 topics**                                                            | **21–26 weeks** |                         | **620+ problems** |
+| Phase                                    | Lectures | Weeks    | Days    | Problems |
+| ---------------------------------------- | -------- | -------- | ------- | -------- |
+| **1 — Foundations**                      | 7        | 1–5      | 31      | 230      |
+| **2 — Core Data Structures**             | 10       | 6–14     | 62      | 285      |
+| **3 — Core Patterns**                    | 7        | 15–19    | 31      | 151      |
+| **4 — Dynamic Programming**              | 4        | 20–23    | 26      | 105      |
+| **5 — Advanced Structures & Algorithms** | 7        | 24–28    | 32      | 130      |
+| **6 — Interview Mastery**                | 3        | 29–31    | 20      | 75       |
+| **Total**                                | **38**   | **1–31** | **202** | **976**  |
+
+---
+
+<sub>This file and `dsa_study_plan.html` are both generated from `tools/curriculum.json` by `tools/build_plan.py`. Edit
+the JSON, then rerun the script — never edit these two by hand, or they will drift apart again.</sub>
