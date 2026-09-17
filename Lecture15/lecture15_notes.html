@@ -1378,6 +1378,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1584,18 +1595,18 @@
         </div>
 
         <h2 class="h1" id="node-class">&#129518; The TreeNode Class</h2>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <span class="code-lang">&#9749; Java &middot; TreeNode</span
+            <span class="code-lang">&#128208; Pseudocode &middot; TreeNode</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">class</span> <span class="cls">TreeNode</span> {
-    <span class="kw">int</span> val;
-    <span class="cls">TreeNode</span> left, right;
-    <span class="cls">TreeNode</span>(<span class="kw">int</span> val) { <span class="kw">this</span>.val = val; }
-}
-<span class="cm">// This is ALL you need. Every LeetCode tree problem uses this exact class.
-// left and right are null by default — no child = null reference.</span></pre>
+          <pre><span class="pc-kw">record</span> TreeNode:
+    val
+    left      <span class="pc-cm">// null when there is no left child</span>
+    right     <span class="pc-cm">// null when there is no right child</span>
+
+<span class="pc-cm">// This is ALL you need. Every LeetCode tree problem uses exactly this shape.</span>
+<span class="pc-cm">// A new node starts as a leaf: TreeNode(val, left = null, right = null)</span></pre>
         </div>
 
         <div class="callout purple">
@@ -1685,22 +1696,10 @@
         <div class="pattern-banner">
           <h4>Pattern Skeleton</h4>
           <p>
-            Base case: if (node == null) return;<br />
+            Base case: if node is null &rarr; return<br />
             Preorder : process root &rarr; left &rarr; right<br />
             Inorder : left &rarr; process root &rarr; right<br />
             Postorder : left &rarr; right &rarr; process root
-          </p>
-        </div>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Any DFS Traversal</h4>
-          <p>
-            function dfs(node):<br />
-            &nbsp;&nbsp;BASE: if node is null &rarr; return<br />
-            &nbsp;&nbsp;[PREORDER: process node here]<br />
-            &nbsp;&nbsp;dfs(node.left)<br />
-            &nbsp;&nbsp;[INORDER: process node here]<br />
-            &nbsp;&nbsp;dfs(node.right)<br />
-            &nbsp;&nbsp;[POSTORDER: process node here]
           </p>
         </div>
         <div class="code-block pseudo">
@@ -1724,70 +1723,40 @@
 <span class="pc-cm">//   in   -> you need sorted order (BST validation, kth smallest)</span>
 <span class="pc-cm">//   post -> you need child answers before the root (height, delete, sizes)</span></pre>
         </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; All Three DFS Orders</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// Preorder: ROOT first — use when root context needed before children (clone, prefix)</span>
-<span class="kw">void</span> <span class="fn">preorder</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
-    process(n.val);          <span class="cm">// ROOT</span>
-    <span class="fn">preorder</span>(n.left);
-    <span class="fn">preorder</span>(n.right);
-}
-<span class="cm">// Inorder: Left-ROOT-Right — gives SORTED output for a BST</span>
-<span class="kw">void</span> <span class="fn">inorder</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
-    <span class="fn">inorder</span>(n.left);
-    process(n.val);          <span class="cm">// ROOT</span>
-    <span class="fn">inorder</span>(n.right);
-}
-<span class="cm">// Postorder: children before root — use when children results needed first (height, delete)</span>
-<span class="kw">void</span> <span class="fn">postorder</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
-    <span class="fn">postorder</span>(n.left);
-    <span class="fn">postorder</span>(n.right);
-    process(n.val);          <span class="cm">// ROOT</span>
-}</pre>
-        </div>
         <h3 class="h3">Iterative Traversals (No Recursion)</h3>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Iterative Preorder + Inorder</span
+              >&#128208; Pseudocode &middot; Iterative Preorder + Inorder</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Iterative Preorder — push RIGHT first, then LEFT (so left is processed first)</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">preorderIterative</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> res;
-    <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-    stack.push(root);
-    <span class="kw">while</span> (!stack.isEmpty()) {
-        <span class="cls">TreeNode</span> n = stack.pop();
-        res.add(n.val);                     <span class="cm">// visit ROOT immediately</span>
-        <span class="kw">if</span> (n.right != <span class="kw">null</span>) stack.push(n.right);  <span class="cm">// right first → processed last</span>
-        <span class="kw">if</span> (n.left  != <span class="kw">null</span>) stack.push(n.left);
-    }
-    <span class="ret">return</span> res;
-}
+          <pre><span class="pc-cm">// Iterative Preorder — push RIGHT first, then LEFT (so left is processed first)</span>
+<span class="pc-kw">function</span> preorderIterative(root):
+    res ← empty list
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
+    stack ← [root]
+    <span class="pc-kw">while</span> stack <span class="pc-kw">is not empty</span>:
+        n ← stack.pop()
+        append n.val <span class="pc-kw">to</span> res                      <span class="pc-cm">// visit ROOT immediately</span>
+        <span class="pc-kw">if</span> n.right ≠ null: stack.push(n.right)   <span class="pc-cm">// right first → processed last</span>
+        <span class="pc-kw">if</span> n.left ≠ null: stack.push(n.left)
+    <span class="pc-kw">return</span> res
 
-<span class="cm">// Iterative Inorder — go left until null, pop &amp; visit, then go right</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderIterative</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-    <span class="cls">TreeNode</span> curr = root;
-    <span class="kw">while</span> (curr != <span class="kw">null</span> || !stack.isEmpty()) {
-        <span class="kw">while</span> (curr != <span class="kw">null</span>) { stack.push(curr); curr = curr.left; }
-        curr = stack.pop();
-        res.add(curr.val);
-        curr = curr.right;
-    }
-    <span class="ret">return</span> res;
-}
-<span class="cm">// Time O(n), Space O(h). Key trick for preorder: push RIGHT before LEFT.</span></pre>
+<span class="pc-cm">// Iterative Inorder — go left until null, pop and visit, then go right</span>
+<span class="pc-kw">function</span> inorderIterative(root):
+    res ← empty list
+    stack ← empty stack
+    curr ← root
+    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">while</span> curr ≠ null:
+            stack.push(curr)
+            curr ← curr.left
+        curr ← stack.pop()
+        append curr.val <span class="pc-kw">to</span> res
+        curr ← curr.right
+    <span class="pc-kw">return</span> res
+
+<span class="pc-cm">// Time O(n), Space O(h). Key trick for preorder: push RIGHT before LEFT.</span></pre>
         </div>
 
         <!-- P1 DRY RUN -->
@@ -1866,36 +1835,12 @@ levels <span class="pc-kw">&larr;</span> empty list
 
     levels.append(level)
 
-<span class="pc-kw">return</span> levels</pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; BFS Level-Order Template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">levelOrder</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> res;
-    <span class="cls">Queue</span>&lt;<span class="cls">TreeNode</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    q.offer(root);
-    <span class="kw">while</span> (!q.isEmpty()) {
-        <span class="kw">int</span> size = q.size();                    <span class="cm">// ← snapshot current level</span>
-        <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; level = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; size; i++) {
-            <span class="cls">TreeNode</span> n = q.poll();
-            level.add(n.val);
-            <span class="kw">if</span> (n.left  != <span class="kw">null</span>) q.offer(n.left);
-            <span class="kw">if</span> (n.right != <span class="kw">null</span>) q.offer(n.right);
-        }
-        res.add(level);
-    }
-    <span class="ret">return</span> res;
-}
-<span class="cm">// Variants built on this template:
-//   Right side view   → last element of each level
-//   Zigzag traversal  → alternate direction per level (LinkedList.addFirst)
-//   Average of levels → sum/size per level</span></pre>
+<span class="pc-kw">return</span> levels
+
+<span class="pc-cm">// Variants built on this template:</span>
+<span class="pc-cm">//   Right side view   → last element of each level</span>
+<span class="pc-cm">//   Zigzag traversal  → alternate direction per level (add to front on odd levels)</span>
+<span class="pc-cm">//   Average of levels → sum ÷ size per level</span></pre>
         </div>
 
         <!-- P2 DRY RUN -->
@@ -1931,39 +1876,29 @@ Right side view = last of each level = [<span class="hl">1</span>, <span class="
           left &amp; right results. This is postorder DFS where each call
           computes something useful for its parent.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Height Recursion</h4>
-          <p>
-            function height(node):<br />
-            &nbsp;&nbsp;BASE: if node is null &rarr; return 0<br />
-            &nbsp;&nbsp;leftH &larr; height(node.left)<br />
-            &nbsp;&nbsp;rightH &larr; height(node.right)<br />
-            &nbsp;&nbsp;return 1 + max(leftH, rightH)<br /><br />
-            <em>Key:</em> children compute FIRST (postorder). Parent uses both
-            results.
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Max Depth + Balanced Check</span
+              >&#128208; Pseudocode &middot; Max Depth + Balanced Check</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> <span class="fn">maxDepth</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="kw">int</span> lh = <span class="fn">maxDepth</span>(n.left), rh = <span class="fn">maxDepth</span>(n.right);
-    <span class="ret">return</span> 1 + <span class="cls">Math</span>.max(lh, rh);
-}
+          <pre><span class="pc-cm">// Height recursion — children compute FIRST (postorder), the parent uses both results.</span>
+<span class="pc-kw">function</span> maxDepth(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← maxDepth(n.left)
+    rh ← maxDepth(n.right)
+    <span class="pc-kw">return</span> 1 + max(lh, rh)
 
-<span class="cm">// Balanced tree — use -1 as a sentinel for "unbalanced", O(n) single pass:</span>
-<span class="kw">boolean</span> <span class="fn">isBalanced</span>(<span class="cls">TreeNode</span> root) { <span class="ret">return</span> <span class="fn">check</span>(root) != -1; }
-<span class="kw">int</span> <span class="fn">check</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="kw">int</span> lh = <span class="fn">check</span>(n.left);   <span class="kw">if</span> (lh == -1) <span class="ret">return</span> -1;
-    <span class="kw">int</span> rh = <span class="fn">check</span>(n.right);  <span class="kw">if</span> (rh == -1) <span class="ret">return</span> -1;
-    <span class="kw">if</span> (<span class="cls">Math</span>.abs(lh - rh) &gt; 1) <span class="ret">return</span> -1;
-    <span class="ret">return</span> 1 + <span class="cls">Math</span>.max(lh, rh);
-}</pre>
+<span class="pc-cm">// Balanced tree — use -1 as a sentinel for "unbalanced", O(n) single pass:</span>
+<span class="pc-kw">function</span> isBalanced(root):
+    <span class="pc-kw">return</span> check(root) ≠ -1
+
+<span class="pc-kw">function</span> check(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← check(n.left);   <span class="pc-kw">if</span> lh = -1: <span class="pc-kw">return</span> -1
+    rh ← check(n.right);  <span class="pc-kw">if</span> rh = -1: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">if</span> |lh - rh| &gt; 1: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">return</span> 1 + max(lh, rh)</pre>
         </div>
         <div class="callout green">
           <span class="callout-icon">&#128218;</span>
@@ -1998,42 +1933,30 @@ Call-stack unwind (children resolve before parent):
           function&apos;s return value is a <em>helper</em> value, not the final
           answer. This trips up beginners the most.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Global State Pattern</h4>
-          <p>
-            global ans = initial_value<br /><br />
-            function dfs(node):<br />
-            &nbsp;&nbsp;BASE: if node is null &rarr; return 0 (or -INF)<br />
-            &nbsp;&nbsp;left &larr; dfs(node.left) &nbsp;&nbsp;<em
-              >(helper value)</em
-            ><br />
-            &nbsp;&nbsp;right &larr; dfs(node.right)<br />
-            &nbsp;&nbsp;ans = max(ans, combine(left, right, node))
-            <em>&larr; update global</em><br />
-            &nbsp;&nbsp;return max(left, right) + node
-            <em>&larr; return helper to parent</em>
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Diameter of Binary Tree (LC 543)</span
+              >&#128208; Pseudocode &middot; Diameter of Binary Tree (LC
+              543)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> maxD = 0;                      <span class="cm">// global answer</span>
+          <pre><span class="pc-cm">// Global state pattern: the recursion RETURNS a helper value (height)</span>
+<span class="pc-cm">// but UPDATES a global answer (diameter) at every node.</span>
+maxD ← 0                               <span class="pc-cm">// global answer</span>
 
-<span class="kw">int</span> <span class="fn">diameterOfBinaryTree</span>(<span class="cls">TreeNode</span> root) {
-    <span class="fn">dfs</span>(root);
-    <span class="ret">return</span> maxD;
-}
-<span class="kw">int</span> <span class="fn">dfs</span>(<span class="cls">TreeNode</span> n) {               <span class="cm">// returns HEIGHT, not diameter</span>
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="kw">int</span> lh = <span class="fn">dfs</span>(n.left), rh = <span class="fn">dfs</span>(n.right);
-    maxD = <span class="cls">Math</span>.max(maxD, lh + rh);  <span class="cm">// diameter through THIS node</span>
-    <span class="ret">return</span> 1 + <span class="cls">Math</span>.max(lh, rh);     <span class="cm">// height returned to parent</span>
-}
-<span class="cm">// Diameter at a node = leftHeight + rightHeight (edges through it)
-// We check EVERY node as a potential "peak" of the diameter path</span></pre>
+<span class="pc-kw">function</span> diameterOfBinaryTree(root):
+    dfs(root)
+    <span class="pc-kw">return</span> maxD
+
+<span class="pc-kw">function</span> dfs(n):                       <span class="pc-cm">// returns HEIGHT, not diameter</span>
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← dfs(n.left)
+    rh ← dfs(n.right)
+    maxD ← max(maxD, lh + rh)          <span class="pc-cm">// diameter through THIS node</span>
+    <span class="pc-kw">return</span> 1 + max(lh, rh)             <span class="pc-cm">// height handed back to the parent</span>
+
+<span class="pc-cm">// Diameter at a node = leftHeight + rightHeight (edges through it)</span>
+<span class="pc-cm">// We check EVERY node as a potential "peak" of the diameter path</span></pre>
         </div>
         <div class="callout blue">
           <span class="callout-icon">&#128161;</span>
@@ -2047,29 +1970,29 @@ Call-stack unwind (children resolve before parent):
             Pattern 4, LC 124 is a 10-line solution.
           </div>
         </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Binary Tree Maximum Path Sum (LC 124)
-              &mdash; Hard</span
+              >&#128208; Pseudocode &middot; Binary Tree Maximum Path Sum (LC
+              124) — Hard</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> maxSum = <span class="cls">Integer</span>.MIN_VALUE;  <span class="cm">// global: reset per problem instance</span>
+          <pre>maxSum ← -∞                           <span class="pc-cm">// global: reset per problem instance</span>
 
-<span class="kw">int</span> <span class="fn">maxPathSum</span>(<span class="cls">TreeNode</span> root) {
-    <span class="fn">gain</span>(root);
-    <span class="ret">return</span> maxSum;
-}
-<span class="cm">// gain(n) = max contribution this subtree can add to a path going UP to parent</span>
-<span class="kw">int</span> <span class="fn">gain</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="kw">int</span> lGain = <span class="cls">Math</span>.max(0, <span class="fn">gain</span>(n.left));   <span class="cm">// ignore negative branches</span>
-    <span class="kw">int</span> rGain = <span class="cls">Math</span>.max(0, <span class="fn">gain</span>(n.right));
-    maxSum = <span class="cls">Math</span>.max(maxSum, lGain + n.val + rGain);  <span class="cm">// path THROUGH this node</span>
-    <span class="ret">return</span> n.val + <span class="cls">Math</span>.max(lGain, rGain);  <span class="cm">// can only go ONE direction up</span>
-}
-<span class="cm">// Why max(0, gain)? A negative subtree hurts the path — better to skip it.
-// Why return only ONE direction? A path going up can't branch — parent picks one side.</span></pre>
+<span class="pc-kw">function</span> maxPathSum(root):
+    gain(root)
+    <span class="pc-kw">return</span> maxSum
+
+<span class="pc-cm">// gain(n) = the most this subtree can add to a path going UP to its parent</span>
+<span class="pc-kw">function</span> gain(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lGain ← max(0, gain(n.left))         <span class="pc-cm">// ignore negative branches</span>
+    rGain ← max(0, gain(n.right))
+    maxSum ← max(maxSum, lGain + n.val + rGain)   <span class="pc-cm">// path THROUGH this node</span>
+    <span class="pc-kw">return</span> n.val + max(lGain, rGain)     <span class="pc-cm">// can only go ONE direction up</span>
+
+<span class="pc-cm">// Why max(0, gain)? A negative subtree hurts the path — better to skip it.</span>
+<span class="pc-cm">// Why return only ONE side? A path going up can't branch — the parent picks one.</span></pre>
         </div>
 
         <!-- P4 DRY RUN -->
@@ -2106,18 +2029,23 @@ Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)<
           strictly less, and all values in its right subtree are strictly
           greater.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; BST Operations</h4>
-          <p>
-            <strong>Search:</strong> if val &lt; node &rarr; go left; if val
-            &gt; node &rarr; go right; if equal &rarr; found<br />
-            <strong>Insert:</strong> same as search until null, place new node
-            there<br />
-            <strong>Validate:</strong> pass (min, max) bounds; every node must
-            satisfy min &lt; val &lt; max<br />
-            <strong>Inorder:</strong> always produces sorted sequence &larr; key
-            BST insight
-          </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; BST Operations</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// The BST rule: everything in the left subtree &lt; node &lt; everything in the right</span>
+<span class="pc-kw">function</span> search(node, val):
+    <span class="pc-kw">while</span> node ≠ null:
+        <span class="pc-kw">if</span> val = node.val: <span class="pc-kw">return</span> node          <span class="pc-cm">// found</span>
+        <span class="pc-kw">if</span> val &lt; node.val: node ← node.left
+        <span class="pc-kw">else</span>: node ← node.right
+    <span class="pc-kw">return</span> null
+
+<span class="pc-cm">// Insert:   same walk as search until null, place the new node there</span>
+<span class="pc-cm">// Validate: pass (min, max) bounds down; every node needs min &lt; val &lt; max</span>
+<span class="pc-cm">// Inorder:  always produces a sorted sequence ← the key BST insight</span></pre>
         </div>
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
@@ -2127,67 +2055,71 @@ Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)<
             <code>node.left.val &lt; node.val &lt; node.right.val</code> at each
             node is <strong>wrong</strong>. You must pass a valid range
             <code>[min, max]</code> down the tree. Going left narrows the max;
-            going right narrows the min. Use <code>Long</code> to handle
-            <code>Integer.MIN_VALUE</code> edge cases.
+            going right narrows the min. Start the bounds at &plusmn;&infin; (in
+            Java, use <code>Long</code> bounds) so a node holding the smallest
+            or largest possible integer isn't wrongly rejected.
           </div>
         </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Validate BST + Kth Smallest</span
+              >&#128208; Pseudocode &middot; Validate BST + Kth Smallest</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Validate BST — range propagation:</span>
-<span class="kw">boolean</span> <span class="fn">isValidBST</span>(<span class="cls">TreeNode</span> root) { <span class="ret">return</span> <span class="fn">check</span>(root, <span class="cls">Long</span>.MIN_VALUE, <span class="cls">Long</span>.MAX_VALUE); }
-<span class="kw">boolean</span> <span class="fn">check</span>(<span class="cls">TreeNode</span> n, <span class="kw">long</span> lo, <span class="kw">long</span> hi) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">true</span>;
-    <span class="kw">if</span> (n.val &lt;= lo || n.val &gt;= hi) <span class="ret">return</span> <span class="kw">false</span>;
-    <span class="ret">return</span> <span class="fn">check</span>(n.left, lo, n.val) &amp;&amp; <span class="fn">check</span>(n.right, n.val, hi);
-}
+          <pre><span class="pc-cm">// Validate BST — range propagation:</span>
+<span class="pc-kw">function</span> isValidBST(root):
+    <span class="pc-kw">return</span> check(root, -∞, +∞)
 
-<span class="cm">// Kth Smallest — inorder = sorted, count as you go:</span>
-<span class="kw">int</span> k, result;
-<span class="kw">void</span> <span class="fn">kth</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
-    <span class="fn">kth</span>(n.left);
-    <span class="kw">if</span> (--k == 0) { result = n.val; <span class="ret">return</span>; }
-    <span class="fn">kth</span>(n.right);
-}</pre>
+<span class="pc-kw">function</span> check(n, lo, hi):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)
+    <span class="pc-cm">// going left narrows the max; going right narrows the min</span>
+
+<span class="pc-cm">// Kth Smallest — inorder = sorted, count as you go:</span>
+k ← the requested rank;  result ← none
+<span class="pc-kw">function</span> kth(n):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> result is set: <span class="pc-kw">return</span>
+    kth(n.left)
+    k ← k - 1
+    <span class="pc-kw">if</span> k = 0:
+        result ← n.val
+        <span class="pc-kw">return</span>
+    kth(n.right)</pre>
         </div>
         <h3 class="h3">BST Insert &amp; Delete</h3>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; BST Insert (LC 701) + Delete (LC 450)</span
+              >&#128208; Pseudocode &middot; BST Insert (LC 701) + Delete (LC
+              450)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// INSERT: navigate like search until null spot found, place node there</span>
-<span class="cls">TreeNode</span> <span class="fn">insertIntoBST</span>(<span class="cls">TreeNode</span> root, <span class="kw">int</span> val) {
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">new</span> <span class="cls">TreeNode</span>(val);
-    <span class="kw">if</span> (val &lt; root.val) root.left  = <span class="fn">insertIntoBST</span>(root.left,  val);
-    <span class="kw">else</span>               root.right = <span class="fn">insertIntoBST</span>(root.right, val);
-    <span class="ret">return</span> root;  <span class="cm">// return root so parent pointer stays valid</span>
-}
+          <pre><span class="pc-cm">// INSERT: navigate like search until a null spot, place the node there</span>
+<span class="pc-kw">function</span> insertIntoBST(root, val):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> TreeNode(val)
+    <span class="pc-kw">if</span> val &lt; root.val: root.left ← insertIntoBST(root.left, val)
+    <span class="pc-kw">else</span>: root.right ← insertIntoBST(root.right, val)
+    <span class="pc-kw">return</span> root                  <span class="pc-cm">// return root so the parent's pointer stays valid</span>
 
-<span class="cm">// DELETE: 3 cases
-// Case 1: leaf node    → return null
-// Case 2: one child    → return that child
-// Case 3: two children → swap with inorder successor, delete successor below</span>
-<span class="cls">TreeNode</span> <span class="fn">deleteNode</span>(<span class="cls">TreeNode</span> root, <span class="kw">int</span> key) {
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">null</span>;
-    <span class="kw">if</span>      (key &lt; root.val) root.left  = <span class="fn">deleteNode</span>(root.left,  key);
-    <span class="kw">else if</span> (key &gt; root.val) root.right = <span class="fn">deleteNode</span>(root.right, key);
-    <span class="kw">else</span> {
-        <span class="kw">if</span> (root.left  == <span class="kw">null</span>) <span class="ret">return</span> root.right;   <span class="cm">// Cases 1 &amp; 2</span>
-        <span class="kw">if</span> (root.right == <span class="kw">null</span>) <span class="ret">return</span> root.left;
-        <span class="cls">TreeNode</span> succ = root.right;
-        <span class="kw">while</span> (succ.left != <span class="kw">null</span>) succ = succ.left;      <span class="cm">// leftmost = successor</span>
-        root.val = succ.val;                               <span class="cm">// copy value up</span>
-        root.right = <span class="fn">deleteNode</span>(root.right, succ.val);   <span class="cm">// delete old successor</span>
-    }
-    <span class="ret">return</span> root;
-}
-<span class="cm">// Time O(h): O(log n) balanced BST, O(n) worst case (skewed)</span></pre>
+<span class="pc-cm">// DELETE: 3 cases</span>
+<span class="pc-cm">// Case 1: leaf node    → return null</span>
+<span class="pc-cm">// Case 2: one child    → return that child</span>
+<span class="pc-cm">// Case 3: two children → copy the inorder successor up, delete the successor below</span>
+<span class="pc-kw">function</span> deleteNode(root, key):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> null
+    <span class="pc-kw">if</span> key &lt; root.val: root.left ← deleteNode(root.left, key)
+    <span class="pc-kw">else if</span> key &gt; root.val: root.right ← deleteNode(root.right, key)
+    <span class="pc-kw">else</span>:
+        <span class="pc-kw">if</span> root.left = null: <span class="pc-kw">return</span> root.right       <span class="pc-cm">// Cases 1 and 2</span>
+        <span class="pc-kw">if</span> root.right = null: <span class="pc-kw">return</span> root.left
+        succ ← root.right
+        <span class="pc-kw">while</span> succ.left ≠ null: succ ← succ.left      <span class="pc-cm">// leftmost = successor</span>
+        root.val ← succ.val                           <span class="pc-cm">// copy value up</span>
+        root.right ← deleteNode(root.right, succ.val) <span class="pc-cm">// delete the old successor</span>
+    <span class="pc-kw">return</span> root
+
+<span class="pc-cm">// Time O(h): O(log n) for a balanced BST, O(n) worst case (skewed)</span></pre>
         </div>
         <hr />
 
@@ -2200,41 +2132,27 @@ Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)<
           of both. It is the first node where they &ldquo;split&rdquo; in the
           tree.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; LCA (Binary Tree)</h4>
-          <p>
-            function lca(node, p, q):<br />
-            &nbsp;&nbsp;BASE: if node is null OR node is p OR node is q &rarr;
-            return node<br />
-            &nbsp;&nbsp;left &larr; lca(node.left, p, q)<br />
-            &nbsp;&nbsp;right &larr; lca(node.right, p, q)<br />
-            &nbsp;&nbsp;if both left and right non-null &rarr; return node
-            <em>(split point!)</em><br />
-            &nbsp;&nbsp;return whichever is non-null
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; LCA Binary Tree (LC 236) + BST (LC
+              >&#128208; Pseudocode &middot; LCA Binary Tree (LC 236) + BST (LC
               235)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Binary Tree — works for any tree:</span>
-<span class="cls">TreeNode</span> <span class="fn">lca</span>(<span class="cls">TreeNode</span> n, <span class="cls">TreeNode</span> p, <span class="cls">TreeNode</span> q) {
-    <span class="kw">if</span> (n == <span class="kw">null</span> || n == p || n == q) <span class="ret">return</span> n;
-    <span class="cls">TreeNode</span> l = <span class="fn">lca</span>(n.left,  p, q);
-    <span class="cls">TreeNode</span> r = <span class="fn">lca</span>(n.right, p, q);
-    <span class="kw">if</span> (l != <span class="kw">null</span> &amp;&amp; r != <span class="kw">null</span>) <span class="ret">return</span> n;  <span class="cm">// split here → this IS the LCA</span>
-    <span class="ret">return</span> l != <span class="kw">null</span> ? l : r;
-}
+          <pre><span class="pc-cm">// Binary Tree — works for any tree:</span>
+<span class="pc-kw">function</span> lca(n, p, q):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
+    l ← lca(n.left, p, q)
+    r ← lca(n.right, p, q)
+    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n     <span class="pc-cm">// split here → this IS the LCA</span>
+    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
+    <span class="pc-kw">return</span> r                               <span class="pc-cm">// whichever side found something</span>
 
-<span class="cm">// BST — exploit ordering (simpler):</span>
-<span class="cls">TreeNode</span> <span class="fn">lcaBST</span>(<span class="cls">TreeNode</span> n, <span class="cls">TreeNode</span> p, <span class="cls">TreeNode</span> q) {
-    <span class="kw">if</span> (p.val &lt; n.val &amp;&amp; q.val &lt; n.val) <span class="ret">return</span> <span class="fn">lcaBST</span>(n.left,  p, q);
-    <span class="kw">if</span> (p.val &gt; n.val &amp;&amp; q.val &gt; n.val) <span class="ret">return</span> <span class="fn">lcaBST</span>(n.right, p, q);
-    <span class="ret">return</span> n;  <span class="cm">// split point → LCA</span>
-}</pre>
+<span class="pc-cm">// BST — exploit the ordering (simpler):</span>
+<span class="pc-kw">function</span> lcaBST(n, p, q):
+    <span class="pc-kw">if</span> p.val &lt; n.val <span class="pc-kw">and</span> q.val &lt; n.val: <span class="pc-kw">return</span> lcaBST(n.left, p, q)
+    <span class="pc-kw">if</span> p.val &gt; n.val <span class="pc-kw">and</span> q.val &gt; n.val: <span class="pc-kw">return</span> lcaBST(n.right, p, q)
+    <span class="pc-kw">return</span> n                               <span class="pc-cm">// split point → LCA</span></pre>
         </div>
         <div class="callout teal">
           <span class="callout-icon">&#128204;</span>
@@ -2302,37 +2220,6 @@ cur <span class="pc-kw">&larr;</span> root
             cur <span class="pc-kw">&larr;</span> cur.right</pre>
         </div>
 
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Morris In-order (LC 94, follow-up)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderMorris</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; out = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="cls">TreeNode</span> cur = root;
-    <span class="kw">while</span> (cur != <span class="kw">null</span>) {
-        <span class="kw">if</span> (cur.left == <span class="kw">null</span>) {
-            out.<span class="fn">add</span>(cur.val);
-            cur = cur.right;
-        } <span class="kw">else</span> {
-            <span class="cls">TreeNode</span> pred = cur.left;
-            <span class="kw">while</span> (pred.right != <span class="kw">null</span> &amp;&amp; pred.right != cur) pred = pred.right;
-
-            <span class="kw">if</span> (pred.right == <span class="kw">null</span>) {   <span class="cm">// first time here — thread and descend</span>
-                pred.right = cur;
-                cur = cur.left;
-            } <span class="kw">else</span> {                       <span class="cm">// second time — unthread and emit</span>
-                pred.right = <span class="kw">null</span>;
-                out.<span class="fn">add</span>(cur.val);
-                cur = cur.right;
-            }
-        }
-    }
-    <span class="ret">return</span> out;
-}</pre>
-        </div>
-
         <div class="complexity-row">
           <span class="cx-badge time"
             ><span class="cx-label">Time</span
@@ -2394,30 +2281,6 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
     <span class="pc-kw">return</span> node
 
 <span class="pc-kw">return</span> build(0, length(inorder) - 1)</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Construct Binary Tree (LC 105)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> p = <span class="num">0</span>;
-<span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; pos = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-
-<span class="cls">TreeNode</span> <span class="fn">buildTree</span>(<span class="kw">int</span>[] preorder, <span class="kw">int</span>[] inorder) {
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; inorder.length; i++) pos.<span class="fn">put</span>(inorder[i], i);
-    <span class="ret">return</span> <span class="fn">build</span>(preorder, <span class="num">0</span>, inorder.length - <span class="num">1</span>);
-}
-
-<span class="cls">TreeNode</span> <span class="fn">build</span>(<span class="kw">int</span>[] pre, <span class="kw">int</span> lo, <span class="kw">int</span> hi) {
-    <span class="kw">if</span> (lo &gt; hi) <span class="ret">return</span> <span class="kw">null</span>;
-    <span class="cls">TreeNode</span> node = <span class="kw">new</span> <span class="cls">TreeNode</span>(pre[p++]);
-    <span class="kw">int</span> mid = pos.<span class="fn">get</span>(node.val);
-    node.left  = <span class="fn">build</span>(pre, lo, mid - <span class="num">1</span>);   <span class="cm">// LEFT first — p advances in order</span>
-    node.right = <span class="fn">build</span>(pre, mid + <span class="num">1</span>, hi);
-    <span class="ret">return</span> node;
-}</pre>
         </div>
 
         <div class="complexity-row">
@@ -2547,41 +2410,39 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Solution (Recursive + Iterative)
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#9749; Java &middot; LC 94 &mdash; Both Approaches</span
+                      >&#128208; Pseudocode &middot; LC 94 — Both
+                      Approaches</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cm">// Recursive — Pattern 1 in its purest form:</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderRecursive</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="fn">dfs</span>(root, res);
-    <span class="ret">return</span> res;
-}
-<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">TreeNode</span> n, <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span>;
-    <span class="fn">dfs</span>(n.left, res);
-    res.add(n.val);   <span class="cm">// ROOT (after left)</span>
-    <span class="fn">dfs</span>(n.right, res);
-}
+                  <pre><span class="pc-cm">// Recursive — Pattern 1 in its purest form:</span>
+<span class="pc-kw">function</span> inorderRecursive(root):
+    res ← empty list
+    dfs(root, res)
+    <span class="pc-kw">return</span> res
 
-<span class="cm">// Iterative — the classic interview follow-up:</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">inorderIterative</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="cls">Deque</span>&lt;<span class="cls">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-    <span class="cls">TreeNode</span> curr = root;
-    <span class="kw">while</span> (curr != <span class="kw">null</span> || !stack.isEmpty()) {
-        <span class="kw">while</span> (curr != <span class="kw">null</span>) { stack.push(curr); curr = curr.left; }
-        curr = stack.pop();
-        res.add(curr.val);
-        curr = curr.right;
-    }
-    <span class="ret">return</span> res;
-}
-<span class="cm">// Both: Time O(n), Space O(h) where h = tree height</span></pre>
+<span class="pc-kw">function</span> dfs(n, res):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span>
+    dfs(n.left, res)
+    append n.val <span class="pc-kw">to</span> res       <span class="pc-cm">// ROOT (after left)</span>
+    dfs(n.right, res)
+
+<span class="pc-cm">// Iterative — the classic interview follow-up:</span>
+<span class="pc-kw">function</span> inorderIterative(root):
+    res ← empty list;  stack ← empty stack;  curr ← root
+    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">while</span> curr ≠ null:
+            stack.push(curr);  curr ← curr.left
+        curr ← stack.pop()
+        append curr.val <span class="pc-kw">to</span> res
+        curr ← curr.right
+    <span class="pc-kw">return</span> res
+
+<span class="pc-cm">// Both: Time O(n), Space O(h) where h = tree height</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2670,18 +2531,18 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Full Solution + Complexity
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 104</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 104</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">maxDepth</span>(<span class="cls">TreeNode</span> root) {
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="ret">return</span> 1 + <span class="cls">Math</span>.max(<span class="fn">maxDepth</span>(root.left), <span class="fn">maxDepth</span>(root.right));
-}
-<span class="cm">// 3 lines. This is the beauty of pattern recognition.</span></pre>
+                  <pre><span class="pc-kw">function</span> maxDepth(root):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">return</span> 1 + max(maxDepth(root.left), maxDepth(root.right))
+<span class="pc-cm">// 3 lines. This is the beauty of pattern recognition.</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2776,31 +2637,28 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Full Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 102</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 102</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">levelOrder</span>(<span class="cls">TreeNode</span> root) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">if</span> (root == <span class="kw">null</span>) <span class="ret">return</span> res;
-    <span class="cls">Queue</span>&lt;<span class="cls">TreeNode</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    q.offer(root);
-    <span class="kw">while</span> (!q.isEmpty()) {
-        <span class="kw">int</span> size = q.size();
-        <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; level = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; size; i++) {
-            <span class="cls">TreeNode</span> n = q.poll();
-            level.add(n.val);
-            <span class="kw">if</span> (n.left  != <span class="kw">null</span>) q.offer(n.left);
-            <span class="kw">if</span> (n.right != <span class="kw">null</span>) q.offer(n.right);
-        }
-        res.add(level);
-    }
-    <span class="ret">return</span> res;
-}</pre>
+                  <pre><span class="pc-kw">function</span> levelOrder(root):
+    res ← empty list
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
+    q ← queue containing root
+    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+        size ← q.size                  <span class="pc-cm">// snapshot: this many nodes in the level</span>
+        level ← empty list
+        <span class="pc-kw">repeat</span> size <span class="pc-kw">times</span>:
+            n ← q.dequeue()
+            append n.val <span class="pc-kw">to</span> level
+            <span class="pc-kw">if</span> n.left ≠ null: q.enqueue(n.left)
+            <span class="pc-kw">if</span> n.right ≠ null: q.enqueue(n.right)
+        append level <span class="pc-kw">to</span> res
+    <span class="pc-kw">return</span> res</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2894,21 +2752,24 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Full Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 543</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 543</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> maxD = 0;
-<span class="kw">int</span> <span class="fn">diameterOfBinaryTree</span>(<span class="cls">TreeNode</span> root) { <span class="fn">dfs</span>(root); <span class="ret">return</span> maxD; }
-<span class="kw">int</span> <span class="fn">dfs</span>(<span class="cls">TreeNode</span> n) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> 0;
-    <span class="kw">int</span> l = <span class="fn">dfs</span>(n.left), r = <span class="fn">dfs</span>(n.right);
-    maxD = <span class="cls">Math</span>.max(maxD, l + r);
-    <span class="ret">return</span> 1 + <span class="cls">Math</span>.max(l, r);
-}</pre>
+                  <pre>maxD ← 0
+<span class="pc-kw">function</span> diameterOfBinaryTree(root):
+    dfs(root)
+    <span class="pc-kw">return</span> maxD
+
+<span class="pc-kw">function</span> dfs(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    l ← dfs(n.left);  r ← dfs(n.right)
+    maxD ← max(maxD, l + r)
+    <span class="pc-kw">return</span> 1 + max(l, r)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3005,19 +2866,21 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Full Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 98</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 98</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">boolean</span> <span class="fn">isValidBST</span>(<span class="cls">TreeNode</span> root) { <span class="ret">return</span> <span class="fn">check</span>(root, <span class="cls">Long</span>.MIN_VALUE, <span class="cls">Long</span>.MAX_VALUE); }
-<span class="kw">boolean</span> <span class="fn">check</span>(<span class="cls">TreeNode</span> n, <span class="kw">long</span> lo, <span class="kw">long</span> hi) {
-    <span class="kw">if</span> (n == <span class="kw">null</span>) <span class="ret">return</span> <span class="kw">true</span>;
-    <span class="kw">if</span> (n.val &lt;= lo || n.val &gt;= hi) <span class="ret">return</span> <span class="kw">false</span>;
-    <span class="ret">return</span> <span class="fn">check</span>(n.left, lo, n.val) &amp;&amp; <span class="fn">check</span>(n.right, n.val, hi);
-}</pre>
+                  <pre><span class="pc-kw">function</span> isValidBST(root):
+    <span class="pc-kw">return</span> check(root, -∞, +∞)
+
+<span class="pc-kw">function</span> check(n, lo, hi):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3118,20 +2981,21 @@ p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">//
                 Full Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 236</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 236</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">TreeNode</span> <span class="fn">lca</span>(<span class="cls">TreeNode</span> n, <span class="cls">TreeNode</span> p, <span class="cls">TreeNode</span> q) {
-    <span class="kw">if</span> (n == <span class="kw">null</span> || n == p || n == q) <span class="ret">return</span> n;
-    <span class="cls">TreeNode</span> l = <span class="fn">lca</span>(n.left,  p, q);
-    <span class="cls">TreeNode</span> r = <span class="fn">lca</span>(n.right, p, q);
-    <span class="kw">if</span> (l != <span class="kw">null</span> &amp;&amp; r != <span class="kw">null</span>) <span class="ret">return</span> n;
-    <span class="ret">return</span> l != <span class="kw">null</span> ? l : r;
-}</pre>
+                  <pre><span class="pc-kw">function</span> lca(n, p, q):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
+    l ← lca(n.left, p, q)
+    r ← lca(n.right, p, q)
+    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n
+    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
+    <span class="pc-kw">return</span> r</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">

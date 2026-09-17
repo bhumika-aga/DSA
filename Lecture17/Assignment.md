@@ -1,8 +1,8 @@
 # 🕸️ Assignment 17 — Graphs
 
-> **Lecture:** Topic 17 — Graphs
-> **Phase:** 3 — Advanced DS · **Topic:** 17 of 30
-> **Estimated Time:** 12 Days · **Total Problems:** 30 (8 Easy · 15 Medium · 7 Hard)
+> **Lecture:** 17 of 38 — Graphs
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 12 days · **Total Problems:** 30 (8 Easy · 15 Medium · 7 Hard)
 > **Goal:** Master the 6 graph patterns — BFS Shortest Path, DFS Flood Fill, Cycle Detection, Topological Sort,
 > Dijkstra, MST.
 

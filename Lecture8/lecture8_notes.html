@@ -1373,6 +1373,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1874,22 +1885,22 @@ Sum = P[r2][c2] - P[r1-<span class="num">1</span>][c2] - P[r2][c1-<span class="n
           <span class="hl">Global Max recorded during this trip: 4</span>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Maximum Subarray</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Maximum Subarray (Kadane)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">public int</span> <span class="fn">maxSubArray</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> currentMax = nums[<span class="num">0</span>];
-    <span class="kw">int</span> globalMax = nums[<span class="num">0</span>];
-    
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {
-        <span class="cm">// Core Philosophy: Accept the baggage or ditch it?</span>
-        currentMax = Math.max(nums[i], currentMax + nums[i]);
-        globalMax = Math.max(globalMax, currentMax);
-    }
-    <span class="ret">return</span> globalMax;
-}</pre>
+          <pre><span class="pc-kw">function</span> maxSubArray(nums):
+    currentMax ← nums[0]
+    globalMax ← nums[0]
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> length(nums) - 1:
+        <span class="pc-cm">// keep extending the running subarray, or start fresh at nums[i]?</span>
+        currentMax ← max(nums[i], currentMax + nums[i])
+        globalMax ← max(globalMax, currentMax)
+    <span class="pc-kw">return</span> globalMax
+<span class="pc-cm">// Seed with nums[0], not 0 — otherwise an all-negative array returns 0.</span></pre>
         </div>
 
         <div class="callout green">
@@ -1943,23 +1954,6 @@ count     <span class="pc-kw">&larr;</span> 0
 <span class="pc-cm">// count occurrences of candidate; it must exceed n / 2.</span></pre>
         </div>
 
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Majority Element (LC 169)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> <span class="fn">majorityElement</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> candidate = <span class="num">0</span>, count = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) {
-        <span class="kw">if</span> (count == <span class="num">0</span>) { candidate = x; count = <span class="num">1</span>; }
-        <span class="kw">else</span> <span class="kw">if</span> (x == candidate) count++;
-        <span class="kw">else</span> count--;
-    }
-    <span class="ret">return</span> candidate;   <span class="cm">// verify in a 2nd pass if majority isn't guaranteed</span>
-}</pre>
-        </div>
-
         <div class="complexity-row">
           <span class="cx-badge time"
             ><span class="cx-label">Time</span
@@ -2008,23 +2002,21 @@ count     <span class="pc-kw">&larr;</span> 0
           </li>
         </ul>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Sort Colors</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Sort Colors</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">public void</span> <span class="fn">sortColors</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> low = <span class="num">0</span>, mid = <span class="num">0</span>, high = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (mid &lt;= high) {
-        <span class="kw">if</span> (nums[mid] == <span class="num">0</span>) {
-            <span class="fn">swap</span>(nums, low++, mid++);
-        } <span class="kw">else if</span> (nums[mid] == <span class="num">1</span>) {
-            mid++;
-        } <span class="kw">else</span> {
-            <span class="fn">swap</span>(nums, mid, high--);
-        }
-    }
-}</pre>
+          <pre><span class="pc-kw">function</span> sortColors(nums):
+    low ← 0;  mid ← 0;  high ← length(nums) - 1
+    <span class="pc-kw">while</span> mid ≤ high:
+        <span class="pc-kw">if</span> nums[mid] = 0:
+            swap(nums, low, mid);  low ← low + 1;  mid ← mid + 1
+        <span class="pc-kw">else if</span> nums[mid] = 1:
+            mid ← mid + 1
+        <span class="pc-kw">else</span>:
+            swap(nums, mid, high);  high ← high - 1   <span class="pc-cm">// mid stays: new value is unseen</span></pre>
         </div>
 
         <hr />
@@ -2049,18 +2041,19 @@ count     <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Array Rotation</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Array Rotation</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">public void</span> <span class="fn">rotate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="kw">int</span> n = nums.length;
-    k %= n;
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, n - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, <span class="num">0</span>, k - <span class="num">1</span>);
-    <span class="fn">reverse</span>(nums, k, n - <span class="num">1</span>);
-}</pre>
+          <pre><span class="pc-cm">// Rotate right by k using three reversals — O(n) time, O(1) space</span>
+<span class="pc-kw">function</span> rotate(nums, k):
+    n ← length(nums)
+    k ← k mod n
+    reverse(nums, 0, n - 1)        <span class="pc-cm">// [1,2,3,4,5], k=2 → [5,4,3,2,1]</span>
+    reverse(nums, 0, k - 1)        <span class="pc-cm">//                  → [4,5,3,2,1]</span>
+    reverse(nums, k, n - 1)        <span class="pc-cm">//                  → [4,5,1,2,3]</span></pre>
         </div>
 
         <hr />
@@ -2073,15 +2066,15 @@ count     <span class="pc-kw">&larr;</span> 0
           fastest way to count frequencies.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Anagram Check</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Anagram Check</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span>[] count = <span class="kw">new int</span>[<span class="num">26</span>];
-<span class="kw">for</span> (<span class="kw">char</span> c : s.toCharArray()) {
-    count[c - <span class="str">'a'</span>]++;
-}</pre>
+          <pre>count ← array of 0, size 26
+<span class="pc-kw">for</span> c <span class="pc-kw">in</span> s:
+    count[c - 'a'] ← count[c - 'a'] + 1   <span class="pc-cm">// letter → slot 0..25</span></pre>
         </div>
 
         <hr />
@@ -2143,17 +2136,17 @@ count     <span class="pc-kw">&larr;</span> 0
           <code>bottom</code>, <code>left</code>, and <code>right</code>.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Spiral Matrix</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Spiral Matrix</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">while</span> (top &lt;= bottom && left &lt;= right) {
-    <span class="cm">// Paint Top wall, increment top</span>
-    <span class="cm">// Paint Right wall, decrement right</span>
-    <span class="cm">// Paint Bottom wall, decrement bottom</span>
-    <span class="cm">// Paint Left wall, increment left</span>
-}</pre>
+          <pre><span class="pc-kw">while</span> top ≤ bottom <span class="pc-kw">and</span> left ≤ right:
+    <span class="pc-cm">// walk the top wall left → right,     then top ← top + 1</span>
+    <span class="pc-cm">// walk the right wall top → bottom,   then right ← right - 1</span>
+    <span class="pc-cm">// walk the bottom wall right → left,  then bottom ← bottom - 1</span>
+    <span class="pc-cm">// walk the left wall bottom → top,    then left ← left + 1</span></pre>
         </div>
 
         <hr />
@@ -2221,15 +2214,17 @@ count     <span class="pc-kw">&larr;</span> 0
 
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-              <div class="code-block">
+              <div class="code-block pseudo">
                 <div class="code-header">
-                  <div class="code-lang">☕ Java · Transpose & Flip</div>
-                  <button class="copy-btn" onclick="copyCode(this)">
+                  <span class="code-lang"
+                    >&#128208; Pseudocode &middot; Transpose &amp; Flip</span
+                  ><button class="copy-btn" onclick="copyCode(this)">
                     Copy
                   </button>
                 </div>
-                <pre><span class="cm">// 1. Transpose: Swap matrix[i][j] with matrix[j][i]</span>
-<span class="cm">// 2. Flip Horizontally: Reverse each row</span></pre>
+                <pre><span class="pc-cm">// Rotate 90° clockwise, in place:</span>
+<span class="pc-cm">// 1. Transpose: swap matrix[i][j] with matrix[j][i]</span>
+<span class="pc-cm">// 2. Flip horizontally: reverse each row</span></pre>
               </div>
             </div>
           </div>
@@ -2387,30 +2382,31 @@ count     <span class="pc-kw">&larr;</span> 0
                 <span class="toggle-arrow">▶</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · O(N) time O(1) extra</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; O(N) time O(1) extra</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public int</span>[] <span class="fn">productExceptSelf</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> n = nums.length;
-    <span class="kw">int</span>[] out = <span class="kw">new int</span>[n];
-    <span class="cm">// Pass 1: out[i] = product of nums[0..i-1]</span>
-    out[<span class="num">0</span>] = <span class="num">1</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; n; i++)
-        out[i] = out[i-<span class="num">1</span>] * nums[i-<span class="num">1</span>];
-    <span class="cm">// Pass 2: multiply by suffix product</span>
-    <span class="kw">int</span> right = <span class="num">1</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = n-<span class="num">1</span>; i &gt;= <span class="num">0</span>; i--) {
-        out[i] *= right;
-        right *= nums[i];
-    }
-    <span class="ret">return</span> out;
-}
-<span class="cm">// [1,2,3,4]: left=[1,1,2,6]
-// right scan: i=3→6×1=6, i=2→2×4=8, i=1→1×12=12, i=0→1×24=24 ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> productExceptSelf(nums):
+    n ← length(nums)
+    out ← array of size n
+
+    <span class="pc-cm">// Pass 1: out[i] = product of everything LEFT of i</span>
+    out[0] ← 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
+        out[i] ← out[i-1] × nums[i-1]
+
+    <span class="pc-cm">// Pass 2: multiply in the product of everything RIGHT of i</span>
+    right ← 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n-1 <span class="pc-kw">down to</span> 0:
+        out[i] ← out[i] × right
+        right ← right × nums[i]
+    <span class="pc-kw">return</span> out
+<span class="pc-cm">// [1,2,3,4]: after pass 1 out = [1,1,2,6]</span>
+<span class="pc-cm">// pass 2: i=3 → 6×1=6, i=2 → 2×4=8, i=1 → 1×12=12, i=0 → 1×24=24 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2507,21 +2503,21 @@ count     <span class="pc-kw">&larr;</span> 0
             <details>
               <summary><span class="toggle-arrow">▶</span> Solution</summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Greedy Two Pointers</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Greedy Two Pointers</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public int</span> <span class="fn">maxArea</span>(<span class="kw">int</span>[] h) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = h.length - <span class="num">1</span>, max = <span class="num">0</span>;
-    <span class="kw">while</span> (lo &lt; hi) {
-        max = Math.<span class="fn">max</span>(max, Math.<span class="fn">min</span>(h[lo], h[hi]) * (hi - lo));
-        <span class="kw">if</span> (h[lo] &lt; h[hi]) lo++; <span class="kw">else</span> hi--;
-    }
-    <span class="ret">return</span> max;
-}</pre>
+                  <pre><span class="pc-kw">function</span> maxArea(h):
+    lo ← 0;  hi ← length(h) - 1;  best ← 0
+    <span class="pc-kw">while</span> lo &lt; hi:
+        best ← max(best, min(h[lo], h[hi]) × (hi - lo))
+        <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo ← lo + 1     <span class="pc-cm">// only a taller short wall can help</span>
+        <span class="pc-kw">else</span>:             hi ← hi - 1
+    <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2618,27 +2614,25 @@ count     <span class="pc-kw">&larr;</span> 0
                 <span class="toggle-arrow">▶</span> Solution + Trace
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Prefix Sum + HashMap</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Prefix Sum + HashMap</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    Map&lt;Integer, Integer&gt; freq = <span class="kw">new</span> HashMap&lt;&gt;();
-    freq.<span class="fn">put</span>(<span class="num">0</span>, <span class="num">1</span>);
-    <span class="kw">int</span> prefix = <span class="num">0</span>, count = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> num : nums) {
-        prefix += num;
-        count += freq.<span class="fn">getOrDefault</span>(prefix - k, <span class="num">0</span>);
-        freq.<span class="fn">merge</span>(prefix, <span class="num">1</span>, Integer::sum);
-    }
-    <span class="ret">return</span> count;
-}
-<span class="cm">// k=2, [1,1,1]: prefix=1→2→3
-// p=2: look up 2-2=0 → {0:1} → count=1
-// p=3: look up 3-2=1 → {1:1} → count=2 ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> subarraySum(nums, k):
+    freq ← map with {0: 1}          <span class="pc-cm">// the empty prefix</span>
+    prefix ← 0;  count ← 0
+    <span class="pc-kw">for</span> num <span class="pc-kw">in</span> nums:
+        prefix ← prefix + num
+        count ← count + freq[prefix - k]   <span class="pc-cm">// default 0</span>
+        freq[prefix] ← freq[prefix] + 1
+    <span class="pc-kw">return</span> count
+<span class="pc-cm">// k=2, [1,1,1]: prefix 1 → 2 → 3</span>
+<span class="pc-cm">//   prefix=2: look up 0 → {0:1} → count = 1</span>
+<span class="pc-cm">//   prefix=3: look up 1 → {1:1} → count = 2 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2734,26 +2728,25 @@ count     <span class="pc-kw">&larr;</span> 0
             <details>
               <summary><span class="toggle-arrow">▶</span> Solution</summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      ☕ Java · Variable Sliding Window
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Variable Sliding
+                      Window</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public int</span> <span class="fn">minSubArrayLen</span>(<span class="kw">int</span> target, <span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, sum = <span class="num">0</span>, min = Integer.MAX_VALUE;
-    <span class="kw">for</span> (<span class="kw">int</span> hi = <span class="num">0</span>; hi &lt; nums.length; hi++) {
-        sum += nums[hi];
-        <span class="kw">while</span> (sum &gt;= target) {
-            min = Math.<span class="fn">min</span>(min, hi - lo + <span class="num">1</span>);
-            sum -= nums[lo++];
-        }
-    }
-    <span class="ret">return</span> min == Integer.MAX_VALUE ? <span class="num">0</span> : min;
-}</pre>
+                  <pre><span class="pc-kw">function</span> minSubArrayLen(target, nums):
+    lo ← 0;  sum ← 0;  best ← INFINITY
+    <span class="pc-kw">for</span> hi <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        sum ← sum + nums[hi]
+        <span class="pc-kw">while</span> sum ≥ target:              <span class="pc-cm">// valid → record, then try to shrink</span>
+            best ← min(best, hi - lo + 1)
+            sum ← sum - nums[lo]
+            lo ← lo + 1
+    <span class="pc-kw">if</span> best = INFINITY: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2846,24 +2839,23 @@ count     <span class="pc-kw">&larr;</span> 0
             <details>
               <summary><span class="toggle-arrow">▶</span> Solution</summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · int[26] Counter</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; int[26] Counter</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public boolean</span> <span class="fn">isAnagram</span>(String s, String t) {
-    <span class="kw">if</span> (s.length() != t.length()) <span class="ret">return false</span>;
-    <span class="kw">int</span>[] cnt = <span class="kw">new int</span>[<span class="num">26</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {
-        cnt[s.<span class="fn">charAt</span>(i) - <span class="str">'a'</span>]++;
-        cnt[t.<span class="fn">charAt</span>(i) - <span class="str">'a'</span>]--;
-    }
-    <span class="kw">for</span> (<span class="kw">int</span> c : cnt)
-        <span class="kw">if</span> (c != <span class="num">0</span>) <span class="ret">return false</span>;
-    <span class="ret">return true</span>;
-}</pre>
+                  <pre><span class="pc-kw">function</span> isAnagram(s, t):
+    <span class="pc-kw">if</span> length(s) ≠ length(t): <span class="pc-kw">return</span> false
+    count ← array of 0, size 26
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
+        count[s[i] - 'a'] ← count[s[i] - 'a'] + 1
+        count[t[i] - 'a'] ← count[t[i] - 'a'] - 1
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> count:
+        <span class="pc-kw">if</span> c ≠ 0: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> true</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2958,24 +2950,22 @@ count     <span class="pc-kw">&larr;</span> 0
                 <span class="toggle-arrow">▶</span> Solution + Trace
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Vertical Scan</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Vertical Scan</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public</span> String <span class="fn">longestCommonPrefix</span>(String[] strs) {
-    <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; strs[<span class="num">0</span>].length(); c++) {
-        <span class="kw">char</span> ch = strs[<span class="num">0</span>].<span class="fn">charAt</span>(c);
-        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; strs.length; i++)
-            <span class="kw">if</span> (c == strs[i].length() || strs[i].<span class="fn">charAt</span>(c) != ch)
-                <span class="ret">return</span> strs[<span class="num">0</span>].<span class="fn">substring</span>(<span class="num">0</span>, c);
-    }
-    <span class="ret">return</span> strs[<span class="num">0</span>];
-}
-<span class="cm">// ["flower","flow","flight"]:
-// c=0:'f' ✓ c=1:'l' ✓ c=2:'o'≠'i'(flight) → return "fl" ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> longestCommonPrefix(strs):
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(strs[0]) - 1:
+        ch ← strs[0][c]
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> length(strs) - 1:
+            <span class="pc-kw">if</span> c = length(strs[i]) <span class="pc-kw">or</span> strs[i][c] ≠ ch:
+                <span class="pc-kw">return</span> strs[0][0 .. c-1]     <span class="pc-cm">// first mismatch ends the prefix</span>
+    <span class="pc-kw">return</span> strs[0]
+<span class="pc-cm">// ["flower","flow","flight"]: c=0 'f' ✓  c=1 'l' ✓  c=2 'o' ≠ 'i' → "fl" ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">

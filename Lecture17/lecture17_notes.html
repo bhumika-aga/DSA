@@ -1378,6 +1378,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1560,7 +1571,7 @@
             you already know from trees (Lecture 15), but on a general graph
             with cycles you must track <code>visited[]</code>. Dijkstra&apos;s
             uses the min-heap from Lecture 16. Kruskal&apos;s MST needs
-            Union-Find (Lecture 18 &mdash; next). After Graphs, Dynamic
+            Union-Find, taught properly in Lecture 24. After Graphs, Dynamic
             Programming on DAGs and interval scheduling both rely on topological
             order.
           </div>
@@ -1576,40 +1587,42 @@
           complexity of every operation.
         </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Representation</th>
-              <th>Space</th>
-              <th>Check Edge</th>
-              <th>List Neighbours</th>
-              <th>Best For</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Adjacency List</strong></td>
-              <td>O(V + E)</td>
-              <td>O(degree)</td>
-              <td>O(degree)</td>
-              <td>Sparse graphs (most interview problems)</td>
-            </tr>
-            <tr>
-              <td><strong>Adjacency Matrix</strong></td>
-              <td>O(V&sup2;)</td>
-              <td>O(1)</td>
-              <td>O(V)</td>
-              <td>Dense graphs, Floyd-Warshall</td>
-            </tr>
-            <tr>
-              <td><strong>Edge List</strong></td>
-              <td>O(E)</td>
-              <td>O(E)</td>
-              <td>O(E)</td>
-              <td>Kruskal&apos;s MST (sort edges)</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Representation</th>
+                <th>Space</th>
+                <th>Check Edge</th>
+                <th>List Neighbours</th>
+                <th>Best For</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Adjacency List</strong></td>
+                <td>O(V + E)</td>
+                <td>O(degree)</td>
+                <td>O(degree)</td>
+                <td>Sparse graphs (most interview problems)</td>
+              </tr>
+              <tr>
+                <td><strong>Adjacency Matrix</strong></td>
+                <td>O(V&sup2;)</td>
+                <td>O(1)</td>
+                <td>O(V)</td>
+                <td>Dense graphs, Floyd-Warshall</td>
+              </tr>
+              <tr>
+                <td><strong>Edge List</strong></td>
+                <td>O(E)</td>
+                <td>O(E)</td>
+                <td>O(E)</td>
+                <td>Kruskal&apos;s MST (sort edges)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <h3 class="h3" id="adj-list">Adjacency List in Java</h3>
         <div class="code-block pseudo">
@@ -1629,27 +1642,6 @@ adj <span class="pc-kw">&larr;</span> array of V empty lists
 <span class="pc-cm">// Weighted? store pairs: adj[u].append( (v, weight) )</span>
 <span class="pc-cm">// A grid is an implicit graph: the neighbours of (r,c) are</span>
 <span class="pc-cm">// (r+1,c) (r-1,c) (r,c+1) (r,c-1) — no adjacency list needed.</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Build Adjacency List</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> n = <span class="num">5</span>;  <span class="cm">// nodes 0..4</span>
-<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) adj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
-
-<span class="cm">// undirected edge 0-1</span>
-adj.<span class="fn">get</span>(<span class="num">0</span>).<span class="fn">add</span>(<span class="num">1</span>);
-adj.<span class="fn">get</span>(<span class="num">1</span>).<span class="fn">add</span>(<span class="num">0</span>);
-
-<span class="cm">// weighted directed edge u→v with weight w</span>
-<span class="cm">// Use: List&lt;int[]&gt; where int[]{neighbour, weight}</span>
-<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; wAdj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) wAdj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
-wAdj.<span class="fn">get</span>(u).<span class="fn">add</span>(<span class="kw">new</span> <span class="kw">int</span>[]{v, weight});</pre>
         </div>
 
         <h3 class="h3" id="adj-matrix">Grid as Implicit Graph</h3>
@@ -1718,34 +1710,9 @@ dist <span class="pc-kw">&larr;</span> 0
 <span class="pc-kw">return</span> unreachable
 
 <span class="pc-cm">// Multi-source (rotting oranges, nearest exit): push EVERY source</span>
-<span class="pc-cm">// before the loop starts, all at distance 0.</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; BFS Shortest Path Template</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span>[] <span class="fn">bfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> src, <span class="kw">int</span> n) {
-    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, -<span class="num">1</span>);
-    dist[src] = <span class="num">0</span>;
-    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    q.<span class="fn">offer</span>(src);
+<span class="pc-cm">// before the loop starts, all at distance 0.</span>
 
-    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
-        <span class="kw">int</span> node = q.<span class="fn">poll</span>();
-        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
-            <span class="kw">if</span> (dist[nei] == -<span class="num">1</span>) {     <span class="cm">// not visited</span>
-                dist[nei] = dist[node] + <span class="num">1</span>;
-                q.<span class="fn">offer</span>(nei);
-            }
-        }
-    }
-    <span class="ret">return</span> dist;
-}
-<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
         </div>
 
         <div class="complexity-row">
@@ -1764,35 +1731,27 @@ dist <span class="pc-kw">&larr;</span> 0
           into the queue at once before the BFS loop begins. This avoids running
           BFS from each source separately.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Multi-Source BFS (Rotting Oranges
+              >&#128208; Pseudocode &middot; Multi-Source BFS (Rotting Oranges
               pattern)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Seed all rotten oranges at distance 0</span>
-<span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; rows; r++)
-    <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; cols; c++)
-        <span class="kw">if</span> (grid[r][c] == <span class="num">2</span>) q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{r, c, <span class="num">0</span>});  <span class="cm">// {row, col, time}</span>
+          <pre><span class="pc-cm">// Seed ALL rotten oranges at time 0</span>
+q ← empty queue
+<span class="pc-kw">for</span> every cell (r, c):
+    <span class="pc-kw">if</span> grid[r][c] = 2: q.enqueue((r, c, 0))       <span class="pc-cm">// (row, col, time)</span>
 
-<span class="kw">int</span>[][] dirs = {{<span class="num">1</span>,<span class="num">0</span>},{-<span class="num">1</span>,<span class="num">0</span>},{<span class="num">0</span>,<span class="num">1</span>},{<span class="num">0</span>,-<span class="num">1</span>}};
-<span class="kw">int</span> maxTime = <span class="num">0</span>;
-
-<span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
-    <span class="kw">int</span>[] cur = q.<span class="fn">poll</span>();
-    <span class="kw">int</span> r = cur[<span class="num">0</span>], c = cur[<span class="num">1</span>], t = cur[<span class="num">2</span>];
-    maxTime = <span class="cls">Math</span>.<span class="fn">max</span>(maxTime, t);
-    <span class="kw">for</span> (<span class="kw">int</span>[] d : dirs) {
-        <span class="kw">int</span> nr = r + d[<span class="num">0</span>], nc = c + d[<span class="num">1</span>];
-        <span class="kw">if</span> (nr &gt;= <span class="num">0</span> &amp;&amp; nr &lt; rows &amp;&amp; nc &gt;= <span class="num">0</span> &amp;&amp; nc &lt; cols &amp;&amp; grid[nr][nc] == <span class="num">1</span>) {
-            grid[nr][nc] = <span class="num">2</span>;   <span class="cm">// mark visited by overwriting</span>
-            q.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{nr, nc, t + <span class="num">1</span>});
-        }
-    }
-}</pre>
+maxTime ← 0
+<span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+    (r, c, t) ← q.dequeue()
+    maxTime ← max(maxTime, t)
+    <span class="pc-kw">for</span> (dr, dc) <span class="pc-kw">in</span> [(1,0), (-1,0), (0,1), (0,-1)]:
+        nr ← r + dr;  nc ← c + dc
+        <span class="pc-kw">if</span> 0 ≤ nr &lt; rows <span class="pc-kw">and</span> 0 ≤ nc &lt; cols <span class="pc-kw">and</span> grid[nr][nc] = 1:
+            grid[nr][nc] ← 2                       <span class="pc-cm">// mark visited by overwriting</span>
+            q.enqueue((nr, nc, t + 1))</pre>
         </div>
 
         <hr />
@@ -1842,35 +1801,9 @@ components <span class="pc-kw">&larr;</span> 0
         <span class="pc-kw">if</span> nb <span class="pc-kw">not in</span> visited: dfs(nb)
 
 <span class="pc-cm">// Deep graph? recursion will overflow the stack. Swap in an explicit</span>
-<span class="pc-cm">// stack: push start, then pop-mark-push-neighbours in a loop.</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; DFS — Count Connected Components</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">boolean</span>[] visited;
+<span class="pc-cm">// stack: push start, then pop-mark-push-neighbours in a loop.</span>
 
-<span class="kw">int</span> <span class="fn">countComponents</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
-    visited = <span class="kw">new</span> <span class="kw">boolean</span>[n];
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
-        <span class="kw">if</span> (!visited[i]) {
-            <span class="fn">dfs</span>(adj, i);
-            count++;
-        }
-    }
-    <span class="ret">return</span> count;
-}
-
-<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node) {
-    visited[node] = <span class="kw">true</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
-        <span class="kw">if</span> (!visited[nei]) <span class="fn">dfs</span>(adj, nei);
-}
-<span class="cm">// Time: O(V + E)  Space: O(V) recursion stack</span></pre>
+<span class="pc-cm">// Time: O(V + E)  Space: O(V) for visited + the recursion stack</span></pre>
         </div>
 
         <div class="callout orange">
@@ -1897,31 +1830,27 @@ components <span class="pc-kw">&larr;</span> 0
           <strong>2 = fully processed (black)</strong>. If during DFS you reach
           a grey node, you found a back edge &rarr; cycle.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Directed Cycle Detection (3-color)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              >&#128208; Pseudocode &middot; Directed Cycle Detection
+              (3-color)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span>[] color; <span class="cm">// 0=white, 1=grey, 2=black</span>
+          <pre>color ← array of V, all WHITE     <span class="pc-cm">// WHITE = unvisited, GREY = in progress, BLACK = done</span>
 
-<span class="kw">boolean</span> <span class="fn">hasCycle</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
-    color = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
-        <span class="kw">if</span> (color[i] == <span class="num">0</span> &amp;&amp; <span class="fn">dfs</span>(adj, i)) <span class="ret">return</span> <span class="kw">true</span>;
-    <span class="ret">return</span> <span class="kw">false</span>;
-}
+<span class="pc-kw">function</span> hasCycle(adj, V):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+        <span class="pc-kw">if</span> color[i] = WHITE <span class="pc-kw">and</span> dfs(adj, i): <span class="pc-kw">return</span> true
+    <span class="pc-kw">return</span> false
 
-<span class="kw">boolean</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node) {
-    color[node] = <span class="num">1</span>;  <span class="cm">// mark grey (in progress)</span>
-    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
-        <span class="kw">if</span> (color[nei] == <span class="num">1</span>) <span class="ret">return</span> <span class="kw">true</span>;  <span class="cm">// back edge = cycle</span>
-        <span class="kw">if</span> (color[nei] == <span class="num">0</span> &amp;&amp; <span class="fn">dfs</span>(adj, nei)) <span class="ret">return</span> <span class="kw">true</span>;
-    }
-    color[node] = <span class="num">2</span>;  <span class="cm">// mark black (done)</span>
-    <span class="ret">return</span> <span class="kw">false</span>;
-}</pre>
+<span class="pc-kw">function</span> dfs(adj, node):
+    color[node] ← GREY                        <span class="pc-cm">// on the current path</span>
+    <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> color[nei] = GREY: <span class="pc-kw">return</span> true      <span class="pc-cm">// back edge = cycle</span>
+        <span class="pc-kw">if</span> color[nei] = WHITE <span class="pc-kw">and</span> dfs(adj, nei): <span class="pc-kw">return</span> true
+    color[node] ← BLACK                       <span class="pc-cm">// fully explored</span>
+    <span class="pc-kw">return</span> false</pre>
         </div>
 
         <h3 class="h3" id="cycle-undirected">
@@ -1933,25 +1862,21 @@ components <span class="pc-kw">&larr;</span> 0
           <code>v</code>, skip the edge back to <code>u</code> (the parent). If
           you still reach an already-visited node, it&apos;s a cycle.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Undirected Cycle Detection
+              >&#128208; Pseudocode &middot; Undirected Cycle Detection
               (parent-skip)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">boolean</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> node, <span class="kw">int</span> parent, <span class="kw">boolean</span>[] vis) {
-    vis[node] = <span class="kw">true</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node)) {
-        <span class="kw">if</span> (!vis[nei]) {
-            <span class="kw">if</span> (<span class="fn">dfs</span>(adj, nei, node, vis)) <span class="ret">return</span> <span class="kw">true</span>;
-        } <span class="kw">else if</span> (nei != parent) {  <span class="cm">// visited AND not the edge we came from</span>
-            <span class="ret">return</span> <span class="kw">true</span>;
-        }
-    }
-    <span class="ret">return</span> <span class="kw">false</span>;
-}</pre>
+          <pre><span class="pc-kw">function</span> dfs(adj, node, parent, vis):
+    vis[node] ← true
+    <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> vis[nei]:
+            <span class="pc-kw">if</span> dfs(adj, nei, node, vis): <span class="pc-kw">return</span> true
+        <span class="pc-kw">else if</span> nei ≠ parent:          <span class="pc-cm">// visited AND not the edge we came from</span>
+            <span class="pc-kw">return</span> true
+    <span class="pc-kw">return</span> false</pre>
         </div>
 
         <div class="callout yellow">
@@ -2009,36 +1934,9 @@ order <span class="pc-kw">&larr;</span> empty list
         <span class="pc-kw">if</span> indeg[nb] = 0: queue.pushBack(nb)
 
 <span class="pc-kw">if</span> length(order) &ne; V: <span class="pc-kw">return</span> CYCLE_DETECTED
-<span class="pc-kw">return</span> order</pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Kahn's Topological Sort</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span>[] <span class="fn">topoSort</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> n) {
-    <span class="kw">int</span>[] inDegree = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="kw">for</span> (<span class="kw">int</span> u = <span class="num">0</span>; u &lt; n; u++)
-        <span class="kw">for</span> (<span class="kw">int</span> v : adj.<span class="fn">get</span>(u)) inDegree[v]++;
+<span class="pc-kw">return</span> order
 
-    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
-        <span class="kw">if</span> (inDegree[i] == <span class="num">0</span>) q.<span class="fn">offer</span>(i);
-
-    <span class="kw">int</span>[] order = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="kw">int</span> idx = <span class="num">0</span>;
-    <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
-        <span class="kw">int</span> node = q.<span class="fn">poll</span>();
-        order[idx++] = node;
-        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
-            <span class="kw">if</span> (--inDegree[nei] == <span class="num">0</span>) q.<span class="fn">offer</span>(nei);
-    }
-    <span class="cm">// idx &lt; n means cycle exists — no valid topo order</span>
-    <span class="ret">return</span> idx == n ? order : <span class="kw">new</span> <span class="kw">int</span>[<span class="num">0</span>];
-}
-<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
         </div>
 
         <h3 class="h3" id="topo-dfs">DFS-based Topological Sort</h3>
@@ -2047,24 +1945,23 @@ order <span class="pc-kw">&larr;</span> empty list
           stack. Reverse the stack for the order. Equivalent to Kahn&apos;s but
           DFS-native &mdash; useful when you already have DFS in the solution.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; DFS Topo Sort (post-order + stack)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              >&#128208; Pseudocode &middot; DFS Topo Sort (post-order +
+              stack)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">Deque</span>&lt;<span class="cls">Integer</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-<span class="kw">boolean</span>[] visited = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+          <pre>stack ← empty stack
+visited ← array of V, all false
 
-<span class="kw">void</span> <span class="fn">dfs</span>(<span class="kw">int</span> node) {
-    visited[node] = <span class="kw">true</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> nei : adj.<span class="fn">get</span>(node))
-        <span class="kw">if</span> (!visited[nei]) <span class="fn">dfs</span>(nei);
-    stack.<span class="fn">push</span>(node);  <span class="cm">// push AFTER all neighbours done</span>
-}
+<span class="pc-kw">function</span> dfs(node):
+    visited[node] ← true
+    <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> visited[nei]: dfs(nei)
+    stack.push(node)                 <span class="pc-cm">// push AFTER all neighbours are done</span>
 
-<span class="cm">// Call dfs(i) for each unvisited i, then read stack top-to-bottom</span></pre>
+<span class="pc-cm">// Call dfs(i) for every unvisited i, then read the stack top-to-bottom</span></pre>
         </div>
 
         <hr />
@@ -2113,41 +2010,9 @@ heap <span class="pc-kw">&larr;</span> min-heap holding (0, src) ordered by dist
 <span class="pc-kw">return</span> dist
 
 <span class="pc-cm">// Negative edges? Dijkstra is WRONG — use Bellman-Ford.</span>
-<span class="pc-cm">// All weights 0 or 1? A deque beats the heap (0-1 BFS).</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Dijkstra's Shortest Path (min-heap)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span>[] <span class="fn">dijkstra</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj, <span class="kw">int</span> src, <span class="kw">int</span> n) {
-    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, <span class="cls">Integer</span>.MAX_VALUE);
-    dist[src] = <span class="num">0</span>;
+<span class="pc-cm">// All weights 0 or 1? A deque beats the heap (0-1 BFS).</span>
 
-    <span class="cm">// min-heap: {dist, node}</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
-    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>, src});
-
-    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
-        <span class="kw">int</span>[] cur = pq.<span class="fn">poll</span>();
-        <span class="kw">int</span> d = cur[<span class="num">0</span>], node = cur[<span class="num">1</span>];
-
-        <span class="kw">if</span> (d &gt; dist[node]) <span class="kw">continue</span>;  <span class="cm">// stale entry — skip</span>
-
-        <span class="kw">for</span> (<span class="kw">int</span>[] edge : adj.<span class="fn">get</span>(node)) {
-            <span class="kw">int</span> nei = edge[<span class="num">0</span>], w = edge[<span class="num">1</span>];
-            <span class="kw">if</span> (dist[node] + w &lt; dist[nei]) {
-                dist[nei] = dist[node] + w;
-                pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{dist[nei], nei});
-            }
-        }
-    }
-    <span class="ret">return</span> dist;
-}
-<span class="cm">// Time: O((V + E) log V)  Space: O(V)</span></pre>
+<span class="pc-cm">// Time: O((V + E) log V)  Space: O(V)</span></pre>
         </div>
 
         <div class="callout yellow">
@@ -2188,31 +2053,29 @@ heap <span class="pc-kw">&larr;</span> min-heap holding (0, src) ordered by dist
           Slower than Dijkstra but more general.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <span class="code-lang">&#9749; Java &middot; Bellman-Ford</span>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Bellman-Ford</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span>[] <span class="fn">bellmanFord</span>(<span class="kw">int</span>[][] edges, <span class="kw">int</span> n, <span class="kw">int</span> src) {
-    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.<span class="fn">fill</span>(dist, <span class="cls">Integer</span>.MAX_VALUE / <span class="num">2</span>);  <span class="cm">// /2 to avoid overflow on relaxation</span>
-    dist[src] = <span class="num">0</span>;
+          <pre><span class="pc-kw">function</span> bellmanFord(edges, V, src):
+    dist ← array of V, all ∞
+    dist[src] ← 0
 
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n - <span class="num">1</span>; i++) {        <span class="cm">// V-1 rounds</span>
-        <span class="kw">for</span> (<span class="kw">int</span>[] e : edges) {                  <span class="cm">// each edge {u, v, w}</span>
-            <span class="kw">int</span> u = e[<span class="num">0</span>], v = e[<span class="num">1</span>], w = e[<span class="num">2</span>];
-            <span class="kw">if</span> (dist[u] + w &lt; dist[v])
-                dist[v] = dist[u] + w;
-        }
-    }
-    <span class="cm">// Optional: V-th pass to detect negative cycle</span>
-    <span class="kw">for</span> (<span class="kw">int</span>[] e : edges)
-        <span class="kw">if</span> (dist[e[<span class="num">0</span>]] + e[<span class="num">2</span>] &lt; dist[e[<span class="num">1</span>]]) {
-            <span class="cm">// negative cycle reachable from src</span>
-        }
-    <span class="ret">return</span> dist;
-}
-<span class="cm">// Time: O(V * E)  Space: O(V)</span></pre>
+    <span class="pc-kw">repeat</span> V - 1 <span class="pc-kw">times</span>:                    <span class="pc-cm">// V-1 rounds</span>
+        <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges:
+            <span class="pc-kw">if</span> dist[u] ≠ ∞ <span class="pc-kw">and</span> dist[u] + w &lt; dist[v]:
+                dist[v] ← dist[u] + w
+
+    <span class="pc-cm">// Optional V-th pass: anything that still improves means a negative cycle</span>
+    <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges:
+        <span class="pc-kw">if</span> dist[u] ≠ ∞ <span class="pc-kw">and</span> dist[u] + w &lt; dist[v]:
+            report "negative cycle reachable <span class="pc-kw">from</span> src"
+    <span class="pc-kw">return</span> dist
+
+<span class="pc-cm">// Time: O(V × E)  Space: O(V)</span>
+<span class="pc-cm">// In fixed-width integers use a large finite INF (e.g. MAX ÷ 2) so dist[u] + w can't overflow</span></pre>
         </div>
 
         <div class="callout purple">
@@ -2263,30 +2126,27 @@ heap <span class="pc-kw">&larr;</span> min-heap holding (0, src) ordered by dist
           </p>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Floyd-Warshall All-Pairs Shortest
+              >&#128208; Pseudocode &middot; Floyd-Warshall All-Pairs Shortest
               Path</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// dist[i][j] = shortest distance from i to j</span>
-<span class="kw">int</span> INF = (<span class="kw">int</span>) <span class="num">1e9</span>;
-<span class="kw">int</span>[][] dist = <span class="kw">new</span> <span class="kw">int</span>[n][n];
-<span class="kw">for</span> (<span class="kw">int</span>[] row : dist) <span class="cls">Arrays</span>.<span class="fn">fill</span>(row, INF);
-<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) dist[i][i] = <span class="num">0</span>;
-<span class="kw">for</span> (<span class="kw">int</span>[] e : edges) dist[e[<span class="num">0</span>]][e[<span class="num">1</span>]] = e[<span class="num">2</span>];  <span class="cm">// {u, v, weight}</span>
+          <pre><span class="pc-cm">// dist[i][j] = shortest distance from i to j</span>
+dist ← V × V matrix, all ∞
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1: dist[i][i] ← 0
+<span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges: dist[u][v] ← w
 
-<span class="cm">// Try every intermediate node k</span>
-<span class="kw">for</span> (<span class="kw">int</span> k = <span class="num">0</span>; k &lt; n; k++)
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++)
-            <span class="kw">if</span> (dist[i][k] &lt; INF &amp;&amp; dist[k][j] &lt; INF)
-                dist[i][j] = <span class="cls">Math</span>.<span class="fn">min</span>(dist[i][j], dist[i][k] + dist[k][j]);
+<span class="pc-cm">// Try every intermediate node k</span>
+<span class="pc-kw">for</span> k <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+            <span class="pc-kw">if</span> dist[i][k] &lt; ∞ <span class="pc-kw">and</span> dist[k][j] &lt; ∞:
+                dist[i][j] ← min(dist[i][j], dist[i][k] + dist[k][j])
 
-<span class="cm">// Negative cycle: if dist[i][i] &lt; 0 for any i, a negative cycle exists</span>
-<span class="cm">// Time: O(V³)  Space: O(V²)</span></pre>
+<span class="pc-cm">// Negative cycle: if dist[i][i] &lt; 0 for any i, a negative cycle exists</span>
+<span class="pc-cm">// Time: O(V³)  Space: O(V²)</span></pre>
         </div>
 
         <div class="callout orange">
@@ -2325,33 +2185,37 @@ heap <span class="pc-kw">&larr;</span> min-heap holding (0, src) ordered by dist
           MST.
         </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Algorithm</th>
-              <th>Strategy</th>
-              <th>Data Structure</th>
-              <th>Time</th>
-              <th>Best When</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Kruskal's</strong></td>
-              <td>Sort edges, add if no cycle</td>
-              <td>Union-Find</td>
-              <td>O(E log E)</td>
-              <td>Sparse graphs</td>
-            </tr>
-            <tr>
-              <td><strong>Prim's</strong></td>
-              <td>Grow MST from a node, always add cheapest reachable edge</td>
-              <td>Min-Heap</td>
-              <td>O(E log V)</td>
-              <td>Dense graphs</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Strategy</th>
+                <th>Data Structure</th>
+                <th>Time</th>
+                <th>Best When</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Kruskal's</strong></td>
+                <td>Sort edges, add if no cycle</td>
+                <td>Union-Find</td>
+                <td>O(E log E)</td>
+                <td>Sparse graphs</td>
+              </tr>
+              <tr>
+                <td><strong>Prim's</strong></td>
+                <td>
+                  Grow MST from a node, always add cheapest reachable edge
+                </td>
+                <td>Min-Heap</td>
+                <td>O(E log V)</td>
+                <td>Dense graphs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <h3 class="h3" id="kruskal">Kruskal&apos;s Algorithm</h3>
         <div class="code-block pseudo">
@@ -2375,67 +2239,35 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
         <span class="pc-kw">if</span> used = V - 1: <span class="pc-kw">break</span>       <span class="pc-cm">// a spanning tree has V-1 edges</span>
 
 <span class="pc-kw">if</span> used &lt; V - 1: <span class="pc-kw">return</span> GRAPH_NOT_CONNECTED
-<span class="pc-kw">return</span> total</pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Kruskal's MST (Union-Find)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// edges: {weight, u, v}; sort by weight</span>
-<span class="kw">int</span> <span class="fn">kruskal</span>(<span class="kw">int</span>[][] edges, <span class="kw">int</span> n) {
-    <span class="cls">Arrays</span>.<span class="fn">sort</span>(edges, (a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
-    <span class="kw">int</span>[] parent = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) parent[i] = i;
+<span class="pc-kw">return</span> total
 
-    <span class="kw">int</span> cost = <span class="num">0</span>, edgesUsed = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span>[] e : edges) {
-        <span class="kw">int</span> w = e[<span class="num">0</span>], u = e[<span class="num">1</span>], v = e[<span class="num">2</span>];
-        <span class="kw">int</span> pu = <span class="fn">find</span>(parent, u), pv = <span class="fn">find</span>(parent, v);
-        <span class="kw">if</span> (pu != pv) {  <span class="cm">// different components — safe to add</span>
-            parent[pu] = pv;
-            cost += w;
-            <span class="kw">if</span> (++edgesUsed == n - <span class="num">1</span>) <span class="kw">break</span>;
-        }
-    }
-    <span class="ret">return</span> edgesUsed == n - <span class="num">1</span> ? cost : -<span class="num">1</span>;  <span class="cm">// -1 if not fully connected</span>
-}
-
-<span class="kw">int</span> <span class="fn">find</span>(<span class="kw">int</span>[] parent, <span class="kw">int</span> x) {
-    <span class="kw">if</span> (parent[x] != x) parent[x] = <span class="fn">find</span>(parent, parent[x]);  <span class="cm">// path compression</span>
-    <span class="ret">return</span> parent[x];
-}</pre>
+<span class="pc-cm">// The disjoint-set find, with path compression:</span>
+<span class="pc-kw">function</span> find(parent, x):
+    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent, parent[x])   <span class="pc-cm">// point straight at the root</span>
+    <span class="pc-kw">return</span> parent[x]</pre>
         </div>
 
         <h3 class="h3" id="prim">Prim&apos;s Algorithm</h3>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Prim's MST (min-heap)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              >&#128208; Pseudocode &middot; Prim's MST (min-heap)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> <span class="fn">prim</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj, <span class="kw">int</span> n) {
-    <span class="kw">boolean</span>[] inMST = <span class="kw">new</span> <span class="kw">boolean</span>[n];
-    <span class="cm">// min-heap: {edge_weight, node}</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a, b) -&gt; a[<span class="num">0</span>] - b[<span class="num">0</span>]);
-    pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>, <span class="num">0</span>});  <span class="cm">// start from node 0</span>
-    <span class="kw">int</span> cost = <span class="num">0</span>;
+          <pre><span class="pc-kw">function</span> prim(adj, V):
+    inMST ← array of V, all false
+    pq ← min-heap of (edgeWeight, node), starting with (0, 0)   <span class="pc-cm">// start from node 0</span>
+    cost ← 0
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        (w, node) ← pq.popMin()
+        <span class="pc-kw">if</span> inMST[node]: <span class="pc-kw">continue</span>        <span class="pc-cm">// already joined by a cheaper edge</span>
+        inMST[node] ← true
+        cost ← cost + w
+        <span class="pc-kw">for</span> (nei, weight) <span class="pc-kw">in</span> adj[node]:
+            <span class="pc-kw">if</span> <span class="pc-kw">not</span> inMST[nei]: pq.push((weight, nei))
+    <span class="pc-kw">return</span> cost
 
-    <span class="kw">while</span> (!pq.<span class="fn">isEmpty</span>()) {
-        <span class="kw">int</span>[] cur = pq.<span class="fn">poll</span>();
-        <span class="kw">int</span> w = cur[<span class="num">0</span>], node = cur[<span class="num">1</span>];
-        <span class="kw">if</span> (inMST[node]) <span class="kw">continue</span>;
-        inMST[node] = <span class="kw">true</span>;
-        cost += w;
-        <span class="kw">for</span> (<span class="kw">int</span>[] edge : adj.<span class="fn">get</span>(node))
-            <span class="kw">if</span> (!inMST[edge[<span class="num">0</span>]]) pq.<span class="fn">offer</span>(<span class="kw">new</span> <span class="kw">int</span>[]{edge[<span class="num">1</span>], edge[<span class="num">0</span>]});
-    }
-    <span class="ret">return</span> cost;
-}
-<span class="cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
+<span class="pc-cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
         </div>
 
         <hr />
@@ -2458,37 +2290,30 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
           </div>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Bipartite Check (BFS coloring)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              >&#128208; Pseudocode &middot; Bipartite Check (BFS
+              coloring)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">boolean</span> <span class="fn">isBipartite</span>(<span class="kw">int</span>[][] graph) {
-    <span class="kw">int</span> n = graph.length;
-    <span class="kw">int</span>[] color = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.<span class="fn">fill</span>(color, -<span class="num">1</span>);
+          <pre><span class="pc-kw">function</span> isBipartite(graph):
+    n ← length(graph)
+    color ← array of n, all -1          <span class="pc-cm">// -1 = uncolored, otherwise 0 or 1</span>
 
-    <span class="kw">for</span> (<span class="kw">int</span> start = <span class="num">0</span>; start &lt; n; start++) {
-        <span class="kw">if</span> (color[start] != -<span class="num">1</span>) <span class="kw">continue</span>;
-        color[start] = <span class="num">0</span>;
-        <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-        q.<span class="fn">offer</span>(start);
-        <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
-            <span class="kw">int</span> node = q.<span class="fn">poll</span>();
-            <span class="kw">for</span> (<span class="kw">int</span> nei : graph[node]) {
-                <span class="kw">if</span> (color[nei] == -<span class="num">1</span>) {
-                    color[nei] = <span class="num">1</span> - color[node];
-                    q.<span class="fn">offer</span>(nei);
-                } <span class="kw">else if</span> (color[nei] == color[node]) {
-                    <span class="ret">return</span> <span class="kw">false</span>;  <span class="cm">// conflict</span>
-                }
-            }
-        }
-    }
-    <span class="ret">return</span> <span class="kw">true</span>;
-}</pre>
+    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:           <span class="pc-cm">// the graph may be disconnected</span>
+        <span class="pc-kw">if</span> color[start] ≠ -1: <span class="pc-kw">continue</span>
+        color[start] ← 0
+        q ← queue containing start
+        <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+            node ← q.dequeue()
+            <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> graph[node]:
+                <span class="pc-kw">if</span> color[nei] = -1:
+                    color[nei] ← 1 - color[node]    <span class="pc-cm">// opposite color</span>
+                    q.enqueue(nei)
+                <span class="pc-kw">else if</span> color[nei] = color[node]:
+                    <span class="pc-kw">return</span> false                    <span class="pc-cm">// conflict</span>
+    <span class="pc-kw">return</span> true</pre>
         </div>
 
         <hr />
@@ -2516,47 +2341,37 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
           </div>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Tarjan&apos;s Bridge Finding (LC
+              >&#128208; Pseudocode &middot; Tarjan's Bridge Finding (LC
               1192)</span
-            >
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span>[] disc, low;
-<span class="kw">int</span> timer = <span class="num">0</span>;
-<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; bridges = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+          <pre>disc ← array of n, all -1     <span class="pc-cm">// discovery time</span>
+low ← array of n              <span class="pc-cm">// earliest discovery time reachable from the subtree</span>
+timer ← 0
+bridges ← empty list
 
-<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">criticalConnections</span>(<span class="kw">int</span> n, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; connections) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) adj.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
-    <span class="kw">for</span> (<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; e : connections) {
-        adj.<span class="fn">get</span>(e.<span class="fn">get</span>(<span class="num">0</span>)).<span class="fn">add</span>(e.<span class="fn">get</span>(<span class="num">1</span>));
-        adj.<span class="fn">get</span>(e.<span class="fn">get</span>(<span class="num">1</span>)).<span class="fn">add</span>(e.<span class="fn">get</span>(<span class="num">0</span>));
-    }
-    disc = <span class="kw">new</span> <span class="kw">int</span>[n]; low = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.<span class="fn">fill</span>(disc, -<span class="num">1</span>);
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
-        <span class="kw">if</span> (disc[i] == -<span class="num">1</span>) <span class="fn">dfs</span>(adj, i, -<span class="num">1</span>);
-    <span class="ret">return</span> bridges;
-}
+<span class="pc-kw">function</span> criticalConnections(n, connections):
+    adj ← undirected adjacency list built <span class="pc-kw">from</span> connections
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> disc[i] = -1: dfs(adj, i, -1)
+    <span class="pc-kw">return</span> bridges
 
-<span class="kw">void</span> <span class="fn">dfs</span>(<span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj, <span class="kw">int</span> u, <span class="kw">int</span> parent) {
-    disc[u] = low[u] = timer++;
-    <span class="kw">for</span> (<span class="kw">int</span> v : adj.<span class="fn">get</span>(u)) {
-        <span class="kw">if</span> (v == parent) <span class="kw">continue</span>;           <span class="cm">// skip the edge we came from</span>
-        <span class="kw">if</span> (disc[v] == -<span class="num">1</span>) {                  <span class="cm">// tree edge — recurse</span>
-            <span class="fn">dfs</span>(adj, v, u);
-            low[u] = <span class="cls">Math</span>.<span class="fn">min</span>(low[u], low[v]);
-            <span class="kw">if</span> (low[v] &gt; disc[u])             <span class="cm">// bridge condition</span>
-                bridges.<span class="fn">add</span>(<span class="cls">Arrays</span>.<span class="fn">asList</span>(u, v));
-        } <span class="kw">else</span> {                              <span class="cm">// back edge — update low</span>
-            low[u] = <span class="cls">Math</span>.<span class="fn">min</span>(low[u], disc[v]);
-        }
-    }
-}
-<span class="cm">// Time: O(V + E)  Space: O(V)</span></pre>
+<span class="pc-kw">function</span> dfs(adj, u, parent):
+    disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
+    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
+        <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>                 <span class="pc-cm">// skip the edge we came from</span>
+        <span class="pc-kw">if</span> disc[v] = -1:                        <span class="pc-cm">// tree edge — recurse</span>
+            dfs(adj, v, u)
+            low[u] ← min(low[u], low[v])
+            <span class="pc-kw">if</span> low[v] &gt; disc[u]:                <span class="pc-cm">// v can't reach u or above without this edge</span>
+                append (u, v) <span class="pc-kw">to</span> bridges
+        <span class="pc-kw">else</span>:                                   <span class="pc-cm">// back edge — update low</span>
+            low[u] ← min(low[u], disc[v])
+
+<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
         </div>
 
         <div class="callout yellow">
@@ -2584,64 +2399,67 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
         <!-- ═══ PATTERNS SUMMARY ═══ -->
         <h2 class="h1" id="patterns">&#127919; Pattern Decision Guide</h2>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Signal in Problem</th>
-              <th>Pattern</th>
-              <th>Key Tool</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>"Shortest path" — unweighted / unit weight</td>
-              <td>BFS</td>
-              <td>Queue + visited[]</td>
-            </tr>
-            <tr>
-              <td>"Shortest path" — weighted, non-negative</td>
-              <td>Dijkstra</td>
-              <td>Min-heap PQ</td>
-            </tr>
-            <tr>
-              <td>"Shortest path" — negative weights or K-stop limit</td>
-              <td>Bellman-Ford</td>
-              <td>Edge list, V&minus;1 rounds</td>
-            </tr>
-            <tr>
-              <td>"Connected components", "number of islands"</td>
-              <td>DFS flood fill</td>
-              <td>visited[] + recursive DFS</td>
-            </tr>
-            <tr>
-              <td>"Course prerequisites", "task order", "dependency"</td>
-              <td>Topological Sort</td>
-              <td>Kahn's (in-degree) or DFS post-order</td>
-            </tr>
-            <tr>
-              <td>
-                "Can you complete all courses" = detect cycle in directed graph
-              </td>
-              <td>Cycle Detection</td>
-              <td>3-color DFS or Kahn's (idx &lt; n)</td>
-            </tr>
-            <tr>
-              <td>"Minimum cost to connect all nodes"</td>
-              <td>MST</td>
-              <td>Kruskal's (edges) or Prim's (heap)</td>
-            </tr>
-            <tr>
-              <td>"Two groups", "no conflict", "bipartite"</td>
-              <td>BFS 2-coloring</td>
-              <td>color[] alternating</td>
-            </tr>
-            <tr>
-              <td>"All-pairs shortest path" (small V)</td>
-              <td>Floyd-Warshall</td>
-              <td>3-loop DP, O(V&sup3;)</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Signal in Problem</th>
+                <th>Pattern</th>
+                <th>Key Tool</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>"Shortest path" — unweighted / unit weight</td>
+                <td>BFS</td>
+                <td>Queue + visited[]</td>
+              </tr>
+              <tr>
+                <td>"Shortest path" — weighted, non-negative</td>
+                <td>Dijkstra</td>
+                <td>Min-heap PQ</td>
+              </tr>
+              <tr>
+                <td>"Shortest path" — negative weights or K-stop limit</td>
+                <td>Bellman-Ford</td>
+                <td>Edge list, V&minus;1 rounds</td>
+              </tr>
+              <tr>
+                <td>"Connected components", "number of islands"</td>
+                <td>DFS flood fill</td>
+                <td>visited[] + recursive DFS</td>
+              </tr>
+              <tr>
+                <td>"Course prerequisites", "task order", "dependency"</td>
+                <td>Topological Sort</td>
+                <td>Kahn's (in-degree) or DFS post-order</td>
+              </tr>
+              <tr>
+                <td>
+                  "Can you complete all courses" = detect cycle in directed
+                  graph
+                </td>
+                <td>Cycle Detection</td>
+                <td>3-color DFS or Kahn's (idx &lt; n)</td>
+              </tr>
+              <tr>
+                <td>"Minimum cost to connect all nodes"</td>
+                <td>MST</td>
+                <td>Kruskal's (edges) or Prim's (heap)</td>
+              </tr>
+              <tr>
+                <td>"Two groups", "no conflict", "bipartite"</td>
+                <td>BFS 2-coloring</td>
+                <td>color[] alternating</td>
+              </tr>
+              <tr>
+                <td>"All-pairs shortest path" (small V)</td>
+                <td>Floyd-Warshall</td>
+                <td>3-loop DP, O(V&sup3;)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <div class="callout green">
           <span class="callout-icon">&#9989;</span>
@@ -2744,25 +2562,26 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 200</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 200</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">numIslands</span>(<span class="kw">char</span>[][] grid) {
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> r = <span class="num">0</span>; r &lt; grid.length; r++)
-        <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; grid[<span class="num">0</span>].length; c++)
-            <span class="kw">if</span> (grid[r][c] == <span class="str">'1'</span>) { <span class="fn">dfs</span>(grid, r, c); count++; }
-    <span class="ret">return</span> count;
-}
-<span class="kw">void</span> <span class="fn">dfs</span>(<span class="kw">char</span>[][] g, <span class="kw">int</span> r, <span class="kw">int</span> c) {
-    <span class="kw">if</span> (r &lt; <span class="num">0</span> || r &gt;= g.length || c &lt; <span class="num">0</span> || c &gt;= g[<span class="num">0</span>].length || g[r][c] != <span class="str">'1'</span>) <span class="ret">return</span>;
-    g[r][c] = <span class="str">'0'</span>;
-    <span class="fn">dfs</span>(g,r+<span class="num">1</span>,c); <span class="fn">dfs</span>(g,r-<span class="num">1</span>,c); <span class="fn">dfs</span>(g,r,c+<span class="num">1</span>); <span class="fn">dfs</span>(g,r,c-<span class="num">1</span>);
-}</pre>
+                  <pre><span class="pc-kw">function</span> numIslands(grid):
+    count ← 0
+    <span class="pc-kw">for</span> every cell (r, c):
+        <span class="pc-kw">if</span> grid[r][c] = '1':
+            dfs(grid, r, c)
+            count ← count + 1
+    <span class="pc-kw">return</span> count
+
+<span class="pc-kw">function</span> dfs(g, r, c):
+    <span class="pc-kw">if</span> r, c out of bounds <span class="pc-kw">or</span> g[r][c] ≠ '1': <span class="pc-kw">return</span>
+    g[r][c] ← '0'                          <span class="pc-cm">// sink it</span>
+    dfs(g, r+1, c);  dfs(g, r-1, c);  dfs(g, r, c+1);  dfs(g, r, c-1)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2860,35 +2679,30 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 994</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 994</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">orangesRotting</span>(<span class="kw">int</span>[][] grid) {
-    <span class="kw">int</span> rows = grid.length, cols = grid[<span class="num">0</span>].length, fresh = <span class="num">0</span>, mins = <span class="num">0</span>;
-    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> r=<span class="num">0</span>; r&lt;rows; r++) <span class="kw">for</span> (<span class="kw">int</span> c=<span class="num">0</span>; c&lt;cols; c++) {
-        <span class="kw">if</span> (grid[r][c]==<span class="num">2</span>) q.offer(<span class="kw">new</span> <span class="kw">int</span>[]{r,c});
-        <span class="kw">else if</span> (grid[r][c]==<span class="num">1</span>) fresh++;
-    }
-    <span class="kw">int</span>[][] dirs = {{<span class="num">1</span>,<span class="num">0</span>},{-<span class="num">1</span>,<span class="num">0</span>},{<span class="num">0</span>,<span class="num">1</span>},{<span class="num">0</span>,-<span class="num">1</span>}};
-    <span class="kw">while</span> (!q.isEmpty() &amp;&amp; fresh&gt;<span class="num">0</span>) {
-        mins++;
-        <span class="kw">for</span> (<span class="kw">int</span> sz=q.size(); sz&gt;<span class="num">0</span>; sz--) {
-            <span class="kw">int</span>[] cur=q.poll();
-            <span class="kw">for</span> (<span class="kw">int</span>[] d:dirs) {
-                <span class="kw">int</span> nr=cur[<span class="num">0</span>]+d[<span class="num">0</span>], nc=cur[<span class="num">1</span>]+d[<span class="num">1</span>];
-                <span class="kw">if</span> (nr&gt;=<span class="num">0</span>&amp;&amp;nr&lt;rows&amp;&amp;nc&gt;=<span class="num">0</span>&amp;&amp;nc&lt;cols&amp;&amp;grid[nr][nc]==<span class="num">1</span>) {
-                    grid[nr][nc]=<span class="num">2</span>; fresh--; q.offer(<span class="kw">new</span> <span class="kw">int</span>[]{nr,nc});
-                }
-            }
-        }
-    }
-    <span class="ret">return</span> fresh==<span class="num">0</span> ? mins : -<span class="num">1</span>;
-}</pre>
+                  <pre><span class="pc-kw">function</span> orangesRotting(grid):
+    q ← empty queue;  fresh ← 0;  mins ← 0
+    <span class="pc-kw">for</span> every cell (r, c):
+        <span class="pc-kw">if</span> grid[r][c] = 2: q.enqueue((r, c))
+        <span class="pc-kw">else if</span> grid[r][c] = 1: fresh ← fresh + 1
+    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> fresh &gt; 0:
+        mins ← mins + 1
+        <span class="pc-kw">repeat</span> q.size <span class="pc-kw">times</span>:                 <span class="pc-cm">// one minute = one BFS level</span>
+            (r, c) ← q.dequeue()
+            <span class="pc-kw">for each</span> of the 4 neighbours (nr, nc):
+                <span class="pc-kw">if</span> <span class="pc-kw">in</span> bounds <span class="pc-kw">and</span> grid[nr][nc] = 1:
+                    grid[nr][nc] ← 2
+                    fresh ← fresh - 1
+                    q.enqueue((nr, nc))
+    <span class="pc-kw">if</span> fresh = 0: <span class="pc-kw">return</span> mins
+    <span class="pc-kw">return</span> -1</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2991,27 +2805,28 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 207</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 207</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">boolean</span> <span class="fn">canFinish</span>(<span class="kw">int</span> n, <span class="kw">int</span>[][] pre) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">int</span>[] indeg = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;n; i++) adj.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
-    <span class="kw">for</span> (<span class="kw">int</span>[] p : pre) { adj.get(p[<span class="num">1</span>]).add(p[<span class="num">0</span>]); indeg[p[<span class="num">0</span>]]++; }
-    <span class="cls">Queue</span>&lt;<span class="cls">Integer</span>&gt; q = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;n; i++) <span class="kw">if</span> (indeg[i]==<span class="num">0</span>) q.offer(i);
-    <span class="kw">int</span> done = <span class="num">0</span>;
-    <span class="kw">while</span> (!q.isEmpty()) {
-        <span class="kw">int</span> node = q.poll(); done++;
-        <span class="kw">for</span> (<span class="kw">int</span> nei : adj.get(node)) <span class="kw">if</span> (--indeg[nei]==<span class="num">0</span>) q.offer(nei);
-    }
-    <span class="ret">return</span> done == n;
-}</pre>
+                  <pre><span class="pc-kw">function</span> canFinish(n, prerequisites):
+    adj ← n empty lists;  indeg ← array of n, all 0
+    <span class="pc-kw">for</span> (course, pre) <span class="pc-kw">in</span> prerequisites:
+        adj[pre].append(course)             <span class="pc-cm">// pre must come before course</span>
+        indeg[course] ← indeg[course] + 1
+    q ← every node with indeg = 0
+    done ← 0
+    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+        node ← q.dequeue()
+        done ← done + 1
+        <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+            indeg[nei] ← indeg[nei] - 1
+            <span class="pc-kw">if</span> indeg[nei] = 0: q.enqueue(nei)
+    <span class="pc-kw">return</span> done = n                          <span class="pc-cm">// anything left is stuck in a cycle</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3106,31 +2921,31 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 743</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 743</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">networkDelayTime</span>(<span class="kw">int</span>[][] times, <span class="kw">int</span> n, <span class="kw">int</span> k) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="kw">int</span>[]&gt;&gt; adj = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">0</span>; i&lt;=n; i++) adj.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;());
-    <span class="kw">for</span> (<span class="kw">int</span>[] t:times) adj.get(t[<span class="num">0</span>]).add(<span class="kw">new</span> <span class="kw">int</span>[]{t[<span class="num">1</span>],t[<span class="num">2</span>]});
-    <span class="kw">int</span>[] dist = <span class="kw">new</span> <span class="kw">int</span>[n+<span class="num">1</span>];
-    <span class="cls">Arrays</span>.fill(dist, <span class="cls">Integer</span>.MAX_VALUE); dist[k] = <span class="num">0</span>;
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
-    pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>,k});
-    <span class="kw">while</span> (!pq.isEmpty()) {
-        <span class="kw">int</span>[] cur=pq.poll();
-        <span class="kw">if</span> (cur[<span class="num">0</span>]&gt;dist[cur[<span class="num">1</span>]]) <span class="kw">continue</span>;
-        <span class="kw">for</span> (<span class="kw">int</span>[] e:adj.get(cur[<span class="num">1</span>]))
-            <span class="kw">if</span> (dist[cur[<span class="num">1</span>]]+e[<span class="num">1</span>]&lt;dist[e[<span class="num">0</span>]]) { dist[e[<span class="num">0</span>]]=dist[cur[<span class="num">1</span>]]+e[<span class="num">1</span>]; pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{dist[e[<span class="num">0</span>]],e[<span class="num">0</span>]}); }
-    }
-    <span class="kw">int</span> ans = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i=<span class="num">1</span>; i&lt;=n; i++) { <span class="kw">if</span> (dist[i]==<span class="cls">Integer</span>.MAX_VALUE) <span class="ret">return</span> -<span class="num">1</span>; ans=<span class="cls">Math</span>.max(ans,dist[i]); }
-    <span class="ret">return</span> ans;
-}</pre>
+                  <pre><span class="pc-kw">function</span> networkDelayTime(<span class="pc-kw">times</span>, n, k):
+    adj ← n + 1 empty lists                 <span class="pc-cm">// nodes are 1-indexed</span>
+    <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> <span class="pc-kw">times</span>: adj[u].append((v, w))
+    dist ← array of n + 1, all ∞;  dist[k] ← 0
+    pq ← min-heap of (distance, node), starting with (0, k)
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        (d, node) ← pq.popMin()
+        <span class="pc-kw">if</span> d &gt; dist[node]: <span class="pc-kw">continue</span>          <span class="pc-cm">// stale</span>
+        <span class="pc-kw">for</span> (nei, w) <span class="pc-kw">in</span> adj[node]:
+            <span class="pc-kw">if</span> dist[node] + w &lt; dist[nei]:
+                dist[nei] ← dist[node] + w
+                pq.push((dist[nei], nei))
+    ans ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">if</span> dist[i] = ∞: <span class="pc-kw">return</span> -1            <span class="pc-cm">// some node never hears the signal</span>
+        ans ← max(ans, dist[i])
+    <span class="pc-kw">return</span> ans</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3227,33 +3042,32 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 1584</span>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 1584</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">minCostConnectPoints</span>(<span class="kw">int</span>[][] pts) {
-    <span class="kw">int</span> n = pts.length;
-    <span class="kw">boolean</span>[] inMST = <span class="kw">new</span> <span class="kw">boolean</span>[n];
-    <span class="kw">int</span>[] minDist = <span class="kw">new</span> <span class="kw">int</span>[n];
-    <span class="cls">Arrays</span>.fill(minDist, <span class="cls">Integer</span>.MAX_VALUE); minDist[<span class="num">0</span>] = <span class="num">0</span>;
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
-    pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{<span class="num">0</span>,<span class="num">0</span>});
-    <span class="kw">int</span> cost = <span class="num">0</span>;
-    <span class="kw">while</span> (!pq.isEmpty()) {
-        <span class="kw">int</span>[] cur = pq.poll();
-        <span class="kw">if</span> (inMST[cur[<span class="num">1</span>]]) <span class="kw">continue</span>;
-        inMST[cur[<span class="num">1</span>]] = <span class="kw">true</span>; cost += cur[<span class="num">0</span>];
-        <span class="kw">for</span> (<span class="kw">int</span> j=<span class="num">0</span>; j&lt;n; j++) {
-            <span class="kw">if</span> (inMST[j]) <span class="kw">continue</span>;
-            <span class="kw">int</span> d = <span class="cls">Math</span>.abs(pts[cur[<span class="num">1</span>]][<span class="num">0</span>]-pts[j][<span class="num">0</span>]) + <span class="cls">Math</span>.abs(pts[cur[<span class="num">1</span>]][<span class="num">1</span>]-pts[j][<span class="num">1</span>]);
-            <span class="kw">if</span> (d &lt; minDist[j]) { minDist[j]=d; pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{d,j}); }
-        }
-    }
-    <span class="ret">return</span> cost;
-}</pre>
+                  <pre><span class="pc-kw">function</span> minCostConnectPoints(pts):
+    n ← length(pts)
+    inMST ← array of n, all false
+    minDist ← array of n, all ∞;  minDist[0] ← 0
+    pq ← min-heap of (distance, index), starting with (0, 0)
+    cost ← 0
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        (d, i) ← pq.popMin()
+        <span class="pc-kw">if</span> inMST[i]: <span class="pc-kw">continue</span>
+        inMST[i] ← true
+        cost ← cost + d
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:              <span class="pc-cm">// dense graph: every point is a neighbour</span>
+            <span class="pc-kw">if</span> inMST[j]: <span class="pc-kw">continue</span>
+            dj ← |pts[i].x - pts[j].x| + |pts[i].y - pts[j].y|   <span class="pc-cm">// Manhattan distance</span>
+            <span class="pc-kw">if</span> dj &lt; minDist[j]:
+                minDist[j] ← dj
+                pq.push((dj, j))
+    <span class="pc-kw">return</span> cost</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -3306,8 +3120,8 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
         <!-- ═══ CHECKLIST ═══ -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
         <p>
-          Check each item before advancing to Lecture 18 (Union-Find). Be honest
-          &mdash; these are your interview readiness criteria for graphs.
+          Check each item before advancing to Lecture 18. Be honest &mdash;
+          these are your interview readiness criteria for graphs.
         </p>
         <div style="margin: 14px 0">
           <div class="checklist-item" onclick="this.classList.toggle('done')">
@@ -3407,14 +3221,14 @@ total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span
           <span class="callout-icon">&#11088;</span>
           <div class="callout-body">
             <strong
-              >You are ready for Lecture 18: Union-Find (Disjoint Set
-              Union)</strong
+              >You are ready for Lecture 18: Two Pointers &amp; Sliding
+              Window</strong
             ><br />
-            DSU is the data structure Kruskal&apos;s MST relies on. It answers
-            &ldquo;are these two nodes in the same component?&rdquo; in near
-            O(1). After Union-Find, you will revisit Kruskal&apos;s with the
-            full DSU implementation &mdash; no more bare <code>find()</code>
-            stubs.
+            Phase 2 is done &mdash; you have every core data structure. Phase 3
+            is about reusable patterns, and it starts with the one that turns
+            the most O(n&sup2;) brute forces into O(n): stop re-reading the same
+            elements. The full Union-Find implementation that Kruskal&apos;s
+            relies on arrives in Lecture 24.
           </div>
         </div>
 

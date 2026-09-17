@@ -1,9 +1,8 @@
 # 📚 Assignment 12 — Stacks & Queues
 
-> **Lecture:** Topic 12 — Stacks & Queues
-> **Topic Count:** 12 of 30 — Phase 2 Core Data Structures
-> **Duration:** 5 Days
-> **Core Problems:** 25 (8 Easy · 12 Medium · 5 Hard)
+> **Lecture:** 12 of 38 — Stacks & Queues
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 5 days · **Total Problems:** 25 (8 Easy · 12 Medium · 5 Hard)
 > **Goal:** Master LIFO/FIFO fundamentals, the Monotonic Stack template, Deque-based sliding window, and stack-driven expression evaluation.
 
 ---

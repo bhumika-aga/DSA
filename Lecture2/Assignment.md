@@ -1,9 +1,8 @@
 # 📝 Assignment 02 — Memory Management & JCF Deep Dive
 
-> **Lecture:** Topic 2 — Memory Management & Java Collections Framework
-> **Topic Count:** 2 of 30 — Phase 1 Foundations
-> **Duration:** 5 Days
-> **Core Problems:** 35 (15 Easy · 15 Medium · 5 Hard) + 10 Challenge + 10 Complexity Exercises
+> **Lecture:** 2 of 38 — Java Memory Management
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 35 (15 Easy · 15 Medium · 5 Hard)
 > **Goal:** Build a rock-solid mental model of JVM memory and master the trade-offs of the Collections Framework.
 
 ---

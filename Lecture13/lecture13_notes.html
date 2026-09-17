@@ -1379,6 +1379,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1810,18 +1821,16 @@ seen.remove(5);</pre>
           Count how many times each element appears. The result is a
           <code>Map&lt;T, Integer&gt;</code> where value = count.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Frequency Map template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Frequency Map template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Count frequency of each number</span>
-<span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> x : nums)
-    freq.merge(x, 1, <span class="cls">Integer</span>::sum);  <span class="cm">// Java 8 idiom</span>
-<span class="cm">// OR: freq.put(x, freq.getOrDefault(x, 0) + 1);</span></pre>
+          <pre><span class="pc-cm">// Count how often each number appears</span>
+freq ← empty map
+<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+    freq[x] ← (freq[x] <span class="pc-kw">if</span> x <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1</pre>
         </div>
 
         <h3 class="h2" id="complement">Pattern 2: Complement Lookup</h3>
@@ -1847,21 +1856,6 @@ seen <span class="pc-kw">&larr;</span> empty map from value &rarr; index
     seen[a[i]] <span class="pc-kw">&larr;</span> i        <span class="pc-cm">// store AFTER the lookup</span>
 
 <span class="pc-kw">return</span> none</pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Complement Lookup template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nums.length; i++) {
-    <span class="kw">int</span> complement = target - nums[i];
-    <span class="kw">if</span> (seen.containsKey(complement))
-        <span class="ret">return new int</span>[]{seen.get(complement), i};
-    seen.put(nums[i], i);  <span class="cm">// add AFTER checking</span>
-}</pre>
         </div>
 
         <h3 class="h2" id="prefix-map">Pattern 3: Prefix Sum + Map</h3>
@@ -1890,22 +1884,6 @@ seen <span class="pc-kw">&larr;</span> map with { 0 &rarr; 1 }   <span class="pc
 
 <span class="pc-kw">return</span> count</pre>
         </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Prefix Sum + Map template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; prefixCount = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
-<span class="kw">int</span> sum = 0, count = 0;
-<span class="kw">for</span> (<span class="kw">int</span> x : nums) {
-    sum += x;
-    count += prefixCount.getOrDefault(sum - k, 0);
-    prefixCount.merge(sum, 1, <span class="cls">Integer</span>::sum);
-}</pre>
-        </div>
 
         <h3 class="h2" id="group-key">Pattern 4: Group-by-Key</h3>
         <p>
@@ -1913,20 +1891,17 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
           string, character frequency array, etc.) and group elements sharing
           the same key.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Group-by-Key template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Group-by-Key template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; groups = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="cls">String</span> s : strs) {
-    <span class="kw">char</span>[] c = s.toCharArray();
-    Arrays.sort(c);
-    <span class="cls">String</span> key = <span class="kw">new</span> <span class="cls">String</span>(c);  <span class="cm">// sorted = canonical form</span>
-    groups.computeIfAbsent(key, k -&gt; <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;()).add(s);
-}</pre>
+          <pre>groups ← empty map                  <span class="pc-cm">// key → list of strings</span>
+<span class="pc-kw">for</span> s <span class="pc-kw">in</span> strs:
+    key ← sort the characters of s   <span class="pc-cm">// sorted = canonical form</span>
+    <span class="pc-kw">if</span> key <span class="pc-kw">not</span> <span class="pc-kw">in</span> groups: groups[key] ← empty list
+    append s <span class="pc-kw">to</span> groups[key]</pre>
         </div>
 
         <h3 class="h2" id="set-membership">Pattern 5: Set Membership</h3>
@@ -1936,24 +1911,19 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
           sequence": only start counting from sequence beginnings (nums where
           <code>num - 1</code> is NOT in the set).
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Set Membership template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Set Membership template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
-<span class="kw">for</span> (<span class="kw">int</span> x : nums) set.add(x);
-
-<span class="kw">int</span> longest = 0;
-<span class="kw">for</span> (<span class="kw">int</span> x : set) {
-    <span class="kw">if</span> (!set.contains(x - 1)) {    <span class="cm">// x is a sequence start</span>
-        <span class="kw">int</span> len = 1;
-        <span class="kw">while</span> (set.contains(x + len)) len++;
-        longest = <span class="cls">Math</span>.max(longest, len);
-    }
-}</pre>
+          <pre>set ← all values of nums
+longest ← 0
+<span class="pc-kw">for</span> x <span class="pc-kw">in</span> set:
+    <span class="pc-kw">if</span> (x - 1) <span class="pc-kw">not</span> <span class="pc-kw">in</span> set:           <span class="pc-cm">// x is a sequence start</span>
+        len ← 1
+        <span class="pc-kw">while</span> (x + len) <span class="pc-kw">in</span> set: len ← len + 1
+        longest ← max(longest, len)</pre>
         </div>
 
         <hr />
@@ -2050,29 +2020,26 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; One-Pass HashMap
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; One-Pass HashMap</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">twoSum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;(); <span class="cm">// value → index</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; nums.length; i++) {
-        <span class="kw">int</span> complement = target - nums[i];
-        <span class="kw">if</span> (seen.containsKey(complement))
-            <span class="ret">return new int</span>[]{seen.get(complement), i};
-        seen.put(nums[i], i); <span class="cm">// add AFTER checking</span>
-    }
-    <span class="ret">return new int</span>[]{};
-}
+                  <pre><span class="pc-kw">function</span> twoSum(nums, target):
+    seen ← empty map                       <span class="pc-cm">// value → index</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        complement ← target - nums[i]
+        <span class="pc-kw">if</span> complement <span class="pc-kw">in</span> seen:
+            <span class="pc-kw">return</span> [seen[complement], i]
+        seen[nums[i]] ← i                  <span class="pc-cm">// add AFTER checking</span>
+    <span class="pc-kw">return</span> []
 
-<span class="cm">// Dry run: nums=[2,7,11,15], target=9
-// i=0: complement=7, seen={} → miss → seen={2:0}
-// i=1: complement=2, seen={2:0} → HIT → return [0,1] ✓</span></pre>
+<span class="pc-cm">// Dry run: nums=[2,7,11,15], target=9</span>
+<span class="pc-cm">// i=0: complement=7, seen={} → miss → seen={2:0}</span>
+<span class="pc-cm">// i=1: complement=2, seen={2:0} → HIT → return [0,1] ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2169,34 +2136,31 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 <span class="toggle-arrow">&#9654;</span>Solution with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; HashMap + Right-to-Left Scan
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; HashMap + Right-to-Left
+                      Scan</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">romanToInt</span>(<span class="cls">String</span> s) {
-    <span class="cls">Map</span>&lt;<span class="cls">Character</span>, <span class="cls">Integer</span>&gt; val = <span class="cls">Map</span>.of(
-        <span class="str">'I'</span>, 1, <span class="str">'V'</span>, 5, <span class="str">'X'</span>, 10, <span class="str">'L'</span>, 50,
-        <span class="str">'C'</span>, 100, <span class="str">'D'</span>, 500, <span class="str">'M'</span>, 1000);
-    <span class="kw">int</span> result = 0, prev = 0;
-    <span class="kw">for</span> (<span class="kw">int</span> i = s.length() - 1; i &gt;= 0; i--) {
-        <span class="kw">int</span> curr = val.get(s.charAt(i));
-        result += (curr &lt; prev) ? -curr : curr;
-        prev = curr;
-    }
-    <span class="ret">return</span> result;
-}
+                  <pre><span class="pc-kw">function</span> romanToInt(s):
+    val ← {I:1, V:5, X:10, L:50, C:100, D:500, M:1000}
+    result ← 0;  prev ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> length(s) - 1 <span class="pc-kw">down to</span> 0:
+        curr ← val[s[i]]
+        <span class="pc-kw">if</span> curr &lt; prev: result ← result - curr     <span class="pc-cm">// smaller before larger → subtract</span>
+        <span class="pc-kw">else</span>: result ← result + curr
+        prev ← curr
+    <span class="pc-kw">return</span> result
 
-<span class="cm">// Dry run: "MCMXCIV" (right to left)
-// i=6: V=5,  prev=0 → 5>=0 → add 5.  result=5,  prev=5
-// i=5: I=1,  prev=5 → 1< 5 → sub 1.  result=4,  prev=1
-// i=4: C=100,prev=1 → 100>=1→ add 100.result=104,prev=100
-// i=3: X=10, prev=100→ 10<100→sub 10.result=94, prev=10
-// i=2: M=1000...→ result=1994 ✓</span></pre>
+<span class="pc-cm">// Dry run: "MCMXCIV" (right to left)</span>
+<span class="pc-cm">// i=6: V=5,   prev=0   → 5 ≥ 0     → add 5.    result=5,   prev=5</span>
+<span class="pc-cm">// i=5: I=1,   prev=5   → 1 &lt; 5     → sub 1.    result=4,   prev=1</span>
+<span class="pc-cm">// i=4: C=100, prev=1   → 100 ≥ 1   → add 100.  result=104, prev=100</span>
+<span class="pc-cm">// i=3: X=10,  prev=100 → 10 &lt; 100  → sub 10.   result=94,  prev=10</span>
+<span class="pc-cm">// i=2: M=1000 ... → result=1994 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2288,31 +2252,27 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 <span class="toggle-arrow">&#9654;</span>Solution with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Sort Key Grouping
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sort Key Grouping</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">groupAnagrams</span>(<span class="cls">String</span>[] strs) {
-    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="cls">String</span> s : strs) {
-        <span class="kw">char</span>[] c = s.toCharArray();
-        Arrays.sort(c);
-        <span class="cls">String</span> key = <span class="kw">new</span> <span class="cls">String</span>(c);          <span class="cm">// canonical form</span>
-        map.computeIfAbsent(key, k -&gt; <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;()).add(s);
-    }
-    <span class="ret">return new</span> <span class="cls">ArrayList</span>&lt;&gt;(map.values());
-}
+                  <pre><span class="pc-kw">function</span> groupAnagrams(strs):
+    map ← empty map                     <span class="pc-cm">// sorted key → list of words</span>
+    <span class="pc-kw">for</span> s <span class="pc-kw">in</span> strs:
+        key ← sort the characters of s  <span class="pc-cm">// canonical form</span>
+        <span class="pc-kw">if</span> key <span class="pc-kw">not</span> <span class="pc-kw">in</span> map: map[key] ← empty list
+        append s <span class="pc-kw">to</span> map[key]
+    <span class="pc-kw">return</span> all values of map
 
-<span class="cm">// Dry run: ["eat","tea","tan"]
-// "eat" → sort → "aet" → map={"aet":["eat"]}
-// "tea" → sort → "aet" → map={"aet":["eat","tea"]}
-// "tan" → sort → "ant" → map={"aet":[...], "ant":["tan"]}
-// Return [[eat,tea],[tan]] ✓</span></pre>
+<span class="pc-cm">// Dry run: ["eat","tea","tan"]</span>
+<span class="pc-cm">// "eat" → sort → "aet" → map={"aet":["eat"]}</span>
+<span class="pc-cm">// "tea" → sort → "aet" → map={"aet":["eat","tea"]}</span>
+<span class="pc-cm">// "tan" → sort → "ant" → map={"aet":[...], "ant":["tan"]}</span>
+<span class="pc-cm">// Return [[eat,tea],[tan]] ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -2423,37 +2383,33 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 approach O(n log k)
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Freq Map + Min-Heap
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Freq Map + Min-Heap</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cm">// Step 1: frequency map</span>
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) freq.merge(x, 1, <span class="cls">Integer</span>::sum);
+                  <pre><span class="pc-kw">function</span> topKFrequent(nums, k):
+    <span class="pc-cm">// Step 1: frequency map</span>
+    freq ← empty map
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums: freq[x] ← (freq[x] <span class="pc-kw">if</span> x <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1
 
-    <span class="cm">// Step 2: min-heap of size k (keeps top-k frequent)</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; pq =
-        <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((<span class="kw">a, b</span>) -&gt; freq.get(a) - freq.get(b));
-    <span class="kw">for</span> (<span class="kw">int</span> key : freq.keySet()) {
-        pq.offer(key);
-        <span class="kw">if</span> (pq.size() &gt; k) pq.poll(); <span class="cm">// evict least frequent</span>
-    }
+    <span class="pc-cm">// Step 2: min-heap of size k, ordered by frequency</span>
+    heap ← empty min-heap ordered by freq[value]
+    <span class="pc-kw">for</span> key <span class="pc-kw">in</span> freq:
+        heap.push(key)
+        <span class="pc-kw">if</span> heap.size &gt; k: heap.popMin()      <span class="pc-cm">// evict the least frequent</span>
 
-    <span class="cm">// Step 3: extract answers</span>
-    <span class="kw">int</span>[] res = <span class="kw">new int</span>[k];
-    <span class="kw">for</span> (<span class="kw">int</span> i = k - 1; i &gt;= 0; i--) res[i] = pq.poll();
-    <span class="ret">return</span> res;
-}
+    <span class="pc-cm">// Step 3: extract answers</span>
+    res ← array of length k
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← heap.popMin()
+    <span class="pc-kw">return</span> res
 
-<span class="cm">// nums=[1,1,1,2,2,3], k=2
-// freq={1:3, 2:2, 3:1}
-// heap after all: [2(freq2), 1(freq3)] → [1,2] ✓</span></pre>
+<span class="pc-cm">// nums=[1,1,1,2,2,3], k=2</span>
+<span class="pc-cm">// freq={1:3, 2:2, 3:1}</span>
+<span class="pc-cm">// heap after all: [2(freq 2), 1(freq 3)] → [1,2] ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -2551,33 +2507,30 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 <span class="toggle-arrow">&#9654;</span>Solution with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Prefix Sum HashMap
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Prefix Sum HashMap</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">subarraySum</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; prefixCount = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    prefixCount.put(0, 1);  <span class="cm">// empty prefix sum seen once</span>
-    <span class="kw">int</span> sum = 0, count = 0;
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) {
-        sum += x;
-        count += prefixCount.getOrDefault(sum - k, 0);
-        prefixCount.merge(sum, 1, <span class="cls">Integer</span>::sum);
-    }
-    <span class="ret">return</span> count;
-}
+                  <pre><span class="pc-kw">function</span> subarraySum(nums, k):
+    prefixCount ← {0: 1}                 <span class="pc-cm">// the empty prefix has sum 0, seen once</span>
+    sum ← 0;  count ← 0
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+        sum ← sum + x
+        <span class="pc-kw">if</span> (sum - k) <span class="pc-kw">in</span> prefixCount:
+            count ← count + prefixCount[sum - k]
+        prefixCount[sum] ← (prefixCount[sum] <span class="pc-kw">if</span> sum <span class="pc-kw">in</span> prefixCount, <span class="pc-kw">else</span> 0) + 1
+    <span class="pc-kw">return</span> count
 
-<span class="cm">// Dry run: nums=[1,1,1], k=2
-// Start: map={0:1}, sum=0, count=0
-// x=1: sum=1, need sum-k=1-2=-1 → map has 0 → count=0 → map={0:1,1:1}
-// x=1: sum=2, need 2-2=0 → map has 1 → count=1  → map={0:1,1:1,2:1}
-// x=1: sum=3, need 3-2=1 → map has 1 → count=2  → map={...,3:1}
-// Return 2 ✓</span></pre>
+<span class="pc-cm">// Dry run: nums=[1,1,1], k=2</span>
+<span class="pc-cm">// Start: map={0:1}, sum=0, count=0</span>
+<span class="pc-cm">// x=1: sum=1, need 1-2=-1 → not in map → count=0 → map={0:1,1:1}</span>
+<span class="pc-cm">// x=1: sum=2, need 2-2=0  → map has 1  → count=1 → map={0:1,1:1,2:1}</span>
+<span class="pc-cm">// x=1: sum=3, need 3-2=1  → map has 1  → count=2 → map={...,3:1}</span>
+<span class="pc-cm">// Return 2 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2680,35 +2633,29 @@ prefixCount.put(0, 1); <span class="cm">// empty prefix sum seen once</span>
                 <span class="toggle-arrow">&#9654;</span>Solution with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; HashSet O(n)
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; HashSet O(n)</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">longestConsecutive</span>(<span class="kw">int</span>[] nums) {
-    <span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) set.add(x);
+                  <pre><span class="pc-kw">function</span> longestConsecutive(nums):
+    set ← all values of nums
+    longest ← 0
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> set:
+        <span class="pc-kw">if</span> (x - 1) <span class="pc-kw">not</span> <span class="pc-kw">in</span> set:              <span class="pc-cm">// x is a sequence start</span>
+            len ← 1
+            <span class="pc-kw">while</span> (x + len) <span class="pc-kw">in</span> set: len ← len + 1
+            longest ← max(longest, len)
+    <span class="pc-kw">return</span> longest
 
-    <span class="kw">int</span> longest = 0;
-    <span class="kw">for</span> (<span class="kw">int</span> x : set) {
-        <span class="kw">if</span> (!set.contains(x - 1)) {   <span class="cm">// x is a sequence start</span>
-            <span class="kw">int</span> len = 1;
-            <span class="kw">while</span> (set.contains(x + len)) len++;
-            longest = <span class="cls">Math</span>.max(longest, len);
-        }
-    }
-    <span class="ret">return</span> longest;
-}
-
-<span class="cm">// [100,4,200,1,3,2] → set={100,4,200,1,3,2}
-// x=100: set has 99? No → start. 101? No → len=1
-// x=4:   set has 3? Yes → NOT a start → skip
-// x=1:   set has 0? No → start. 2?Yes,3?Yes,4?Yes,5?No → len=4
-// longest = 4 ✓</span></pre>
+<span class="pc-cm">// [100,4,200,1,3,2] → set={100,4,200,1,3,2}</span>
+<span class="pc-cm">// x=100: 99 in set? No → start. 101? No → len=1</span>
+<span class="pc-cm">// x=4:   3 in set? Yes → NOT a start → skip</span>
+<span class="pc-cm">// x=1:   0 in set? No → start. 2? Yes, 3? Yes, 4? Yes, 5? No → len=4</span>
+<span class="pc-cm">// longest = 4 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">

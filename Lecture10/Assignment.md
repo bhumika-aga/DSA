@@ -1,9 +1,8 @@
 # 🔍 Assignment 10 — Searching Algorithms
 
-> **Lecture:** Topic 10 — Searching Algorithms
-> **Topic Count:** 10 of 30 — Phase 2 Core Data Structures
-> **Duration:** 5 Days
-> **Core Problems:** 28 (8 Easy · 13 Medium · 7 Hard)
+> **Lecture:** 10 of 38 — Searching Algorithms
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 5 days · **Total Problems:** 28 (8 Easy · 13 Medium · 7 Hard)
 > **Goal:** Master unconditional Linear Searching, classic $O (\log N)$ Binary Search templates, **Binary Search on
 > Answer Space** (Monotonic optimization), and matrix traversal boundaries.
 
@@ -75,8 +74,7 @@ _Focus on extremely tight constraints and dual-array partitioning logic._
 
 2. **[Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/) (LC 410)** — Binary Search on the range $[\max (arr), \sum (arr)]$. `[LC Hard]` `[Companies: Google, Amazon, Meta]`
 
-3. **Book Allocation Problem** — Classic interview variation: Allocate $N$ books to $M$ students. `[Pattern: Max-Min]`  
-   **🔗 [LC 410](https://leetcode.com/problems/split-array-largest-sum/)** · **Companies:** Google, Amazon, Meta
+3. **[Divide Chocolate](https://leetcode.com/problems/divide-chocolate/) (LC 1231)** — The exact dual of Split Array Largest Sum: _maximise the minimum_ piece instead of minimising the maximum. Same binary search, flipped predicate. `[Pattern: Max-Min]` `[LC Hard]` `[Companies: Google, Amazon]`
 
 4. **[Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/) (LC 719)** — Binary Search + Two Pointers. `[LC Hard]` `[Companies: Google, Amazon]`
 

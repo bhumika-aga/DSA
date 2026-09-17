@@ -1,9 +1,8 @@
 # 📝 Assignment 03 — OOP & Java Collections Deep Dive
 
-> **Topic:** OOP & Java Collections (Phase 1 — Foundations)
-> **Topic Count:** 3 of 30 — Phase 1 Foundations
-> **Duration:** 4 Days
-> **Core Problems:** 35 (15 Easy · 15 Medium · 5 Hard) + 8 Challenge + 8 Complexity Exercises
+> **Lecture:** 3 of 38 — OOP & Java Collections Deep Dive
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 35 (15 Easy · 15 Medium · 5 Hard)
 > **Goal:** Master the abstractions of Java and the high-performance implementation of the Collections Framework.
 
 ---

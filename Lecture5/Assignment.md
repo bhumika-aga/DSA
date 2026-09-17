@@ -1,9 +1,8 @@
 # 📝 Assignment 05 — Recursion & Backtracking Masterclass
 
-> **Lecture:** Topic 5 — Recursion & Backtracking
-> **Topic Count:** 5 of 30 — Phase 1 Foundations
-> **Duration:** 6 Days
-> **Core Problems:** 40 (15 Easy · 15 Medium · 10 Hard) + 12 Challenge + 10 Complexity Exercises
+> **Lecture:** 5 of 38 — Recursion & Backtracking
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 7 days · **Total Problems:** 35 (15 Easy · 15 Medium · 5 Hard)
 > **Goal:** Master the "Divide & Conquer" thinking, recursive call-stack visualizing, and backtracking state-space
 > pruning.
 

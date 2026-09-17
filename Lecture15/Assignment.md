@@ -1,8 +1,8 @@
 # 🌳 Assignment 15 — Trees (Binary Trees & BST)
 
-> **Lecture:** Topic 15 — Trees (Binary Trees & BST)
-> **Phase:** 2 — Core Data Structures · **Topic:** 15 of 30
-> **Estimated Time:** 10 Days · **Total Problems:** 45 (12 Easy · 23 Medium · 10 Hard)
+> **Lecture:** 15 of 38 — Trees (Binary Trees & BST)
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 10 days · **Total Problems:** 45 (12 Easy · 23 Medium · 10 Hard)
 > **Goal:** Master the 6 tree patterns — DFS, BFS Level-Order, Height Recursion, Global via Local, BST Property, and LCA — and apply them to the most frequently asked FAANG tree problems.
 
 ---
@@ -208,12 +208,12 @@
 
 ---
 
-### M9 · Binary Tree Maximum Path Sum ⭐ (Pattern 4 Boss)
+### M9 · Maximum Difference Between Node and Ancestor ⭐ (Pattern 4 Boss)
 
-**🔗 [LC 124](https://leetcode.com/problems/binary-tree-maximum-path-sum/)**
-**Pattern:** Global via Local | **Companies:** Google, Amazon, Facebook, Microsoft
+**🔗 [LC 1026](https://leetcode.com/problems/maximum-difference-between-node-and-ancestor/)**
+**Pattern:** Global via Local | **Companies:** Amazon, Google, Meta
 
-**Hint:** DFS returns max gain from one branch (can't use both branches — that would "fork" the path). Global variable tracks the best path through any node = `leftGain + node.val + rightGain`. Gains can be negative, so use `max(0, childGain)` to drop bad branches.
+**Hint:** Carry the minimum and maximum values seen on the path from the root **down** into each call. At every node the best answer through it is `max(|val - pathMin|, |val - pathMax|)` — update a global answer there. No return values needed: the state flows top-down. (The bottom-up version of this pattern is H1 · Binary Tree Maximum Path Sum.)
 
 ---
 
@@ -405,12 +405,14 @@
 
 ---
 
-### H7 · Binary Tree Right Side View (Hard follow-up: left AND right AND top AND bottom)
+### H7 · Boundary of Binary Tree
 
-**🔗 [LC 199](https://leetcode.com/problems/binary-tree-right-side-view/)** + boundary view
+**🔗 [LC 545](https://leetcode.com/problems/boundary-of-binary-tree/)**
 **Pattern:** BFS + DFS boundary | **Companies:** Amazon, Adobe, Samsung
 
-**Hint for full boundary view:** Collect left boundary (excluding leaves) top-down, then all leaves left-to-right, then right boundary (excluding leaves) bottom-up.
+**Hint:** Builds on M3 · Right Side View, but needs three separate walks rather than one.
+
+**Order:** Collect left boundary (excluding leaves) top-down, then all leaves left-to-right, then right boundary (excluding leaves) bottom-up.
 
 ---
 

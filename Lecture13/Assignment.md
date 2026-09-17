@@ -1,9 +1,8 @@
 # 🗃️ Assignment 13 — HashMap & HashSet Deep Dive
 
-> **Lecture:** Topic 13 — HashMap & HashSet
-> **Topic Count:** 13 of 30 — Phase 2 Core Data Structures
-> **Duration:** 4 Days
-> **Core Problems:** 25 (7 Easy · 13 Medium · 5 Hard)
+> **Lecture:** 13 of 38 — HashMap & HashSet
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 4 days · **Total Problems:** 25 (7 Easy · 13 Medium · 5 Hard)
 > **Goal:** Master the 5 core HashMap patterns: Frequency Map, Complement Lookup, Prefix Sum + Map, Group-by-Key, and Set Membership. Understand hashing internals, collision resolution, and cache design.
 
 ---

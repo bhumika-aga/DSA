@@ -1,9 +1,8 @@
 # 📝 Assignment 06 — Bit Manipulation Masterclass
 
-> **Lecture:** Topic 6 — Bit Manipulation
-> **Topic Count:** 6 of 30 — Phase 1 Foundations
-> **Duration:** 3 Days
-> **Core Problems:** 30 (10 Easy · 15 Medium · 5 Hard) + 8 Challenge + 8 Complexity Exercises
+> **Lecture:** 6 of 38 — Bit Manipulation
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 30 (10 Easy · 15 Medium · 5 Hard)
 > **Goal:** Develop binary intuition, master O (1) bitwise optimizations, and understand XOR properties for
 > interview-standard puzzles.
 

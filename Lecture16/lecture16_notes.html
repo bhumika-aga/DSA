@@ -1378,6 +1378,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1620,61 +1631,18 @@
         i <span class="pc-kw">&larr;</span> smallest
 
 <span class="pc-kw">function</span> insert(x):  heap[size] <span class="pc-kw">&larr;</span> x; size <span class="pc-kw">&larr;</span> size + 1; siftUp(size - 1)
-<span class="pc-kw">function</span> extractMin(): min <span class="pc-kw">&larr;</span> heap[0]; heap[0] <span class="pc-kw">&larr;</span> heap[size-1];
-                    size <span class="pc-kw">&larr;</span> size - 1; siftDown(0); <span class="pc-kw">return</span> min
+<span class="pc-kw">function</span> extractMin():
+    min <span class="pc-kw">&larr;</span> heap[0]
+    heap[0] <span class="pc-kw">&larr;</span> heap[size-1]      <span class="pc-cm">// move the last leaf to the root</span>
+    size <span class="pc-kw">&larr;</span> size - 1
+    siftDown(0)
+    <span class="pc-kw">return</span> min
 
 <span class="pc-kw">function</span> build(array):       <span class="pc-cm">// O(n), NOT O(n log n)</span>
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> size&divide;2 - 1 <span class="pc-kw">down to</span> 0: siftDown(i)</pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Min-Heap from Scratch (sift-up, sift-down,
-              build)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span>[] heap; <span class="kw">int</span> size;
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> size&divide;2 - 1 <span class="pc-kw">down to</span> 0: siftDown(i)
 
-<span class="cm">// INSERT: add at end, bubble up until heap property restored</span>
-<span class="kw">void</span> <span class="fn">offer</span>(<span class="kw">int</span> val) {
-    heap[size++] = val;
-    <span class="fn">siftUp</span>(size - 1);
-}
-<span class="kw">void</span> <span class="fn">siftUp</span>(<span class="kw">int</span> i) {
-    <span class="kw">while</span> (i > 0) {
-        <span class="kw">int</span> p = (i - 1) / 2;
-        <span class="kw">if</span> (heap[p] <= heap[i]) <span class="kw">break</span>;  <span class="cm">// already valid</span>
-        <span class="fn">swap</span>(i, p);
-        i = p;
-    }
-}
-
-<span class="cm">// ── Delete &amp; sift-down ──────────────────────────────────</span>
-<span class="cm">// EXTRACT-MIN: swap root with last, shrink, sift root down</span>
-<span class="kw">int</span> <span class="fn">poll</span>() {
-    <span class="kw">int</span> min = heap[0];
-    heap[0] = heap[--size];
-    <span class="fn">siftDown</span>(0);
-    <span class="ret">return</span> min;
-}
-<span class="kw">void</span> <span class="fn">siftDown</span>(<span class="kw">int</span> i) {
-    <span class="kw">while</span> (<span class="num">2</span>*i+<span class="num">1</span> < size) {
-        <span class="kw">int</span> left = <span class="num">2</span>*i+<span class="num">1</span>, right = <span class="num">2</span>*i+<span class="num">2</span>;
-        <span class="kw">int</span> smallest = (right < size && heap[right] < heap[left]) ? right : left;
-        <span class="kw">if</span> (heap[i] <= heap[smallest]) <span class="kw">break</span>;
-        <span class="fn">swap</span>(i, smallest);
-        i = smallest;
-    }
-}
-
-<span class="cm">// ── Build heap in O(n) ────────────────────────────────────</span>
-<span class="cm">// BUILD HEAP in O(n): sift-down from last internal node upward</span>
-<span class="kw">void</span> <span class="fn">buildHeap</span>(<span class="kw">int</span>[] arr) {
-    heap = arr; size = arr.length;
-    <span class="kw">for</span> (<span class="kw">int</span> i = size/<span class="num">2</span> - <span class="num">1</span>; i >= <span class="num">0</span>; i--) <span class="fn">siftDown</span>(i);
-}
-<span class="cm">// Why O(n)? Leaf nodes need 0 work. Bottom half are all leaves.
-// Formal proof: sum of sift-down heights = O(n) (geometric series)</span></pre>
+<span class="pc-cm">// Why is build O(n)? Leaves need 0 work, and the bottom half of the array is all leaves.</span>
+<span class="pc-cm">// Formal proof: the sum of sift-down heights is a geometric series = O(n).</span></pre>
         </div>
 
         <h3 class="h3" id="sift-down">Delete &amp; Sift-Down</h3>
@@ -1817,35 +1785,25 @@ After:  heap = [<span class="hl">1</span>, 3, <span class="nd">2</span>, 7, 9, 5
           always the Kth largest. If a new element is larger than the root, pop
           root and push new element.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Kth Largest</h4>
-          <p>
-            Maintain a min-heap of size K:<br />
-            &nbsp;&nbsp;for each num in nums:<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;offer num to heap<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;if heap.size() &gt; K &rarr; poll (discard
-            smallest)<br />
-            &nbsp;&nbsp;return heap.peek() &mdash; the Kth largest<br /><br />
-            <em>Why size-K min-heap?</em> The K largest elements survive. Their
-            minimum (heap root) is exactly the Kth largest.
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Kth Largest Element in Array (LC 215)</span
+              >&#128208; Pseudocode &middot; Kth Largest Element in Array (LC
+              215)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();  <span class="cm">// min-heap</span>
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        minH.offer(n);
-        <span class="kw">if</span> (minH.size() > k) minH.poll();  <span class="cm">// evict smallest; top K survive</span>
-    }
-    <span class="ret">return</span> minH.peek();  <span class="cm">// min of top-K = Kth largest</span>
-}
-<span class="cm">// Time O(n log k)  Space O(k)
-// Why NOT sort? Sort is O(n log n). If k &lt;&lt; n, heap is much faster.</span></pre>
+          <pre><span class="pc-cm">// Maintain a min-heap of size K.</span>
+<span class="pc-kw">function</span> findKthLargest(nums, k):
+    minH ← empty min-heap
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        minH.push(n)
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()    <span class="pc-cm">// evict the smallest; the top K survive</span>
+    <span class="pc-kw">return</span> minH.peek()                      <span class="pc-cm">// min of the top K = Kth largest</span>
+
+<span class="pc-cm">// Why a size-K MIN-heap? The K largest elements survive, and</span>
+<span class="pc-cm">// their minimum (the heap root) is exactly the Kth largest.</span>
+<span class="pc-cm">// Time O(n log k)  Space O(k)</span>
+<span class="pc-cm">// Why NOT sort? Sort is O(n log n). If k is much smaller than n, the heap is much faster.</span></pre>
         </div>
 
         <!-- P1 DRY RUN -->
@@ -1874,53 +1832,42 @@ peek = <span class="hl">5</span> &#10003;  (5 is the 2nd largest in [3,2,1,5,6,4
           <strong>use a min-heap of size K for top-K largest</strong>
           (counterintuitive &mdash; min-heap, not max-heap).
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Top K Frequent</h4>
-          <p>
-            1. Count frequencies with a HashMap<br />
-            2. Push (freq, num) into a min-heap of size K<br />
-            3. If heap size &gt; K, poll (removes least frequent)<br />
-            4. Remaining K entries are the top-K frequent<br /><br />
-            <em>Why min-heap?</em> We want to EVICT the least frequent (smallest
-            freq) to keep top-K. The min is always at the root, so we can
-            discard it in O(log k).
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Top K Frequent Elements (LC 347) + K
-              Closest Points (LC 973)</span
+              >&#128208; Pseudocode &middot; Top K Frequent Elements (LC 347) +
+              K Closest Points (LC 973)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Top K Frequent Elements:</span>
-<span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq.merge(n, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
-    <span class="cm">// min-heap: sort by frequency ascending → easily evict least frequent</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; a[<span class="num">0</span>]-b[<span class="num">0</span>]);
-    <span class="kw">for</span> (<span class="kw">var</span> e : freq.entrySet()) {
-        minH.offer(<span class="kw">new</span> <span class="kw">int</span>[]{e.getValue(), e.getKey()});
-        <span class="kw">if</span> (minH.size() &gt; k) minH.poll();
-    }
-    <span class="kw">int</span>[] res = <span class="kw">new</span> <span class="kw">int</span>[k];
-    <span class="kw">for</span> (<span class="kw">int</span> i = k-<span class="num">1</span>; i &gt;= <span class="num">0</span>; i--) res[i] = minH.poll()[<span class="num">1</span>];
-    <span class="ret">return</span> res;
-}
-<span class="cm">// Time O(n log k)  Space O(n) for freq map
+          <pre><span class="pc-cm">// Top K Frequent Elements:</span>
+<span class="pc-cm">// 1. Count frequencies with a hash map</span>
+<span class="pc-cm">// 2. Push (freq, num) into a min-heap of size K</span>
+<span class="pc-cm">// 3. If heap size &gt; K, pop (removes the least frequent)</span>
+<span class="pc-cm">// 4. The remaining K entries are the top-K frequent</span>
+<span class="pc-kw">function</span> topKFrequent(nums, k):
+    freq ← empty map
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums: freq[n] ← (freq[n] <span class="pc-kw">if</span> n <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1
+    minH ← empty min-heap of (freq, num), ordered by freq
+    <span class="pc-kw">for</span> (num, f) <span class="pc-kw">in</span> freq:
+        minH.push((f, num))
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()
+    res ← array of length k
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← minH.popMin().num
+    <span class="pc-kw">return</span> res
 
-// K Closest Points to Origin — same pattern, different comparator:</span>
-<span class="kw">int</span>[][] <span class="fn">kClosest</span>(<span class="kw">int</span>[][] pts, <span class="kw">int</span> k) {
-    <span class="cm">// max-heap by distance — evict farthest, keep K closest</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(
-        (a,b) -&gt; (b[<span class="num">0</span>]*b[<span class="num">0</span>]+b[<span class="num">1</span>]*b[<span class="num">1</span>]) - (a[<span class="num">0</span>]*a[<span class="num">0</span>]+a[<span class="num">1</span>]*a[<span class="num">1</span>]));
-    <span class="kw">for</span> (<span class="kw">int</span>[] p : pts) {
-        maxH.offer(p);
-        <span class="kw">if</span> (maxH.size() &gt; k) maxH.poll();  <span class="cm">// evict farthest</span>
-    }
-    <span class="ret">return</span> maxH.toArray(<span class="kw">new</span> <span class="kw">int</span>[<span class="num">0</span>][]);
-}
-<span class="cm">// Note: use squared distance to avoid floating point sqrt</span></pre>
+<span class="pc-cm">// Why a MIN-heap? We want to EVICT the least frequent to keep the top K.</span>
+<span class="pc-cm">// The min is always at the root, so discarding it costs O(log k).</span>
+<span class="pc-cm">// Time O(n log k)  Space O(n) for the frequency map</span>
+
+<span class="pc-cm">// K Closest Points to Origin — same pattern, flipped heap:</span>
+<span class="pc-kw">function</span> kClosest(pts, k):
+    maxH ← empty max-heap ordered by x² + y²     <span class="pc-cm">// farthest point on top</span>
+    <span class="pc-kw">for</span> p <span class="pc-kw">in</span> pts:
+        maxH.push(p)
+        <span class="pc-kw">if</span> maxH.size &gt; k: maxH.popMax()          <span class="pc-cm">// evict the farthest</span>
+    <span class="pc-kw">return</span> all points <span class="pc-kw">in</span> maxH
+
+<span class="pc-cm">// Note: compare SQUARED distances — no square root, no floating point</span></pre>
         </div>
         <hr />
 
@@ -1935,48 +1882,29 @@ peek = <span class="hl">5</span> &#10003;  (5 is the 2nd largest in [3,2,1,5,6,4
           balanced (differ by at most 1). The median is always at one of the two
           roots.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Two Heaps Median</h4>
-          <p>
-            maxH = max-heap (lower half) &nbsp;|&nbsp; minH = min-heap (upper
-            half)<br /><br />
-            addNum(n):<br />
-            &nbsp;&nbsp;offer n to maxH<br />
-            &nbsp;&nbsp;offer maxH.poll() to minH &nbsp;&nbsp;<em
-              >(push max-of-lower up)</em
-            ><br />
-            &nbsp;&nbsp;if minH.size() &gt; maxH.size() &rarr; offer minH.poll()
-            to maxH<br /><br />
-            findMedian():<br />
-            &nbsp;&nbsp;if sizes equal &rarr; (maxH.peek() + minH.peek()) /
-            2.0<br />
-            &nbsp;&nbsp;else &rarr; maxH.peek() &nbsp;<em
-              >(maxH always has the extra element)</em
-            >
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Find Median from Data Stream (LC 295)
-              &mdash; Hard</span
+              >&#128208; Pseudocode &middot; Find Median from Data Stream (LC
+              295) — Hard</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder()); <span class="cm">// lower half</span>
-<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();                           <span class="cm">// upper half</span>
+          <pre>maxH ← empty max-heap        <span class="pc-cm">// lower half</span>
+minH ← empty min-heap        <span class="pc-cm">// upper half</span>
 
-<span class="kw">void</span> <span class="fn">addNum</span>(<span class="kw">int</span> n) {
-    maxH.offer(n);
-    minH.offer(maxH.poll());        <span class="cm">// ensure max-of-lower ≤ min-of-upper</span>
-    <span class="kw">if</span> (minH.size() &gt; maxH.size()) maxH.offer(minH.poll());  <span class="cm">// rebalance</span>
-}
+<span class="pc-kw">function</span> addNum(n):
+    maxH.push(n)
+    minH.push(maxH.popMax())         <span class="pc-cm">// push the max of the lower half up</span>
+    <span class="pc-kw">if</span> minH.size &gt; maxH.size:
+        maxH.push(minH.popMin())     <span class="pc-cm">// rebalance: maxH keeps the extra element</span>
 
-<span class="kw">double</span> <span class="fn">findMedian</span>() {
-    <span class="kw">if</span> (maxH.size() == minH.size()) <span class="ret">return</span> (maxH.peek() + minH.peek()) / 2.0;
-    <span class="ret">return</span> maxH.peek();  <span class="cm">// maxH has the extra element</span>
-}
-<span class="cm">// addNum: O(log n)  findMedian: O(1)
-// Invariant: maxH.peek() ≤ minH.peek() always (cross-push enforces this)</span></pre>
+<span class="pc-kw">function</span> findMedian():
+    <span class="pc-kw">if</span> maxH.size = minH.size:
+        <span class="pc-kw">return</span> (maxH.peek() + minH.peek()) ÷ 2     <span class="pc-cm">// real division, e.g. 2.5</span>
+    <span class="pc-kw">return</span> maxH.peek()               <span class="pc-cm">// maxH always has the extra element</span>
+
+<span class="pc-cm">// addNum: O(log n)  findMedian: O(1)</span>
+<span class="pc-cm">// Invariant: maxH.peek() ≤ minH.peek() always (the cross-push enforces this)</span></pre>
         </div>
         <div class="callout teal">
           <span class="callout-icon">&#128202;</span>
@@ -2007,41 +1935,29 @@ addNum(3):
           the globally smallest element each time. Always keep exactly one
           element from each active list in the heap.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; K-way Merge</h4>
-          <p>
-            1. Push the first element of each list into min-heap (with list
-            index + position)<br />
-            2. While heap not empty:<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;Poll the smallest element &rarr; add to
-            result<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;If that list has more elements &rarr; push
-            the next one<br /><br />
-            <em>Key:</em> heap always has at most K elements &rarr; poll is
-            O(log K) not O(log n)
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Merge K Sorted Lists (LC 23)</span
+              >&#128208; Pseudocode &middot; Merge K Sorted Lists (LC 23)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">ListNode</span> <span class="fn">mergeKLists</span>(<span class="cls">ListNode</span>[] lists) {
-    <span class="cm">// min-heap ordered by node value</span>
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">ListNode</span>&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; a.val - b.val);
-    <span class="kw">for</span> (<span class="cls">ListNode</span> head : lists) <span class="kw">if</span> (head != <span class="kw">null</span>) pq.offer(head);
+          <pre><span class="pc-cm">// K-way merge: the heap holds at most one "front" node per list.</span>
+<span class="pc-kw">function</span> mergeKLists(lists):
+    pq ← empty min-heap ordered by node value
+    <span class="pc-kw">for</span> head <span class="pc-kw">in</span> lists:
+        <span class="pc-kw">if</span> head ≠ null: pq.push(head)
 
-    <span class="cls">ListNode</span> dummy = <span class="kw">new</span> <span class="cls">ListNode</span>(<span class="num">0</span>), curr = dummy;
-    <span class="kw">while</span> (!pq.isEmpty()) {
-        curr.next = pq.poll();          <span class="cm">// pull globally smallest</span>
-        curr = curr.next;
-        <span class="kw">if</span> (curr.next != <span class="kw">null</span>) pq.offer(curr.next);  <span class="cm">// push next from same list</span>
-    }
-    <span class="ret">return</span> dummy.next;
-}
-<span class="cm">// Time O(N log K) where N = total nodes, K = number of lists
-// Space O(K) for the heap — only K nodes live in the heap at any time</span></pre>
+    dummy ← ListNode(0)
+    curr ← dummy
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        curr.next ← pq.popMin()               <span class="pc-cm">// pull the globally smallest</span>
+        curr ← curr.next
+        <span class="pc-kw">if</span> curr.next ≠ null: pq.push(curr.next)   <span class="pc-cm">// push the next from the same list</span>
+    <span class="pc-kw">return</span> dummy.next
+
+<span class="pc-cm">// Key: the heap has at most K elements → each pop is O(log K), not O(log N)</span>
+<span class="pc-cm">// Time O(N log K) where N = total nodes, K = number of lists</span>
+<span class="pc-cm">// Space O(K) for the heap</span></pre>
         </div>
 
         <!-- P4 DRY RUN -->
@@ -2076,67 +1992,44 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
           task next. When a cooldown constraint exists, pair the heap with a
           wait queue.
         </p>
-        <div class="pattern-banner">
-          <h4>Pseudocode &mdash; Task Scheduler</h4>
-          <p>
-            maxH = max-heap of task frequencies<br />
-            queue = [(freq_after_task, available_at_time)]<br /><br />
-            while maxH or queue not empty:<br />
-            &nbsp;&nbsp;time++<br />
-            &nbsp;&nbsp;if maxH not empty &rarr; pick most frequent, decrement,
-            push to queue with (freq-1, time+n)<br />
-            &nbsp;&nbsp;if queue.front.available_at &le; time &rarr; push back
-            to maxH
-          </p>
-        </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#9749; Java &middot; Task Scheduler (LC 621) + Reorganize String
-              (LC 767)</span
+              >&#128208; Pseudocode &middot; Task Scheduler (LC 621) +
+              Reorganize String (LC 767)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Task Scheduler — greedy: always do the most-frequent available task</span>
-<span class="kw">int</span> <span class="fn">leastInterval</span>(<span class="kw">char</span>[] tasks, <span class="kw">int</span> n) {
-    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
-    <span class="kw">for</span> (<span class="kw">char</span> c : tasks) cnt[c-<span class="str">'A'</span>]++;
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
-    <span class="kw">for</span> (<span class="kw">int</span> c : cnt) <span class="kw">if</span> (c > <span class="num">0</span>) maxH.offer(c);
-    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; waitQ = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();   <span class="cm">// [remaining_count, available_at]</span>
-    <span class="kw">int</span> time = <span class="num">0</span>;
-    <span class="kw">while</span> (!maxH.isEmpty() || !waitQ.isEmpty()) {
-        time++;
-        <span class="kw">if</span> (!maxH.isEmpty()) {
-            <span class="kw">int</span> rem = maxH.poll() - <span class="num">1</span>;
-            <span class="kw">if</span> (rem > <span class="num">0</span>) waitQ.offer(<span class="kw">new</span> <span class="kw">int</span>[]{rem, time + n});
-        }
-        <span class="kw">if</span> (!waitQ.isEmpty() && waitQ.peek()[<span class="num">1</span>] == time) maxH.offer(waitQ.poll()[<span class="num">0</span>]);
-    }
-    <span class="ret">return</span> time;
-}
-<span class="cm">// Time O(T * 26) where T = total tasks  Space O(26) = O(1)
+          <pre><span class="pc-cm">// Task Scheduler — greedy: always run the most frequent available task</span>
+<span class="pc-kw">function</span> leastInterval(tasks, n):
+    cnt ← count of each task letter (26 slots)
+    maxH ← max-heap of every non-zero count
+    waitQ ← empty queue of (remaining count, available at time)
+    time ← 0
+    <span class="pc-kw">while</span> maxH <span class="pc-kw">is not empty</span> <span class="pc-kw">or</span> waitQ <span class="pc-kw">is not empty</span>:
+        time ← time + 1
+        <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+            rem ← maxH.popMax() - 1
+            <span class="pc-kw">if</span> rem &gt; 0: waitQ.enqueue((rem, time + n))     <span class="pc-cm">// cooling down</span>
+        <span class="pc-kw">if</span> waitQ <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> waitQ.front().availableAt = time:
+            maxH.push(waitQ.dequeue().rem)                  <span class="pc-cm">// cooled down — back in play</span>
+    <span class="pc-kw">return</span> time
+<span class="pc-cm">// Time O(T × 26) where T = total tasks  Space O(26) = O(1)</span>
 
-// Reorganize String — same greedy idea:
-// Always pick the most frequent char that != previous char</span>
-<span class="cls">String</span> <span class="fn">reorganizeString</span>(<span class="cls">String</span> s) {
-    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
-    <span class="kw">for</span> (<span class="kw">char</span> c : s.toCharArray()) cnt[c-<span class="str">'a'</span>]++;
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b) -&gt; b[<span class="num">0</span>]-a[<span class="num">0</span>]);
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">26</span>; i++) <span class="kw">if</span> (cnt[i]&gt;<span class="num">0</span>) maxH.offer(<span class="kw">new</span> <span class="kw">int</span>[]{cnt[i], i});
-    <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
-    <span class="kw">while</span> (maxH.size() &gt;= <span class="num">2</span>) {
-        <span class="kw">int</span>[] a = maxH.poll(), b = maxH.poll();
-        sb.append((<span class="kw">char</span>)('a'+a[<span class="num">1</span>])); sb.append((<span class="kw">char</span>)('a'+b[<span class="num">1</span>]));
-        <span class="kw">if</span> (--a[<span class="num">0</span>] > <span class="num">0</span>) maxH.offer(a);
-        <span class="kw">if</span> (--b[<span class="num">0</span>] > <span class="num">0</span>) maxH.offer(b);
-    }
-    <span class="kw">if</span> (!maxH.isEmpty()) {
-        <span class="kw">if</span> (maxH.peek()[<span class="num">0</span>] &gt; <span class="num">1</span>) <span class="ret">return</span> <span class="str">""</span>;  <span class="cm">// impossible</span>
-        sb.append((<span class="kw">char</span>)('a'+maxH.poll()[<span class="num">1</span>]));
-    }
-    <span class="ret">return</span> sb.toString();
-}
-<span class="cm">// Time O(n log 26) = O(n)  Space O(n) for output</span></pre>
+<span class="pc-cm">// Reorganize String — same greedy idea:</span>
+<span class="pc-cm">// always place the most frequent char that differs from the previous one</span>
+<span class="pc-kw">function</span> reorganizeString(s):
+    maxH ← max-heap of (count, char) <span class="pc-kw">for</span> every char <span class="pc-kw">in</span> s
+    out ← empty string
+    <span class="pc-kw">while</span> maxH.size ≥ 2:
+        a ← maxH.popMax();  b ← maxH.popMax()    <span class="pc-cm">// two DIFFERENT chars</span>
+        append a.char, then b.char <span class="pc-kw">to</span> out
+        a.count ← a.count - 1;  <span class="pc-kw">if</span> a.count &gt; 0: maxH.push(a)
+        b.count ← b.count - 1;  <span class="pc-kw">if</span> b.count &gt; 0: maxH.push(b)
+    <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">if</span> maxH.peek().count &gt; 1: <span class="pc-kw">return</span> ""      <span class="pc-cm">// impossible</span>
+        append maxH.popMax().char <span class="pc-kw">to</span> out
+    <span class="pc-kw">return</span> out
+<span class="pc-cm">// Time O(n log 26) = O(n)  Space O(n) for the output</span></pre>
         </div>
         <hr />
 
@@ -2221,18 +2114,20 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 215</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 215</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">findKthLargest</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) { minH.offer(n); <span class="kw">if</span> (minH.size()>k) minH.poll(); }
-    <span class="ret">return</span> minH.peek();
-}</pre>
+                  <pre><span class="pc-kw">function</span> findKthLargest(nums, k):
+    minH ← empty min-heap
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        minH.push(n)
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()
+    <span class="pc-kw">return</span> minH.peek()</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2321,25 +2216,23 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 347</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 347</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">topKFrequent</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) freq.merge(n, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
-    <span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a[<span class="num">0</span>]-b[<span class="num">0</span>]);
-    <span class="kw">for</span> (<span class="kw">var</span> e : freq.entrySet()) {
-        pq.offer(<span class="kw">new</span> <span class="kw">int</span>[]{e.getValue(), e.getKey()});
-        <span class="kw">if</span> (pq.size() > k) pq.poll();
-    }
-    <span class="kw">int</span>[] res = <span class="kw">new</span> <span class="kw">int</span>[k];
-    <span class="kw">for</span> (<span class="kw">int</span> i=k-<span class="num">1</span>; i>=<span class="num">0</span>; i--) res[i] = pq.poll()[<span class="num">1</span>];
-    <span class="ret">return</span> res;
-}</pre>
+                  <pre><span class="pc-kw">function</span> topKFrequent(nums, k):
+    freq ← count of each value <span class="pc-kw">in</span> nums
+    pq ← empty min-heap of (freq, num), ordered by freq
+    <span class="pc-kw">for</span> (num, f) <span class="pc-kw">in</span> freq:
+        pq.push((f, num))
+        <span class="pc-kw">if</span> pq.size &gt; k: pq.popMin()
+    res ← array of length k
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← pq.popMin().num
+    <span class="pc-kw">return</span> res</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -2438,22 +2331,24 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 295</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 295</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
-<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();
-<span class="kw">void</span> <span class="fn">addNum</span>(<span class="kw">int</span> n) {
-    maxH.offer(n); minH.offer(maxH.poll());
-    <span class="kw">if</span> (minH.size() > maxH.size()) maxH.offer(minH.poll());
-}
-<span class="kw">double</span> <span class="fn">findMedian</span>() {
-    <span class="ret">return</span> maxH.size()==minH.size() ? (maxH.peek()+minH.peek())/2.0 : maxH.peek();
-}</pre>
+                  <pre>maxH ← empty max-heap;  minH ← empty min-heap
+
+<span class="pc-kw">function</span> addNum(n):
+    maxH.push(n)
+    minH.push(maxH.popMax())
+    <span class="pc-kw">if</span> minH.size &gt; maxH.size: maxH.push(minH.popMin())
+
+<span class="pc-kw">function</span> findMedian():
+    <span class="pc-kw">if</span> maxH.size = minH.size: <span class="pc-kw">return</span> (maxH.peek() + minH.peek()) ÷ 2
+    <span class="pc-kw">return</span> maxH.peek()</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -2548,23 +2443,22 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 23</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 23</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">ListNode</span> <span class="fn">mergeKLists</span>(<span class="cls">ListNode</span>[] lists) {
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">ListNode</span>&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((a,b)->a.val-b.val);
-    <span class="kw">for</span> (<span class="cls">ListNode</span> h : lists) <span class="kw">if</span> (h!=<span class="kw">null</span>) pq.offer(h);
-    <span class="cls">ListNode</span> dummy = <span class="kw">new</span> <span class="cls">ListNode</span>(<span class="num">0</span>), cur = dummy;
-    <span class="kw">while</span> (!pq.isEmpty()) {
-        cur.next = pq.poll(); cur = cur.next;
-        <span class="kw">if</span> (cur.next != <span class="kw">null</span>) pq.offer(cur.next);
-    }
-    <span class="ret">return</span> dummy.next;
-}</pre>
+                  <pre><span class="pc-kw">function</span> mergeKLists(lists):
+    pq ← min-heap (by value) of every non-null head
+    dummy ← ListNode(0);  cur ← dummy
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        cur.next ← pq.popMin()
+        cur ← cur.next
+        <span class="pc-kw">if</span> cur.next ≠ null: pq.push(cur.next)
+    <span class="pc-kw">return</span> dummy.next</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">
@@ -2660,27 +2554,26 @@ Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
                 Solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <span class="code-lang">&#9749; Java &middot; LC 621</span
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 621</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">leastInterval</span>(<span class="kw">char</span>[] tasks, <span class="kw">int</span> n) {
-    <span class="kw">int</span>[] cnt = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">26</span>];
-    <span class="kw">for</span> (<span class="kw">char</span> c : tasks) cnt[c-<span class="str">'A'</span>]++;
-    <span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxH = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
-    <span class="kw">for</span> (<span class="kw">int</span> c : cnt) <span class="kw">if</span> (c><span class="num">0</span>) maxH.offer(c);
-    <span class="cls">Queue</span>&lt;<span class="kw">int</span>[]&gt; waitQ = <span class="kw">new</span> <span class="cls">LinkedList</span>&lt;&gt;();
-    <span class="kw">int</span> time = <span class="num">0</span>;
-    <span class="kw">while</span> (!maxH.isEmpty() || !waitQ.isEmpty()) {
-        time++;
-        <span class="kw">if</span> (!maxH.isEmpty()) { <span class="kw">int</span> r=maxH.poll()-<span class="num">1</span>; <span class="kw">if</span>(r><span class="num">0</span>) waitQ.offer(<span class="kw">new</span> <span class="kw">int</span>[]{r,time+n}); }
-        <span class="kw">if</span> (!waitQ.isEmpty() && waitQ.peek()[<span class="num">1</span>]==time) maxH.offer(waitQ.poll()[<span class="num">0</span>]);
-    }
-    <span class="ret">return</span> time;
-}</pre>
+                  <pre><span class="pc-kw">function</span> leastInterval(tasks, n):
+    maxH ← max-heap of every non-zero task count
+    waitQ ← empty queue of (remaining, availableAt)
+    time ← 0
+    <span class="pc-kw">while</span> maxH <span class="pc-kw">is not empty</span> <span class="pc-kw">or</span> waitQ <span class="pc-kw">is not empty</span>:
+        time ← time + 1
+        <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+            r ← maxH.popMax() - 1
+            <span class="pc-kw">if</span> r &gt; 0: waitQ.enqueue((r, time + n))
+        <span class="pc-kw">if</span> waitQ <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> waitQ.front().availableAt = time:
+            maxH.push(waitQ.dequeue().remaining)
+    <span class="pc-kw">return</span> time</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge yellow">

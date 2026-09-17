@@ -1397,6 +1397,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1621,30 +1632,6 @@ bound <span class="pc-kw">&larr;</span> 1
 <span class="pc-kw">return</span> binarySearch(arr, bound &divide; 2, min(bound, length(arr) - 1), target)</pre>
         </div>
 
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#9749; Java &middot; Exponential Search</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> <span class="fn">exponentialSearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
-    <span class="kw">if</span> (arr.length == <span class="num">0</span>) <span class="ret">return</span> -<span class="num">1</span>;
-    <span class="kw">if</span> (arr[<span class="num">0</span>] == target) <span class="ret">return</span> <span class="num">0</span>;
-
-    <span class="kw">int</span> bound = <span class="num">1</span>;
-    <span class="kw">while</span> (bound &lt; arr.length &amp;&amp; arr[bound] &lt; target) bound *= <span class="num">2</span>;
-
-    <span class="kw">int</span> lo = bound / <span class="num">2</span>, hi = Math.<span class="fn">min</span>(bound, arr.length - <span class="num">1</span>);
-    <span class="kw">while</span> (lo &lt;= hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (arr[mid] == target) <span class="ret">return</span> mid;
-        <span class="kw">if</span> (arr[mid] &lt; target) lo = mid + <span class="num">1</span>;
-        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-    }
-    <span class="ret">return</span> -<span class="num">1</span>;
-}</pre>
-        </div>
-
         <div class="complexity-row">
           <span class="cx-badge time"
             ><span class="cx-label">Time</span
@@ -1690,23 +1677,6 @@ ans <span class="pc-kw">&larr;</span> 1
         hi <span class="pc-kw">&larr;</span> mid - 1    <span class="pc-cm">// too big</span>
 
 <span class="pc-kw">return</span> ans</pre>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang">&#9749; Java &middot; Sqrt(x) (LC 69)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> <span class="fn">mySqrt</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt; <span class="num">2</span>) <span class="ret">return</span> n;
-    <span class="kw">long</span> lo = <span class="num">1</span>, hi = n / <span class="num">2</span>, ans = <span class="num">1</span>;
-    <span class="kw">while</span> (lo &lt;= hi) {
-        <span class="kw">long</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (mid * mid &lt;= n) { ans = mid; lo = mid + <span class="num">1</span>; }   <span class="cm">// use long: mid*mid overflows int</span>
-        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-    }
-    <span class="ret">return</span> (<span class="kw">int</span>) ans;
-}</pre>
         </div>
 
         <div class="complexity-row">
@@ -1779,27 +1749,24 @@ ans <span class="pc-kw">&larr;</span> 1
             </p>
           </div>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <div class="code-lang">
-                ☕ Java · Linear Search (Iterative vs Recursive)
-              </div>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Linear Search (Iterative vs
+                Recursive)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="cm">// Iterative: Space O(1)</span>
-<span class="kw">public int</span> <span class="fn">linearSearch</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < nums.length; i++) {
-        <span class="kw">if</span> (nums[i] == target) <span class="ret">return</span> i;
-    }
-    <span class="ret">return</span> -<span class="num">1</span>;
-}
+            <pre><span class="pc-cm">// Iterative: space O(1)</span>
+<span class="pc-kw">function</span> linearSearch(nums, target):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        <span class="pc-kw">if</span> nums[i] = target: <span class="pc-kw">return</span> i
+    <span class="pc-kw">return</span> NOT_FOUND
 
-<span class="cm">// Recursive: Space O(N) due to Call Stack</span>
-<span class="kw">public int</span> <span class="fn">recursiveLinear</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target, <span class="kw">int</span> index) {
-    <span class="kw">if</span> (index >= nums.length) <span class="ret">return</span> -<span class="num">1</span>;
-    <span class="kw">if</span> (nums[index] == target) <span class="ret">return</span> index;
-    <span class="ret">return</span> <span class="fn">recursiveLinear</span>(nums, target, index + <span class="num">1</span>);
-}</pre>
+<span class="pc-cm">// Recursive: space O(n) — one call-stack frame per element</span>
+<span class="pc-kw">function</span> recursiveLinear(nums, target, index):
+    <span class="pc-kw">if</span> index ≥ length(nums): <span class="pc-kw">return</span> NOT_FOUND
+    <span class="pc-kw">if</span> nums[index] = target: <span class="pc-kw">return</span> index
+    <span class="pc-kw">return</span> recursiveLinear(nums, target, index + 1)</pre>
           </div>
 
           <h3 class="h2">Binary Search</h3>
@@ -1816,21 +1783,20 @@ ans <span class="pc-kw">&larr;</span> 1
             </p>
           </div>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <div class="code-lang">☕ Java · Classic Binary Search</div>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Classic Binary Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">public int</span> <span class="fn">binarySearch</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (lo <= hi) { <span class="cm">// '<=' allows exhaustive 1-element checks</span>
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (nums[mid] == target) <span class="ret">return</span> mid;
-        <span class="kw">if</span> (nums[mid] < target) lo = mid + <span class="num">1</span>;
-        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-    }
-    <span class="ret">return</span> -<span class="num">1</span>;
-}</pre>
+            <pre><span class="pc-kw">function</span> binarySearch(nums, target):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo ≤ hi:                   <span class="pc-cm">// '≤' so a one-element range is still checked</span>
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
+        <span class="pc-kw">if</span> nums[mid] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                  hi ← mid - 1
+    <span class="pc-kw">return</span> NOT_FOUND</pre>
           </div>
 
           <h3 class="h2">Interpolation Search</h3>
@@ -1850,22 +1816,26 @@ ans <span class="pc-kw">&larr;</span> 1
             </p>
           </div>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <div class="code-lang">☕ Java · Interpolation Search</div>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Interpolation Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">while</span> (lo <= hi && target >= arr[lo] && target <= arr[hi]) {
-    <span class="cm">// Prevent division by zero</span>
-    <span class="kw">if</span> (lo == hi) {
-        <span class="kw">if</span> (arr[lo] == target) <span class="ret">return</span> lo;
-        <span class="ret">return</span> -<span class="num">1</span>;
-    }
-    <span class="kw">int</span> pos = lo + (((hi - lo) / (arr[hi] - arr[lo])) * (target - arr[lo]));
-    <span class="kw">if</span> (arr[pos] == target) <span class="ret">return</span> pos;
-    <span class="kw">if</span> (arr[pos] < target) lo = pos + <span class="num">1</span>;
-    <span class="kw">else</span> hi = pos - <span class="num">1</span>;
-}</pre>
+            <pre><span class="pc-cm">// Guess the position from the VALUE, like opening a dictionary near 'M' for "mango".</span>
+<span class="pc-kw">while</span> lo ≤ hi <span class="pc-kw">and</span> arr[lo] ≤ target ≤ arr[hi]:
+    <span class="pc-kw">if</span> arr[hi] = arr[lo]:                        <span class="pc-cm">// flat range — avoid dividing by zero</span>
+        <span class="pc-kw">if</span> arr[lo] = target: <span class="pc-kw">return</span> lo
+        <span class="pc-kw">return</span> NOT_FOUND
+
+    <span class="pc-cm">// multiply BEFORE dividing: dividing first truncates to 0 and the probe collapses to lo</span>
+    pos ← lo + (target - arr[lo]) × (hi - lo) ÷ (arr[hi] - arr[lo])
+
+    <span class="pc-kw">if</span> arr[pos] = target: <span class="pc-kw">return</span> pos
+    <span class="pc-kw">if</span> arr[pos] &lt; target: lo ← pos + 1
+    <span class="pc-kw">else</span>:                 hi ← pos - 1
+<span class="pc-kw">return</span> NOT_FOUND
+<span class="pc-cm">// O(log log n) on uniformly spread values; degrades to O(n) on skewed data.</span></pre>
           </div>
 
           <h3 class="h2">Ternary Search</h3>
@@ -1883,20 +1853,20 @@ ans <span class="pc-kw">&larr;</span> 1
             </p>
           </div>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <div class="code-lang">
-                ☕ Java · Ternary Search (Peak Finding)
-              </div>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Ternary Search (Peak
+                Finding)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">while</span> (hi - lo > <span class="num">2</span>) {
-    <span class="kw">int</span> mid1 = lo + (hi - lo) / <span class="num">3</span>;
-    <span class="kw">int</span> mid2 = hi - (hi - lo) / <span class="num">3</span>;
-    <span class="cm">// Assuming we are searching for the Maximum peak in f(x)</span>
-    <span class="kw">if</span> (<span class="fn">f</span>(mid1) < <span class="fn">f</span>(mid2)) lo = mid1; <span class="cm">// Max must be right of mid1</span>
-    <span class="kw">else</span> hi = mid2; <span class="cm">// Max must be left of mid2</span>
-}</pre>
+            <pre><span class="pc-cm">// Find the maximum of a function that rises then falls (unimodal)</span>
+<span class="pc-kw">while</span> hi - lo &gt; 2:
+    mid1 ← lo + (hi - lo) ÷ 3
+    mid2 ← hi - (hi - lo) ÷ 3
+    <span class="pc-kw">if</span> f(mid1) &lt; f(mid2): lo ← mid1      <span class="pc-cm">// the peak is right of mid1</span>
+    <span class="pc-kw">else</span>:                 hi ← mid2      <span class="pc-cm">// the peak is left of mid2</span>
+<span class="pc-cm">// then check the last ≤ 3 points directly</span></pre>
           </div>
         </section>
 
@@ -1933,21 +1903,6 @@ lo <span class="pc-kw">&larr;</span> 0; hi <span class="pc-kw">&larr;</span> len
 
 <span class="pc-kw">return</span> ans</pre>
           </div>
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-lang">☕ Java · Lower Bound logic</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="kw">int</span> ans = -<span class="num">1</span>;
-<span class="kw">while</span> (lo <= hi) {
-    <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-    <span class="kw">if</span> (nums[mid] == target) {
-        ans = mid; <span class="cm">// Capture possible target</span>
-        hi = mid - <span class="num">1</span>; <span class="cm">// Keep looking left for earlier occurrence</span>
-    } <span class="kw">else if</span> (nums[mid] < target) lo = mid + <span class="num">1</span>;
-    <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-}</pre>
-          </div>
 
           <h3 class="h2">Search in Rotated Sorted Array</h3>
           <p>
@@ -1956,18 +1911,18 @@ lo <span class="pc-kw">&larr;</span> 0; hi <span class="pc-kw">&larr;</span> len
             side is perfectly sorted, and you can evaluate containment safely.
           </p>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <span class="code-lang">☕ Java · Sorted Half Validation</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Sorted Half Validation</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">if</span> (nums[lo] <= nums[mid]) { <span class="cm">// Left half is perfectly sorted</span>
-    <span class="kw">if</span> (target >= nums[lo] && target < nums[mid]) hi = mid - <span class="num">1</span>; <span class="cm">// Must be in left</span>
-    <span class="kw">else</span> lo = mid + <span class="num">1</span>; <span class="cm">// Must be in right</span>
-} <span class="kw">else</span> { <span class="cm">// Right half is perfectly sorted</span>
-    <span class="kw">if</span> (target > nums[mid] && target <= nums[hi]) lo = mid + <span class="num">1</span>; <span class="cm">// Must be in right</span>
-    <span class="kw">else</span> hi = mid - <span class="num">1</span>; <span class="cm">// Must be in left</span>
-}</pre>
+            <pre><span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                     <span class="pc-cm">// left half is sorted</span>
+    <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             lo ← mid + 1   <span class="pc-cm">// so it must be on the right</span>
+<span class="pc-kw">else</span>:                                        <span class="pc-cm">// right half is sorted</span>
+    <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             hi ← mid - 1   <span class="pc-cm">// so it must be on the left</span></pre>
           </div>
 
           <h3 class="h2">Binary Search on Answer Space</h3>
@@ -2015,22 +1970,15 @@ ans <span class="pc-kw">&larr;</span> hi
 <span class="pc-kw">return</span> ans
 
 <span class="pc-cm">// Koko eating bananas: feasible(speed) = hours needed &lt;= H</span>
-<span class="pc-cm">// Ship packages in D days: feasible(cap)  = days needed &lt;= D</span></pre>
-          </div>
-          <div class="code-block">
-            <div class="code-header">
-              <span class="code-lang">☕ Java · Answer Space Template</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="kw">while</span> (lo < hi) {
-    <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-    <span class="kw">if</span> (<span class="fn">isValid</span>(mid)) {
-        hi = mid; <span class="cm">// It works! See if we can find a smaller valid capacity</span>
-    } <span class="kw">else</span> {
-        lo = mid + <span class="num">1</span>; <span class="cm">// Did not work. We must increase capacity</span>
-    }
-}
-<span class="ret">return</span> lo;</pre>
+<span class="pc-cm">// Ship packages in D days: feasible(cap)  = days needed &lt;= D</span>
+
+<span class="pc-cm">// Equivalent form without `ans`: shrink the range until lo = hi.</span>
+<span class="pc-cm">// Here lo always points at the smallest answer not yet ruled out.</span>
+<span class="pc-kw">while</span> lo &lt; hi:
+    mid ← lo + (hi - lo) ÷ 2
+    <span class="pc-kw">if</span> feasible(mid): hi ← mid         <span class="pc-cm">// mid works — keep it in range</span>
+    <span class="pc-kw">else</span>:             lo ← mid + 1     <span class="pc-cm">// mid fails — discard it</span>
+<span class="pc-kw">return</span> lo</pre>
           </div>
         </section>
 
@@ -2105,20 +2053,21 @@ ans <span class="pc-kw">&larr;</span> hi
             </p>
           </div>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <span class="code-lang">☕ Java · 1D to 2D Mapping</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; 1D to 2D Mapping</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">int</span> rows = matrix.length, cols = matrix[<span class="num">0</span>].length;
-<span class="kw">int</span> lo = <span class="num">0</span>, hi = (rows * cols) - <span class="num">1</span>;
-<span class="kw">while</span> (lo <= hi) {
-    <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-    <span class="kw">int</span> val = matrix[mid / cols][mid % cols];
-    <span class="kw">if</span> (val == target) <span class="ret">return</span> <span class="kw">true</span>;
-    <span class="kw">if</span> (val < target) lo = mid + <span class="num">1</span>;
-    <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-}</pre>
+            <pre>rows ← number of rows;  cols ← number of columns
+lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the matrix as one sorted array</span>
+<span class="pc-kw">while</span> lo ≤ hi:
+    mid ← lo + (hi - lo) ÷ 2
+    val ← matrix[mid ÷ cols][mid mod cols]
+    <span class="pc-kw">if</span> val = target: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> val &lt; target: lo ← mid + 1
+    <span class="pc-kw">else</span>:            hi ← mid - 1
+<span class="pc-kw">return</span> false</pre>
           </div>
 
           <h3 class="h2">Staircase / Saddleback Search</h3>
@@ -2130,22 +2079,23 @@ ans <span class="pc-kw">&larr;</span> hi
             leftwards or downwards in $O(M + N)$ combinations.
           </p>
 
-          <div class="code-block">
+          <div class="code-block pseudo">
             <div class="code-header">
-              <span class="code-lang">☕ Java · Top-Right Staircase</span>
-              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Top-Right Staircase</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <pre><span class="kw">int</span> row = <span class="num">0</span>, col = matrix[<span class="num">0</span>].length - <span class="num">1</span>;
-<span class="kw">while</span> (row < matrix.length && col >= <span class="num">0</span>) {
-    <span class="kw">if</span> (matrix[row][col] == target) <span class="ret">return</span> <span class="kw">true</span>;
-    <span class="kw">if</span> (matrix[row][col] > target) col--; <span class="cm">// Eliminate current column</span>
-    <span class="kw">else</span> row++; <span class="cm">// Eliminate current row</span>
-}</pre>
+            <pre>row ← 0;  col ← last column index
+<span class="pc-kw">while</span> row &lt; number of rows <span class="pc-kw">and</span> col ≥ 0:
+    <span class="pc-kw">if</span> matrix[row][col] = target: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> matrix[row][col] &gt; target: col ← col - 1   <span class="pc-cm">// everything below is bigger → drop this column</span>
+    <span class="pc-kw">else</span>:                         row ← row + 1   <span class="pc-cm">// everything left is smaller → drop this row</span>
+<span class="pc-kw">return</span> false</pre>
           </div>
         </section>
 
         <!-- PRACTICE PROBLEMS -->
-        <section id="practice" class="section">
+        <section class="section">
           <h2 class="h1" id="practice">
             &#128170; In-Lecture Practice Problems
           </h2>
@@ -2221,29 +2171,27 @@ ans <span class="pc-kw">&larr;</span> hi
                     complexity
                   </summary>
                   <div class="details-body">
-                    <div class="code-block">
+                    <div class="code-block pseudo">
                       <div class="code-header">
-                        <div class="code-lang">☕ Java · Pivot Logic</div>
-                        <button class="copy-btn" onclick="copyCode(this)">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Pivot Logic</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
                           Copy
                         </button>
                       </div>
-                      <pre><span class="kw">public int</span> <span class="fn">search</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (lo <= hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (nums[mid] == target) <span class="ret">return</span> mid;
-        
-        <span class="kw">if</span> (nums[lo] <= nums[mid]) {
-            <span class="kw">if</span> (target >= nums[lo] && target < nums[mid]) hi = mid - <span class="num">1</span>;
-            <span class="kw">else</span> lo = mid + <span class="num">1</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> (target > nums[mid] && target <= nums[hi]) lo = mid + <span class="num">1</span>;
-            <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-        }
-    }
-    <span class="ret">return</span> -<span class="num">1</span>;
-}</pre>
+                      <pre><span class="pc-kw">function</span> search(nums, target):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
+
+        <span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                       <span class="pc-cm">// left half sorted</span>
+            <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1
+            <span class="pc-kw">else</span>:                             lo ← mid + 1
+        <span class="pc-kw">else</span>:                                          <span class="pc-cm">// right half sorted</span>
+            <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1
+            <span class="pc-kw">else</span>:                             hi ← mid - 1
+    <span class="pc-kw">return</span> NOT_FOUND</pre>
                     </div>
                     <div class="complexity-row">
                       <div class="cx-badge green">
@@ -2330,27 +2278,23 @@ ans <span class="pc-kw">&larr;</span> hi
                     complexity
                   </summary>
                   <div class="details-body">
-                    <div class="code-block">
+                    <div class="code-block pseudo">
                       <div class="code-header">
-                        <div class="code-lang">☕ Java · Upward Slope</div>
-                        <button class="copy-btn" onclick="copyCode(this)">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Upward Slope</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
                           Copy
                         </button>
                       </div>
-                      <pre><span class="kw">public int</span> <span class="fn">findPeakElement</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (lo < hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="cm">// If slope is rising, peak is to the right</span>
-        <span class="kw">if</span> (nums[mid] < nums[mid + <span class="num">1</span>]) {
-            lo = mid + <span class="num">1</span>;
-        } <span class="kw">else</span> {
-            <span class="cm">// Slope falling, peak is at mid or to the left</span>
-            hi = mid;
-        }
-    }
-    <span class="ret">return</span> lo;
-}</pre>
+                      <pre><span class="pc-kw">function</span> findPeakElement(nums):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] &lt; nums[mid + 1]:
+            lo ← mid + 1          <span class="pc-cm">// rising slope → a peak lies to the right</span>
+        <span class="pc-kw">else</span>:
+            hi ← mid              <span class="pc-cm">// falling slope → peak at mid or to the left</span>
+    <span class="pc-kw">return</span> lo</pre>
                     </div>
                     <div class="complexity-row">
                       <div class="cx-badge green">
@@ -2439,42 +2383,36 @@ ans <span class="pc-kw">&larr;</span> hi
                     complexity
                   </summary>
                   <div class="details-body">
-                    <div class="code-block">
+                    <div class="code-block pseudo">
                       <div class="code-header">
-                        <div class="code-lang">☕ Java · Partition Search</div>
-                        <button class="copy-btn" onclick="copyCode(this)">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Partition Search</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
                           Copy
                         </button>
                       </div>
-                      <pre><span class="kw">public double</span> <span class="fn">findMedianSortedArrays</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span>[] nums2) {
-    <span class="kw">if</span> (nums1.length > nums2.length) <span class="ret">return</span> <span class="fn">findMedianSortedArrays</span>(nums2, nums1);
-    <span class="kw">int</span> x = nums1.length, y = nums2.length;
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = x;
-    
-    <span class="kw">while</span> (lo <= hi) {
-        <span class="kw">int</span> partitionX = (lo + hi) / <span class="num">2</span>;
-        <span class="kw">int</span> partitionY = (x + y + <span class="num">1</span>) / <span class="num">2</span> - partitionX;
-        
-        <span class="kw">int</span> maxLeftX = (partitionX == <span class="num">0</span>) ? Integer.MIN_VALUE : nums1[partitionX - <span class="num">1</span>];
-        <span class="kw">int</span> minRightX = (partitionX == x) ? Integer.MAX_VALUE : nums1[partitionX];
-        
-        <span class="kw">int</span> maxLeftY = (partitionY == <span class="num">0</span>) ? Integer.MIN_VALUE : nums2[partitionY - <span class="num">1</span>];
-        <span class="kw">int</span> minRightY = (partitionY == y) ? Integer.MAX_VALUE : nums2[partitionY];
-        
-        <span class="kw">if</span> (maxLeftX <= minRightY && maxLeftY <= minRightX) {
-            <span class="kw">if</span> ((x + y) % <span class="num">2</span> == <span class="num">0</span>) {
-                <span class="ret">return</span> (Math.<span class="fn">max</span>(maxLeftX, maxLeftY) + Math.<span class="fn">min</span>(minRightX, minRightY)) / <span class="num">2.0</span>;
-            } <span class="kw">else</span> {
-                <span class="ret">return</span> Math.<span class="fn">max</span>(maxLeftX, maxLeftY);
-            }
-        } <span class="kw">else if</span> (maxLeftX > minRightY) {
-            hi = partitionX - <span class="num">1</span>;
-        } <span class="kw">else</span> {
-            lo = partitionX + <span class="num">1</span>;
-        }
-    }
-    <span class="ret">return</span> <span class="num">0.0</span>;
-}</pre>
+                      <pre><span class="pc-kw">function</span> findMedianSortedArrays(A, B):
+    <span class="pc-kw">if</span> length(A) &gt; length(B): <span class="pc-kw">return</span> findMedianSortedArrays(B, A)   <span class="pc-cm">// search the shorter one</span>
+    x ← length(A);  y ← length(B)
+    lo ← 0;  hi ← x
+
+    <span class="pc-kw">while</span> lo ≤ hi:
+        px ← (lo + hi) ÷ 2                  <span class="pc-cm">// how many of A go on the left</span>
+        py ← (x + y + 1) ÷ 2 - px           <span class="pc-cm">// the rest of the left half comes from B</span>
+
+        maxLeftA  ← A[px-1] <span class="pc-kw">if</span> px &gt; 0 <span class="pc-kw">else</span> -INFINITY
+        minRightA ← A[px]   <span class="pc-kw">if</span> px &lt; x <span class="pc-kw">else</span>  INFINITY
+        maxLeftB  ← B[py-1] <span class="pc-kw">if</span> py &gt; 0 <span class="pc-kw">else</span> -INFINITY
+        minRightB ← B[py]   <span class="pc-kw">if</span> py &lt; y <span class="pc-kw">else</span>  INFINITY
+
+        <span class="pc-kw">if</span> maxLeftA ≤ minRightB <span class="pc-kw">and</span> maxLeftB ≤ minRightA:     <span class="pc-cm">// correct split</span>
+            <span class="pc-kw">if</span> (x + y) <span class="pc-kw">is even</span>:
+                <span class="pc-kw">return</span> (max(maxLeftA, maxLeftB) + min(minRightA, minRightB)) / 2
+            <span class="pc-kw">return</span> max(maxLeftA, maxLeftB)
+        <span class="pc-kw">else if</span> maxLeftA &gt; minRightB:
+            hi ← px - 1                     <span class="pc-cm">// took too many from A</span>
+        <span class="pc-kw">else</span>:
+            lo ← px + 1                     <span class="pc-cm">// took too few from A</span></pre>
                     </div>
                     <div class="complexity-row">
                       <div class="cx-badge green">
@@ -2560,30 +2498,27 @@ ans <span class="pc-kw">&larr;</span> hi
                     complexity
                   </summary>
                   <div class="details-body">
-                    <div class="code-block">
+                    <div class="code-block pseudo">
                       <div class="code-header">
-                        <div class="code-lang">☕ Java · Monotonic Search</div>
-                        <button class="copy-btn" onclick="copyCode(this)">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Monotonic Search</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
                           Copy
                         </button>
                       </div>
-                      <pre><span class="kw">public int</span> <span class="fn">minEatingSpeed</span>(<span class="kw">int</span>[] piles, <span class="kw">int</span> h) {
-    <span class="kw">int</span> lo = <span class="num">1</span>, hi = <span class="num">1000000000</span>; <span class="cm">// Max pile value constraint</span>
-    <span class="kw">while</span> (lo < hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (<span class="fn">possibleToEat</span>(piles, h, mid)) hi = mid;
-        <span class="kw">else</span> lo = mid + <span class="num">1</span>;
-    }
-    <span class="ret">return</span> lo;
-}
+                      <pre><span class="pc-kw">function</span> minEatingSpeed(piles, h):
+    lo ← 1;  hi ← maximum of piles          <span class="pc-cm">// eating faster than the biggest pile never helps</span>
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> canFinish(piles, h, mid): hi ← mid
+        <span class="pc-kw">else</span>:                        lo ← mid + 1
+    <span class="pc-kw">return</span> lo
 
-<span class="kw">private boolean</span> <span class="fn">possibleToEat</span>(<span class="kw">int</span>[] piles, <span class="kw">int</span> h, <span class="kw">int</span> k) {
-    <span class="kw">int</span> hours = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> pile : piles) {
-        hours += (pile + k - <span class="num">1</span>) / k; <span class="cm">// Ceiling division</span>
-    }
-    <span class="ret">return</span> hours <= h;
-}</pre>
+<span class="pc-kw">function</span> canFinish(piles, h, k):
+    hours ← 0
+    <span class="pc-kw">for</span> pile <span class="pc-kw">in</span> piles:
+        hours ← hours + ceil(pile / k)      <span class="pc-cm">// = (pile + k - 1) ÷ k in integer arithmetic</span>
+    <span class="pc-kw">return</span> hours ≤ h</pre>
                     </div>
                     <div class="complexity-row">
                       <div class="cx-badge green">
@@ -2669,25 +2604,24 @@ ans <span class="pc-kw">&larr;</span> hi
                     complexity
                   </summary>
                   <div class="details-body">
-                    <div class="code-block">
+                    <div class="code-block pseudo">
                       <div class="code-header">
-                        <div class="code-lang">☕ Java · Midpoint Mapping</div>
-                        <button class="copy-btn" onclick="copyCode(this)">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Midpoint Mapping</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
                           Copy
                         </button>
                       </div>
-                      <pre><span class="kw">public boolean</span> <span class="fn">searchMatrix</span>(<span class="kw">int</span>[][] matrix, <span class="kw">int</span> target) {
-    <span class="kw">int</span> m = matrix.length, n = matrix[<span class="num">0</span>].length;
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = m * n - <span class="num">1</span>;
-    <span class="kw">while</span> (lo <= hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">int</span> r = mid / n, c = mid % n;
-        <span class="kw">if</span> (matrix[r][c] == target) <span class="ret">return</span> <span class="kw">true</span>;
-        <span class="kw">if</span> (matrix[r][c] < target) lo = mid + <span class="num">1</span>;
-        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-    }
-    <span class="ret">return</span> <span class="kw">false</span>;
-}</pre>
+                      <pre><span class="pc-kw">function</span> searchMatrix(matrix, target):
+    m ← number of rows;  n ← number of columns
+    lo ← 0;  hi ← m × n - 1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        r ← mid ÷ n;  c ← mid mod n
+        <span class="pc-kw">if</span> matrix[r][c] = target: <span class="pc-kw">return</span> true
+        <span class="pc-kw">if</span> matrix[r][c] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                     hi ← mid - 1
+    <span class="pc-kw">return</span> false</pre>
                     </div>
                     <div class="complexity-row">
                       <div class="cx-badge green">
@@ -2786,28 +2720,25 @@ ans <span class="pc-kw">&larr;</span> hi
                   <span class="toggle-arrow">▶</span> Solution + Trace
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
                       <span class="code-lang"
-                        >☕ Java · Binary Search on Rotation Pivot</span
+                        >&#128208; Pseudocode &middot; Binary Search on Rotation
+                        Pivot</span
                       ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">findMin</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>;
-    <span class="kw">while</span> (lo &lt; hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (nums[mid] &gt; nums[hi])
-            lo = mid + <span class="num">1</span>; <span class="cm">// min is in right half</span>
-        <span class="kw">else</span>
-            hi = mid;    <span class="cm">// min is at mid or left</span>
-    }
-    <span class="ret">return</span> nums[lo];
-}
-<span class="cm">// [3,4,5,1,2]: lo=0,hi=4, mid=2, nums[2]=5 > nums[4]=2 → lo=3
-// lo=3,hi=4, mid=3, nums[3]=1 ≤ nums[4]=2 → hi=3
-// lo==hi=3 → return nums[3]=1 ✓</span></pre>
+                    <pre><span class="pc-kw">function</span> findMin(nums):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] &gt; nums[hi]: lo ← mid + 1    <span class="pc-cm">// the drop is to the right</span>
+        <span class="pc-kw">else</span>:                    hi ← mid        <span class="pc-cm">// min is at mid or to the left</span>
+    <span class="pc-kw">return</span> nums[lo]
+<span class="pc-cm">// [3,4,5,1,2]: lo=0 hi=4 mid=2, 5 &gt; 2 → lo=3</span>
+<span class="pc-cm">//              lo=3 hi=4 mid=3, 1 ≤ 2 → hi=3</span>
+<span class="pc-cm">//              lo = hi = 3 → return 1 ✓</span></pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2910,32 +2841,29 @@ ans <span class="pc-kw">&larr;</span> hi
               <details>
                 <summary><span class="toggle-arrow">▶</span> Solution</summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
                       <span class="code-lang"
-                        >☕ Java · Two Binary Searches (Lower + Upper
-                        Bound)</span
+                        >&#128208; Pseudocode &middot; Two Binary Searches
+                        (Lower + Upper Bound)</span
                       ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span>[] <span class="fn">searchRange</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target) {
-    <span class="ret">return new int</span>[] { <span class="fn">bound</span>(nums, target, <span class="kw">true</span>), <span class="fn">bound</span>(nums, target, <span class="kw">false</span>) };
-}
+                    <pre><span class="pc-kw">function</span> searchRange(nums, target):
+    <span class="pc-kw">return</span> (bound(nums, target, findFirst = true), bound(nums, target, findFirst = false))
 
-<span class="kw">private int</span> <span class="fn">bound</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> target, <span class="kw">boolean</span> findLeft) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = nums.length - <span class="num">1</span>, ans = -<span class="num">1</span>;
-    <span class="kw">while</span> (lo &lt;= hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;
-        <span class="kw">if</span> (nums[mid] == target) {
-            ans = mid;
-            <span class="kw">if</span> (findLeft) hi = mid - <span class="num">1</span>; <span class="cm">// keep going left</span>
-            <span class="kw">else</span>         lo = mid + <span class="num">1</span>; <span class="cm">// keep going right</span>
-        } <span class="kw">else if</span> (nums[mid] &lt; target) lo = mid + <span class="num">1</span>;
-        <span class="kw">else</span> hi = mid - <span class="num">1</span>;
-    }
-    <span class="ret">return</span> ans;
-}</pre>
+<span class="pc-kw">function</span> bound(nums, target, findFirst):
+    lo ← 0;  hi ← length(nums) - 1;  ans ← -1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target:
+            ans ← mid
+            <span class="pc-kw">if</span> findFirst: hi ← mid - 1       <span class="pc-cm">// keep looking left</span>
+            <span class="pc-kw">else</span>:         lo ← mid + 1       <span class="pc-cm">// keep looking right</span>
+        <span class="pc-kw">else if</span> nums[mid] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                       hi ← mid - 1
+    <span class="pc-kw">return</span> ans</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">

@@ -1,8 +1,8 @@
 # ⛰️ Assignment 16 — Heaps & Priority Queues
 
-> **Lecture:** Topic 16 — Heaps & Priority Queues
-> **Phase:** 2 — Core Data Structures · **Topic:** 16 of 30
-> **Estimated Time:** 5 Days · **Total Problems:** 20 (5 Easy · 10 Medium · 5 Hard)
+> **Lecture:** 16 of 38 — Heaps & Priority Queues
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 5 days · **Total Problems:** 20 (5 Easy · 10 Medium · 5 Hard)
 > **Goal:** Master the 5 heap patterns — Single Heap, Top-K, Two Heaps, K-way Merge, Greedy Heap.
 
 ---

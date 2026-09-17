@@ -903,6 +903,12 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* Anchor jumps scroll .main, so targets must clear the sticky topbar. */
+      .lcard,
+      .phase-header {
+        scroll-margin-top: 104px !important;
+      }
     </style>
   </head>
 
@@ -3879,7 +3885,11 @@
         const current = html.getAttribute("data-theme");
         const next = current === "light" ? "dark" : "light";
         html.setAttribute("data-theme", next);
-        localStorage.setItem("dsa-theme", next);
+        try {
+          localStorage.setItem("dsa-theme", next);
+        } catch (e) {
+          /* storage blocked (private browsing, embedded viewer) — theme still toggles */
+        }
         updateThemeIcon(next);
       }
 
@@ -3891,22 +3901,19 @@
       }
 
       // Initialize Theme
-      const savedTheme = localStorage.getItem("dsa-theme") || "dark";
+      let savedTheme = "dark";
+      try {
+        savedTheme = localStorage.getItem("dsa-theme") || "dark";
+      } catch (e) {
+        /* storage blocked — fall back to the default theme */
+      }
       document.documentElement.setAttribute("data-theme", savedTheme);
       window.addEventListener("DOMContentLoaded", () => {
         updateThemeIcon(savedTheme);
       });
 
-      // Hash change offset
-      window.addEventListener("hashchange", () => {
-        setTimeout(() => {
-          window.scrollBy(0, -80);
-        }, 10);
-      });
-
       // CARD EXPANSION LOGIC
       function toggleCard(card) {
-        console.log("Toggling card:", card.id);
         const isExpanded = card.classList.contains("expanded");
 
         // Collapse all other cards

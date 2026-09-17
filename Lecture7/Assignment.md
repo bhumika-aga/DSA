@@ -1,9 +1,8 @@
 # 📝 Assignment 07 — Mathematics for DSA
 
-> **Topic:** Mathematics & Number Theory
-> **Topic Count:** 7 of 30 — Phase 1 Foundations
-> **Duration:** 3 Days
-> **Core Problems:** 30 (10 Easy · 15 Medium · 5 Hard) + 10 Challenge + 6 Complexity Exercises
+> **Lecture:** 7 of 38 — Mathematics for DSA
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 30 (10 Easy · 15 Medium · 5 Hard)
 > **Goal:** Master number theory and combinatorics to handle large numbers, overflow prevention, and prime-based
 > algorithms.
 
@@ -127,9 +126,9 @@ Write a function `multiply(long a, long b, long m)` that safely returns `(a * b)
 
 ### Problem 16 — Modular Exponentiation
 
-**🔗 [LC 50](https://leetcode.com/problems/powx-n/)** · **Companies:** Google, Amazon, Meta
+**🔗 [LC 372](https://leetcode.com/problems/super-pow/)** · **Companies:** Google, Amazon
 
-> 🔗 **Practice:** Compute `(a^b) % m` using Binary Exponentiation. This is used in RSA and competition math.
+> 🔗 **Practice:** Compute `(a^b) % m` using Binary Exponentiation. LC 372 is the interview form: `a^b mod 1337` where `b` is too large to fit in any integer type. This is used in RSA and competition math.
 
 ### Problem 17 — Perfect Number
 

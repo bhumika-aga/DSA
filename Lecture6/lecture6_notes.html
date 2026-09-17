@@ -1374,6 +1374,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1770,20 +1781,21 @@
           </table>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · All Four Operations</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; All Four Operations</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// n = 13 = 1101 (binary), k = 1</span>
+          <pre><span class="pc-cm">// n = 13 = 1101 in binary, k = 1</span>
 
-<span class="cm">// CHECK bit 1:</span>  (13 >> 1) & 1 = (110) & 1 = <span class="num">0</span> <span class="cm">// bit 1 is NOT set</span>
+<span class="pc-cm">// CHECK bit 1:  (13 &gt;&gt; 1) AND 1     = 110 AND 1      = 0      // bit 1 is NOT set</span>
 
-<span class="cm">// SET bit 1:</span>    13 | (1 << 1) = 1101 | 0010 = <span class="num">1111</span> = <span class="num">15</span>
+<span class="pc-cm">// SET bit 1:    13 OR (1 &lt;&lt; 1)      = 1101 OR 0010   = 1111 = 15</span>
 
-<span class="cm">// CLEAR bit 2:</span>  13 & ~(1 << 2) = 1101 & 1011 = <span class="num">1001</span> = <span class="num">9</span>
+<span class="pc-cm">// CLEAR bit 2:  13 AND NOT(1 &lt;&lt; 2)  = 1101 AND 1011  = 1001 = 9</span>
 
-<span class="cm">// TOGGLE bit 0:</span> 13 ^ (1 << 0) = 1101 ^ 0001 = <span class="num">1100</span> = <span class="num">12</span></pre>
+<span class="pc-cm">// TOGGLE bit 0: 13 XOR (1 &lt;&lt; 0)     = 1101 XOR 0001  = 1100 = 12</span></pre>
         </div>
 
         <h4 class="h3">Advanced: Clearing a Range of Bits</h4>
@@ -1792,18 +1804,21 @@
           (MSB) down to index <code>i</code>, or from index <code>i</code> down
           to 0.
         </p>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Range Masking</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Range Masking</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// 1. Clear all bits from MSB down to index i (inclusive)</span>
-<span class="kw">int</span> mask1 = (<span class="num">1</span> &lt;&lt; i) - <span class="num">1</span>;
-n = n & mask1;
+          <pre><span class="pc-cm">// 1. Clear every bit from the top down to index i (inclusive)</span>
+<span class="pc-cm">//    — keeps only bits i-1 … 0</span>
+mask1 ← (1 &lt;&lt; i) - 1
+n ← n AND mask1
 
-<span class="cm">// 2. Clear all bits from index i down to 0 (inclusive)</span>
-<span class="kw">int</span> mask2 = ~((<span class="num">1</span> &lt;&lt; (i + <span class="num">1</span>)) - <span class="num">1</span>);
-n = n & mask2;</pre>
+<span class="pc-cm">// 2. Clear every bit from index i down to 0 (inclusive)</span>
+<span class="pc-cm">//    — keeps only bits above i</span>
+mask2 ← NOT((1 &lt;&lt; (i + 1)) - 1)
+n ← n AND mask2</pre>
         </div>
 
         <h3 class="h2" id="brian-k">
@@ -1837,27 +1852,13 @@ count <span class="pc-kw">&larr;</span> 0
 <span class="pc-cm">//   n & (1 &lt;&lt; i)   -> is bit i set?</span>
 <span class="pc-cm">//   n | (1 &lt;&lt; i)   -> set bit i</span>
 <span class="pc-cm">//   n & ~(1 &lt;&lt; i)  -> clear bit i</span>
-<span class="pc-cm">//   n ^ (1 &lt;&lt; i)   -> flip bit i</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Brian Kernighan</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> <span class="fn">countSetBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">while</span> (n != <span class="num">0</span>) {
-        n = n & (n - <span class="num">1</span>);  <span class="cm">// remove lowest set bit</span>
-        count++;
-    }
-    <span class="ret">return</span> count;
-}
+<span class="pc-cm">//   n ^ (1 &lt;&lt; i)   -> flip bit i</span>
 
-<span class="cm">// Dry run: n = 13 (1101)
-// Iteration 1: n = 1101 & 1100 = 1100 (12), count = 1
-// Iteration 2: n = 1100 & 1011 = 1000 (8),  count = 2
-// Iteration 3: n = 1000 & 0111 = 0000 (0),  count = 3
-// Return 3 ✓</span></pre>
+<span class="pc-cm">// Dry run: n = 13 (1101)</span>
+<span class="pc-cm">//   pass 1: n = 1101 AND 1100 = 1100 (12), count = 1</span>
+<span class="pc-cm">//   pass 2: n = 1100 AND 1011 = 1000 (8),  count = 2</span>
+<span class="pc-cm">//   pass 3: n = 1000 AND 0111 = 0000 (0),  count = 3</span>
+<span class="pc-cm">//   return 3 ✓</span></pre>
         </div>
 
         <div class="callout green">
@@ -1877,18 +1878,18 @@ count <span class="pc-kw">&larr;</span> 0
           <strong>exactly one set bit</strong>.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Power of 2</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Power of 2</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">boolean</span> <span class="fn">isPowerOfTwo</span>(<span class="kw">int</span> n) {
-    <span class="ret">return</span> n > <span class="num">0</span> && (n & (n - <span class="num">1</span>)) == <span class="num">0</span>;
-}
+          <pre><span class="pc-kw">function</span> isPowerOfTwo(n):
+    <span class="pc-kw">return</span> n &gt; 0 <span class="pc-kw">and</span> (n AND (n - 1)) = 0
 
-<span class="cm">// 16 = 10000 → 16 & 15 = 10000 & 01111 = 00000 → true ✓
-//  6 = 00110 →  6 &  5 = 00110 & 00101 = 00100 → false ✓
-// EDGE CASE: n must be > 0! (0 is NOT a power of 2)</span></pre>
+<span class="pc-cm">// 16 = 10000 → 16 AND 15 = 10000 AND 01111 = 00000 → true ✓</span>
+<span class="pc-cm">//  6 = 00110 →  6 AND  5 = 00110 AND 00101 = 00100 → false ✓</span>
+<span class="pc-cm">// EDGE CASE: n must be &gt; 0 — zero is NOT a power of 2</span></pre>
         </div>
 
         <hr />
@@ -1954,26 +1955,15 @@ result <span class="pc-kw">&larr;</span> 0
 <span class="pc-kw">return</span> result
 
 <span class="pc-cm">// Two loners? XOR everything, take any set bit of the result to</span>
-<span class="pc-cm">// split the numbers into two groups, then XOR each group separately.</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Single Number</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> result = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) result ^= n;
-    <span class="ret">return</span> result;
-}
+<span class="pc-cm">// split the numbers into two groups, then XOR each group separately.</span>
 
-<span class="cm">// Dry run: [4, 1, 2, 1, 2]
-// 0 ^ 4 = 4
-// 4 ^ 1 = 5
-// 5 ^ 2 = 7
-// 7 ^ 1 = 6  (1 cancelled)
-// 6 ^ 2 = 4  (2 cancelled)
-// Return 4 ✓ — only the unique number survives!</span></pre>
+<span class="pc-cm">// Dry run: [4, 1, 2, 1, 2]</span>
+<span class="pc-cm">//   0 XOR 4 = 4</span>
+<span class="pc-cm">//   4 XOR 1 = 5</span>
+<span class="pc-cm">//   5 XOR 2 = 7</span>
+<span class="pc-cm">//   7 XOR 1 = 6   (the 1s cancelled)</span>
+<span class="pc-cm">//   6 XOR 2 = 4   (the 2s cancelled)</span>
+<span class="pc-cm">//   return 4 ✓ — only the unique number survives</span></pre>
         </div>
 
         <h4 class="h3" style="margin-top: 24px">
@@ -2005,30 +1995,29 @@ result <span class="pc-kw">&larr;</span> 0
           split the array using any differing bit:
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Two Unique Numbers</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Two Unique Numbers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span>[] <span class="fn">twoUnique</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> xor = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) xor ^= n;  <span class="cm">// xor = a ^ b</span>
+          <pre><span class="pc-kw">function</span> twoUnique(nums):
+    x ← 0
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums: x ← x XOR n             <span class="pc-cm">// x = a XOR b</span>
 
-    <span class="kw">int</span> rightmostBit = xor & (-xor);  <span class="cm">// isolate lowest differing bit</span>
+    lowBit ← x AND (-x)                    <span class="pc-cm">// isolate the lowest bit where a and b differ</span>
 
-    <span class="kw">int</span> a = <span class="num">0</span>, b = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> ((n & rightmostBit) != <span class="num">0</span>) a ^= n;  <span class="cm">// group 1</span>
-        <span class="kw">else</span> b ^= n;                          <span class="cm">// group 2</span>
-    }
-    <span class="ret">return new int</span>[]{a, b};
-}
+    a ← 0;  b ← 0
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        <span class="pc-kw">if</span> (n AND lowBit) ≠ 0: a ← a XOR n <span class="pc-cm">// group 1</span>
+        <span class="pc-kw">else</span>:                  b ← b XOR n <span class="pc-cm">// group 2</span>
+    <span class="pc-kw">return</span> (a, b)
 
-<span class="cm">// Why this works:
-// Step 1: XOR all → get a^b (some bits are set where a,b differ)
-// Step 2: Pick any set bit → this bit is 1 in one number, 0 in the other
-// Step 3: Split into two groups by this bit → each group has ONE unique
-// Step 4: XOR each group → pairs cancel, unique survives</span></pre>
+<span class="pc-cm">// Why this works:</span>
+<span class="pc-cm">// 1. XOR everything → a XOR b (bits are 1 exactly where a and b differ)</span>
+<span class="pc-cm">// 2. Pick any set bit → it is 1 in one number and 0 in the other</span>
+<span class="pc-cm">// 3. Split the array by that bit → each group holds ONE unique number</span>
+<span class="pc-cm">// 4. XOR each group → the pairs cancel, the unique one survives</span></pre>
         </div>
 
         <hr />
@@ -2043,36 +2032,29 @@ result <span class="pc-kw">&larr;</span> 0
           (0 to 2ⁿ-1). If bit j is set, include element j.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Subsets via Bitmask</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Subsets via Bitmask</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">List</span>&lt;List&lt;Integer&gt;&gt; <span class="fn">subsets</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> n = nums.length;
-    List&lt;List&lt;Integer&gt;&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
+          <pre><span class="pc-kw">function</span> subsets(nums):
+    n ← length(nums)
+    result ← empty list
 
-    <span class="kw">for</span> (<span class="kw">int</span> mask = <span class="num">0</span>; mask &lt; (<span class="num">1</span> &lt;&lt; n); mask++) {
-        List&lt;Integer&gt; subset = <span class="kw">new</span> ArrayList&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++) {
-            <span class="kw">if</span> ((mask & (<span class="num">1</span> &lt;&lt; j)) != <span class="num">0</span>) {
-                subset.add(nums[j]);
-            }
-        }
-        result.add(subset);
-    }
-    <span class="ret">return</span> result;
-}
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2ⁿ - 1:
+        subset ← empty list
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+            <span class="pc-kw">if</span> (mask AND (1 &lt;&lt; j)) ≠ 0:     <span class="pc-cm">// bit j set → include nums[j]</span>
+                subset.append(nums[j])
+        result.append(subset)
+    <span class="pc-kw">return</span> result
 
-<span class="cm">// For nums = [a, b, c], n=3, masks 0..7:
-// mask=0 (000): []
-// mask=1 (001): [a]
-// mask=2 (010): [b]
-// mask=3 (011): [a, b]
-// mask=4 (100): [c]
-// mask=5 (101): [a, c]
-// mask=6 (110): [b, c]
-// mask=7 (111): [a, b, c]</span></pre>
+<span class="pc-cm">// nums = [a, b, c], n = 3, masks 0..7:</span>
+<span class="pc-cm">//   0 (000): []        4 (100): [c]</span>
+<span class="pc-cm">//   1 (001): [a]       5 (101): [a, c]</span>
+<span class="pc-cm">//   2 (010): [b]       6 (110): [b, c]</span>
+<span class="pc-cm">//   3 (011): [a, b]    7 (111): [a, b, c]</span></pre>
         </div>
 
         <div class="callout purple">
@@ -2163,20 +2145,20 @@ result <span class="pc-kw">&larr;</span> 0
             next column).
           </li>
         </ul>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Sum of Two Integers</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Sum of Two Integers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">public int</span> <span class="fn">getSum</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
-    <span class="kw">while</span> (b != <span class="num">0</span>) {
-        <span class="kw">int</span> sum = a ^ b;            <span class="cm">// step 1: sum without carry</span>
-        <span class="kw">int</span> carry = (a & b) &lt;&lt; <span class="num">1</span>;    <span class="cm">// step 2: find carry and shift</span>
-        a = sum;
-        b = carry;                  <span class="cm">// repeat until carry is zero</span>
-    }
-    <span class="ret">return</span> a;
-}</pre>
+          <pre><span class="pc-cm">// Add without + by splitting addition into two bitwise steps</span>
+<span class="pc-kw">function</span> getSum(a, b):
+    <span class="pc-kw">while</span> b ≠ 0:
+        sum ← a XOR b             <span class="pc-cm">// 1. add every bit, ignoring carries</span>
+        carry ← (a AND b) &lt;&lt; 1    <span class="pc-cm">// 2. the carries, shifted into place</span>
+        a ← sum
+        b ← carry                 <span class="pc-cm">// repeat until nothing is left to carry</span>
+    <span class="pc-kw">return</span> a</pre>
         </div>
 
         <hr />
@@ -2322,21 +2304,20 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Number of 1 Bits</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">hammingWeight</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> count = <span class="num">0</span>;
-    <span class="kw">while</span> (n != <span class="num">0</span>) {
-        n &= (n - <span class="num">1</span>);  <span class="cm">// drops the lowest set bit</span>
-        count++;
-    }
-    <span class="ret">return</span> count;
-}</pre>
+                    <pre><span class="pc-kw">function</span> hammingWeight(n):
+    count ← 0
+    <span class="pc-kw">while</span> n ≠ 0:
+        n ← n AND (n - 1)        <span class="pc-cm">// drops the lowest set bit</span>
+        count ← count + 1
+    <span class="pc-kw">return</span> count</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2421,18 +2402,18 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Single Number</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> res = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) res ^= n;
-    <span class="ret">return</span> res;
-}</pre>
+                    <pre><span class="pc-kw">function</span> singleNumber(nums):
+    result ← 0
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums: result ← result XOR n   <span class="pc-cm">// pairs cancel, the loner remains</span>
+    <span class="pc-kw">return</span> result</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2519,27 +2500,25 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Single Number III</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span>[] <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> xor = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) xor ^= n;
-    
-    <span class="kw">int</span> diffBit = xor & (-xor);
-    
-    <span class="kw">int</span> a = <span class="num">0</span>, b = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) {
-        <span class="kw">if</span> ((n & diffBit) == <span class="num">0</span>) a ^= n;
-        <span class="kw">else</span> b ^= n;
-    }
-    
-    <span class="ret">return new int</span>[]{a, b};
-}</pre>
+                    <pre><span class="pc-kw">function</span> singleNumber(nums):
+    x ← 0
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums: x ← x XOR n             <span class="pc-cm">// a XOR b</span>
+
+    diffBit ← x AND (-x)                   <span class="pc-cm">// lowest bit where a and b differ</span>
+
+    a ← 0;  b ← 0
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        <span class="pc-kw">if</span> (n AND diffBit) = 0: a ← a XOR n
+        <span class="pc-kw">else</span>:                   b ← b XOR n
+    <span class="pc-kw">return</span> (a, b)</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2624,29 +2603,25 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Subsets</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public</span> List&lt;List&lt;Integer&gt;&gt; <span class="fn">subsets</span>(<span class="kw">int</span>[] nums) {
-    List&lt;List&lt;Integer&gt;&gt; res = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">int</span> n = nums.length;
-    <span class="kw">int</span> total = <span class="num">1</span> << n;
-    
-    <span class="kw">for</span> (<span class="kw">int</span> mask = <span class="num">0</span>; mask < total; mask++) {
-        List&lt;Integer&gt; curr = <span class="kw">new</span> ArrayList&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j < n; j++) {
-            <span class="kw">if</span> ((mask & (<span class="num">1</span> << j)) != <span class="num">0</span>) {
-                curr.add(nums[j]);
-            }
-        }
-        res.add(curr);
-    }
-    <span class="ret">return</span> res;
-}</pre>
+                    <pre><span class="pc-kw">function</span> subsets(nums):
+    result ← empty list
+    n ← length(nums)
+
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2ⁿ - 1:             <span class="pc-cm">// each mask is one subset</span>
+        current ← empty list
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+            <span class="pc-kw">if</span> (mask AND (1 &lt;&lt; j)) ≠ 0:
+                current.append(nums[j])
+        result.append(current)
+    <span class="pc-kw">return</span> result</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2734,21 +2709,20 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Missing Number</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">missingNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> res = nums.length;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < nums.length; i++) {
-        res ^= i;
-        res ^= nums[i];
-    }
-    <span class="ret">return</span> res;
-}</pre>
+                    <pre><span class="pc-kw">function</span> missingNumber(nums):
+    result ← length(nums)
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        result ← result XOR i          <span class="pc-cm">// every index 0..n</span>
+        result ← result XOR nums[i]    <span class="pc-cm">// every value present</span>
+    <span class="pc-kw">return</span> result                      <span class="pc-cm">// everything paired off except the missing one</span></pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2830,18 +2804,18 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Power of Two</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public boolean</span> <span class="fn">isPowerOfTwo</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= <span class="num">0</span>) <span class="ret">return false</span>;
-    <span class="cm">// A power of 2 has exactly one '1' bit</span>
-    <span class="ret">return</span> (n & (n - <span class="num">1</span>)) == <span class="num">0</span>;
-}</pre>
+                    <pre><span class="pc-kw">function</span> isPowerOfTwo(n):
+    <span class="pc-kw">if</span> n ≤ 0: <span class="pc-kw">return</span> false
+    <span class="pc-cm">// a power of 2 has exactly one 1-bit, and n-1 flips it and everything below</span>
+    <span class="pc-kw">return</span> (n AND (n - 1)) = 0</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -2929,20 +2903,20 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Counting Bits</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span>[] <span class="fn">countBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span>[] ans = <span class="kw">new int</span>[n + <span class="num">1</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i <= n; i++) {
-        ans[i] = ans[i >> <span class="num">1</span>] + (i & <span class="num">1</span>); 
-    }
-    <span class="ret">return</span> ans;
-}</pre>
+                    <pre><span class="pc-kw">function</span> countBits(n):
+    ans ← array of 0, size n + 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-cm">// i without its last bit (i &gt;&gt; 1) is already solved</span>
+        ans[i] ← ans[i &gt;&gt; 1] + (i AND 1)
+    <span class="pc-kw">return</span> ans</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -3022,21 +2996,22 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Reverse Bits</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">reverseBits</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> result = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">32</span>; i++) {
-        <span class="kw">int</span> bit = (n >> i) & <span class="num">1</span>;
-        result = result | (bit << (<span class="num">31</span> - i));
-    }
-    <span class="ret">return</span> result;
-}</pre>
+                    <pre><span class="pc-kw">function</span> reverseBits(n):
+    result ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 31:
+        bit ← (n &gt;&gt; i) AND 1                  <span class="pc-cm">// read bit i</span>
+        result ← result OR (bit &lt;&lt; (31 - i))  <span class="pc-cm">// write it to the mirrored position</span>
+    <span class="pc-kw">return</span> result
+<span class="pc-cm">// Treat n as an UNSIGNED 32-bit value — in languages with signed ints,</span>
+<span class="pc-cm">// use a logical (not arithmetic) right shift.</span></pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -3123,19 +3098,19 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Find the Difference</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public char</span> <span class="fn">findTheDifference</span>(String s, String t) {
-    <span class="kw">char</span> ans = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">char</span> c : s.toCharArray()) ans ^= c;
-    <span class="kw">for</span> (<span class="kw">char</span> c : t.toCharArray()) ans ^= c;
-    <span class="ret">return</span> ans;
-}</pre>
+                    <pre><span class="pc-kw">function</span> findTheDifference(s, t):
+    ans ← 0
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> s: ans ← ans XOR c
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> t: ans ← ans XOR c     <span class="pc-cm">// every shared letter cancels</span>
+    <span class="pc-kw">return</span> ans                      <span class="pc-cm">// the extra letter in t</span></pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">
@@ -3221,26 +3196,25 @@ result <span class="pc-kw">&larr;</span> 0
                   <span class="toggle-arrow">▶</span>Full solution
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Single Number II</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">public int</span> <span class="fn">singleNumber</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> ans = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">32</span>; i++) {
-        <span class="kw">int</span> sum = <span class="num">0</span>;
-        <span class="kw">for</span> (<span class="kw">int</span> num : nums) {
-            <span class="kw">if</span> (((num >> i) & <span class="num">1</span>) == <span class="num">1</span>) sum++;
-        }
-        <span class="kw">if</span> (sum % <span class="num">3</span> != <span class="num">0</span>) {
-            ans = ans | (<span class="num">1</span> << i);
-        }
-    }
-    <span class="ret">return</span> ans;
-}</pre>
+                    <pre><span class="pc-cm">// Every number appears 3 times except one. Count each bit position:</span>
+<span class="pc-cm">// if a bit's total isn't a multiple of 3, the single number has that bit.</span>
+<span class="pc-kw">function</span> singleNumber(nums):
+    ans ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 31:
+        count ← 0
+        <span class="pc-kw">for</span> num <span class="pc-kw">in</span> nums:
+            <span class="pc-kw">if</span> ((num &gt;&gt; i) AND 1) = 1: count ← count + 1
+        <span class="pc-kw">if</span> count mod 3 ≠ 0:
+            ans ← ans OR (1 &lt;&lt; i)
+    <span class="pc-kw">return</span> ans</pre>
                   </div>
                   <div class="complexity-row">
                     <div class="cx-badge green">

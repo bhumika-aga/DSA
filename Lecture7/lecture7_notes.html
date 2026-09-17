@@ -1377,6 +1377,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1617,22 +1628,22 @@
             check divisors up to &radic;n.
           </div>
         </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; isPrime O(&radic;n)
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; isPrime O(√n)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">boolean</span> <span class="fn">isPrime</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt; 2) <span class="ret">return false</span>;
-    <span class="kw">if</span> (n == 2) <span class="ret">return true</span>;
-    <span class="kw">if</span> (n % 2 == 0) <span class="ret">return false</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 3; i * i &lt;= n; i += 2)  <span class="cm">// only odd divisors</span>
-        <span class="kw">if</span> (n % i == 0) <span class="ret">return false</span>;
-    <span class="ret">return true</span>;
-}
-<span class="cm">// isPrime(25): i=3(9&le;25,25%3=1) i=5(25&le;25,25%5=0) &rarr; false ✓ (25=5&times;5)</span></pre>
+          <pre><span class="pc-kw">function</span> isPrime(n):
+    <span class="pc-kw">if</span> n &lt; 2: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> n = 2: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> n <span class="pc-kw">is even</span>: <span class="pc-kw">return</span> false
+    i ← 3
+    <span class="pc-kw">while</span> i × i ≤ n:                  <span class="pc-cm">// a factor above √n pairs with one below it</span>
+        <span class="pc-kw">if</span> n mod i = 0: <span class="pc-kw">return</span> false
+        i ← i + 2                     <span class="pc-cm">// only odd divisors</span>
+    <span class="pc-kw">return</span> true
+<span class="pc-cm">// isPrime(25): i=3 (9 ≤ 25, 25 mod 3 = 1), i=5 (25 ≤ 25, 25 mod 5 = 0) → false ✓</span></pre>
         </div>
         <div class="complexity-row">
           <div class="cx-badge time">Time O(&radic;n)</div>
@@ -1665,21 +1676,6 @@ isPrime[0] <span class="pc-kw">&larr;</span> isPrime[1] <span class="pc-kw">&lar
 
 <span class="pc-kw">return</span> every p with isPrime[p] = true</pre>
         </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">&#9749; Java &middot; Sieve</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">boolean</span>[] <span class="fn">sieve</span>(<span class="kw">int</span> n) {
-    <span class="kw">boolean</span>[] comp = <span class="kw">new boolean</span>[n+1]; <span class="cm">// false=prime</span>
-    comp[0] = comp[1] = <span class="kw">true</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; (<span class="kw">long</span>)i*i &lt;= n; i++)
-        <span class="kw">if</span> (!comp[i])
-            <span class="kw">for</span> (<span class="kw">int</span> j = i*i; j &lt;= n; j += i) <span class="cm">// start at i&sup2;</span>
-                comp[j] = <span class="kw">true</span>;
-    <span class="ret">return</span> comp; <span class="cm">// comp[i]=false &rarr; prime</span>
-}</pre>
-        </div>
         <div class="ascii-tree">
           Sieve(10): step by step Start: 2 3 4 5 6 7 8 9 10 i=2: mark
           <span class="nd">4,6,8,10</span> &rarr; left: 2 3 5 7 9 i=3: mark
@@ -1710,22 +1706,28 @@ isPrime[0] <span class="pc-kw">&larr;</span> isPrime[1] <span class="pc-kw">&lar
             first to prevent overflow
           </div>
         </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">&#9749; Java &middot; GCD &amp; LCM</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; GCD &amp; LCM</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> <span class="fn">gcd</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="ret">return</span> b == 0 ? a : <span class="fn">gcd</span>(b, a%b); }
+          <pre><span class="pc-kw">function</span> gcd(a, b):
+    <span class="pc-kw">if</span> b = 0: <span class="pc-kw">return</span> a
+    <span class="pc-kw">return</span> gcd(b, a mod b)
 
-<span class="kw">int</span> <span class="fn">gcdIter</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="cm">// iterative (avoids stack overflow)</span>
-    <span class="kw">while</span> (b != 0) { <span class="kw">int</span> t = b; b = a%b; a = t; }
-    <span class="ret">return</span> a;
-}
+<span class="pc-kw">function</span> gcdIterative(a, b):          <span class="pc-cm">// same thing without recursion depth</span>
+    <span class="pc-kw">while</span> b ≠ 0:
+        t ← b
+        b ← a mod b
+        a ← t
+    <span class="pc-kw">return</span> a
 
-<span class="kw">long</span> <span class="fn">lcm</span>(<span class="kw">long</span> a, <span class="kw">long</span> b) { <span class="ret">return</span> (a / <span class="fn">gcd</span>((<span class="kw">int</span>)a, (<span class="kw">int</span>)b)) * b; }
+<span class="pc-kw">function</span> lcm(a, b):
+    <span class="pc-kw">return</span> (a ÷ gcd(a, b)) × b        <span class="pc-cm">// divide first to avoid overflow</span>
 
-<span class="cm">// gcd(48,18): &rarr;gcd(18,12) &rarr;gcd(12,6) &rarr;gcd(6,0) = 6 ✓
-// lcm(4,6) = (4/2)*6 = 12 ✓</span></pre>
+<span class="pc-cm">// gcd(48, 18) → gcd(18, 12) → gcd(12, 6) → gcd(6, 0) = 6 ✓</span>
+<span class="pc-cm">// lcm(4, 6) = (4 ÷ 2) × 6 = 12 ✓</span></pre>
         </div>
         <div class="complexity-row">
           <div class="cx-badge time">Time O(log min(a,b))</div>
@@ -1779,28 +1781,13 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
 
 <span class="pc-kw">return</span> result
 
-<span class="pc-cm">// Watch the overflow: base*base needs a 64-bit type when m is large.</span></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Binary Exponentiation
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">long</span> <span class="fn">fastPow</span>(<span class="kw">long</span> base, <span class="kw">long</span> exp, <span class="kw">long</span> mod) {
-    <span class="kw">long</span> result = 1;
-    base %= mod;
-    <span class="kw">while</span> (exp &gt; 0) {
-        <span class="kw">if</span> ((exp &amp; 1) == 1) result = result * base % mod; <span class="cm">// odd exp: accumulate</span>
-        base = base * base % mod;  <span class="cm">// square the base</span>
-        exp &gt;&gt;= 1;                 <span class="cm">// exp = exp/2</span>
-    }
-    <span class="ret">return</span> result;
-}
-<span class="cm">// fastPow(2,10,1000):
-// exp=1010&sub2;: base=2,4,16,256
-// Bits set at positions 1,3 &rarr; result = 4&times;256=1024 &rarr; 1024%1000=24 ✓</span></pre>
+<span class="pc-cm">// Watch the overflow: base*base needs a 64-bit type when m is large.</span>
+
+<span class="pc-cm">// Dry run: fastPow(2, 10, 1000) — 10 = 1010 in binary</span>
+<span class="pc-cm">//   bit 0 = 0: skip           base → 4</span>
+<span class="pc-cm">//   bit 1 = 1: result = 4     base → 16</span>
+<span class="pc-cm">//   bit 2 = 0: skip           base → 256</span>
+<span class="pc-cm">//   bit 3 = 1: result = 4 × 256 = 1024 mod 1000 = 24 ✓</span></pre>
         </div>
         <div class="complexity-row">
           <div class="cx-badge time">Time O(log n)</div>
@@ -1811,22 +1798,24 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
         <h2 class="h1" id="prime-factor">
           &#129518; Prime Factorization &mdash; O(&radic;n)
         </h2>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">
-              &#9749; Java &middot; Prime Factorization
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Prime Factorization</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; <span class="fn">primeFactors</span>(<span class="kw">int</span> n) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>,<span class="cls">Integer</span>&gt; f = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; (<span class="kw">long</span>)i*i &lt;= n; i++)
-        <span class="kw">while</span> (n % i == 0) { f.merge(i,1,<span class="cls">Integer</span>::sum); n /= i; }
-    <span class="kw">if</span> (n &gt; 1) f.put(n, 1);
-    <span class="ret">return</span> f;
-}
-<span class="cm">// 360 = 2&sup3;&times;3&sup2;&times;5 &rarr; {{2:3, 3:2, 5:1}}
-// Divisor count = (3+1)(2+1)(1+1) = 24 divisors</span></pre>
+          <pre><span class="pc-kw">function</span> primeFactors(n):
+    factors ← empty map                 <span class="pc-cm">// prime → exponent</span>
+    i ← 2
+    <span class="pc-kw">while</span> i × i ≤ n:
+        <span class="pc-kw">while</span> n mod i = 0:
+            factors[i] ← factors[i] + 1 <span class="pc-cm">// default 0</span>
+            n ← n ÷ i
+        i ← i + 1
+    <span class="pc-kw">if</span> n &gt; 1: factors[n] ← 1            <span class="pc-cm">// whatever remains is itself prime</span>
+    <span class="pc-kw">return</span> factors
+<span class="pc-cm">// 360 = 2³ × 3² × 5 → {2: 3, 3: 2, 5: 1}</span>
+<span class="pc-cm">// Number of divisors = (3+1)(2+1)(1+1) = 24</span></pre>
         </div>
 
         <hr />
@@ -1843,21 +1832,20 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
             the smaller side to minimize computation
           </div>
         </div>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">&#9749; Java &middot; Pascal's Triangle</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Pascal's Triangle</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">long</span>[][] <span class="fn">pascalTriangle</span>(<span class="kw">int</span> n) {
-    <span class="kw">long</span>[][] C = <span class="kw">new long</span>[n+1][n+1];
-    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt;= n; i++) {
-        C[i][0] = 1;
-        <span class="kw">for</span> (<span class="kw">int</span> j = 1; j &lt;= i; j++)
-            C[i][j] = C[i-1][j-1] + C[i-1][j]; <span class="cm">// Pascal's Rule</span>
-    }
-    <span class="ret">return</span> C;
-}
-<span class="cm">// C[4][2] = C(4,2) = 6 ways to choose 2 from 4 ✓</span></pre>
+          <pre><span class="pc-kw">function</span> pascalTriangle(n):
+    C ← (n+1) × (n+1) grid of 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n:
+        C[i][0] ← 1
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> i:
+            C[i][j] ← C[i-1][j-1] + C[i-1][j]   <span class="pc-cm">// Pascal's rule</span>
+    <span class="pc-kw">return</span> C
+<span class="pc-cm">// C[4][2] = C(4, 2) = 6 ways to choose 2 from 4 ✓</span></pre>
         </div>
         <div class="ascii-tree">
           Pascal's Triangle: Row 0: <span class="hl">1</span> Row 1:
@@ -1955,27 +1943,31 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Sieve O(n log log n)
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sieve O(n log log n)</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">countPrimes</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt;= 2) <span class="ret">return</span> 0;
-    <span class="kw">boolean</span>[] comp = <span class="kw">new boolean</span>[n]; <span class="cm">// comp[i]=true means composite</span>
-    comp[0] = comp[1] = <span class="kw">true</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; (<span class="kw">long</span>)i*i &lt; n; i++)
-        <span class="kw">if</span> (!comp[i])
-            <span class="kw">for</span> (<span class="kw">int</span> j = i*i; j &lt; n; j += i) comp[j] = <span class="kw">true</span>;
-    <span class="kw">int</span> cnt = 0;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; i &lt; n; i++) <span class="kw">if</span> (!comp[i]) cnt++;
-    <span class="ret">return</span> cnt;
-}
-<span class="cm">// n=10: mark 4,6,8,9,10 &rarr; primes left: 2,3,5,7 &rarr; count=4 &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> countPrimes(n):           <span class="pc-cm">// primes strictly below n</span>
+    <span class="pc-kw">if</span> n ≤ 2: <span class="pc-kw">return</span> 0
+    composite ← array of false, size n
+    composite[0] ← true;  composite[1] ← true
+
+    i ← 2
+    <span class="pc-kw">while</span> i × i &lt; n:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> composite[i]:
+            <span class="pc-kw">for</span> j <span class="pc-kw">from</span> i × i <span class="pc-kw">to</span> n - 1 <span class="pc-kw">step</span> i:
+                composite[j] ← true
+        i ← i + 1
+
+    count ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> composite[i]: count ← count + 1
+    <span class="pc-kw">return</span> count
+<span class="pc-cm">// n = 10: mark 4, 6, 8, 9 → primes left 2, 3, 5, 7 → 4 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2068,21 +2060,21 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">&#9749; Java</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; GCD of Array</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">findGCD</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> min = nums[0], max = nums[0];
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) { min = Math.min(min,x); max = Math.max(max,x); }
-    <span class="ret">return</span> <span class="fn">gcd</span>(min, max);
-}
-<span class="kw">int</span> <span class="fn">gcd</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="ret">return</span> b == 0 ? a : <span class="fn">gcd</span>(b, a%b); }
-<span class="cm">// [2,5,6,9,10]: min=2,max=10 &rarr; gcd(2,10)=gcd(10,2%10?)
-// gcd(2,10): gcd(10,2) &rarr; gcd(2,0) = 2 &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> findGCD(nums):
+    <span class="pc-kw">return</span> gcd(minimum of nums, maximum of nums)
+
+<span class="pc-kw">function</span> gcd(a, b):
+    <span class="pc-kw">if</span> b = 0: <span class="pc-kw">return</span> a
+    <span class="pc-kw">return</span> gcd(b, a mod b)
+<span class="pc-cm">// [2, 5, 6, 9, 10]: min 2, max 10 → gcd(2, 10) → gcd(10, 2) → gcd(2, 0) = 2 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2180,31 +2172,30 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Binary Exponentiation
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Binary Exponentiation</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">double</span> <span class="fn">myPow</span>(<span class="kw">double</span> x, <span class="kw">int</span> n) {
-    <span class="kw">long</span> N = n;                      <span class="cm">// use long: n=-2^31 would overflow on negation</span>
-    <span class="kw">if</span> (N &lt; 0) { x = 1.0 / x; N = -N; }
-    <span class="kw">double</span> res = 1;
-    <span class="kw">while</span> (N &gt; 0) {
-        <span class="kw">if</span> ((N &amp; 1) == 1) res *= x; <span class="cm">// odd exponent: take one x</span>
-        x *= x;                       <span class="cm">// square the base</span>
-        N &gt;&gt;= 1;                      <span class="cm">// halve the exponent</span>
-    }
-    <span class="ret">return</span> res;
-}
-<span class="cm">// myPow(2,10): N=1010&sub2;
-// N=10(even): x=4, N=5
-// N=5(odd):  res=4, x=16, N=2
-// N=2(even): x=256, N=1
-// N=1(odd):  res=4&times;256=1024 &rarr; 1024.0 &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> myPow(x, n):
+    N ← n                              <span class="pc-cm">// widen first: negating the smallest int overflows</span>
+    <span class="pc-kw">if</span> N &lt; 0:
+        x ← 1 / x
+        N ← -N
+    result ← 1
+    <span class="pc-kw">while</span> N &gt; 0:
+        <span class="pc-kw">if</span> N <span class="pc-kw">is odd</span>: result ← result × x   <span class="pc-cm">// take one x</span>
+        x ← x × x                          <span class="pc-cm">// square the base</span>
+        N ← N ÷ 2                          <span class="pc-cm">// halve the exponent</span>
+    <span class="pc-kw">return</span> result
+<span class="pc-cm">// myPow(2, 10):</span>
+<span class="pc-cm">//   N=10 (even): x=4,    N=5</span>
+<span class="pc-cm">//   N=5  (odd):  res=4,  x=16,  N=2</span>
+<span class="pc-cm">//   N=2  (even): x=256,  N=1</span>
+<span class="pc-cm">//   N=1  (odd):  res=4 × 256 = 1024 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2304,29 +2295,29 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; HashSet approach
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; HashSet approach</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">boolean</span> <span class="fn">isHappy</span>(<span class="kw">int</span> n) {
-    <span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
-    <span class="kw">while</span> (n != 1 &amp;&amp; !seen.contains(n)) {
-        seen.add(n);
-        n = <span class="fn">sumOfSquares</span>(n);
-    }
-    <span class="ret">return</span> n == 1;
-}
-<span class="kw">int</span> <span class="fn">sumOfSquares</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span> s = 0;
-    <span class="kw">while</span> (n &gt; 0) { <span class="kw">int</span> d = n%10; s += d*d; n /= 10; }
-    <span class="ret">return</span> s;
-}
-<span class="cm">// isHappy(19): 82&rarr;68&rarr;100&rarr;1 &rarr; true &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> isHappy(n):
+    seen ← empty set
+    <span class="pc-kw">while</span> n ≠ 1 <span class="pc-kw">and</span> n <span class="pc-kw">not</span> <span class="pc-kw">in</span> seen:     <span class="pc-cm">// a repeat means we're in a loop</span>
+        add n <span class="pc-kw">to</span> seen
+        n ← sumOfSquares(n)
+    <span class="pc-kw">return</span> n = 1
+
+<span class="pc-kw">function</span> sumOfSquares(n):
+    s ← 0
+    <span class="pc-kw">while</span> n &gt; 0:
+        d ← n mod 10
+        s ← s + d × d
+        n ← n ÷ 10
+    <span class="pc-kw">return</span> s
+<span class="pc-cm">// isHappy(19): 82 → 68 → 100 → 1 → true ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2424,24 +2415,26 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; O(min(m,n)) Combinatorics
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; O(min(m,n))
+                      Combinatorics</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">uniquePaths</span>(<span class="kw">int</span> m, <span class="kw">int</span> n) {
-    <span class="kw">long</span> result = 1;
-    <span class="kw">int</span> r = m-1, total = m+n-2;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; r; i++)
-        result = result * (total - i) / (i + 1); <span class="cm">// compute C(total,r) incrementally</span>
-    <span class="ret">return</span> (<span class="kw">int</span>) result;
-}
-<span class="cm">// m=3,n=7: C(8,2) = 8*7/2 = 28 &#10003;
-// m=3,n=2: C(3,2) = 3 &#10003;</span></pre>
+                  <pre><span class="pc-cm">// Every path is (m-1) downs and (n-1) rights in some order → C(m+n-2, m-1)</span>
+<span class="pc-kw">function</span> uniquePaths(m, n):
+    result ← 1
+    r ← m - 1
+    total ← m + n - 2
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> r - 1:
+        result ← result × (total - i) ÷ (i + 1)   <span class="pc-cm">// build C(total, r) one factor at a time</span>
+    <span class="pc-kw">return</span> result
+<span class="pc-cm">// Multiply before dividing — each partial product is an exact binomial, so ÷ is exact.</span>
+<span class="pc-cm">// m=3, n=7: C(8, 2) = 8 × 7 ÷ 2 = 28 ✓</span>
+<span class="pc-cm">// m=3, n=2: C(3, 2) = 3 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2537,23 +2530,22 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">&#9749; Java</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Pascal's Triangle Row</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; <span class="fn">getRow</span>(<span class="kw">int</span> n) {
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; row = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(); row.add(1);
-    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++) {
-        <span class="kw">for</span> (<span class="kw">int</span> j = i-1; j &gt;= 1; j--)   <span class="cm">// RIGHT TO LEFT</span>
-            row.set(j, row.get(j-1) + row.get(j));
-        row.add(1);
-    }
-    <span class="ret">return</span> row;
-}
-<span class="cm">// n=3: [1] &rarr; [1,1] &rarr; [1,2,1] &rarr; [1,3,3,1] &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> getRow(n):
+    row ← [1]
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> i-1 <span class="pc-kw">down to</span> 1:           <span class="pc-cm">// RIGHT TO LEFT, so row[j-1] is still old</span>
+            row[j] ← row[j-1] + row[j]
+        row.append(1)
+    <span class="pc-kw">return</span> row
+<span class="pc-cm">// n = 3: [1] → [1,1] → [1,2,1] → [1,3,3,1] ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2649,24 +2641,24 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">&#9749; Java</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Excel Sheet Column
+                      Title</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">String</span> <span class="fn">convertToTitle</span>(<span class="kw">int</span> n) {
-    <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
-    <span class="kw">while</span> (n &gt; 0) {
-        n--;                                         <span class="cm">// shift to 0-indexed</span>
-        sb.insert(0, (<span class="kw">char</span>)('A' + n % 26)); <span class="cm">// get current letter</span>
-        n /= 26;
-    }
-    <span class="ret">return</span> sb.toString();
-}
-<span class="cm">// n=28: n=27, 27%26=1='B', n=1; n=0, 0%26=0='A', n=0 &rarr; "AB" &#10003;
-// n=701: n=700, 700%26=24='Y', n=26; n=25, 25%26=25='Z', n=0 &rarr; "ZY" &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> convertToTitle(n):
+    title ← ""
+    <span class="pc-kw">while</span> n &gt; 0:
+        n ← n - 1                              <span class="pc-cm">// A is 1, not 0 — shift to 0-indexed</span>
+        title ← letter('A' + n mod 26) + title <span class="pc-cm">// prepend the current letter</span>
+        n ← n ÷ 26
+    <span class="pc-kw">return</span> title
+<span class="pc-cm">// n = 28:  n=27, 27 mod 26 = 1 → 'B', n=1;  n=0, 0 → 'A'  → "AB" ✓</span>
+<span class="pc-cm">// n = 701: n=700, 700 mod 26 = 24 → 'Y', n=26;  n=25, 25 → 'Z' → "ZY" ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2768,29 +2760,30 @@ base <span class="pc-kw">&larr;</span> base <span class="pc-kw">mod</span> m
                 <span class="toggle-arrow">&#9654;</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Three Pointer DP
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Three Pointer DP</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">nthUglyNumber</span>(<span class="kw">int</span> n) {
-    <span class="kw">int</span>[] ugly = <span class="kw">new int</span>[n]; ugly[0] = 1;
-    <span class="kw">int</span> i2=0, i3=0, i5=0;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt; n; i++) {
-        <span class="kw">int</span> next2 = ugly[i2]*2, next3 = ugly[i3]*3, next5 = ugly[i5]*5;
-        <span class="kw">int</span> next = Math.min(next2, Math.min(next3, next5));
-        ugly[i] = next;
-        <span class="kw">if</span> (next == next2) i2++; <span class="cm">// advance whichever pointer(s) produced minimum</span>
-        <span class="kw">if</span> (next == next3) i3++;
-        <span class="kw">if</span> (next == next5) i5++;
-    }
-    <span class="ret">return</span> ugly[n-1];
-}
-<span class="cm">// Sequence: 1,2,3,4,5,6,8,9,10,12 &rarr; ugly[9]=12 &#10003;</span></pre>
+                  <pre><span class="pc-kw">function</span> nthUglyNumber(n):
+    ugly ← array of size n
+    ugly[0] ← 1
+    i2 ← 0;  i3 ← 0;  i5 ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
+        next2 ← ugly[i2] × 2
+        next3 ← ugly[i3] × 3
+        next5 ← ugly[i5] × 5
+        next ← min(next2, next3, next5)
+        ugly[i] ← next
+        <span class="pc-cm">// advance EVERY pointer that produced the minimum — this skips duplicates</span>
+        <span class="pc-kw">if</span> next = next2: i2 ← i2 + 1
+        <span class="pc-kw">if</span> next = next3: i3 ← i3 + 1
+        <span class="pc-kw">if</span> next = next5: i5 ← i5 + 1
+    <span class="pc-kw">return</span> ugly[n-1]
+<span class="pc-cm">// Sequence: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 → ugly[9] = 12 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">

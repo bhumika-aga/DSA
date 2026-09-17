@@ -1,10 +1,8 @@
 # 🧮 Assignment 14 — Matrix Problems
 
-> **Lecture:** Topic 14 — Matrix Problems
+> **Lecture:** 14 of 38 — Matrix Problems
 > **Phase:** 2 — Core Data Structures
-> **Topic Count:** 14 of 30
-> **Estimated Time:** 4 Days
-> **Total Problems:** 24 (5 Easy · 14 Medium · 5 Hard)
+> **Estimated Time:** 4 days · **Total Problems:** 24 (5 Easy · 14 Medium · 5 Hard)
 > **Goal:** Master the 4 matrix patterns (Boundary Traversal, In-Place State Machine, Grid DFS/BFS, 2D Binary Search) and apply them to the most frequently asked FAANG matrix problems.
 
 ---

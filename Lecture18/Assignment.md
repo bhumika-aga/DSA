@@ -1,8 +1,8 @@
 # 🎯 Assignment 18 — Two Pointers & Sliding Window
 
-> **Lecture:** 18 — Two Pointers & Sliding Window
-> **Phase:** 3 — Core Patterns · **Lecture:** 18 of 38
-> **Estimated Time:** 6 Days · **Total Problems:** 30 (10 Easy · 15 Medium · 5 Hard)
+> **Lecture:** 18 of 38 — Two Pointers & Sliding Window
+> **Phase:** 3 — Core Patterns
+> **Estimated Time:** 6 days · **Total Problems:** 30 (10 Easy · 15 Medium · 5 Hard)
 > **Goal:** Stop choosing an algorithm and start recognising a shape. Every problem below is one of five.
 
 ---

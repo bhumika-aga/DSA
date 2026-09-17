@@ -1,9 +1,8 @@
 # 📝 Assignment 04 — Java 8+ Modern Features
 
-> **Topic:** Java 8+ Modern Features (Phase 1 — Foundations)
-> **Topic Count:** 4 of 30 — Phase 1 Foundations
-> **Duration:** 3 Days
-> **Core Problems:** 25 (10 Easy · 10 Medium · 5 Hard) + 8 Challenge + 6 Complexity Exercises
+> **Lecture:** 4 of 38 — Java 8+ Modern Features
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 3 days · **Total Problems:** 25 (10 Easy · 10 Medium · 5 Hard)
 > **Goal:** Leverage the power of Lambdas, Streams, and Optional to write cleaner, more declarative, and FAANG-ready
 > Java code.
 

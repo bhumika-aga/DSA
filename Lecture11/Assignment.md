@@ -1,9 +1,8 @@
 # 🔗 Assignment 11 — Linked Lists
 
-> **Lecture:** Topic 11 — Linked Lists Foundations
-> **Topic Count:** 11 of 30 — Phase 2 Core Data Structures
-> **Duration:** 6 Days
-> **Core Problems:** 28 (10 Easy · 13 Medium · 5 Hard)
+> **Lecture:** 11 of 38 — Linked Lists
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 6 days · **Total Problems:** 28 (10 Easy · 13 Medium · 5 Hard)
 > **Goal:** Master pointer rerouting, Fast & Slow pointer paradigms, and complex cache design invariants (LRU/LFU).
 
 ---

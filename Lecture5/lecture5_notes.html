@@ -1374,6 +1374,17 @@
           text-align: center;
         }
       }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
     </style>
   </head>
 
@@ -1623,41 +1634,40 @@
           </table>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Recursion Skeleton</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Template: every recursive function follows this skeleton</span>
-<span class="kw">returnType</span> <span class="fn">solve</span>(<span class="kw">params</span>) {
+          <pre><span class="pc-cm">// Every recursive function follows this shape</span>
+<span class="pc-kw">function</span> solve(problem):
 
-    <span class="cm">// ① BASE CASE — stop condition</span>
-    <span class="kw">if</span> (simplest problem) {
-        <span class="ret">return</span> known_answer;
-    }
+    <span class="pc-cm">// ① BASE CASE — the smallest problem you can answer directly</span>
+    <span class="pc-kw">if</span> problem is simplest:
+        <span class="pc-kw">return</span> knownAnswer
 
-    <span class="cm">// ② RECURSIVE CASE — shrink &amp; trust</span>
-    smaller = shrink(params);           <span class="cm">// make problem smaller</span>
-    subResult = <span class="fn">solve</span>(smaller);       <span class="cm">// TRUST this works ✓</span>
-    <span class="ret">return</span> combine(subResult, current); <span class="cm">// build answer from sub-result</span>
-}</pre>
+    <span class="pc-cm">// ② RECURSIVE CASE — shrink the problem and trust the call</span>
+    smaller ← shrink(problem)         <span class="pc-cm">// make the problem smaller</span>
+    subResult ← solve(smaller)        <span class="pc-cm">// TRUST this works ✓</span>
+    <span class="pc-kw">return</span> combine(subResult, current) <span class="pc-cm">// build the answer from it</span></pre>
         </div>
 
         <h3 class="h3">Concrete Example: Factorial</h3>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Factorial</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">int</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
-    <span class="cm">// BASE CASE: 0! = 1  (we know this cold)</span>
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 1;
+          <pre><span class="pc-kw">function</span> factorial(n):
+    <span class="pc-cm">// BASE CASE: 0! = 1  (we know this cold)</span>
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 1
 
-    <span class="cm">// TRUST: factorial(n-1) gives (n-1)! correctly</span>
-    <span class="cm">// INDUCT: n! = n × (n-1)!</span>
-    <span class="ret">return</span> n * <span class="fn">factorial</span>(n - 1);
-}</pre>
+    <span class="pc-cm">// TRUST: factorial(n-1) gives (n-1)! correctly</span>
+    <span class="pc-cm">// INDUCT: n! = n × (n-1)!</span>
+    <span class="pc-kw">return</span> n × factorial(n - 1)</pre>
         </div>
 
         <div class="ascii-tree">
@@ -1834,22 +1844,21 @@
           recursion tree is a straight line (depth = n).
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Linear Recursion</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Linear Recursion</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Sum of array: sum(arr, n) = arr[n-1] + sum(arr, n-1)</span>
-<span class="kw">int</span> <span class="fn">arraySum</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 0;                    <span class="cm">// base case</span>
-    <span class="ret">return</span> arr[n-1] + <span class="fn">arraySum</span>(arr, n-1);   <span class="cm">// linear: ONE call</span>
-}
+          <pre><span class="pc-cm">// Sum of array: sum(a, n) = a[n-1] + sum(a, n-1)</span>
+<span class="pc-kw">function</span> arraySum(a, n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 0                     <span class="pc-cm">// base case</span>
+    <span class="pc-kw">return</span> a[n-1] + arraySum(a, n-1)       <span class="pc-cm">// linear: ONE call per frame</span>
 
-<span class="cm">// String reversal: reverse(s) = last char + reverse(s without last)</span>
-<span class="cls">String</span> <span class="fn">reverse</span>(<span class="cls">String</span> s) {
-    <span class="kw">if</span> (s.length() <= 1) <span class="ret">return</span> s;
-    <span class="ret">return</span> <span class="fn">reverse</span>(s.substring(1)) + s.charAt(0);
-}</pre>
+<span class="pc-cm">// String reversal: reverse(s) = reverse(s without first char) + first char</span>
+<span class="pc-kw">function</span> reverse(s):
+    <span class="pc-kw">if</span> length(s) ≤ 1: <span class="pc-kw">return</span> s
+    <span class="pc-kw">return</span> reverse(s[1 ..]) + s[0]</pre>
         </div>
 
         <h3 class="h2" id="tail-rec">
@@ -1862,23 +1871,22 @@
           default, but the pattern is worth knowing.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Tail Recursion</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Tail Recursion</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// NOT tail recursive: multiply happens AFTER the call</span>
-<span class="kw">int</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 1;
-    <span class="ret">return</span> n * <span class="fn">factorial</span>(n-1);  <span class="cm">// multiply happens after return!</span>
-}
+          <pre><span class="pc-cm">// NOT tail recursive: the multiply happens AFTER the call returns</span>
+<span class="pc-kw">function</span> factorial(n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 1
+    <span class="pc-kw">return</span> n × factorial(n-1)
 
-<span class="cm">// Tail recursive: accumulator carries the result</span>
-<span class="kw">int</span> <span class="fn">factTail</span>(<span class="kw">int</span> n, <span class="kw">int</span> acc) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> acc;              <span class="cm">// acc has the full answer</span>
-    <span class="ret">return</span> <span class="fn">factTail</span>(n-1, n * acc);      <span class="cm">// call IS the last operation</span>
-}
-<span class="cm">// Call: factTail(5, 1)</span></pre>
+<span class="pc-cm">// Tail recursive: an accumulator carries the result down</span>
+<span class="pc-kw">function</span> factTail(n, acc):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> acc                   <span class="pc-cm">// acc already holds the answer</span>
+    <span class="pc-kw">return</span> factTail(n-1, n × acc)          <span class="pc-cm">// the call IS the last operation</span>
+<span class="pc-cm">// Call: factTail(5, 1)</span></pre>
         </div>
 
         <h3 class="h2" id="tree-rec">
@@ -1890,18 +1898,18 @@
           implementations.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Tree Recursion</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Tree Recursion</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Fibonacci: TWO recursive calls → tree recursion</span>
-<span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= 1) <span class="ret">return</span> n;                 <span class="cm">// base cases: fib(0)=0, fib(1)=1</span>
-    <span class="ret">return</span> <span class="fn">fib</span>(n-1) + <span class="fn">fib</span>(n-2);         <span class="cm">// TWO calls → branching!</span>
-}
-<span class="cm">// Time: O(2ⁿ) — exponential! Same subproblems recomputed.</span>
-<span class="cm">// Fix: Memoization (DP Lecture) brings it to O(n).</span></pre>
+          <pre><span class="pc-cm">// Fibonacci: TWO recursive calls per frame → tree recursion</span>
+<span class="pc-kw">function</span> fib(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n                     <span class="pc-cm">// base cases: fib(0)=0, fib(1)=1</span>
+    <span class="pc-kw">return</span> fib(n-1) + fib(n-2)             <span class="pc-cm">// TWO calls → branching!</span>
+<span class="pc-cm">// Time: O(2ⁿ) — the same subproblems are recomputed.</span>
+<span class="pc-cm">// Fix: memoization brings it to O(n).</span></pre>
         </div>
 
         <div class="ascii-tree">
@@ -1919,21 +1927,20 @@
         <h3 class="h2" id="mutual-rec">
           4. Mutual Recursion — Functions calling each other
         </h3>
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Mutual Recursion</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Mutual Recursion</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// is n even? → if n==0: yes. else ask: is (n-1) odd?</span>
-<span class="kw">boolean</span> <span class="fn">isEven</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return true</span>;
-    <span class="ret">return</span> <span class="fn">isOdd</span>(n - 1);   <span class="cm">// delegates to isOdd!</span>
-}
+          <pre><span class="pc-cm">// is n even? → if n = 0: yes. Otherwise ask: is n-1 odd?</span>
+<span class="pc-kw">function</span> isEven(n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> true
+    <span class="pc-kw">return</span> isOdd(n - 1)        <span class="pc-cm">// delegates to isOdd</span>
 
-<span class="kw">boolean</span> <span class="fn">isOdd</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return false</span>;
-    <span class="ret">return</span> <span class="fn">isEven</span>(n - 1);  <span class="cm">// delegates back to isEven!</span>
-}</pre>
+<span class="pc-kw">function</span> isOdd(n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> isEven(n - 1)       <span class="pc-cm">// delegates back to isEven</span></pre>
         </div>
 
         <hr />
@@ -1953,36 +1960,33 @@
           </div>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Memoization Pattern</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Memoization Pattern</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Without memoization: O(2ⁿ) — recomputes fib(2), fib(3) many times</span>
-<span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt;= 1) <span class="ret">return</span> n;
-    <span class="ret">return</span> <span class="fn">fib</span>(n-1) + <span class="fn">fib</span>(n-2);   <span class="cm">// O(2ⁿ) — exponential</span>
-}
+          <pre><span class="pc-cm">// Without memoization: O(2ⁿ) — fib(2), fib(3) recomputed many times</span>
+<span class="pc-kw">function</span> fib(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n
+    <span class="pc-kw">return</span> fib(n-1) + fib(n-2)
 
-<span class="cm">// WITH memoization: O(n) — each n solved exactly once</span>
-<span class="kw">int</span>[] memo = <span class="kw">new int</span>[n+1];  <span class="cm">// -1 = not computed yet</span>
-<span class="cls">Arrays</span>.fill(memo, -1);
+<span class="pc-cm">// WITH memoization: O(n) — each n is solved exactly once</span>
+memo ← array of size n+1, all set <span class="pc-kw">to</span> UNKNOWN
 
-<span class="kw">int</span> <span class="fn">fibMemo</span>(<span class="kw">int</span> n, <span class="kw">int</span>[] memo) {
-    <span class="kw">if</span> (n &lt;= 1) <span class="ret">return</span> n;
-    <span class="kw">if</span> (memo[n] != -1) <span class="ret">return</span> memo[n]; <span class="cm">// ✔ CACHE HIT — skip recomputation</span>
-    memo[n] = <span class="fn">fibMemo</span>(n-1, memo) + <span class="fn">fibMemo</span>(n-2, memo);
-    <span class="ret">return</span> memo[n];                      <span class="cm">// store before returning</span>
-}
+<span class="pc-kw">function</span> fibMemo(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n
+    <span class="pc-kw">if</span> memo[n] ≠ UNKNOWN: <span class="pc-kw">return</span> memo[n]    <span class="pc-cm">// ✔ cache hit — skip the work</span>
+    memo[n] ← fibMemo(n-1) + fibMemo(n-2)
+    <span class="pc-kw">return</span> memo[n]                          <span class="pc-cm">// store before returning</span>
 
-<span class="cm">// For non-integer keys, use HashMap:</span>
-<span class="cls">Map</span>&lt;<span class="cls">String</span>,<span class="cls">Integer</span>&gt; cache = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-<span class="kw">int</span> <span class="fn">solve</span>(<span class="cls">String</span> state) {
-    <span class="kw">if</span> (cache.containsKey(state)) <span class="ret">return</span> cache.get(state);
-    <span class="cm">// ... compute result ...</span>
-    cache.put(state, result);
-    <span class="ret">return</span> result;
-}</pre>
+<span class="pc-cm">// When the state isn't a small integer, key the cache by the state itself:</span>
+cache ← empty map
+<span class="pc-kw">function</span> solve(state):
+    <span class="pc-kw">if</span> state <span class="pc-kw">in</span> cache: <span class="pc-kw">return</span> cache[state]
+    result ← … compute <span class="pc-kw">from</span> smaller states …
+    cache[state] ← result
+    <span class="pc-kw">return</span> result</pre>
         </div>
 
         <div class="table-wrap">
@@ -2039,27 +2043,27 @@
           accumulated state as the answer.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Parameterized</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Parameterized</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Print 1 to N using recursion (no return value — side effects)</span>
-<span class="kw">void</span> <span class="fn">print1toN</span>(<span class="kw">int</span> i, <span class="kw">int</span> n) {
-    <span class="kw">if</span> (i > n) <span class="ret">return</span>;      <span class="cm">// base case: done</span>
-    System.out.println(i);  <span class="cm">// print BEFORE call → 1,2,3,...,n</span>
-    <span class="fn">print1toN</span>(i + 1, n);    <span class="cm">// carry state: i increases each call</span>
-}
-<span class="cm">// Call: print1toN(1, n)</span>
+          <pre><span class="pc-cm">// Print 1 to n (no return value — the work is a side effect)</span>
+<span class="pc-kw">function</span> print1toN(i, n):
+    <span class="pc-kw">if</span> i &gt; n: <span class="pc-kw">return</span>          <span class="pc-cm">// base case: done</span>
+    print(i)                  <span class="pc-cm">// print BEFORE the call → 1, 2, 3, …, n</span>
+    print1toN(i + 1, n)       <span class="pc-cm">// carry state: i grows each call</span>
+<span class="pc-cm">// Call: print1toN(1, n)</span>
 
-<span class="cm">// Print N to 1 — just move print AFTER call!</span>
-<span class="kw">void</span> <span class="fn">printNto1</span>(<span class="kw">int</span> i, <span class="kw">int</span> n) {
-    <span class="kw">if</span> (i > n) <span class="ret">return</span>;
-    <span class="fn">printNto1</span>(i + 1, n);    <span class="cm">// go to base first</span>
-    System.out.println(i);  <span class="cm">// print on the WAY BACK → n,n-1,...,1</span>
-}
-<span class="cm">// KEY INSIGHT: Code BEFORE recursive call = top-down (going in)
-//              Code AFTER recursive call  = bottom-up (coming back)</span></pre>
+<span class="pc-cm">// Print n to 1 — just move the print AFTER the call</span>
+<span class="pc-kw">function</span> printNto1(i, n):
+    <span class="pc-kw">if</span> i &gt; n: <span class="pc-kw">return</span>
+    printNto1(i + 1, n)       <span class="pc-cm">// go all the way down first</span>
+    print(i)                  <span class="pc-cm">// print on the WAY BACK → n, n-1, …, 1</span>
+
+<span class="pc-cm">// KEY INSIGHT: work BEFORE the call happens going in (top-down)</span>
+<span class="pc-cm">//              work AFTER  the call happens coming back (bottom-up)</span></pre>
         </div>
 
         <div class="callout orange">
@@ -2084,28 +2088,26 @@
           sub-answers. Classic mathematical recursion style.
         </p>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Functional</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Functional</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// Power function: x^n</span>
-<span class="kw">double</span> <span class="fn">power</span>(<span class="kw">double</span> x, <span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 1;                       <span class="cm">// x^0 = 1</span>
-    <span class="kw">if</span> (n < 0)  <span class="ret">return</span> <span class="fn">power</span>(1/x, -n);          <span class="cm">// handle negatives</span>
-    <span class="cm">// Naive: O(n) — multiply x n times</span>
-    <span class="ret">return</span> x * <span class="fn">power</span>(x, n-1);                   <span class="cm">// O(n) time</span>
-}
+          <pre><span class="pc-cm">// Power: xⁿ</span>
+<span class="pc-kw">function</span> power(x, n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 1                       <span class="pc-cm">// x⁰ = 1</span>
+    <span class="pc-kw">if</span> n &lt; 0: <span class="pc-kw">return</span> power(1/x, -n)          <span class="pc-cm">// handle negative exponents</span>
+    <span class="pc-kw">return</span> x × power(x, n-1)                 <span class="pc-cm">// naive: O(n)</span>
 
-<span class="cm">// Optimized: Fast Power (Binary Exponentiation) — O(log n)</span>
-<span class="kw">double</span> <span class="fn">fastPower</span>(<span class="kw">double</span> x, <span class="kw">long</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 1;
-    <span class="kw">if</span> (n < 0)  <span class="ret">return</span> <span class="fn">fastPower</span>(1/x, -n);
-    <span class="kw">double</span> half = <span class="fn">fastPower</span>(x, n/2);            <span class="cm">// compute HALF, not n-1!</span>
-    <span class="kw">if</span> (n % 2 == 0) <span class="ret">return</span> half * half;          <span class="cm">// even: x^n = (x^(n/2))²</span>
-    <span class="kw">else</span>            <span class="ret">return</span> x * half * half;       <span class="cm">// odd:  x^n = x*(x^(n/2))²</span>
-}
-<span class="cm">// fastPower(2, 10): 10→5→2→1→0  (only 4 levels deep vs 10)</span></pre>
+<span class="pc-cm">// Fast power (binary exponentiation) — O(log n)</span>
+<span class="pc-kw">function</span> fastPower(x, n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 1
+    <span class="pc-kw">if</span> n &lt; 0: <span class="pc-kw">return</span> fastPower(1/x, -n)
+    half ← fastPower(x, n ÷ 2)               <span class="pc-cm">// solve HALF, not n-1</span>
+    <span class="pc-kw">if</span> n <span class="pc-kw">is even</span>: <span class="pc-kw">return</span> half × half         <span class="pc-cm">// xⁿ = (x^(n/2))²</span>
+    <span class="pc-kw">else</span>:         <span class="pc-kw">return</span> x × half × half     <span class="pc-cm">// xⁿ = x · (x^(n/2))²</span>
+<span class="pc-cm">// fastPower(2, 10): 10 → 5 → 2 → 1 → 0  (4 levels deep instead of 10)</span></pre>
         </div>
 
         <h3 class="h2" id="p-subset">
@@ -2123,28 +2125,28 @@
           </p>
         </div>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Subsets / Power Set</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Subsets / Power Set</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">void</span> <span class="fn">subsets</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> idx, <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; current, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; result) {
-    <span class="cm">// BASE CASE: processed all elements → add current subset to result</span>
-    <span class="kw">if</span> (idx == arr.length) {
-        result.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(current)); <span class="cm">// ⚠️ add a COPY, not reference!</span>
-        <span class="ret">return</span>;
-    }
+          <pre><span class="pc-kw">function</span> subsets(a, idx, current, result):
+    <span class="pc-cm">// BASE CASE: every element decided → record this subset</span>
+    <span class="pc-kw">if</span> idx = length(a):
+        result.append(copy of current)       <span class="pc-cm">// ⚠️ a COPY, not the list itself</span>
+        <span class="pc-kw">return</span>
 
-    <span class="cm">// CHOICE 1: INCLUDE arr[idx]</span>
-    current.add(arr[idx]);
-    <span class="fn">subsets</span>(arr, idx + 1, current, result);
+    <span class="pc-cm">// CHOICE 1: INCLUDE a[idx]</span>
+    current.append(a[idx])
+    subsets(a, idx + 1, current, result)
 
-    <span class="cm">// CHOICE 2: EXCLUDE arr[idx] (backtrack — undo the add)</span>
-    current.remove(current.size() - 1);   <span class="cm">// ← THIS IS BACKTRACKING</span>
-    <span class="fn">subsets</span>(arr, idx + 1, current, result);
-}
-<span class="cm">// For arr=[1,2,3]: generates [], [3], [2], [2,3], [1], [1,3], [1,2], [1,2,3]
-// Total 2³ = 8 subsets. Time: O(2ⁿ × n), Space: O(n) call stack</span></pre>
+    <span class="pc-cm">// CHOICE 2: EXCLUDE a[idx] — undo the append first</span>
+    current.removeLast()                     <span class="pc-cm">// ← THIS is backtracking</span>
+    subsets(a, idx + 1, current, result)
+
+<span class="pc-cm">// a = [1,2,3] → [1,2,3], [1,2], [1,3], [1], [2,3], [2], [3], []</span>
+<span class="pc-cm">// 2³ = 8 subsets. Time O(2ⁿ × n), space O(n) for the call stack</span></pre>
         </div>
 
         <div class="ascii-tree">
@@ -2160,34 +2162,32 @@
           Pattern 4 — Permutations (arrange all elements)
         </h3>
 
-        <div class="code-block">
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Permutations</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Permutations</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="kw">void</span> <span class="fn">permutations</span>(<span class="cls">String</span> s, <span class="cls">String</span> chosen, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; result) {
-    <span class="kw">if</span> (s.isEmpty()) {
-        result.add(chosen); <span class="cm">// base case: all chars placed</span>
-        <span class="ret">return</span>;
-    }
-    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; s.length(); i++) {
-        <span class="kw">char</span> c = s.charAt(i);
-        <span class="cm">// pick character c, remove from remaining s</span>
-        <span class="fn">permutations</span>(s.substring(0,i) + s.substring(i+1), chosen + c, result);
-    }
-}
-<span class="cm">// "ABC" → 3! = 6 permutations: ABC, ACB, BAC, BCA, CAB, CBA
-// Time: O(n!), Space: O(n) — n! is the dominant cost for generating</span>
+          <pre><span class="pc-kw">function</span> permutations(remaining, chosen, result):
+    <span class="pc-kw">if</span> remaining <span class="pc-kw">is empty</span>:
+        result.append(chosen)                <span class="pc-cm">// base case: every char placed</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(remaining) - 1:
+        c ← remaining[i]
+        <span class="pc-cm">// pick c, then permute what is left</span>
+        permutations(remaining without index i, chosen + c, result)
+<span class="pc-cm">// "ABC" → 3! = 6: ABC, ACB, BAC, BCA, CAB, CBA</span>
+<span class="pc-cm">// Time O(n!), space O(n)</span>
 
-<span class="cm">// ─── Efficient version using swap (in-place, avoids String concat) ───</span>
-<span class="kw">void</span> <span class="fn">permuteSwap</span>(<span class="kw">char</span>[] arr, <span class="kw">int</span> start, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; res) {
-    <span class="kw">if</span> (start == arr.length) { res.add(<span class="kw">new</span> <span class="cls">String</span>(arr)); <span class="ret">return</span>; }
-    <span class="kw">for</span> (<span class="kw">int</span> i = start; i &lt; arr.length; i++) {
-        <span class="fn">swap</span>(arr, start, i);           <span class="cm">// place arr[i] at position start</span>
-        <span class="fn">permuteSwap</span>(arr, start+1, res); <span class="cm">// fix start, permute rest</span>
-        <span class="fn">swap</span>(arr, start, i);           <span class="cm">// BACKTRACK: restore</span>
-    }
-}</pre>
+<span class="pc-cm">// ─── In-place version: swap instead of building new strings ───</span>
+<span class="pc-kw">function</span> permuteSwap(a, start, result):
+    <span class="pc-kw">if</span> start = length(a):
+        result.append(copy of a)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> start <span class="pc-kw">to</span> length(a) - 1:
+        swap(a, start, i)                    <span class="pc-cm">// put a[i] at position start</span>
+        permuteSwap(a, start + 1, result)    <span class="pc-cm">// fix it, permute the rest</span>
+        swap(a, start, i)                    <span class="pc-cm">// BACKTRACK: restore order</span></pre>
         </div>
 
         <hr />
@@ -2267,38 +2267,6 @@
 <span class="pc-cm">// Copy the state when you record it. Recording a reference means</span>
 <span class="pc-cm">// every answer you collect ends up empty once undo() has run.</span></pre>
         </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">
-              ☕ Java · Universal Backtracking Template
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">void</span> <span class="fn">backtrack</span>(<span class="kw">int</span> idx, <span class="cls">List</span>&lt;T&gt; current, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;T&gt;&gt; result, <span class="kw">int</span>[] input) {
-
-    <span class="cm">// ① Is the current state a valid complete solution?</span>
-    <span class="kw">if</span> (isSolution(idx, current)) {
-        result.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(current)); <span class="cm">// ✓ collect it</span>
-        <span class="ret">return</span>;
-    }
-
-    <span class="cm">// ② Try all choices at this decision point</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = idx; i &lt; input.length; i++) {
-
-        <span class="cm">// ③ PRUNE: skip impossible choices early</span>
-        <span class="kw">if</span> (!isValid(input[i], current)) <span class="kw">continue</span>;
-
-        <span class="cm">// ④ MAKE the choice</span>
-        current.add(input[i]);
-
-        <span class="cm">// ⑤ EXPLORE deeper with this choice</span>
-        <span class="fn">backtrack</span>(i + 1, current, result, input);
-
-        <span class="cm">// ⑥ UNDO the choice (backtrack)</span>
-        current.remove(current.size() - 1);
-    }
-}</pre>
-        </div>
 
         <h3 class="h2" id="bt-pruning">Pruning — The Key to Efficiency</h3>
         <p>
@@ -2358,39 +2326,37 @@
               other. A queen attacks any piece in the same row, column, or
               diagonal.
             </p>
-            <div class="code-block">
+            <div class="code-block pseudo">
               <div class="code-header">
-                <div class="code-lang">☕ Java · N-Queens</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <span class="code-lang"
+                  >&#128208; Pseudocode &middot; N-Queens</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
-              <pre><span class="kw">void</span> <span class="fn">nQueens</span>(<span class="kw">int</span> row, <span class="kw">int</span> n, <span class="kw">char</span>[][] board, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; result) {
-    <span class="kw">if</span> (row == n) {
-        result.add(<span class="fn">buildBoard</span>(board)); <span class="cm">// all rows filled ✓</span>
-        <span class="ret">return</span>;
-    }
-    <span class="kw">for</span> (<span class="kw">int</span> col = 0; col &lt; n; col++) {
-        <span class="kw">if</span> (<span class="fn">isSafe</span>(row, col, board, n)) { <span class="cm">// PRUNE: is this cell safe?</span>
-            board[row][col] = <span class="str">'Q'</span>;         <span class="cm">// PLACE queen</span>
-            <span class="fn">nQueens</span>(row + 1, n, board, result); <span class="cm">// explore next row</span>
-            board[row][col] = <span class="str">'.'</span>;         <span class="cm">// REMOVE queen (backtrack)</span>
-        }
-    }
-}
+              <pre><span class="pc-kw">function</span> nQueens(row, n, board, result):
+    <span class="pc-kw">if</span> row = n:
+        result.append(copy of board)         <span class="pc-cm">// every row has a queen ✓</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> col <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> isSafe(row, col, board, n):       <span class="pc-cm">// PRUNE unsafe cells</span>
+            board[row][col] ← 'Q'            <span class="pc-cm">// place</span>
+            nQueens(row + 1, n, board, result)
+            board[row][col] ← '.'            <span class="pc-cm">// remove (backtrack)</span>
 
-<span class="kw">boolean</span> <span class="fn">isSafe</span>(<span class="kw">int</span> row, <span class="kw">int</span> col, <span class="kw">char</span>[][] board, <span class="kw">int</span> n) {
-    <span class="cm">// Check column above</span>
-    <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; row; r++)
-        <span class="kw">if</span> (board[r][col] == <span class="str">'Q'</span>) <span class="ret">return false</span>;
-    <span class="cm">// Check upper-left diagonal</span>
-    <span class="kw">for</span> (<span class="kw">int</span> r = row-1, c = col-1; r >= 0 && c >= 0; r--, c--)
-        <span class="kw">if</span> (board[r][c] == <span class="str">'Q'</span>) <span class="ret">return false</span>;
-    <span class="cm">// Check upper-right diagonal</span>
-    <span class="kw">for</span> (<span class="kw">int</span> r = row-1, c = col+1; r >= 0 && c &lt; n; r--, c++)
-        <span class="kw">if</span> (board[r][c] == <span class="str">'Q'</span>) <span class="ret">return false</span>;
-    <span class="ret">return true</span>;
-}
-<span class="cm">// Time: O(N!) worst case, but pruning makes it much faster in practice
-// 4-Queens: 2 solutions | 8-Queens: 92 solutions</span></pre>
+<span class="pc-cm">// Queens are placed top-down, so only rows ABOVE need checking.</span>
+<span class="pc-kw">function</span> isSafe(row, col, board, n):
+    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> row - 1:                              <span class="pc-cm">// column above</span>
+        <span class="pc-kw">if</span> board[r][col] = 'Q': <span class="pc-kw">return</span> false
+    r ← row - 1;  c ← col - 1
+    <span class="pc-kw">while</span> r ≥ 0 <span class="pc-kw">and</span> c ≥ 0:                                <span class="pc-cm">// upper-left diagonal</span>
+        <span class="pc-kw">if</span> board[r][c] = 'Q': <span class="pc-kw">return</span> false
+        r ← r - 1;  c ← c - 1
+    r ← row - 1;  c ← col + 1
+    <span class="pc-kw">while</span> r ≥ 0 <span class="pc-kw">and</span> c &lt; n:                                <span class="pc-cm">// upper-right diagonal</span>
+        <span class="pc-kw">if</span> board[r][c] = 'Q': <span class="pc-kw">return</span> false
+        r ← r - 1;  c ← c + 1
+    <span class="pc-kw">return</span> true
+<span class="pc-cm">// Time O(n!) worst case — pruning makes it far faster in practice</span>
+<span class="pc-cm">// 4-Queens: 2 solutions | 8-Queens: 92 solutions</span></pre>
             </div>
             <div class="callout green">
               <span class="callout-icon">✅</span>
@@ -2411,38 +2377,32 @@
             <span>📖 Deep Dive: Sudoku Solver</span>
           </summary>
           <div class="details-body">
-            <div class="code-block">
+            <div class="code-block pseudo">
               <div class="code-header">
-                <div class="code-lang">☕ Java · Sudoku Solver</div>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <span class="code-lang"
+                  >&#128208; Pseudocode &middot; Sudoku Solver</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
-              <pre><span class="kw">boolean</span> <span class="fn">solveSudoku</span>(<span class="kw">char</span>[][] board) {
-    <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; 9; r++) {
-        <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; 9; c++) {
-            <span class="kw">if</span> (board[r][c] != <span class="str">'.'</span>) <span class="kw">continue</span>; <span class="cm">// skip filled cells</span>
-            <span class="kw">for</span> (<span class="kw">char</span> d = <span class="str">'1'</span>; d &lt;= <span class="str">'9'</span>; d++) {
-                <span class="kw">if</span> (<span class="fn">isValid</span>(board, r, c, d)) {
-                    board[r][c] = d;               <span class="cm">// PLACE digit</span>
-                    <span class="kw">if</span> (<span class="fn">solveSudoku</span>(board)) <span class="ret">return true</span>; <span class="cm">// solved!</span>
-                    board[r][c] = <span class="str">'.'</span>;            <span class="cm">// BACKTRACK</span>
-                }
-            }
-            <span class="ret">return false</span>; <span class="cm">// no digit worked → propagate failure</span>
-        }
-    }
-    <span class="ret">return true</span>; <span class="cm">// all cells filled → solved!</span>
-}
+              <pre><span class="pc-kw">function</span> solveSudoku(board):
+    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+            <span class="pc-kw">if</span> board[r][c] ≠ '.': <span class="pc-kw">continue</span>                <span class="pc-cm">// skip filled cells</span>
+            <span class="pc-kw">for</span> d <span class="pc-kw">from</span> '1' <span class="pc-kw">to</span> '9':
+                <span class="pc-kw">if</span> isValid(board, r, c, d):
+                    board[r][c] ← d                         <span class="pc-cm">// place</span>
+                    <span class="pc-kw">if</span> solveSudoku(board): <span class="pc-kw">return</span> true      <span class="pc-cm">// solved!</span>
+                    board[r][c] ← '.'                       <span class="pc-cm">// backtrack</span>
+            <span class="pc-kw">return</span> false        <span class="pc-cm">// no digit fits here → report failure upward</span>
+    <span class="pc-kw">return</span> true                 <span class="pc-cm">// no empty cell left → solved</span>
 
-<span class="kw">boolean</span> <span class="fn">isValid</span>(<span class="kw">char</span>[][] board, <span class="kw">int</span> row, <span class="kw">int</span> col, <span class="kw">char</span> d) {
-    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 9; i++) {
-        <span class="kw">if</span> (board[row][i] == d) <span class="ret">return false</span>;       <span class="cm">// row check</span>
-        <span class="kw">if</span> (board[i][col] == d) <span class="ret">return false</span>;       <span class="cm">// col check</span>
-        <span class="cm">// 3×3 box check: map to box start corner</span>
-        <span class="kw">int</span> br = 3*(row/3) + i/3, bc = 3*(col/3) + i%3;
-        <span class="kw">if</span> (board[br][bc] == d) <span class="ret">return false</span>;
-    }
-    <span class="ret">return true</span>;
-}</pre>
+<span class="pc-kw">function</span> isValid(board, row, col, d):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+        <span class="pc-kw">if</span> board[row][i] = d: <span class="pc-kw">return</span> false                  <span class="pc-cm">// row</span>
+        <span class="pc-kw">if</span> board[i][col] = d: <span class="pc-kw">return</span> false                  <span class="pc-cm">// column</span>
+        br ← 3 × (row ÷ 3) + i ÷ 3                          <span class="pc-cm">// walk the 3×3 box</span>
+        bc ← 3 × (col ÷ 3) + i mod 3
+        <span class="pc-kw">if</span> board[br][bc] = d: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> true</pre>
             </div>
           </div>
         </details>
@@ -2618,24 +2578,24 @@
                 <span class="toggle-arrow">▶</span> Solution + Dry Run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sum of Digits</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">digitSum</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n == 0) <span class="ret">return</span> 0;          <span class="cm">// base case</span>
-    <span class="ret">return</span> (n % 10) + <span class="fn">digitSum</span>(n / 10); <span class="cm">// last digit + rest</span>
-}
+                  <pre><span class="pc-kw">function</span> digitSum(n):
+    <span class="pc-kw">if</span> n = 0: <span class="pc-kw">return</span> 0                       <span class="pc-cm">// base case</span>
+    <span class="pc-kw">return</span> (n mod 10) + digitSum(n ÷ 10)     <span class="pc-cm">// last digit + the rest</span>
 
-<span class="cm">// Dry run: digitSum(1234)
-// = 4 + digitSum(123)
-//   = 4 + 3 + digitSum(12)
-//     = 4 + 3 + 2 + digitSum(1)
-//       = 4 + 3 + 2 + 1 + digitSum(0)
-//         = 4+3+2+1+0 = 10 ✓</span></pre>
+<span class="pc-cm">// Dry run: digitSum(1234)</span>
+<span class="pc-cm">// = 4 + digitSum(123)</span>
+<span class="pc-cm">//   = 4 + 3 + digitSum(12)</span>
+<span class="pc-cm">//     = 4 + 3 + 2 + digitSum(1)</span>
+<span class="pc-cm">//       = 4 + 3 + 2 + 1 + digitSum(0)</span>
+<span class="pc-cm">//         = 10 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2729,59 +2689,55 @@
                   Approaches
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">
-                        ☕ Java · Approach 1: Naive Recursion
-                      </div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Approach 1: Naive
+                        Recursion</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= 1) <span class="ret">return</span> n;
-    <span class="ret">return</span> <span class="fn">fib</span>(n-1) + <span class="fn">fib</span>(n-2); <span class="cm">// O(2ⁿ) — recomputes same values!</span>
-}</pre>
+                    <pre><span class="pc-kw">function</span> fib(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n
+    <span class="pc-kw">return</span> fib(n-1) + fib(n-2)     <span class="pc-cm">// O(2ⁿ) — recomputes the same values</span></pre>
                   </div>
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">
-                        ☕ Java · Approach 2: Memoization (Top-Down DP)
-                      </div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Approach 2: Memoization
+                        (Top-Down DP)</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">int</span>[] memo = <span class="kw">new int</span>[101];
-<span class="cls">Arrays</span>.fill(memo, -1);
+                    <pre>memo ← array of size n+1, all set <span class="pc-kw">to</span> UNKNOWN
 
-<span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= 1) <span class="ret">return</span> n;
-    <span class="kw">if</span> (memo[n] != -1) <span class="ret">return</span> memo[n]; <span class="cm">// already computed!</span>
-    memo[n] = <span class="fn">fib</span>(n-1) + <span class="fn">fib</span>(n-2);
-    <span class="ret">return</span> memo[n];
-}
-<span class="cm">// Time: O(n) — each subproblem solved once
-// Space: O(n) — memo array + O(n) call stack</span></pre>
+<span class="pc-kw">function</span> fib(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n
+    <span class="pc-kw">if</span> memo[n] ≠ UNKNOWN: <span class="pc-kw">return</span> memo[n]    <span class="pc-cm">// already computed</span>
+    memo[n] ← fib(n-1) + fib(n-2)
+    <span class="pc-kw">return</span> memo[n]
+<span class="pc-cm">// Time O(n) — each subproblem solved once</span>
+<span class="pc-cm">// Space O(n) — the memo plus the call stack</span></pre>
                   </div>
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">
-                        ☕ Java · Approach 3: Iterative (O(1) space)
-                      </div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Approach 3: Iterative
+                        (O(1) space)</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n <= 1) <span class="ret">return</span> n;
-    <span class="kw">int</span> a = 0, b = 1;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; i <= n; i++) {
-        <span class="kw">int</span> c = a + b; a = b; b = c; <span class="cm">// slide the window forward</span>
-    }
-    <span class="ret">return</span> b;
-}
-<span class="cm">// Time: O(n), Space: O(1) — best solution!</span></pre>
+                    <pre><span class="pc-kw">function</span> fib(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> n
+    a ← 0;  b ← 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
+        c ← a + b
+        a ← b;  b ← c          <span class="pc-cm">// slide the two-value window forward</span>
+    <span class="pc-kw">return</span> b
+<span class="pc-cm">// Time O(n), space O(1) — the best version</span></pre>
                   </div>
                   <div class="callout yellow">
                     <span class="callout-icon">🎓</span>
@@ -2873,30 +2829,27 @@
                   <span class="toggle-arrow">▶</span> Solution + Decision Tree
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">☕ Java · Include/Exclude</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Include/Exclude</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">subsets</span>(<span class="kw">int</span>[] nums) {
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; result = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="fn">backtrack</span>(nums, 0, <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(), result);
-    <span class="ret">return</span> result;
-}
+                    <pre><span class="pc-kw">function</span> subsets(nums):
+    result ← empty list
+    backtrack(nums, 0, empty list, result)
+    <span class="pc-kw">return</span> result
 
-<span class="kw">void</span> <span class="fn">backtrack</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> idx, <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; cur,
-               <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; res) {
-    res.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(cur));    <span class="cm">// add current subset ALWAYS</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = idx; i &lt; nums.length; i++) {
-        cur.add(nums[i]);              <span class="cm">// INCLUDE nums[i]</span>
-        <span class="fn">backtrack</span>(nums, i+1, cur, res); <span class="cm">// explore with it</span>
-        cur.remove(cur.size()-1);      <span class="cm">// BACKTRACK (exclude)</span>
-    }
-}
-<span class="cm">// Time: O(2ⁿ × n) — 2ⁿ subsets, each takes O(n) to copy
-// Space: O(n) — max recursion depth n</span></pre>
+<span class="pc-kw">function</span> backtrack(nums, idx, cur, result):
+    result.append(copy of cur)           <span class="pc-cm">// every partial choice is a subset</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> idx <span class="pc-kw">to</span> length(nums) - 1:
+        cur.append(nums[i])              <span class="pc-cm">// include nums[i]</span>
+        backtrack(nums, i + 1, cur, result)
+        cur.removeLast()                 <span class="pc-cm">// backtrack (exclude it)</span>
+<span class="pc-cm">// Time O(2ⁿ × n) — 2ⁿ subsets, each copied in O(n)</span>
+<span class="pc-cm">// Space O(n) — maximum recursion depth</span></pre>
                   </div>
                   <div class="ascii-tree">
                     start=[], idx=0 → ADD [] ├── include 1: [1], idx=1 → ADD [1]
@@ -2987,35 +2940,31 @@
                   Explanation
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">
-                        ☕ Java · Backtracking + Pruning
-                      </div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Backtracking +
+                        Pruning</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">combinationSum</span>(<span class="kw">int</span>[] candidates, <span class="kw">int</span> target) {
-    <span class="cls">Arrays</span>.sort(candidates); <span class="cm">// ← enables early termination!</span>
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; res = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="fn">backtrack</span>(candidates, 0, target, <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(), res);
-    <span class="ret">return</span> res;
-}
+                    <pre><span class="pc-kw">function</span> combinationSum(candidates, target):
+    sort(candidates)                     <span class="pc-cm">// ← makes early termination possible</span>
+    result ← empty list
+    backtrack(candidates, 0, target, empty list, result)
+    <span class="pc-kw">return</span> result
 
-<span class="kw">void</span> <span class="fn">backtrack</span>(<span class="kw">int</span>[] cands, <span class="kw">int</span> start, <span class="kw">int</span> remaining,
-               <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; cur, <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; res) {
-    <span class="kw">if</span> (remaining == 0) { res.add(<span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(cur)); <span class="ret">return</span>; }
-
-    <span class="kw">for</span> (<span class="kw">int</span> i = start; i &lt; cands.length; i++) {
-        <span class="cm">// PRUNING: sorted array → if cands[i] > remaining, all later are too</span>
-        <span class="kw">if</span> (cands[i] > remaining) <span class="kw">break</span>; <span class="cm">// ← prune entire branch!</span>
-
-        cur.add(cands[i]);
-        <span class="fn">backtrack</span>(cands, i, remaining - cands[i], cur, res); <span class="cm">// i not i+1 (reuse!)</span>
-        cur.remove(cur.size()-1); <span class="cm">// backtrack</span>
-    }
-}</pre>
+<span class="pc-kw">function</span> backtrack(cands, start, remaining, cur, result):
+    <span class="pc-kw">if</span> remaining = 0:
+        result.append(copy of cur)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> start <span class="pc-kw">to</span> length(cands) - 1:
+        <span class="pc-cm">// sorted → once one candidate is too big, every later one is too</span>
+        <span class="pc-kw">if</span> cands[i] &gt; remaining: <span class="pc-kw">break</span>               <span class="pc-cm">// ← prune the whole branch</span>
+        cur.append(cands[i])
+        backtrack(cands, i, remaining - cands[i], cur, result)   <span class="pc-cm">// i, not i+1: reuse allowed</span>
+        cur.removeLast()</pre>
                   </div>
                   <div class="callout green">
                     <span class="callout-icon">🔑</span>
@@ -3109,43 +3058,39 @@
                   Explanation
                 </summary>
                 <div class="details-body">
-                  <div class="code-block">
+                  <div class="code-block pseudo">
                     <div class="code-header">
-                      <div class="code-lang">
-                        ☕ Java · Grid DFS Backtracking
-                      </div>
-                      <button class="copy-btn" onclick="copyCode(this)">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Grid DFS
+                        Backtracking</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
                         Copy
                       </button>
                     </div>
-                    <pre><span class="kw">boolean</span> <span class="fn">exist</span>(<span class="kw">char</span>[][] board, <span class="cls">String</span> word) {
-    <span class="kw">int</span> m = board.length, n = board[0].length;
-    <span class="kw">for</span> (<span class="kw">int</span> r = 0; r &lt; m; r++)
-        <span class="kw">for</span> (<span class="kw">int</span> c = 0; c &lt; n; c++)
-            <span class="kw">if</span> (<span class="fn">dfs</span>(board, word, r, c, 0)) <span class="ret">return true</span>; <span class="cm">// try every start</span>
-    <span class="ret">return false</span>;
-}
+                    <pre><span class="pc-kw">function</span> exist(board, word):
+    <span class="pc-kw">for each</span> cell (r, c) <span class="pc-kw">in</span> board:
+        <span class="pc-kw">if</span> dfs(board, word, r, c, 0): <span class="pc-kw">return</span> true    <span class="pc-cm">// try every start</span>
+    <span class="pc-kw">return</span> false
 
-<span class="kw">boolean</span> <span class="fn">dfs</span>(<span class="kw">char</span>[][] board, <span class="cls">String</span> word, <span class="kw">int</span> r, <span class="kw">int</span> c, <span class="kw">int</span> idx) {
-    <span class="kw">if</span> (idx == word.length()) <span class="ret">return true</span>;  <span class="cm">// all chars matched!</span>
+<span class="pc-kw">function</span> dfs(board, word, r, c, idx):
+    <span class="pc-kw">if</span> idx = length(word): <span class="pc-kw">return</span> true               <span class="pc-cm">// every char matched</span>
 
-    <span class="cm">// PRUNE: out of bounds or wrong character or already visited</span>
-    <span class="kw">if</span> (r &lt; 0 || r >= board.length || c &lt; 0 || c >= board[0].length
-        || board[r][c] != word.charAt(idx)) <span class="ret">return false</span>;
+    <span class="pc-cm">// PRUNE: off the grid, wrong letter, or already on the path</span>
+    <span class="pc-kw">if</span> r <span class="pc-kw">or</span> c is outside the grid <span class="pc-kw">or</span> board[r][c] ≠ word[idx]:
+        <span class="pc-kw">return</span> false
 
-    <span class="kw">char</span> temp = board[r][c];
-    board[r][c] = <span class="str">'#'</span>;  <span class="cm">// MARK visited (in-place, no extra visited array!)</span>
+    saved ← board[r][c]
+    board[r][c] ← '#'                <span class="pc-cm">// mark visited in place — no visited array</span>
 
-    <span class="kw">boolean</span> found = <span class="fn">dfs</span>(board,word,r+1,c,idx+1) <span class="cm">// down</span>
-                 || <span class="fn">dfs</span>(board,word,r-1,c,idx+1) <span class="cm">// up</span>
-                 || <span class="fn">dfs</span>(board,word,r,c+1,idx+1) <span class="cm">// right</span>
-                 || <span class="fn">dfs</span>(board,word,r,c-1,idx+1); <span class="cm">// left</span>
+    found ← dfs(board, word, r+1, c, idx+1)      <span class="pc-cm">// down</span>
+         <span class="pc-kw">or</span> dfs(board, word, r-1, c, idx+1)      <span class="pc-cm">// up</span>
+         <span class="pc-kw">or</span> dfs(board, word, r, c+1, idx+1)      <span class="pc-cm">// right</span>
+         <span class="pc-kw">or</span> dfs(board, word, r, c-1, idx+1)      <span class="pc-cm">// left</span>
 
-    board[r][c] = temp;  <span class="cm">// BACKTRACK: restore cell</span>
-    <span class="ret">return</span> found;
-}
-<span class="cm">// Time: O(m×n × 4^L) where L = word length
-// Space: O(L) — recursion depth = word length</span></pre>
+    board[r][c] ← saved              <span class="pc-cm">// BACKTRACK: restore the cell</span>
+    <span class="pc-kw">return</span> found
+<span class="pc-cm">// Time O(m × n × 4^L) where L = word length</span>
+<span class="pc-cm">// Space O(L) — recursion depth</span></pre>
                   </div>
                   <div class="callout orange">
                     <span class="callout-icon">🔑</span>
@@ -3250,45 +3195,42 @@
                 with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · 3 Approaches</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; 3 Approaches</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cm">// Approach 1: Naive Recursion — O(2ⁿ) ❌ TLE for large n</span>
-<span class="kw">int</span> <span class="fn">climbStairs_naive</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="ret">return 1</span>;
-    <span class="ret">return</span> climbStairs_naive(n - <span class="num">1</span>) + climbStairs_naive(n - <span class="num">2</span>);
-}
+                  <pre><span class="pc-cm">// Approach 1: naive recursion — O(2ⁿ), times out for large n</span>
+<span class="pc-kw">function</span> climbNaive(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> 1
+    <span class="pc-kw">return</span> climbNaive(n - 1) + climbNaive(n - 2)
 
-<span class="cm">// Approach 2: Memoization — O(n) time, O(n) space</span>
-<span class="kw">int</span> <span class="fn">climbStairs_memo</span>(<span class="kw">int</span> n, <span class="kw">int</span>[] memo) {
-    <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="ret">return 1</span>;
-    <span class="kw">if</span> (memo[n] != <span class="num">0</span>) <span class="ret">return</span> memo[n];  <span class="cm">// cache hit!</span>
-    memo[n] = climbStairs_memo(n-<span class="num">1</span>, memo) + climbStairs_memo(n-<span class="num">2</span>, memo);
-    <span class="ret">return</span> memo[n];
-}
+<span class="pc-cm">// Approach 2: memoization — O(n) time, O(n) space</span>
+<span class="pc-kw">function</span> climbMemo(n, memo):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> 1
+    <span class="pc-kw">if</span> memo[n] is known: <span class="pc-kw">return</span> memo[n]          <span class="pc-cm">// cache hit</span>
+    memo[n] ← climbMemo(n-1, memo) + climbMemo(n-2, memo)
+    <span class="pc-kw">return</span> memo[n]
 
-<span class="cm">// Approach 3: Iterative DP — O(n) time, O(1) space ✅</span>
-<span class="kw">int</span> <span class="fn">climbStairs</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="ret">return 1</span>;
-    <span class="kw">int</span> prev2 = <span class="num">1</span>, prev1 = <span class="num">1</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">2</span>; i &lt;= n; i++) {
-        <span class="kw">int</span> curr = prev1 + prev2;
-        prev2 = prev1;
-        prev1 = curr;
-    }
-    <span class="ret">return</span> prev1;
-}
+<span class="pc-cm">// Approach 3: iterative — O(n) time, O(1) space ✅</span>
+<span class="pc-kw">function</span> climbStairs(n):
+    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> 1
+    prev2 ← 1;  prev1 ← 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
+        curr ← prev1 + prev2
+        prev2 ← prev1
+        prev1 ← curr
+    <span class="pc-kw">return</span> prev1
 
-<span class="cm">// Dry run: climbStairs(5)
-// i=2: curr=1+1=2, prev2=1, prev1=2
-// i=3: curr=2+1=3, prev2=2, prev1=3
-// i=4: curr=3+2=5, prev2=3, prev1=5
-// i=5: curr=5+3=8, prev2=5, prev1=8
-// Return 8 ✓</span></pre>
+<span class="pc-cm">// Dry run: climbStairs(5)</span>
+<span class="pc-cm">// i=2: curr=1+1=2, prev2=1, prev1=2</span>
+<span class="pc-cm">// i=3: curr=2+1=3, prev2=2, prev1=3</span>
+<span class="pc-cm">// i=4: curr=3+2=5, prev2=3, prev1=5</span>
+<span class="pc-cm">// i=5: curr=5+3=8, prev2=5, prev1=8</span>
+<span class="pc-cm">// return 8 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3424,47 +3366,42 @@
                 tree
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Backtracking</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Backtracking</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">List</span>&lt;String&gt; <span class="fn">generateParenthesis</span>(<span class="kw">int</span> n) {
-    List&lt;String&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
-    backtrack(result, <span class="kw">new</span> StringBuilder(), <span class="num">0</span>, <span class="num">0</span>, n);
-    <span class="ret">return</span> result;
-}
+                  <pre><span class="pc-kw">function</span> generateParenthesis(n):
+    result ← empty list
+    backtrack(result, "", 0, 0, n)
+    <span class="pc-kw">return</span> result
 
-<span class="kw">void</span> <span class="fn">backtrack</span>(List&lt;String&gt; res, StringBuilder sb, <span class="kw">int</span> open, <span class="kw">int</span> close, <span class="kw">int</span> n) {
-    <span class="kw">if</span> (sb.length() == <span class="num">2</span> * n) {     <span class="cm">// base case: used all n pairs</span>
-        res.add(sb.toString());
-        <span class="ret">return</span>;
-    }
-    <span class="kw">if</span> (open &lt; n) {               <span class="cm">// can still open?</span>
-        sb.append(<span class="str">'('</span>);
-        backtrack(res, sb, open + <span class="num">1</span>, close, n);
-        sb.deleteCharAt(sb.length() - <span class="num">1</span>);  <span class="cm">// ← BACKTRACK</span>
-    }
-    <span class="kw">if</span> (close &lt; open) {            <span class="cm">// can close? (only if close &lt; open)</span>
-        sb.append(<span class="str">')'</span>);
-        backtrack(res, sb, open, close + <span class="num">1</span>, n);
-        sb.deleteCharAt(sb.length() - <span class="num">1</span>);  <span class="cm">// ← BACKTRACK</span>
-    }
-}
+<span class="pc-kw">function</span> backtrack(result, s, open, close, n):
+    <span class="pc-kw">if</span> length(s) = 2 × n:                 <span class="pc-cm">// all n pairs used</span>
+        result.append(s)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">if</span> open &lt; n:                          <span class="pc-cm">// can still open one</span>
+        backtrack(result, s + "(", open + 1, close, n)
+    <span class="pc-kw">if</span> close &lt; open:                      <span class="pc-cm">// can only close what is open</span>
+        backtrack(result, s + ")", open, close + 1, n)
 
-<span class="cm">// Recursion tree for n=2:
-//              ""
-//             /
-//           "("
-//          /      \
-//       "(("      "()"
-//       /           \
-//     "(()"        "()(
-//      /              \
-//    "(())"         "()()"
-//  [VALID]         [VALID]</span></pre>
+<span class="pc-cm">// Passing s + "(" builds a new string each call, so nothing needs undoing.</span>
+<span class="pc-cm">// With a mutable buffer: append, recurse, then remove the last char.</span>
+
+<span class="pc-cm">// Recursion tree for n = 2:</span>
+<span class="pc-cm">//              ""</span>
+<span class="pc-cm">//             /</span>
+<span class="pc-cm">//           "("</span>
+<span class="pc-cm">//          /      \</span>
+<span class="pc-cm">//       "(("      "()"</span>
+<span class="pc-cm">//       /           \</span>
+<span class="pc-cm">//     "(()"        "()("</span>
+<span class="pc-cm">//      /              \</span>
+<span class="pc-cm">//    "(())"         "()()"</span>
+<span class="pc-cm">//  [VALID]         [VALID]</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3584,47 +3521,38 @@
                 approach + dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Swap-based (in-place)</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Swap-based (in-place)</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">List</span>&lt;List&lt;Integer&gt;&gt; <span class="fn">permute</span>(<span class="kw">int</span>[] nums) {
-    List&lt;List&lt;Integer&gt;&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
-    backtrack(nums, <span class="num">0</span>, result);
-    <span class="ret">return</span> result;
-}
+                  <pre><span class="pc-kw">function</span> permute(nums):
+    result ← empty list
+    backtrack(nums, 0, result)
+    <span class="pc-kw">return</span> result
 
-<span class="kw">void</span> <span class="fn">backtrack</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> idx, List&lt;List&lt;Integer&gt;&gt; res) {
-    <span class="kw">if</span> (idx == nums.length) {                  <span class="cm">// all positions fixed</span>
-        List&lt;Integer&gt; perm = <span class="kw">new</span> ArrayList&lt;&gt;();
-        <span class="kw">for</span> (<span class="kw">int</span> n : nums) perm.add(n);
-        res.add(perm);                            <span class="cm">// add COPY</span>
-        <span class="ret">return</span>;
-    }
-    <span class="kw">for</span> (<span class="kw">int</span> i = idx; i &lt; nums.length; i++) {
-        swap(nums, idx, i);                       <span class="cm">// choose</span>
-        backtrack(nums, idx + <span class="num">1</span>, res);             <span class="cm">// explore</span>
-        swap(nums, idx, i);                       <span class="cm">// unchoose</span>
-    }
-}
+<span class="pc-kw">function</span> backtrack(nums, idx, result):
+    <span class="pc-kw">if</span> idx = length(nums):                <span class="pc-cm">// every position fixed</span>
+        result.append(copy of nums)       <span class="pc-cm">// add a COPY</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> idx <span class="pc-kw">to</span> length(nums) - 1:
+        swap(nums, idx, i)                <span class="pc-cm">// choose</span>
+        backtrack(nums, idx + 1, result)  <span class="pc-cm">// explore</span>
+        swap(nums, idx, i)                <span class="pc-cm">// unchoose</span>
 
-<span class="kw">void</span> <span class="fn">swap</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> i, <span class="kw">int</span> j) {
-    <span class="kw">int</span> t = a[i]; a[i] = a[j]; a[j] = t;
-}
-
-<span class="cm">// Dry run: [1, 2, 3], idx=0
-// i=0: swap(0,0) → [1,2,3], recurse idx=1
-//   i=1: swap(1,1) → [1,2,3], recurse idx=2
-//     i=2: swap(2,2) → [1,2,3] → ADD [1,2,3] ✓
-//   i=2: swap(1,2) → [1,3,2], recurse idx=2
-//     → ADD [1,3,2] ✓, swap back → [1,2,3]
-// i=1: swap(0,1) → [2,1,3], recurse idx=1
-//   → generates [2,1,3] and [2,3,1]
-// i=2: swap(0,2) → [3,2,1], recurse idx=1
-//   → generates [3,2,1] and [3,1,2]</span></pre>
+<span class="pc-cm">// Dry run: [1, 2, 3], idx = 0</span>
+<span class="pc-cm">// i=0: swap(0,0) → [1,2,3], recurse idx=1</span>
+<span class="pc-cm">//   i=1: swap(1,1) → [1,2,3], recurse idx=2</span>
+<span class="pc-cm">//     i=2: swap(2,2) → [1,2,3] → ADD [1,2,3] ✓</span>
+<span class="pc-cm">//   i=2: swap(1,2) → [1,3,2], recurse idx=2</span>
+<span class="pc-cm">//     → ADD [1,3,2] ✓, swap back → [1,2,3]</span>
+<span class="pc-cm">// i=1: swap(0,1) → [2,1,3], recurse idx=1</span>
+<span class="pc-cm">//   → generates [2,1,3] and [2,3,1]</span>
+<span class="pc-cm">// i=2: swap(0,2) → [3,2,1], recurse idx=1</span>
+<span class="pc-cm">//   → generates [3,2,1] and [3,1,2]</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3751,46 +3679,38 @@
                 optimization
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Optimized O(1) Check</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Optimized O(1) Check</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">List</span>&lt;List&lt;String&gt;&gt; <span class="fn">solveNQueens</span>(<span class="kw">int</span> n) {
-    List&lt;List&lt;String&gt;&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">char</span>[][] board = <span class="kw">new char</span>[n][n];
-    <span class="kw">for</span> (<span class="kw">char</span>[] row : board) Arrays.fill(row, <span class="str">'.'</span>);
+                  <pre><span class="pc-kw">function</span> solveNQueens(n):
+    result ← empty list
+    board ← n × n grid filled with '.'
+    cols ← empty set
+    diag1 ← empty set            <span class="pc-cm">// cells on one diagonal share row - col</span>
+    diag2 ← empty set            <span class="pc-cm">// cells on the other share row + col</span>
+    solve(board, 0, cols, diag1, diag2, result)
+    <span class="pc-kw">return</span> result
 
-    Set&lt;Integer&gt; cols = <span class="kw">new</span> HashSet&lt;&gt;();
-    Set&lt;Integer&gt; diag1 = <span class="kw">new</span> HashSet&lt;&gt;();  <span class="cm">// row - col</span>
-    Set&lt;Integer&gt; diag2 = <span class="kw">new</span> HashSet&lt;&gt;();  <span class="cm">// row + col</span>
+<span class="pc-kw">function</span> solve(board, row, cols, d1, d2, result):
+    <span class="pc-kw">if</span> row = n:
+        result.append(copy of board)         <span class="pc-cm">// valid placement found</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> col <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> col <span class="pc-kw">in</span> cols <span class="pc-kw">or</span> (row - col) <span class="pc-kw">in</span> d1 <span class="pc-kw">or</span> (row + col) <span class="pc-kw">in</span> d2:
+            <span class="pc-kw">continue</span>                         <span class="pc-cm">// attacked — pruned in O(1)</span>
 
-    solve(board, <span class="num">0</span>, cols, diag1, diag2, result);
-    <span class="ret">return</span> result;
-}
+        board[row][col] ← 'Q'                <span class="pc-cm">// choose</span>
+        add col <span class="pc-kw">to</span> cols;  add row-col <span class="pc-kw">to</span> d1;  add row+col <span class="pc-kw">to</span> d2
 
-<span class="kw">void</span> <span class="fn">solve</span>(<span class="kw">char</span>[][] board, <span class="kw">int</span> row,
-           Set&lt;Integer&gt; cols, Set&lt;Integer&gt; d1, Set&lt;Integer&gt; d2,
-           List&lt;List&lt;String&gt;&gt; res) {
-    <span class="kw">if</span> (row == board.length) {
-        res.add(construct(board));     <span class="cm">// found valid placement!</span>
-        <span class="ret">return</span>;
-    }
-    <span class="kw">for</span> (<span class="kw">int</span> col = <span class="num">0</span>; col &lt; board.length; col++) {
-        <span class="kw">if</span> (cols.contains(col) || d1.contains(row-col) || d2.contains(row+col))
-            <span class="kw">continue</span>;              <span class="cm">// pruned! O(1) check</span>
+        solve(board, row + 1, cols, d1, d2, result)   <span class="pc-cm">// explore</span>
 
-        board[row][col] = <span class="str">'Q'</span>;      <span class="cm">// choose</span>
-        cols.add(col); d1.add(row-col); d2.add(row+col);
-
-        solve(board, row+<span class="num">1</span>, cols, d1, d2, res);  <span class="cm">// explore</span>
-
-        board[row][col] = <span class="str">'.'</span>;      <span class="cm">// unchoose (backtrack)</span>
-        cols.remove(col); d1.remove(row-col); d2.remove(row+col);
-    }
-}</pre>
+        board[row][col] ← '.'                <span class="pc-cm">// unchoose</span>
+        remove col <span class="pc-kw">from</span> cols;  remove row-col <span class="pc-kw">from</span> d1;  remove row+col <span class="pc-kw">from</span> d2</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -3904,46 +3824,36 @@
                 <span class="toggle-arrow">▶</span>Full solution with dry run
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Backtracking</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Backtracking</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">String</span>[] map = {<span class="str">""</span>,<span class="str">""</span>,<span class="str">"abc"</span>,<span class="str">"def"</span>,<span class="str">"ghi"</span>,<span class="str">"jkl"</span>,<span class="str">"mno"</span>,<span class="str">"pqrs"</span>,<span class="str">"tuv"</span>,<span class="str">"wxyz"</span>};
+                  <pre>keys ← ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]
 
-<span class="kw">List</span>&lt;String&gt; <span class="fn">letterCombinations</span>(String digits) {
-    List&lt;String&gt; result = <span class="kw">new</span> ArrayList&lt;&gt;();
-    <span class="kw">if</span> (digits.isEmpty()) <span class="ret">return</span> result;
-    backtrack(digits, <span class="num">0</span>, <span class="kw">new</span> StringBuilder(), result);
-    <span class="ret">return</span> result;
-}
+<span class="pc-kw">function</span> letterCombinations(digits):
+    result ← empty list
+    <span class="pc-kw">if</span> digits <span class="pc-kw">is empty</span>: <span class="pc-kw">return</span> result
+    backtrack(digits, 0, "", result)
+    <span class="pc-kw">return</span> result
 
-<span class="kw">void</span> <span class="fn">backtrack</span>(String digits, <span class="kw">int</span> idx, StringBuilder sb, List&lt;String&gt; res) {
-    <span class="kw">if</span> (idx == digits.length()) {
-        res.add(sb.toString());   <span class="cm">// used all digits → complete combo</span>
-        <span class="ret">return</span>;
-    }
-    String letters = map[digits.charAt(idx) - <span class="str">'0'</span>];
-    <span class="kw">for</span> (<span class="kw">char</span> c : letters.toCharArray()) {
-        sb.append(c);             <span class="cm">// choose</span>
-        backtrack(digits, idx + <span class="num">1</span>, sb, res);  <span class="cm">// explore</span>
-        sb.deleteCharAt(sb.length() - <span class="num">1</span>);   <span class="cm">// unchoose</span>
-    }
-}
+<span class="pc-kw">function</span> backtrack(digits, idx, combo, result):
+    <span class="pc-kw">if</span> idx = length(digits):
+        result.append(combo)                 <span class="pc-cm">// one letter per digit → complete</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> keys[digits[idx]]:
+        backtrack(digits, idx + 1, combo + c, result)
 
-<span class="cm">// Dry run: digits = "23"
-// idx=0, digit='2', letters="abc"
-//   c='a': sb="a", recurse idx=1
-//     digit='3', letters="def"
-//       c='d': sb="ad" → ADD "ad", remove 'd' → sb="a"
-//       c='e': sb="ae" → ADD "ae", remove 'e' → sb="a"
-//       c='f': sb="af" → ADD "af", remove 'f' → sb="a"
-//     remove 'a' → sb=""
-//   c='b': sb="b", recurse → "bd","be","bf"
-//   c='c': sb="c", recurse → "cd","ce","cf"
-// Total: 9 combinations ✓</span></pre>
+<span class="pc-cm">// Dry run: digits = "23"</span>
+<span class="pc-cm">// idx=0, digit '2' → "abc"</span>
+<span class="pc-cm">//   'a': idx=1, digit '3' → "def"</span>
+<span class="pc-cm">//        "ad" ✓  "ae" ✓  "af" ✓</span>
+<span class="pc-cm">//   'b': → "bd", "be", "bf"</span>
+<span class="pc-cm">//   'c': → "cd", "ce", "cf"</span>
+<span class="pc-cm">// Total: 9 combinations ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">

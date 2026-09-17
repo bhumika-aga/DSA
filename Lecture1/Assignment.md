@@ -1,9 +1,8 @@
 # 📝 Assignment 01 — Java Fundamentals & Big-O Analysis
 
-> **Lecture:** Topic 1 — Java & Programming Fundamentals
-> **Topic Count:** 1 of 30 — Phase 1 Foundations
-> **Duration:** 5 Days
-> **Core Problems:** 30 (20 Easy · 10 Medium) + 10 Challenge + 8 Complexity Exercises
+> **Lecture:** 1 of 38 — Java & Programming Fundamentals
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 5 days · **Total Problems:** 40 (20 Easy · 10 Medium · 10 Hard)
 > **Goal:** Cement control flow, array manipulation, type system mastery, and complexity analysis.
 
 ---

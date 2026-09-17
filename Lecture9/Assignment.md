@@ -1,9 +1,8 @@
 # ⚖️ Assignment 09 — Sorting & Cyclic Patterns
 
-> **Lecture:** Topic 9 — Sorting Algorithms
-> **Topic Count:** 9 of 30 — Phase 2 Core Data Structures
-> **Duration:** 4 Days
-> **Core Problems:** 25 (10 Easy · 10 Medium · 5 Hard) + 4 Complexity Exercises
+> **Lecture:** 9 of 38 — Sorting Algorithms
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 4 days · **Total Problems:** 25 (10 Easy · 10 Medium · 5 Hard)
 > **Goal:** Master core comparison sorts ($O (N^2)$ to $O (N \log N)$), non-comparison sorting ($O (N)$), partitioning
 > paradigms, and the **Cyclic Sort** invariant for range-limited domains.
 
