@@ -1,88 +1,290 @@
-# 🔍 Assignment 10 — Searching Algorithms
+# 🔎 Assignment 10 — Searching Algorithms
 
 > **Lecture:** 10 of 38 — Searching Algorithms
 > **Phase:** 2 — Core Data Structures
 > **Estimated Time:** 5 days · **Total Problems:** 28 (8 Easy · 13 Medium · 7 Hard)
-> **Goal:** Master unconditional Linear Searching, classic $O (\log N)$ Binary Search templates, **Binary Search on
+> **Goal:** Master unconditional Linear Searching, classic $O(\log N)$ Binary Search templates, **Binary Search on
 > Answer Space** (Monotonic optimization), and matrix traversal boundaries.
 
 ---
 
-## 🟢 Easy Tier (Foundations & Templates)
+## 🗺️ Pattern Recognition — Read Before Starting
 
-_Focus on loop conditions (`lo <= hi`), non-overflow mid calculation, and understanding $O (1)$ vs $O (\log N)$ search
-spaces._
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-1. **[Binary Search](https://leetcode.com/problems/binary-search/) (LC 704)** — Baseline template. `[Basic]` `[Companies: Google, Amazon, Microsoft]`
-
-2. **[Search Insert Position](https://leetcode.com/problems/search-insert-position/) (LC 35)** — Understanding binary boundary behavior. `[LC Easy]` `[Companies: Amazon, Google, Microsoft]`
-
-3. **[Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/) (LC 34)** — Building boundary-seeking templates. `[Pattern: Boundary Search]` `[Companies: Meta, Amazon, Google, LinkedIn]`
-
-4. **[Guess Number Higher or Lower](https://leetcode.com/problems/guess-number-higher-or-lower/) (LC 374)** — Simple BS in a fixed range. `[LC Easy]` `[Companies: Google, Amazon]`
-
-5. **[Valid Perfect Square](https://leetcode.com/problems/valid-perfect-square/) (LC 367)** — Monotonic search on whole numbers. `[LC Easy]` `[Companies: Google, Amazon, LinkedIn]`
-
-6. **[Arranging Coins](https://leetcode.com/problems/arranging-coins/) (LC 441)** — Binary Search on integer solutions. `[LC Easy]` `[Companies: Amazon, Microsoft]`
-
-7. **[Peak Index in a Mountain Array](https://leetcode.com/problems/peak-index-in-a-mountain-array/) (LC 852)** — Simple local maxima search. `[Pattern: Peak]` `[Companies: Google, Amazon]`
-
-8. **Binary Search on Negative Range** — Search a target in an array containing $[-10^9, 10^9]$. `[Basic]`  
-   `[Concept · no LeetCode equivalent]` `[Companies: Google, Amazon]`
+| Signal in the Problem                         | Pattern                 | Move                                             |
+| --------------------------------------------- | ----------------------- | ------------------------------------------------ |
+| "sorted array" + "find"                       | Classic Binary Search   | `while lo <= hi`, `mid = lo + (hi - lo) / 2`     |
+| "first / last position"                       | Lower / Upper Bound     | keep searching after a match                     |
+| "rotated sorted array"                        | Find the Sorted Half    | compare `nums[mid]` with `nums[lo]`              |
+| "minimum capacity / speed / days such that …" | Binary Search on Answer | search the answer space with a feasibility check |
+| "peak", "mountain"                            | Slope Search            | move toward the rising side                      |
+| "sorted matrix"                               | 2D Binary Search        | flatten indices, or search the value range       |
 
 ---
 
-## 🟡 Medium Tier (The Power of Mid & Answer Space)
+## 🟢 Easy Tier (8 Problems)
+
+_Focus on loop conditions (`lo <= hi`), non-overflow mid calculation, and understanding $O(1)$ vs $O(\log N)$ search
+spaces._
+
+### E1 · Binary Search
+
+**🔗 [LC 704 — Binary Search](https://leetcode.com/problems/binary-search/)** · Easy
+**Pattern:** Classic Binary Search | **Companies:** Google, Amazon, Microsoft
+
+**Hint:** The template: `lo = 0`, `hi = n - 1`, `while lo <= hi`, `mid = lo + (hi - lo) / 2`. Compare and discard half. Write it until you can do it without thinking — every later problem modifies this loop.
+
+---
+
+### E2 · Search Insert Position
+
+**🔗 [LC 35 — Search Insert Position](https://leetcode.com/problems/search-insert-position/)** · Easy
+**Pattern:** Lower Bound | **Companies:** Amazon, Google, Microsoft
+
+**Hint:** Find the first index with `nums[i] >= target` (lower bound). With `lo = 0, hi = n` and `while lo < hi`, set `hi = mid` when `nums[mid] >= target` and `lo = mid + 1` otherwise. The answer is `lo`, even if the target isn't present.
+
+---
+
+### E3 · Find First and Last Position of Element in Sorted Array
+
+**🔗 [LC 34 — Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)** · Medium
+**Pattern:** Boundary Search | **Companies:** Meta, Amazon, Google, LinkedIn
+
+**Hint:** Run two boundary searches: the first index `>= target` and the first index `> target`. If the first one is out of range or doesn't hold `target`, return `[-1, -1]`; otherwise return `[first, second - 1]`.
+
+---
+
+### E4 · Guess Number Higher or Lower
+
+**🔗 [LC 374 — Guess Number Higher or Lower](https://leetcode.com/problems/guess-number-higher-or-lower/)** · Easy
+**Pattern:** Classic Binary Search | **Companies:** Google, Amazon
+
+**Hint:** Plain binary search over `[1, n]`, but the comparison comes from `guess(mid)`: -1 means go left, 1 means go right. Use `lo + (hi - lo) / 2` — `n` can be `2³¹ - 1`.
+
+---
+
+### E5 · Valid Perfect Square
+
+**🔗 [LC 367 — Valid Perfect Square](https://leetcode.com/problems/valid-perfect-square/)** · Easy
+**Pattern:** Binary Search on Answer | **Companies:** Google, Amazon, LinkedIn
+
+**Hint:** Binary search `mid` in `[1, num]` and compare `mid * mid` with `num` using `long`. No `sqrt` allowed.
+
+---
+
+### E6 · Arranging Coins
+
+**🔗 [LC 441 — Arranging Coins](https://leetcode.com/problems/arranging-coins/)** · Easy
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Microsoft
+
+**Hint:** Find the largest `k` with `k(k + 1) / 2 <= n`. The condition is monotonic in `k`, so binary search over `[0, n]` with `long` arithmetic.
+
+---
+
+### E7 · Peak Index in a Mountain Array
+
+**🔗 [LC 852 — Peak Index in a Mountain Array](https://leetcode.com/problems/peak-index-in-a-mountain-array/)** · Medium
+**Pattern:** Peak | **Companies:** Google, Amazon
+
+**Hint:** Compare `arr[mid]` with `arr[mid + 1]`: if it is rising, the peak is to the right (`lo = mid + 1`); otherwise it's at `mid` or to the left (`hi = mid`). Loop while `lo < hi`.
+
+---
+
+### E8 · Maximum Count of Positive Integer and Negative Integer
+
+**🔗 [LC 2529 — Maximum Count of Positive Integer and Negative Integer](https://leetcode.com/problems/maximum-count-of-positive-integer-and-negative-integer/)** · Easy
+**Pattern:** Lower / Upper Bound | **Companies:** Amazon, Microsoft
+
+**Hint:** The array is sorted. `neg` = first index with value ≥ 0 (lower bound of 0), `pos` = n − first index with value > 0 (upper bound of 0). Return `max(neg, pos)` in O(log n).
+
+---
+
+## 🟡 Medium Tier (13 Problems)
 
 _Focus on Rotated Arrays, Index Parity, and Monotonic Optimization problems._
 
-1. **[Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/) (LC 33)** — Core logic: Checking which side is sorted. `[Pattern: Rotated] [LC Medium]` `[Companies: Google, Amazon, Meta, Microsoft]`
+### M1 · Search in Rotated Sorted Array
 
-2. **[Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/) (LC 81)** — Handling duplicates (Worst case $O (N)$). `[Pattern: Rotated] [LC Medium]` `[Companies: Amazon, Google, Meta]`
+**🔗 [LC 33 — Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)** · Medium
+**Pattern:** Rotated | **Companies:** Google, Amazon, Meta, Microsoft
 
-3. **[Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) (LC 153)** — Finding the pivot. `[Pattern: Index-based] [LC Medium]` `[Companies: Microsoft, Amazon, Google]`
-
-4. **[Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/) (LC 74)** — 1D to 2D index mapping: `[mid/col][mid%col]`. `[Pattern: 2D] [LC Medium]` `[Companies: Amazon, Microsoft, Meta]`
-
-5. **[Find Peak Element](https://leetcode.com/problems/find-peak-element/) (LC 162)** — Binary search for local maxima in non-sorted data. `[Pattern: Peak] [LC Medium]` `[Companies: Uber, Google, Meta]`
-
-6. **[Single Element in a Sorted Array](https://leetcode.com/problems/single-element-in-a-sorted-array/) (LC 540)** —
-   Using index parity (even/odd pairs). `[Companies: Amazon, Google, Meta]`
-
-7. **[Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/) (LC 875)** — Gateway into **Binary Search on Answer**. `[Pattern: Search-on-Answer] [LC Medium]` `[Companies: Airbnb, Google, Amazon]`
-
-8. **[Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/) ( LC 1011)** — Classic Master-tier Optimization. `[Pattern: Search-on-Answer] [LC Medium]` `[Companies: Amazon, Google, Meta]`
-
-9. **[Find the Smallest Divisor Given a Threshold](https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/) ( LC 1283)** — Monotonic optimization on sums. `[LC Medium]` `[Companies: Amazon, Google]`
-
-10. **[Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/) ( LC 1482)** — Range-based search on time. `[LC Medium]` `[Companies: Amazon, Google]`
-
-11. **[Magnetic Force Between Two Balls](https://leetcode.com/problems/magnetic-force-between-two-balls/) (LC 1552)** —
-    Gold standard for Distance Max-Min. `[Companies: Amazon, Google]`
-
-12. **[Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/) (LC 287)** — Binary Search on the value range $[1, N]$. `[Pattern: Discrete Space] [LC Medium]` `[Companies: Amazon, Google, Meta, Microsoft]`
-
-13. **[Heaters](https://leetcode.com/problems/heaters/) (LC 475)** — Binary Search + Two Pointers variant. `[LC Medium]` `[Companies: Amazon, Google]`
+**Hint:** At every `mid`, one half is sorted. If `nums[lo] <= nums[mid]`, the left half is sorted — check whether the target lies in `[nums[lo], nums[mid])` to decide the side. Otherwise the right half is sorted; apply the mirror check.
 
 ---
 
-## 🔴 Challenge Zone (Boundary Masters)
+### M2 · Search in Rotated Sorted Array II
+
+**🔗 [LC 81 — Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)** · Medium
+**Pattern:** Rotated | **Companies:** Amazon, Google, Meta
+
+**Hint:** Same as the version without duplicates, but when `nums[lo] == nums[mid] == nums[hi]` you can't tell which half is sorted — shrink with `lo++` and `hi--`. This makes the worst case O(n).
+
+---
+
+### M3 · Find Minimum in Rotated Sorted Array
+
+**🔗 [LC 153 — Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)** · Medium
+**Pattern:** Index-based | **Companies:** Microsoft, Amazon, Google
+
+**Hint:** Compare `nums[mid]` with `nums[hi]`: if `nums[mid] > nums[hi]`, the minimum is to the right (`lo = mid + 1`); otherwise it's at `mid` or to the left (`hi = mid`). Loop while `lo < hi`.
+
+---
+
+### M4 · Search a 2D Matrix
+
+**🔗 [LC 74 — Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)** · Medium
+**Pattern:** 2D | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** Treat the matrix as one sorted array of length `m × n`. Binary search the index and convert it to a cell with `row = mid / n`, `col = mid % n`.
+
+---
+
+### M5 · Find Peak Element
+
+**🔗 [LC 162 — Find Peak Element](https://leetcode.com/problems/find-peak-element/)** · Medium
+**Pattern:** Peak | **Companies:** Uber, Google, Meta
+
+**Hint:** Any neighbour that's bigger leads uphill to a peak. If `nums[mid] < nums[mid + 1]`, go right; otherwise go left, keeping `mid`. The array ends count as -∞, so a peak always exists.
+
+---
+
+### M6 · Single Element in a Sorted Array
+
+**🔗 [LC 540 — Single Element in a Sorted Array](https://leetcode.com/problems/single-element-in-a-sorted-array/)** · Medium
+**Pattern:** Binary Search on Pairs | **Companies:** Amazon, Google, Meta
+
+**Hint:** Before the single element, pairs start at even indices. Force `mid` to be even (`mid -= mid % 2`); if `nums[mid] == nums[mid + 1]`, the single is to the right (`lo = mid + 2`), otherwise `hi = mid`.
+
+---
+
+### M7 · Koko Eating Bananas
+
+**🔗 [LC 875 — Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)** · Medium
+**Pattern:** Search-on-Answer | **Companies:** Airbnb, Google, Amazon
+
+**Hint:** Binary search the speed `k` in `[1, max(piles)]`. Hours needed is `sum(ceil(pile / k))` — use `(pile + k - 1) / k`. Find the smallest `k` whose hours are `<= h`.
+
+---
+
+### M8 · Capacity To Ship Packages Within D Days
+
+**🔗 [LC 1011 — Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)** · Medium
+**Pattern:** Search-on-Answer | **Companies:** Amazon, Google, Meta
+
+**Hint:** The answer lies between `max(weights)` and `sum(weights)`. For a capacity, greedily fill days and count how many you need. Find the smallest capacity that needs at most `days` days.
+
+---
+
+### M9 · Find the Smallest Divisor Given a Threshold
+
+**🔗 [LC 1283 — Find the Smallest Divisor Given a Threshold](https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Google
+
+**Hint:** The sum of `ceil(num / d)` only shrinks as `d` grows, so binary search `d` in `[1, max(nums)]` for the smallest divisor whose sum is `<= threshold`.
+
+---
+
+### M10 · Minimum Number of Days to Make m Bouquets
+
+**🔗 [LC 1482 — Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Google
+
+**Hint:** If `m * k > n`, return -1. Otherwise binary search the day in `[min(bloom), max(bloom)]`. For a day, count bouquets by scanning runs of consecutive flowers that have bloomed. Find the first day that yields `m`.
+
+---
+
+### M11 · Magnetic Force Between Two Balls
+
+**🔗 [LC 1552 — Magnetic Force Between Two Balls](https://leetcode.com/problems/magnetic-force-between-two-balls/)** · Medium
+**Pattern:** Binary Search on Answer (Max-Min) | **Companies:** Amazon, Google
+
+**Hint:** Sort positions. Binary search the minimum distance `d`; it's feasible if greedily placing each ball at the first position at least `d` from the previous one fits all `m` balls. Find the largest feasible `d`.
+
+---
+
+### M12 · Maximum Candies Allocated to K Children
+
+**🔗 [LC 2226 — Maximum Candies Allocated to K Children](https://leetcode.com/problems/maximum-candies-allocated-to-k-children/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Google, Amazon
+
+**Hint:** Search `x` in `[1, max(candies)]`. `x` is feasible if `sum(pile / x) >= k` (use `long`). Find the largest feasible `x`; if even `x = 1` fails, return 0.
+
+---
+
+### M13 · Heaters
+
+**🔗 [LC 475 — Heaters](https://leetcode.com/problems/heaters/)** · Medium
+**Pattern:** Sort + Binary Search | **Companies:** Amazon, Google
+
+**Hint:** Sort the heaters. For each house, binary search its nearest heater on each side and take the smaller distance. The answer is the largest of these distances.
+
+---
+
+## 🔴 Hard Tier (7 Problems)
 
 _Focus on extremely tight constraints and dual-array partitioning logic._
 
-1. **[Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/) (LC 4)** — The hardest partitioning problem. `[Pattern: Dual-Partitioning] [LC Hard]` `[Companies: Apple, Google, Amazon, Adobe]`
+### H1 · Median of Two Sorted Arrays
 
-2. **[Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/) (LC 410)** — Binary Search on the range $[\max (arr), \sum (arr)]$. `[LC Hard]` `[Companies: Google, Amazon, Meta]`
+**🔗 [LC 4 — Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/)** · Hard
+**Pattern:** Dual-Partitioning | **Companies:** Apple, Google, Amazon, Adobe
 
-3. **[Divide Chocolate](https://leetcode.com/problems/divide-chocolate/) (LC 1231)** — The exact dual of Split Array Largest Sum: _maximise the minimum_ piece instead of minimising the maximum. Same binary search, flipped predicate. `[Pattern: Max-Min]` `[LC Hard]` `[Companies: Google, Amazon]`
+**Hint:** Binary search a cut in the smaller array so the left parts of both arrays hold half the elements. The cut is correct when `maxLeftA <= minRightB` and `maxLeftB <= minRightA`. The median comes from the max-left and min-right values. O(log(min(m, n))).
 
-4. **[Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/) (LC 719)** — Binary Search + Two Pointers. `[LC Hard]` `[Companies: Google, Amazon]`
+---
 
-5. **[Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/) ( LC 378)** — BS on value range, not indices. `[Pattern: 2D Value Search] [LC Medium/Hard]` `[Companies: Amazon, Google, Meta]`
+### H2 · Split Array Largest Sum
 
-6. **[Preimage Size of Factorial Zeroes Function](https://leetcode.com/problems/preimage-size-of-factorial-zeroes-function/) ( LC 793)** — BS on extremely large ranges. `[LC Hard]` `[Companies: Google, Amazon]`
+**🔗 [LC 410 — Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)** · Hard
+**Pattern:** Binary Search on Answer (Min-Max) | **Companies:** Google, Amazon, Meta
 
-7. **[Smallest Good Base](https://leetcode.com/problems/smallest-good-base/) (LC 483)** — Searching mathematically derived boundaries. `[LC Hard]` `[Companies: Google, Amazon]`
+**Hint:** Binary search the largest allowed subarray sum in `[max(nums), sum(nums)]`. For a limit, greedily count how many pieces you need; find the smallest limit that needs at most `k` pieces.
+
+---
+
+### H3 · Maximize the Minimum Powered City
+
+**🔗 [LC 2528 — Maximize the Minimum Powered City](https://leetcode.com/problems/maximize-the-minimum-powered-city/)** · Hard
+**Pattern:** Max-Min | **Companies:** Google, Amazon
+
+**Hint:** The "maximise the minimum" dual of Split Array Largest Sum: binary search the answer, then greedily place stations with a difference array to check feasibility.
+
+---
+
+### H4 · Find K-th Smallest Pair Distance
+
+**🔗 [LC 719 — Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/)** · Hard
+**Pattern:** Binary Search on Answer + Two Pointers | **Companies:** Google, Amazon
+
+**Hint:** Sort. Binary search the distance `d` in `[0, max - min]`. Count pairs with distance `<= d` using a sliding right pointer (O(n)). Find the smallest `d` whose count is `>= k`.
+
+---
+
+### H5 · Kth Smallest Element in a Sorted Matrix
+
+**🔗 [LC 378 — Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)** · Medium
+**Pattern:** 2D Value Search | **Companies:** Amazon, Google, Meta
+
+**Hint:** Binary search the value, not the index: in `[matrix[0][0], matrix[n-1][n-1]]`, count cells `<= mid` with a staircase walk from the bottom-left (O(n)). The smallest value with count `>= k` is the answer.
+
+---
+
+### H6 · Preimage Size of Factorial Zeroes Function
+
+**🔗 [LC 793 — Preimage Size of Factorial Zeroes Function](https://leetcode.com/problems/preimage-size-of-factorial-zeroes-function/)** · Hard
+**Pattern:** Binary Search on a Monotonic Function | **Companies:** Google, Amazon
+
+**Hint:** The number of trailing zeros of `x!` is `x/5 + x/25 + …`, which never decreases as `x` grows. Binary search the smallest `x` with at least `k` zeros; if it has exactly `k`, the answer is 5, otherwise 0.
+
+---
+
+### H7 · Smallest Good Base
+
+**🔗 [LC 483 — Smallest Good Base](https://leetcode.com/problems/smallest-good-base/)** · Hard
+**Pattern:** Binary Search per Length | **Companies:** Google, Amazon
+
+**Hint:** `n = 1 + k + k² + … + k^m`. Try each length `m` from the largest (about 60) down to 1, and binary search the base `k` for that length. Watch overflow when summing. The first match gives the smallest base.
 
 ---
 
@@ -108,4 +310,30 @@ _Focus on extremely tight constraints and dual-array partitioning logic._
 
 ---
 
-**Next:** [Topic 11 — Linked Lists Foundations](../Lecture11/lecture11_notes.html) →
+## 🏢 Company Focus
+
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/), [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/), [Maximize the Minimum Powered City](https://leetcode.com/problems/maximize-the-minimum-powered-city/), [Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/)                     |
+| **Google**    | [Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/), [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/), [Maximize the Minimum Powered City](https://leetcode.com/problems/maximize-the-minimum-powered-city/), [Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/)                     |
+| **Meta**      | [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/), [Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/), [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/), [Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/) |
+| **Microsoft** | [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/), [Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/), [Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/), [Binary Search](https://leetcode.com/problems/binary-search/)                                                         |
+| **LinkedIn**  | [Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/), [Valid Perfect Square](https://leetcode.com/problems/valid-perfect-square/)                                                                                                                                                                               |
+
+---
+
+## ✅ Completion Checklist
+
+- [ ] All 8 Easy problems solved
+- [ ] All 13 Medium problems solved
+- [ ] All 7 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] All 4 conceptual questions answered out loud
+- [ ] I can write lower bound and upper bound without off-by-one errors
+- [ ] I can recognise a monotonic feasibility function in a word problem
+
+---
+
+**← [Lecture 9 · Sorting Algorithms](../Lecture9/Assignment.md)** &nbsp;·&nbsp; **[Lecture 11 · Linked Lists](../Lecture11/Assignment.md) →**

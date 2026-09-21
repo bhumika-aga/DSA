@@ -56,7 +56,7 @@
 | 15  | 🌳 Trees (Binary Trees & BST)                               | Phase 2 | 10d  | 45       | ✅     |
 | 16  | ⛰️ Heaps & Priority Queues                                  | Phase 2 | 5d   | 20       | ✅     |
 | 17  | 🕸️ Graphs                                                   | Phase 2 | 12d  | 30       | ✅     |
-| 18  | 🎯 Two Pointers & Sliding Window                            | Phase 3 | 6d   | 30       | 📝     |
+| 18  | 🎯 Two Pointers & Sliding Window                            | Phase 3 | 6d   | 30       | ✅     |
 | 19  | 🧾 Prefix Sums & Difference Arrays                          | Phase 3 | 4d   | 20       | 📝     |
 | 20  | 📉 Monotonic Stack & Queue                                  | Phase 3 | 4d   | 20       | 📝     |
 | 21  | 📐 Intervals & Sweep Line                                   | Phase 3 | 4d   | 18       | 📝     |
@@ -122,7 +122,7 @@
 2. **Day 2:** Operators, control flow (if/else, switch), loops (for, while, do-while, enhanced-for)
 3. **Day 3:** Methods, parameter passing (by value vs reference), scope, the call stack, overloading
 4. **Day 4:** OOP — Classes, objects, constructors, `this` keyword, `static` vs instance, inheritance, polymorphism
-5. **Day 5:** Introduction to Big-O — O (1), O (log n), O (n), O (n log n), O (n²), O (2ⁿ), O (n!), space complexity
+5. **Day 5:** Introduction to Big-O — O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ), O(n!), space complexity
 
 #### 🏢 Companies That Ask These
 
@@ -309,7 +309,7 @@
 
 - Understand binary representation and bitwise operators (AND, OR, XOR, NOT, shifts)
 - Learn bit tricks that appear in interviews
-- Solve problems in O (1) space using bit manipulation
+- Solve problems in O(1) space using bit manipulation
 - Understand bitmask DP setup (used in Lecture 28)
 
 #### 🔑 Key Patterns
@@ -364,7 +364,7 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** GCD (Euclidean), LCM, prime factorization, Sieve of Eratosthenes, prime test O (√n)
+1. **Day 1:** GCD (Euclidean), LCM, prime factorization, Sieve of Eratosthenes, prime test O(√n)
 2. **Day 2:** Fast exponentiation, modular arithmetic, modular inverse (Fermat's little theorem), Pow (x, n), Sqrt (x)
 3. **Day 3:** Number theory problems — Count Primes, Happy Number, Excel Sheet Column, Ugly Number I/II
 4. **Day 4:** Combinatorics — Pascal's Triangle, Unique Paths (math), Catalan Numbers, nCr mod p
@@ -399,7 +399,7 @@
 - Master in-place array manipulation techniques
 - Learn two-pointer technique for sorted/unsorted arrays
 - Understand sliding window for subarray/substring problems
-- Use prefix sums for O (1) range query optimization
+- Use prefix sums for O(1) range query optimization
 - Apply Kadane's algorithm for maximum subarray problems
 
 #### 🔑 Key Patterns
@@ -447,7 +447,7 @@
 - Implement all major sorting algorithms from scratch
 - Know stability, in-place, and worst-case trade-offs for each sort
 - Apply sort as preprocessing to unlock faster algorithms
-- Understand counting/radix sort for O (n) on bounded-range inputs
+- Understand counting/radix sort for O(n) on bounded-range inputs
 
 #### 🔑 Key Patterns
 
@@ -461,8 +461,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** O (n²) sorts — Bubble Sort (stable), Selection Sort (unstable), Insertion Sort (adaptive, stable)
-2. **Day 2:** O (n log n) sorts — Merge Sort (stable, D&C), Quick Sort (partition, pivot selection, unstable)
+1. **Day 1:** O(n²) sorts — Bubble Sort (stable), Selection Sort (unstable), Insertion Sort (adaptive, stable)
+2. **Day 2:** O(n log n) sorts — Merge Sort (stable, D&C), Quick Sort (partition, pivot selection, unstable)
 3. **Day 3:** Non-comparison sorts — Counting Sort, Radix Sort, Bucket Sort. **Cyclic Sort** pattern for range-limited
    arrays.
 4. **Day 4:** Interview problems — Custom Comparators (Largest Number, Wiggle Sort), QuickSelect for Kth Largest, Merge
@@ -487,7 +487,7 @@
 
 #### 🎓 Learning Objectives
 
-- Understand the limits of $O (N)$ Linear Search against $O (\log N)$ Binary Search scaling.
+- Understand the limits of $O(N)$ Linear Search against $O(\log N)$ Binary Search scaling.
 - Implement Binary Search perfectly — get boundaries right every single time.
 - Recognize disguised binary search problems that aren't initially obvious.
 - Apply "binary search on answer space" for monotonic optimization scenarios.
@@ -506,7 +506,7 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Searching Basics — Linear Search ($O (N)$) vs Binary Search introduction, constraints and capabilities.
+1. **Day 1:** Searching Basics — Linear Search ($O(N)$) vs Binary Search introduction, constraints and capabilities.
 2. **Day 2:** Classic Binary Strategy — The `lo/hi/mid` template, overflow bugs, when to safely use `<` vs `<=`.
 3. **Day 3:** Rotated Arrays & Bounds — Searching in Rotated Sorted Arrays, First/Last Occurrences, Find Peak.
 4. **Day 4:** Answer Space Optimization — "Binary Search on Answer" structure (Koko Eating Bananas, Capacity to Ship).
@@ -554,7 +554,7 @@
 3. **Day 3:** Fast & slow pointers — find middle, detect cycle, find cycle start, nth from end
 4. **Day 4:** Advanced re-linking — Reverse in-place (iterative/recursive), Reverse in K-Groups
 5. **Day 5:** Specialized variations — Flattening multilevel lists, Copy with random pointer
-6. **Day 6:** Cache Design — LRU Cache & O (1) LFU Cache implementation logic
+6. **Day 6:** Cache Design — LRU Cache & O(1) LFU Cache implementation logic
 
 #### 🏢 Companies That Ask These
 
@@ -578,7 +578,7 @@
 - Understand LIFO (stack) and FIFO (queue) principles and their implementations
 - Master monotonic stack for next greater/smaller element problems
 - Use queues for BFS and level-order traversals
-- Master deque for O (n) sliding window min/max problems
+- Master deque for O(n) sliding window min/max problems
 
 #### 🔑 Key Patterns
 
@@ -619,7 +619,7 @@
 
 - Understand hashing, hash functions, and collision resolution internals
 - Use frequency maps for counting, grouping, and top-K problems
-- Apply complement lookup for pair-sum patterns in O (1)
+- Apply complement lookup for pair-sum patterns in O(1)
 - Know when to use TreeMap (sorted), LinkedHashMap (ordered), vs HashMap (fastest)
 
 #### 🔑 Key Patterns
@@ -701,7 +701,7 @@
 
 - Master all traversals (pre, in, post, level-order, Morris traversal)
 - Think recursively — every tree problem is root + left sub-problem + right sub-problem
-- Leverage BST property for O (log n) operations
+- Leverage BST property for O(log n) operations
 - Solve path-sum, ancestor, construction, and serialization problems
 
 #### 🔑 Key Patterns
@@ -726,7 +726,7 @@
 7. **Day 7:** BST ops — search, insert, delete, validate BST, kth smallest, successor/predecessor
 8. **Day 8:** LCA — LCA of binary tree, LCA of BST, distance between two nodes
 9. **Day 9:** Views — serialize/deserialize BT, vertical/top/bottom/boundary view
-10. **Day 10:** Advanced — flatten BT to LL, Morris traversal O (1) space, count complete tree nodes
+10. **Day 10:** Advanced — flatten BT to LL, Morris traversal O(1) space, count complete tree nodes
 
 #### 🏢 Companies That Ask These
 
@@ -750,7 +750,7 @@
 - Understand heap property (min-heap, max-heap) and heapify operation
 - Implement a heap from scratch using array representation
 - Solve Top-K problems efficiently with a size-K min-heap
-- Use two heaps for dynamic median computation in O (log n) per element
+- Use two heaps for dynamic median computation in O(log n) per element
 
 #### 🔑 Key Patterns
 
@@ -766,7 +766,7 @@
 
 1. **Day 1:** Heap property, array representation (parent=i, left=2i+1, right=2i+2), sift-up, sift-down, build heap O
    (n)
-2. **Day 2:** Heap sort O (n log n), PriorityQueue in Java — custom comparators, objects in heap
+2. **Day 2:** Heap sort O(n log n), PriorityQueue in Java — custom comparators, objects in heap
 3. **Day 3:** Top K — Kth Largest Element, K Closest Points, Top K Frequent, Sort K Sorted Array
 4. **Day 4:** Two heaps — Find Median from Data Stream, Sliding Window Median
 5. **Day 5:** K-way merge — Merge K Sorted Lists, Smallest Range Covering Elements, Task Scheduler, Reorganize String
@@ -888,9 +888,9 @@
 
 #### 🎓 Learning Objectives
 
-- Build a prefix-sum array and answer any range-sum query in O (1)
+- Build a prefix-sum array and answer any range-sum query in O(1)
 - Combine prefix sums with a HashMap to count subarrays matching a target
-- Apply many range updates in O (1) each using a difference array
+- Apply many range updates in O(1) each using a difference array
 - Extend both ideas to 2D grids (integral images)
 - Recognise prefix-XOR and prefix-product as the same shape of trick
 
@@ -908,7 +908,7 @@
 
 1. **Day 1:** 1D prefix sums — build, query, and the off-by-one discipline. Running sum vs stored array.
 2. **Day 2:** Prefix + HashMap — Subarray Sum Equals K, Subarray Sums Divisible by K, Longest Zero-Sum Subarray.
-3. **Day 3:** Difference arrays — range increment in O (1), Car Pooling, Meeting Room capacity, 2D difference arrays.
+3. **Day 3:** Difference arrays — range increment in O(1), Car Pooling, Meeting Room capacity, 2D difference arrays.
 4. **Day 4:** 2D prefix sums — matrix region sums, Max Sum Submatrix; then the prefix-XOR family.
 
 #### 🏢 Companies That Ask These
@@ -931,7 +931,7 @@
 
 - Internalize all 4 monotonic stack variants as a single unified template
 - Apply the contribution technique to solve range min/max sum problems
-- Use monotone deque for O (n) sliding window extremes
+- Use monotone deque for O(n) sliding window extremes
 - Recognize problems solvable only with monotonic structures
 
 #### 🔑 Key Patterns
@@ -970,7 +970,7 @@
 
 - Recognize intervals as a distinct pattern family beyond basic merge/overlap
 - Apply sweep line algorithm for event-processing problems
-- Use difference arrays for O (1) per range update
+- Use difference arrays for O(1) per range update
 - Handle Skyline Problem and rectangle area union
 
 #### 🔑 Key Patterns
@@ -986,7 +986,7 @@
 #### 📝 Sub-Topics & Lecture Flow
 
 1. **Day 1:** Interval fundamentals — overlap check (a.end > b.start), merge, insert, min meeting rooms
-2. **Day 2:** Difference array — range increment/decrement O (1), car pooling, corporate flight bookings
+2. **Day 2:** Difference array — range increment/decrement O(1), car pooling, corporate flight bookings
 3. **Day 3:** Sweep line — Skyline Problem, Rectangle Area Union, Employee Free Time
 
 #### 🏢 Companies That Ask These
@@ -1049,7 +1049,7 @@
 #### 🎓 Learning Objectives
 
 - Formally analyze recursive algorithms using the Master Theorem
-- Apply QuickSelect for O (n) average-case selection
+- Apply QuickSelect for O(n) average-case selection
 - Identify when divide-and-conquer beats brute force
 - Solve hard problems by splitting the problem space
 
@@ -1065,7 +1065,7 @@
 #### 📝 Sub-Topics & Lecture Flow
 
 1. **Day 1:** Master Theorem, recurrence relations, analyzing T (n) = aT (n/b) + f (n)
-2. **Day 2:** QuickSelect — Kth Largest/Smallest, worst case O (n²) vs average O (n)
+2. **Day 2:** QuickSelect — Kth Largest/Smallest, worst case O(n²) vs average O(n)
 3. **Day 3:** Merge sort variants — Count Inversions, Count of Smaller Numbers After Self
 4. **Day 4:** Median of Two Sorted Arrays, different ways to add parentheses, expression evaluation
 
@@ -1088,7 +1088,7 @@
 #### 🎓 Learning Objectives
 
 - Understand DSU as a data structure for tracking dynamic connectivity
-- Implement with path compression + union by rank for near-O (1) per operation
+- Implement with path compression + union by rank for near-O(1) per operation
 - Apply to connected components, cycle detection, and set-merging problems
 - Know when DSU is better than BFS/DFS (online queries, dynamic edges)
 
@@ -1104,7 +1104,7 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** DSU fundamentals — naive, path compression, union by rank, Inverse Ackermann O (α) proof
+1. **Day 1:** DSU fundamentals — naive, path compression, union by rank, Inverse Ackermann O(α) proof
 2. **Day 2:** Classic problems — Number of Provinces, Redundant Connection, Graph Valid Tree, Connecting Cities
 3. **Day 3:** Advanced — Accounts Merge, Number of Islands II (online), Largest Color Value in a DAG
 
@@ -1136,7 +1136,7 @@
 
 - Recognise the two DP signals: overlapping subproblems and optimal substructure
 - Convert any recursion into memoized top-down DP mechanically
-- Convert top-down into bottom-up tabulation, then into O (1) space
+- Convert top-down into bottom-up tabulation, then into O(1) space
 - Define a state precisely — say what dp[i] means in one sentence
 - Solve the 1D families: climbing, robbing, jumping, LIS
 
@@ -1158,7 +1158,7 @@
    Cost Climbing Stairs.
 3. **Day 3:** Take/skip family — House Robber I & II, Delete and Earn, Maximum Alternating Subsequence Sum.
 4. **Day 4:** Jump & reach family — Jump Game I & II, Minimum Jumps, Frog Jump with K distances.
-5. **Day 5:** LIS family — O (n²) DP, then O (n log n) patience sorting, Russian Doll Envelopes, Number of LIS.
+5. **Day 5:** LIS family — O(n²) DP, then O(n log n) patience sorting, Russian Doll Envelopes, Number of LIS.
 6. **Day 6:** Decode Ways, Word Break, Perfect Squares, Coin Change as 1D. Write your own state-definition checklist.
 
 #### 🏢 Companies That Ask These
@@ -1319,7 +1319,7 @@
 #### 🎓 Learning Objectives
 
 - Understand prefix trees as a specialized string search structure
-- Implement insert, search, startsWith from scratch in O (L) time
+- Implement insert, search, startsWith from scratch in O(L) time
 - Apply tries for autocomplete, dictionary, and multi-word grid search
 - Learn XOR tries for efficient maximum XOR queries
 
@@ -1359,7 +1359,7 @@
 #### 🎓 Learning Objectives
 
 - Understand why static prefix sums fail when elements can be updated
-- Build segment trees for O (log n) range query and point update
+- Build segment trees for O(log n) range query and point update
 - Learn lazy propagation to batch range updates efficiently
 - Implement Fenwick Tree (BIT) — simpler and cache-friendly for prefix sums
 
@@ -1376,9 +1376,9 @@
 #### 📝 Sub-Topics & Lecture Flow
 
 1. **Day 1:** Motivation — static prefix sum breaks on updates; square-root decomposition as bridge
-2. **Day 2:** Segment tree — build O (n), range query O (log n), point update O (log n)
-3. **Day 3:** Lazy propagation — range update + range query in O (log n) each
-4. **Day 4:** Fenwick Tree (BIT) — build, prefix sum query, point update — all O (log n)
+2. **Day 2:** Segment tree — build O(n), range query O(log n), point update O(log n)
+3. **Day 3:** Lazy propagation — range update + range query in O(log n) each
+4. **Day 4:** Fenwick Tree (BIT) — build, prefix sum query, point update — all O(log n)
 5. **Day 5:** Problems — Range Sum Query Mutable, Count of Smaller Numbers After Self, Reverse Pairs
 
 #### 🏢 Companies That Ask These
@@ -1400,7 +1400,7 @@
 #### 🎓 Learning Objectives
 
 - Understand the "block-based" strategy to optimize range queries when full trees are overkill
-- Master the O (√N) query and O (1) or O (√N) update trade-offs
+- Master the O(√N) query and O(1) or O(√N) update trade-offs
 - Learn Mo’s Algorithm for offline range queries
 - Handle problems involving frequency counting in specific ranges
 
@@ -1415,8 +1415,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** SQRT fundamentals — partitioning array into blocks, Range Sum/Min query in O (√N)
-2. **Day 2:** Update operations — point update O (1) vs. range query O (√N), block-based optimizations
+1. **Day 1:** SQRT fundamentals — partitioning array into blocks, Range Sum/Min query in O(√N)
+2. **Day 2:** Update operations — point update O(1) vs. range query O(√N), block-based optimizations
 3. **Day 3:** Mo’s Algorithm — query sorting basics, offline range processing, solving Range Distinct Elements
 
 #### 🏢 Companies That Ask These
@@ -1437,10 +1437,10 @@
 
 #### 🎓 Learning Objectives
 
-- Implement KMP for O (n+m) guaranteed pattern matching
-- Use Rabin-Karp rolling hash for average O (n) matching
+- Implement KMP for O(n+m) guaranteed pattern matching
+- Use Rabin-Karp rolling hash for average O(n) matching
 - Apply Z-algorithm for linear prefix-matching queries
-- Use Manacher's for O (n) palindromic substring discovery
+- Use Manacher's for O(n) palindromic substring discovery
 
 #### 🔑 Key Patterns
 
@@ -1456,7 +1456,7 @@
 1. **Day 1:** KMP — prefix function / failure function construction, pattern matching, Repeated Substring Pattern
 2. **Day 2:** Rabin-Karp — polynomial rolling hash, modular arithmetic, collision handling
 3. **Day 3:** Z-algorithm — Z-array construction and applications for pattern matching
-4. **Day 4:** Palindromes — expand around center O (n²), Manacher's O (n), Shortest Palindrome
+4. **Day 4:** Palindromes — expand around center O(n²), Manacher's O(n), Shortest Palindrome
 
 #### 🏢 Companies That Ask These
 
@@ -1562,7 +1562,7 @@
 
 #### 🎓 Learning Objectives
 
-- Compute linear recurrences in O (log n) with matrix exponentiation
+- Compute linear recurrences in O(log n) with matrix exponentiation
 - Count arrangements with nCr, Pascal's triangle and modular inverse
 - Reason about expected value using linearity and indicator variables
 - Decide win/lose positions with the Sprague-Grundy theorem
@@ -1612,9 +1612,9 @@
 #### 🎓 Learning Objectives
 
 - Design custom data structures by combining primitive structures
-- Understand trade-offs: O (1) read vs O (1) write, space vs time
+- Understand trade-offs: O(1) read vs O(1) write, space vs time
 - Implement LRU and LFU cache eviction policies
-- Design for O (1) get/put/delete/random simultaneously
+- Design for O(1) get/put/delete/random simultaneously
 
 #### 🔑 Key Patterns
 
@@ -1628,8 +1628,8 @@
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** LRU Cache — HashMap + Doubly Linked List. Why this pair achieves O (1) get/put/evict
-2. **Day 2:** LFU Cache — two HashMaps + DLL per frequency. O (1) all operations analysis
+1. **Day 1:** LRU Cache — HashMap + Doubly Linked List. Why this pair achieves O(1) get/put/evict
+2. **Day 2:** LFU Cache — two HashMaps + DLL per frequency. O(1) all operations analysis
 3. **Day 3:** Min Stack, Max Stack (two-stack trick), Median Stream (two heaps), RandomizedSet
 4. **Day 4:** Design Search Autocomplete System, Time-Based Key-Value Store, Snapshot Array
 5. **Day 5:** Advanced — Design Twitter (heap + lists), In-Memory File System, Skip List

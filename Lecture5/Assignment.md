@@ -1,4 +1,4 @@
-# 📝 Assignment 05 — Recursion & Backtracking Masterclass
+# 🔁 Assignment 5 — Recursion & Backtracking
 
 > **Lecture:** 5 of 38 — Recursion & Backtracking
 > **Phase:** 1 — Foundations
@@ -8,250 +8,364 @@
 
 ---
 
-## 🗺️ Problem Map by Pattern
+## 🗺️ Pattern Recognition — Read Before Starting
 
-| Pattern / Topic             | Problems           |
-| --------------------------- | ------------------ |
-| Linear Recursion            | 01, 02, 03, 04, 05 |
-| Divide & Conquer            | 06, 07, 08         |
-| Include / Exclude (Subsets) | 09, 10, 11, 12     |
-| Permutations (Swapping)     | 13, 14, 15         |
-| Combinations (Math)         | 16, 17             |
-| Backtracking (Grids)        | 18, 19, 20, 21, 22 |
-| String Recursion            | 23, 24, 25         |
-| Hard Constraints (Puzzles)  | 26, 27, 28, 29, 30 |
-| Challenge Zone (FAANG)      | 31, 32, 33, 34, 35 |
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
----
-
-## 🟢 Easy Tier — 15 Problems (Build the Recursion Tree)
-
-### Problem 01 — Sum of First N Numbers
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Write `sum(n)` recursively. Draw the call stack for `n=4`. Use `return n + sum(n-1)`. State the space
-> complexity (O is NOT 1 here!).
-
-### Problem 02 — Factorial & GCD
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Implement `factorial(n)` and `gcd(a, b)` recursively. Why is recursion better than loops for Euclid's
-> GCD?
-
-### Problem 03 — Power Function (O (n))
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Implement `pow(x, n)` as `x * pow(x, n-1)`. Then look at Topic 7 for how to do this in O (log n).
-
-### Problem 04 — Reverse an Array (Two Pointers)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Use recursion to swap `arr[l]` and `arr[r]`, then call `reverse(l+1, r-1)`. Base case: `l >= r`.
-
-### Problem 05 — Palindrome String check
-
-> 🔗 **LeetCode:** [Check Palindrome (Recursively)](https://leetcode.com/problems/valid-palindrome/)
-> **`[Pattern: Symmetrical Recursion]` `[Easy]` `[Companies: Meta, Amazon, Microsoft]`**
-> Compare `s[0]` and `s[last]`, then recurse on the inner string.
-
-### Problem 06 — Binary Search (Recursive)
-
-**🔗 [LC 704](https://leetcode.com/problems/binary-search/)** · **Companies:** Google, Amazon, Microsoft
-
-> 🔗 **Practice:** Write the recursive version of Binary Search. What is the Space Complexity due to the call stack?
-
-### Problem 07 — Merge Sort (Divide & Conquer)
-
-**🔗 [LC 912](https://leetcode.com/problems/sort-an-array/)** · **Companies:** Amazon, Google, Microsoft
-
-> 🔗 **Practice:** Implement Merge Sort. Focus on the `merge()` step. Why does Merge Sort take O (n log n) time?
-
-### Problem 08 — Quicksort (Partition Logic)
-
-**🔗 [LC 912](https://leetcode.com/problems/sort-an-array/)** · **Companies:** Amazon, Google, Microsoft
-
-> 🔗 **Practice:** Implement Quicksort. Use the **Lomuto partition** or **Hoare partition**. Try to understand why the
-> pivot choice determines the O (n²) worst case.
-
-### Problem 09 — Print Subsequences ("Pick/Don't Pick")
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Given "abc", print all 2³ = 8 subsequences. This is the **most important pattern** for backtracking.
-
-### Problem 10 — Count Digits Recursively
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** `1 + countDigits(n/10)` if `n > 0`.
-
-### Problem 11 — Check if Array is Sorted
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** `return (arr[0] <= arr[1]) && isSorted(rest of array)`.
-
-### Problem 12 — Linear Search (Recursive)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Search index 0, then recurse.
-
-### Problem 13 — Fibonacci (Naïve)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Implement `fib(n) = fib(n-1) + fib(n-2)`. Draw the recursion tree for `n=4`. Why are there 15 nodes
-> for such a small input?
-
-### Problem 14 — Sum of Digits
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** Extract `n % 10`, then recurse `n / 10`.
-
-### Problem 15 — Josephus Problem (Easy Version)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-
-> 🔗 **Practice:** `n` people in a circle, every `k`-th killed. Return survivors index. (Hint:
-> `f(n, k) = (f(n-1, k) + k) % n`).
+| Signal in the Problem                      | Pattern           | Move                                     |
+| ------------------------------------------ | ----------------- | ---------------------------------------- |
+| "all subsets / subsequences"               | Include / Exclude | two branches per element                 |
+| "all arrangements"                         | Permutations      | swap or use a `used[]` array, undo after |
+| "choose k", "sum to target"                | Combinations      | start index + prune when over target     |
+| "split the string into valid pieces"       | Partitioning      | try every cut, recurse on the rest       |
+| "paths in a grid / maze"                   | Grid Backtracking | mark, recurse in 4 directions, unmark    |
+| "solve a smaller copy of the same problem" | Divide & Conquer  | split, recurse, combine                  |
 
 ---
 
-## 🟡 Medium Tier — 15 Problems (The Backtracking Template)
+## 🟢 Easy Tier (15 Problems)
 
-### Problem 16 — Subsets I (The Foundation)
+_Build the Recursion Tree._
 
-> 🔗 **LeetCode:** [78. Subsets](https://leetcode.com/problems/subsets/)
-> **`[Pattern: Include / Exclude]` `[Amazon] [Google]` `[Medium]` `[Companies: Google, Amazon, Meta, Microsoft]`**
-> Build all power sets. Use the template: `helper(index, currentList)`.
+### E1 · Sum of First N Numbers
 
-### Problem 17 — Subsets II (Duplicates)
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-> 🔗 **LeetCode:** [90. Subsets II](https://leetcode.com/problems/subsets-ii/)
-> **`[Pattern: Sort + Skip Duplicates]` `[Medium]` `[Companies: Amazon, Google, Meta]`**
-> Same as above, but with duplicate numbers. Sort first, then skip `nums[i]` if `nums[i] == nums[i-1]`.
-
-### Problem 18 — Permutations I
-
-> 🔗 **LeetCode:** [46. Permutations](https://leetcode.com/problems/permutations/)
-> **`[Pattern: Swapping / Visited Array]` `[Facebook/Meta]` `[Medium]` `[Companies: Google, Amazon, Microsoft, Meta]`**
-> Find all possible orderings of N distinct elements. O (n!).
-
-### Problem 19 — Combinations (K from N)
-
-> 🔗 **LeetCode:** [77. Combinations](https://leetcode.com/problems/combinations/)
-> **`[Pattern: Range Recursion]` `[Medium]` `[Companies: Google, Amazon, Microsoft]`**
-> Return all combinations of k numbers from n.
-
-### Problem 20 — Combination Sum I
-
-> 🔗 **LeetCode:** [39. Combination Sum](https://leetcode.com/problems/combination-sum/)
-> **`[Pattern: Unlimited Reuse]` `[Medium]` `[Companies: Google, Amazon, Meta, Uber]`**
-> Find all unique combinations that sum to target. You can reuse the same element.
-
-### Problem 21 — Combination Sum II
-
-> 🔗 **LeetCode:** [40. Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)
-> **`[Pattern: Single Use + Duplicates]` `[Medium]` `[Companies: Amazon, Google, Meta]`**
-> Each element used only once. Skip duplicates logic applied.
-
-### Problem 22 — Palindrome Partitioning
-
-> 🔗 **LeetCode:** [131. Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
-> **`[Pattern: Cut / Validation]` `[Amazon] [Netflix]` `[Medium]` `[Companies: Google, Amazon, Meta]`**
-> Partition string so every substring is a palindrome.
-
-### Problem 23 — Word Search
-
-> 🔗 **LeetCode:** [79. Word Search](https://leetcode.com/problems/word-search/)
-> **`[Pattern: Grid Backtracking (DFS)]` `[Medium]` `[Companies: Google, Amazon, Microsoft, Meta]`**
-> Find if word exists in a 2D grid. Mark visited cell (e.g., set to '#'), search neighbors, then **unmark** (Backtrack).
-
-### Problem 24 — Letter Combinations of a Phone Number
-
-> 🔗 **LeetCode:** [17. Phone Number Combinations](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)
-> **`[Pattern: Mapping + Recursion]` `[Medium]` `[Companies: Google, Amazon, Meta, Uber]`**
-> E.g., 2="abc", 3="def". Return all strings "ad", "ae", "af"...
-
-### Problem 25 — Binary Tree Paths
-
-> 🔗 **LeetCode:** [257. Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)
-> **`[Pattern: Tree Traversal]` `[Medium]` `[Companies: Google, Amazon, Meta]`**
-> Return all paths from root to leaf. Pre-order traversal with a path tracker.
-
-### Problem 26 — Target Sum
-
-> 🔗 **LeetCode:** [494. Target Sum](https://leetcode.com/problems/target-sum/)
-> **`[Pattern: +/- Choices]` `[Medium]` `[Companies: Meta, Amazon, Google]`**
-> Use `+` or `-` for each number to reach target.
-
-### Problem 27 — Generate Parentheses
-
-> 🔗 **LeetCode:** [22. Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)
-> **`[Pattern: Count-based Backtracking]` `[Medium]` `[Companies: Google, Amazon, Meta, Uber]`**
-> Keep track of open and close counts. Only add `)` if `close < open`.
-
-### Problem 28 — Path with Maximum Gold
-
-> 🔗 **LeetCode:** [1219. Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/)
-> **`[Pattern: Grid DFS + Max result]` `[Medium]` `[Companies: Amazon, Google]`**
-> Similar to Word Search, but track the running sum.
-
-### Problem 29 — All Paths Source to Target
-
-> 🔗 **LeetCode:** [797. All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/)
-> **`[Pattern: Graph DFS]` `[Medium]` `[Companies: Amazon, Google]`**
-> Find all paths from node 0 to node n-1.
-
-### Problem 30 — Restore IP Addresses
-
-> 🔗 **LeetCode:** [93. Restore IP Addresses](https://leetcode.com/problems/restore-ip-addresses/)
-> **`[Pattern: String Segmenting]` `[Medium]` `[Companies: Amazon, Google, Meta]`**
+**Task:** Write `sum(n)` recursively. Draw the call stack for `n=4`. Use `return n + sum(n-1)`. State the space complexity (O is NOT 1 here!).
 
 ---
 
-## 🔴 Challenge Zone — 5 Advanced Problems
+### E2 · Factorial & GCD
 
-### P31-35: The Expert Tier
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-- **P31: N-Queens** ([LC 51](https://leetcode.com/problems/n-queens/)) - The classic backtracking problem. Use sets for columns, row-sum, and row-diff diagonals. `[Companies: Google, Amazon, Meta]`
-
-- **P32: Sudoku Solver** ([LC 37](https://leetcode.com/problems/sudoku-solver/)) - Hard constraints. Return boolean to stop recursion immediately. `[Companies: Google, Amazon, Uber]`
-
-- **P33: Word Break II** ([LC 140](https://leetcode.com/problems/word-break-ii/)) - Backtracking + Memoization. `[Companies: Google, Amazon, Meta, Uber]`
-
-- **P34: Expression Add Operators** ([LC 282](https://leetcode.com/problems/expression-add-operators/)) - Complexity intensive. `[Companies: Google, Meta, Amazon]`
-
-- **P35: Rat in a Maze** ([GFG](https://www.geeksforgeeks.org/problems/rat-in-a-maze-problem/1)) - Standard FAANG  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Google, Adobe]`
-  interview question.
+**Task:** Implement `factorial(n)` and `gcd(a, b)` recursively. Why is recursion better than loops for Euclid's GCD?
 
 ---
 
-## 📊 Complexity Analysis Exercises — 10 Snippets
+### E3 · Power Function (O(n))
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+
+**Task:** Implement `pow(x, n)` as `x * pow(x, n-1)`. Then look at Lecture 7 for how to do this in O(log n).
+
+---
+
+### E4 · Reverse an Array (Two Pointers)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+
+**Task:** Use recursion to swap `arr[l]` and `arr[r]`, then call `reverse(l+1, r-1)`. Base case: `l >= r`.
+
+---
+
+### E5 · Valid Palindrome II
+
+**🔗 [LC 680 — Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/)** · Easy
+**Pattern:** Recursion — Branch Once | **Companies:** Meta, Amazon, Microsoft
+
+**Hint:** Write `isPal(s, l, r)` recursively. At the first mismatch you get exactly one deletion, so return `isPal(l + 1, r) || isPal(l, r - 1)` with no deletions left.
+
+---
+
+### E6 · Kth Missing Positive Number
+
+**🔗 [LC 1539 — Kth Missing Positive Number](https://leetcode.com/problems/kth-missing-positive-number/)** · Easy
+**Pattern:** Recursive Binary Search | **Companies:** Meta, Amazon, Microsoft
+
+**Hint:** The count of missing numbers before index `i` is `arr[i] - (i + 1)`. Binary search — recursively — for the first index where that count is at least `k`; the answer is `lo + k`.
+
+---
+
+### E7 · Sort an Array
+
+**🔗 [LC 912 — Sort an Array](https://leetcode.com/problems/sort-an-array/)** · Medium
+**Pattern:** Merge Sort (Divide & Conquer) | **Companies:** Amazon, Microsoft, Google
+
+**Hint:** Recursively sort the left and right halves, then merge with two pointers into a temporary array. Base case: size ≤ 1. Guaranteed O(n log n), which LeetCode requires here.
+
+---
+
+### E8 · Partition Array According to Given Pivot
+
+**🔗 [LC 2161 — Partition Array According to Given Pivot](https://leetcode.com/problems/partition-array-according-to-given-pivot/)** · Medium
+**Pattern:** Partition Logic | **Companies:** Amazon, Google
+
+**Hint:** This is quicksort's partition step, done stably: collect elements `< pivot`, then `== pivot`, then `> pivot`. Then try it in one pass that writes smaller elements from the front and larger ones from the back.
+
+---
+
+### E9 · Print Subsequences ("Pick/Don't Pick")
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Include / Exclude (Subsets) | **Companies:** Amazon, Google, Adobe
+
+**Task:** Given "abc", print all 2³ = 8 subsequences. This is the **most important pattern** for backtracking.
+
+---
+
+### E10 · Count Digits Recursively
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+
+**Task:** `1 + countDigits(n/10)` if `n > 0`.
+
+---
+
+### E11 · Check if Array is Sorted
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+
+**Task:** `return (arr[0] <= arr[1]) && isSorted(rest of array)`.
+
+---
+
+### E12 · Linear Search (Recursive)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+
+**Task:** Search index 0, then recurse.
+
+---
+
+### E13 · Fibonacci Number
+
+**🔗 [LC 509 — Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)** · Easy
+**Pattern:** Multiple Recursion | **Companies:** Amazon, Google, Adobe
+
+**Hint:** Implement `fib(n) = fib(n-1) + fib(n-2)` and draw the recursion tree for `n = 5`. Count the repeated calls, then add a memo array and count again.
+
+---
+
+### E14 · Sum of Digits in Base K
+
+**🔗 [LC 1837 — Sum of Digits in Base K](https://leetcode.com/problems/sum-of-digits-in-base-k/)** · Easy
+**Pattern:** Linear Recursion on Digits | **Companies:** Amazon, Adobe
+
+**Hint:** Recursive rule: `sumBase(n, k) = n % k + sumBase(n / k, k)`, with base case `n == 0`.
+
+---
+
+### E15 · Find the Winner of the Circular Game
+
+**🔗 [LC 1823 — Find the Winner of the Circular Game](https://leetcode.com/problems/find-the-winner-of-the-circular-game/)** · Medium
+**Pattern:** Recurrence | **Companies:** Amazon, Google, Adobe
+
+**Hint:** `n` people in a circle, every `k`-th is removed. Return the survivor. (Hint: 0-indexed, `f(1, k) = 0` and `f(n, k) = (f(n-1, k) + k) % n`; LeetCode numbers people from 1, so return `f(n, k) + 1`).
+
+---
+
+## 🟡 Medium Tier (15 Problems)
+
+_The Backtracking Template._
+
+### M1 · Subsets
+
+**🔗 [LC 78 — Subsets](https://leetcode.com/problems/subsets/)** · Medium
+**Pattern:** Include / Exclude | **Companies:** Google, Amazon, Meta, Microsoft
+
+**Hint:** Build all power sets. Use the template: `helper(index, currentList)`.
+
+---
+
+### M2 · Subsets II
+
+**🔗 [LC 90 — Subsets II](https://leetcode.com/problems/subsets-ii/)** · Medium
+**Pattern:** Sort + Skip Duplicates | **Companies:** Amazon, Google, Meta
+
+**Hint:** Same as above, but with duplicate numbers. Sort first, then skip `nums[i]` if `nums[i] == nums[i-1]`.
+
+---
+
+### M3 · Permutations
+
+**🔗 [LC 46 — Permutations](https://leetcode.com/problems/permutations/)** · Medium
+**Pattern:** Swapping / Visited Array | **Companies:** Google, Amazon, Microsoft, Meta
+
+**Hint:** Find all possible orderings of N distinct elements. O(n!).
+
+---
+
+### M4 · Combinations
+
+**🔗 [LC 77 — Combinations](https://leetcode.com/problems/combinations/)** · Medium
+**Pattern:** Range Recursion | **Companies:** Google, Amazon, Microsoft
+
+**Hint:** Backtrack with a start index: at each level try numbers from `start` to `n`, add one, recurse with `start = i + 1`, then remove it. Prune when there aren't enough numbers left to reach size `k` (`i <= n - (k - path.size()) + 1`).
+
+---
+
+### M5 · Combination Sum
+
+**🔗 [LC 39 — Combination Sum](https://leetcode.com/problems/combination-sum/)** · Medium
+**Pattern:** Unlimited Reuse | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** Find all unique combinations that sum to target. You can reuse the same element.
+
+---
+
+### M6 · Combination Sum II
+
+**🔗 [LC 40 — Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)** · Medium
+**Pattern:** Single Use + Duplicates | **Companies:** Amazon, Google, Meta
+
+**Hint:** Each element used only once. Skip duplicates logic applied.
+
+---
+
+### M7 · Palindrome Partitioning
+
+**🔗 [LC 131 — Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)** · Medium
+**Pattern:** Cut / Validation | **Companies:** Google, Amazon, Meta
+
+**Hint:** Partition string so every substring is a palindrome.
+
+---
+
+### M8 · Word Search
+
+**🔗 [LC 79 — Word Search](https://leetcode.com/problems/word-search/)** · Medium
+**Pattern:** Grid Backtracking (DFS) | **Companies:** Google, Amazon, Microsoft, Meta
+
+**Hint:** Find if word exists in a 2D grid. Mark visited cell (e.g., set to '#'), search neighbors, then **unmark** (Backtrack).
+
+---
+
+### M9 · Letter Combinations of a Phone Number
+
+**🔗 [LC 17 — Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)** · Medium
+**Pattern:** Mapping + Recursion | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** E.g., 2="abc", 3="def". Return all strings "ad", "ae", "af"...
+
+---
+
+### M10 · Binary Tree Paths
+
+**🔗 [LC 257 — Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)** · Easy
+**Pattern:** Tree Traversal | **Companies:** Google, Amazon, Meta
+
+**Hint:** Return all paths from root to leaf. Pre-order traversal with a path tracker.
+
+---
+
+### M11 · Target Sum
+
+**🔗 [LC 494 — Target Sum](https://leetcode.com/problems/target-sum/)** · Medium
+**Pattern:** +/- Choices | **Companies:** Meta, Amazon, Google
+
+**Hint:** Every number gets a `+` or a `-`: recurse `(i + 1, sum ± nums[i])` and count paths that end at `target`. Then memoise on `(i, sum)`. The DP trick (a subset with sum `(total + target) / 2`) comes in Lecture 27.
+
+---
+
+### M12 · Generate Parentheses
+
+**🔗 [LC 22 — Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)** · Medium
+**Pattern:** Count-based Backtracking | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** Keep track of open and close counts. Only add `)` if `close < open`.
+
+---
+
+### M13 · Path with Maximum Gold
+
+**🔗 [LC 1219 — Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/)** · Medium
+**Pattern:** Grid DFS + Max result | **Companies:** Amazon, Google
+
+**Hint:** From every cell with gold, DFS in 4 directions, temporarily setting the cell to 0 so a path can't revisit it and restoring it on the way back. Return `cell + best neighbour result` and take the maximum over all starts.
+
+---
+
+### M14 · All Paths From Source to Target
+
+**🔗 [LC 797 — All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/)** · Medium
+**Pattern:** Graph DFS | **Companies:** Amazon, Google
+
+**Hint:** The graph is a DAG, so no visited set is needed. DFS from node 0 with a path list; when you reach `n - 1`, copy the path into the results. Add a node before recursing and remove it after.
+
+---
+
+### M15 · Restore IP Addresses
+
+**🔗 [LC 93 — Restore IP Addresses](https://leetcode.com/problems/restore-ip-addresses/)** · Medium
+**Pattern:** String Segmenting | **Companies:** Amazon, Google, Meta
+
+**Hint:** Place 3 dots with backtracking: at each step take the next 1–3 digits as a segment. A segment is valid if it's ≤ 255 and has no leading zero (unless it is exactly "0"). Stop when you have 4 segments and have used every digit.
+
+---
+
+## 🔴 Hard Tier (5 Problems)
+
+_5 Advanced Problems._
+
+### H1 · N-Queens
+
+**🔗 [LC 51 — N-Queens](https://leetcode.com/problems/n-queens/)** · Hard
+**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Meta
+
+**Hint:** The classic backtracking problem. Use sets for columns, row-sum, and row-diff diagonals.
+
+---
+
+### H2 · Sudoku Solver
+
+**🔗 [LC 37 — Sudoku Solver](https://leetcode.com/problems/sudoku-solver/)** · Hard
+**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Uber
+
+**Hint:** Find the next empty cell, try digits 1–9 that don't clash with the row, column or 3×3 box (track these with boolean arrays for O(1) checks), recurse, and undo on failure. Return `true` as soon as the board is full so the solved state isn't undone.
+
+---
+
+### H3 · Word Break II
+
+**🔗 [LC 140 — Word Break II](https://leetcode.com/problems/word-break-ii/)** · Hard
+**Pattern:** Backtracking + Memoization | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** Recurse on the suffix starting at `i`: for every dictionary word that is a prefix, combine it with each sentence of the rest. Memoise `i → list of sentences` so each suffix is solved once.
+
+---
+
+### H4 · Expression Add Operators
+
+**🔗 [LC 282 — Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)** · Hard
+**Pattern:** Expression Backtracking | **Companies:** Google, Meta, Amazon
+
+**Hint:** Backtrack over every split of the digit string, carrying `value` and `prev` (the last operand). For `*`, undo the last operand: `value - prev + prev * cur`. Skip operands with a leading zero and use `long` for the running value.
+
+---
+
+### H5 · Unique Paths III
+
+**🔗 [LC 980 — Unique Paths III](https://leetcode.com/problems/unique-paths-iii/)** · Hard
+**Pattern:** Grid Backtracking | **Companies:** Amazon, Google, Adobe
+
+**Hint:** Count the empty cells first. DFS from the start, marking cells visited and unmarking on the way back. A path counts only if it reaches the end having visited every non-obstacle cell. The same template solves Rat in a Maze.
+
+---
+
+## 📊 Complexity Analysis Exercises
 
 Trace the recursion tree and find Time & Space complexity.
 
-```java
+```psuedocode
 // Snippet 1
-void recur(int n) {
-    if (n <= 1) return;
-    for (int i = 0; i < n; i++) System.out.println(i);
-    recur(n / 2);
-}
+function recur(n):
+    if n ≤ 1: return
+    for i from 0 to n - 1: print(i)
+    recur(n ÷ 2)
 
 // Snippet 2
-void solve(int n) {
-    if (n <= 0) return;
-    solve(n - 1);
-    solve(n - 1);
-}
+function solve(n):
+    if n ≤ 0: return
+    solve(n - 1)
+    solve(n - 1)
 
 // Snippet 3
 // Generating all subsets of an array of size N
@@ -260,52 +374,50 @@ void solve(int n) {
 // Generating all permutations of an array of size N
 
 // Snippet 5
-int factorial(int n) {
-    if (n == 0) return 1;
-    return n * factorial(n - 1);
-}
+function factorial(n):
+    if n = 0: return 1
+    return n × factorial(n - 1)
 
 // Snippet 6
-// N-Queens on an N*N board
+// N-Queens on an N×N board
 
 // Snippet 7
-// Sudoku Solver (Worst case vs Average case)
+// Sudoku Solver (worst case vs average case)
 
 // Snippet 8
-// Fibonacci with Memoization
+// Fibonacci with memoization
 
 // Snippet 9
-void work(int n) {
-    if (n <= 1) return;
-    for (int i = 0; i < n; i++) work(n - 1);
-}
+function work(n):
+    if n ≤ 1: return
+    for i from 0 to n - 1: work(n - 1)
 
 // Snippet 10
-// Traversing a perfectly balanced Binary Tree of height H
+// Traversing a perfectly balanced binary tree of height H
 ```
 
 **Complexity Answers:**
 
-1. **O (n)** Time (n + n/2 + n/4... = 2n), O (log n) Space (Stack depth).
-2. **O (2ⁿ)** Time, O (n) Space.
-3. **O (2ⁿ \* n)** Time. 2ⁿ subsets, n work per subset.
-4. **O (n! \* n)** Time. n! permutations, n work per result.
-5. **O (n)** Time, O (n) Space.
-6. **O (n!)** Time. Each queen limits the column for the next.
-7. **O (9^D)** where D is empty cells.
-8. **O (n)** Time, O (n) Space.
-9. **O (n!)** Time.
-10. **O (2ᴴ)** Time, O (H) Space.
+1. **O(n)** Time (n + n/2 + n/4... = 2n), O(log n) Space (Stack depth).
+2. **O(2ⁿ)** Time, O(n) Space.
+3. **O(2ⁿ \* n)** Time. 2ⁿ subsets, n work per subset.
+4. **O(n! \* n)** Time. n! permutations, n work per result.
+5. **O(n)** Time, O(n) Space.
+6. **O(n!)** Time. Each queen limits the column for the next.
+7. **O(9^D)** where D is empty cells.
+8. **O(n)** Time, O(n) Space.
+9. **O(n!)** Time.
+10. **O(2ᴴ)** Time, O(H) Space.
 
 ---
 
-## ✅ Self-Assessment — True / False
+## 🔍 Self-Assessment — True / False
 
 1. Base case is optional in recursion if the input is always positive. → **False** (leads to infinite recursion).
 2. Recursion always uses more memory than iteration due to stack frames. → **True** (unless Tail Call Optimization
    exists).
 3. Backtracking is essentially systematic "trial and error". → **True**.
-4. Memoization converts a recursive problem to O (n) space always. → **False** (Depends on state variables).
+4. Memoization converts a recursive problem to O(n) space always. → **False** (Depends on state variables).
 5. In backtracking, "unvisiting" a node is the core step that makes it different from simple DFS. → **True**.
 6. Recursion stack limit can be changed in JVM flags. → **True**.
 7. Divide and Conquer and Dynamic Programming mean the same thing. → **False** (DP has overlapping subproblems).
@@ -313,7 +425,7 @@ void work(int n) {
 
 ---
 
-## 🧠 Conceptual Mastery Questions
+## 🧠 Conceptual Check
 
 1. **State Space Tree**: What is a state space tree in the context of N-Queens? How does "pruning" change the number of
    visited nodes?
@@ -326,4 +438,31 @@ void work(int n) {
 
 ---
 
-Next: [Topic 6 — Bit Manipulation](../Lecture6/Assignment.md)
+## 🏢 Company Focus
+
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [N-Queens](https://leetcode.com/problems/n-queens/), [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)                                         |
+| **Google**    | [N-Queens](https://leetcode.com/problems/n-queens/), [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)                                         |
+| **Meta**      | [N-Queens](https://leetcode.com/problems/n-queens/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/), [Subsets](https://leetcode.com/problems/subsets/)                                                     |
+| **Microsoft** | [Subsets](https://leetcode.com/problems/subsets/), [Permutations](https://leetcode.com/problems/permutations/), [Combinations](https://leetcode.com/problems/combinations/), [Word Search](https://leetcode.com/problems/word-search/)                                                                         |
+| **Uber**      | [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Combination Sum](https://leetcode.com/problems/combination-sum/), [Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) |
+
+---
+
+## ✅ Completion Checklist
+
+- [ ] All 15 Easy problems solved
+- [ ] All 15 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 5 conceptual questions answered out loud
+- [ ] I can draw the recursion tree for a small input before coding
+- [ ] I can write the choose → explore → un-choose backtracking template from memory
+
+---
+
+**← [Lecture 4 · Java 8+ Modern Features](../Lecture4/Assignment.md)** &nbsp;·&nbsp; **[Lecture 6 · Bit Manipulation](../Lecture6/Assignment.md) →**

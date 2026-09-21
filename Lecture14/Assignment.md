@@ -21,15 +21,15 @@ Before writing any code, identify which of the 4 patterns applies. Do this **wit
 
 ---
 
-## 🟢 Easy Tier — Build Fluency (5 Problems)
+---
+
+## 🟢 Easy Tier (5 Problems)
 
 _Goal: Get comfortable with grid indexing, bounds checking, and recognising the basic patterns._
 
----
-
 ### E1 · Flood Fill
 
-**🔗 [LC 733 — Flood Fill](https://leetcode.com/problems/flood-fill/)**
+**🔗 [LC 733 — Flood Fill](https://leetcode.com/problems/flood-fill/)** · Easy
 **Pattern:** Grid DFS | **Companies:** Amazon, Adobe
 
 **Problem:** Given a 2D image, a starting cell `(sr, sc)`, and a new colour, flood-fill the connected region starting from `(sr, sc)` with the new colour.
@@ -42,7 +42,7 @@ _Goal: Get comfortable with grid indexing, bounds checking, and recognising the 
 
 ### E2 · Island Perimeter
 
-**🔗 [LC 463 — Island Perimeter](https://leetcode.com/problems/island-perimeter/)**
+**🔗 [LC 463 — Island Perimeter](https://leetcode.com/problems/island-perimeter/)** · Easy
 **Pattern:** Grid Counting | **Companies:** Goldman Sachs, Microsoft
 
 **Problem:** Given a grid with exactly one island (no lakes), return the perimeter of the island.
@@ -57,7 +57,7 @@ _Goal: Get comfortable with grid indexing, bounds checking, and recognising the 
 
 ### E3 · Matrix Diagonal Sum
 
-**🔗 [LC 1572 — Matrix Diagonal Sum](https://leetcode.com/problems/matrix-diagonal-sum/)**
+**🔗 [LC 1572 — Matrix Diagonal Sum](https://leetcode.com/problems/matrix-diagonal-sum/)** · Easy
 **Pattern:** Index Arithmetic | **Companies:** Microsoft
 
 **Problem:** Given a square matrix, return the sum of all elements on the primary diagonal plus the secondary diagonal, counting the centre cell once if n is odd.
@@ -68,22 +68,18 @@ _Goal: Get comfortable with grid indexing, bounds checking, and recognising the 
 
 ---
 
-### E4 · Search a 2D Matrix I
+### E4 · Transpose Matrix
 
-**🔗 [LC 74 — Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)**
-**Pattern:** 2D Binary Search | **Companies:** Amazon, Microsoft
+**🔗 [LC 867 — Transpose Matrix](https://leetcode.com/problems/transpose-matrix/)** · Easy
+**Pattern:** Index Swap | **Companies:** Amazon, Microsoft
 
-**Problem:** Matrix is row-major sorted (last of row < first of next row). Search for a target in O(log(m\*n)).
-
-**Hint:** The entire matrix is a sorted 1D array if you "unwrap" it. Use classic binary search with `mid = lo + (hi - lo) / 2`. Convert `mid` to 2D: `row = mid / n`, `col = mid % n`. This gives O(log(m\*n)).
-
-**Why Easy?** Standard binary search with a simple index mapping trick.
+**Hint:** The result has size `n × m`: `result[j][i] = matrix[i][j]`. For a square matrix, try it in place by swapping across the diagonal only for `j > i`.
 
 ---
 
-### E5 · Count Negative Numbers in Sorted Matrix
+### E5 · Count Negative Numbers in a Sorted Matrix
 
-**🔗 [LC 1351 — Count Negative Numbers in a Sorted Matrix](https://leetcode.com/problems/count-negative-numbers-in-a-sorted-matrix/)**
+**🔗 [LC 1351 — Count Negative Numbers in a Sorted Matrix](https://leetcode.com/problems/count-negative-numbers-in-a-sorted-matrix/)** · Easy
 **Pattern:** Corner Walk | **Companies:** Google
 
 **Problem:** Given a matrix sorted descending in each row and column, count negatives efficiently.
@@ -94,15 +90,13 @@ _Goal: Get comfortable with grid indexing, bounds checking, and recognising the 
 
 ---
 
-## 🟡 Medium Tier — Core Interview Patterns (14 Problems)
+## 🟡 Medium Tier (14 Problems)
 
 _Each problem requires identifying and correctly applying one of the 4 core patterns. These are the most commonly asked matrix problems at FAANG companies._
 
----
-
 ### M1 · Spiral Matrix
 
-**🔗 [LC 54 — Spiral Matrix](https://leetcode.com/problems/spiral-matrix/)**
+**🔗 [LC 54 — Spiral Matrix](https://leetcode.com/problems/spiral-matrix/)** · Medium
 **Pattern:** Boundary Walk | **Companies:** Amazon, Google, Microsoft, Facebook
 
 **Problem:** Return all elements of an m×n matrix in spiral order.
@@ -115,7 +109,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M2 · Rotate Image
 
-**🔗 [LC 48 — Rotate Image](https://leetcode.com/problems/rotate-image/)**
+**🔗 [LC 48 — Rotate Image](https://leetcode.com/problems/rotate-image/)** · Medium
 **Pattern:** In-Place Transformation | **Companies:** Amazon, Microsoft, Apple
 
 **Problem:** Rotate an n×n matrix 90° clockwise in place using O(1) extra space.
@@ -128,7 +122,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M3 · Set Matrix Zeroes
 
-**🔗 [LC 73 — Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/)**
+**🔗 [LC 73 — Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/)** · Medium
 **Pattern:** In-Place State Machine | **Companies:** Amazon, Microsoft, Goldman Sachs
 
 **Problem:** If any cell is 0, set its entire row and column to 0. Do it in place with O(1) extra space.
@@ -141,7 +135,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M4 · Number of Islands
 
-**🔗 [LC 200 — Number of Islands](https://leetcode.com/problems/number-of-islands/)**
+**🔗 [LC 200 — Number of Islands](https://leetcode.com/problems/number-of-islands/)** · Medium
 **Pattern:** Grid DFS (Flood Fill) | **Companies:** Amazon, Google, Meta, Bloomberg
 
 **Problem:** Count connected groups of adjacent '1' cells in a grid of '1' (land) and '0' (water).
@@ -154,7 +148,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M5 · 01 Matrix
 
-**🔗 [LC 542 — 01 Matrix](https://leetcode.com/problems/01-matrix/)**
+**🔗 [LC 542 — 01 Matrix](https://leetcode.com/problems/01-matrix/)** · Medium
 **Pattern:** Multi-Source BFS | **Companies:** Google, Amazon, Uber
 
 **Problem:** Return a matrix where each cell contains its distance to the nearest 0.
@@ -165,7 +159,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M6 · Rotting Oranges
 
-**🔗 [LC 994 — Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)**
+**🔗 [LC 994 — Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)** · Medium
 **Pattern:** Multi-Source BFS with Time Tracking | **Companies:** Amazon, Google, Uber
 
 **Problem:** Rotten oranges (2) spread to fresh (1) neighbours every minute. Return minimum minutes to rot all, or -1 if impossible.
@@ -176,7 +170,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M7 · Search a 2D Matrix II
 
-**🔗 [LC 240 — Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)**
+**🔗 [LC 240 — Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)** · Medium
 **Pattern:** Corner Walk O(m+n) | **Companies:** Google, Microsoft
 
 **Problem:** Matrix has sorted rows (left→right) and sorted columns (top→bottom) independently. Search for target.
@@ -189,7 +183,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M8 · Spiral Matrix II
 
-**🔗 [LC 59 — Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)**
+**🔗 [LC 59 — Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)** · Medium
 **Pattern:** Boundary Walk (fill) | **Companies:** Amazon
 
 **Problem:** Given n, construct an n×n matrix filled with numbers 1 to n² in spiral order.
@@ -200,26 +194,25 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 
 ### M9 · Max Area of Island
 
-**🔗 [LC 695 — Max Area of Island](https://leetcode.com/problems/max-area-of-island/)**
+**🔗 [LC 695 — Max Area of Island](https://leetcode.com/problems/max-area-of-island/)** · Medium
 **Pattern:** Grid DFS with size tracking | **Companies:** Amazon, Google, DoorDash
 
 **Problem:** Find the maximum area (cell count) of any island in the grid.
 
 **Hint:** Same DFS flood fill as Number of Islands, but the DFS returns the **size** of the island it sinks. Track the maximum across all islands.
 
-```java
-int dfs(int r, int c) {
-    if (out of bounds or not '1') return 0;
-    mark visited;
-    return 1 + dfs(r-1,c) + dfs(r+1,c) + dfs(r,c-1) + dfs(r,c+1);
-}
+```psuedocode
+function dfs(r, c):
+    if (r, c) is out of bounds or grid[r][c] ≠ '1': return 0
+    mark (r, c) visited
+    return 1 + dfs(r-1, c) + dfs(r+1, c) + dfs(r, c-1) + dfs(r, c+1)
 ```
 
 ---
 
 ### M10 · Pacific Atlantic Water Flow
 
-**🔗 [LC 417 — Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)**
+**🔗 [LC 417 — Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)** · Medium
 **Pattern:** Reverse Multi-Source BFS/DFS | **Companies:** Google, Amazon
 
 **Problem:** Water flows from higher-or-equal to lower cells. Find all cells that can drain to both Pacific (top/left edges) and Atlantic (bottom/right edges).
@@ -232,7 +225,7 @@ int dfs(int r, int c) {
 
 ### M11 · Game of Life
 
-**🔗 [LC 289 — Game of Life](https://leetcode.com/problems/game-of-life/)**
+**🔗 [LC 289 — Game of Life](https://leetcode.com/problems/game-of-life/)** · Medium
 **Pattern:** In-Place State Machine | **Companies:** Amazon, LinkedIn, Snapchat
 
 **Problem:** Apply Conway's Game of Life rules to a binary grid in place. Cells live or die based on neighbour counts.
@@ -245,7 +238,7 @@ int dfs(int r, int c) {
 
 ### M12 · Surrounded Regions
 
-**🔗 [LC 130 — Surrounded Regions](https://leetcode.com/problems/surrounded-regions/)**
+**🔗 [LC 130 — Surrounded Regions](https://leetcode.com/problems/surrounded-regions/)** · Medium
 **Pattern:** Grid DFS from boundary | **Companies:** Amazon, Microsoft
 
 **Problem:** Capture all 'O' regions not connected to any border. Replace captured 'O's with 'X'.
@@ -254,39 +247,31 @@ int dfs(int r, int c) {
 
 ---
 
-### M13 · Word Search
+### M13 · Number of Closed Islands
 
-**🔗 [LC 79 — Word Search](https://leetcode.com/problems/word-search/)**
-**Pattern:** Grid DFS + Backtracking | **Companies:** Amazon, Microsoft, Google, Bloomberg
+**🔗 [LC 1254 — Number of Closed Islands](https://leetcode.com/problems/number-of-closed-islands/)** · Medium
+**Pattern:** Grid DFS with Border Elimination | **Companies:** Google, Amazon
 
-**Problem:** Given a grid and a word, return true if the word exists as a sequence of adjacent cells (4-directional, no reuse).
-
-**Hint:** For each cell matching `word[0]`, DFS to match the rest of the word. Temporarily mark visited cells (e.g., `grid[r][c] = '#'`) before recursing, restore afterwards (backtracking). Return true as soon as the word is found.
-
-**Optimisation:** If the last letter is rarer than the first, search the word backwards.
+**Hint:** First flood-fill every land cell connected to the border (those islands can't be closed). Then count the remaining land components with DFS.
 
 ---
 
-### M14 · Clone Graph
+### M14 · As Far from Land as Possible
 
-**🔗 [LC 133 — Clone Graph](https://leetcode.com/problems/clone-graph/)**
-**Pattern:** BFS + HashMap | **Companies:** Meta, Amazon, Bloomberg
+**🔗 [LC 1162 — As Far from Land as Possible](https://leetcode.com/problems/as-far-from-land-as-possible/)** · Medium
+**Pattern:** Multi-Source BFS | **Companies:** Amazon, Google
 
-**Problem:** Given a reference to a node in a connected undirected graph, return a deep copy.
-
-**Hint:** BFS from the start node. Use a `HashMap<Node, Node>` mapping original → clone. For each original node, create its clone if not already done, then connect all neighbour clones.
+**Hint:** Enqueue every land cell at distance 0 and BFS outward over water. The last water cell reached has the maximum distance. If there is no land or no water, return -1.
 
 ---
 
-## 🔴 Hard Tier — FAANG Mastery (5 Problems)
+## 🔴 Hard Tier (5 Problems)
 
 _Combines multiple patterns or requires advanced BFS state management. These appear in on-site rounds at Google, Meta, and Amazon._
 
----
-
 ### H1 · Shortest Path in Binary Matrix
 
-**🔗 [LC 1091 — Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)**
+**🔗 [LC 1091 — Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)** · Medium
 **Pattern:** BFS Shortest Path (8-directional) | **Companies:** Google, Amazon
 
 **Problem:** Find the shortest clear path from top-left to bottom-right in a binary matrix (0=clear, 1=blocked). Movement is 8-directional.
@@ -297,21 +282,19 @@ _Combines multiple patterns or requires advanced BFS state management. These app
 
 ---
 
-### H2 · Walls and Gates
+### H2 · Map of Highest Peak
 
-**🔗 [LC 286 — Walls and Gates](https://leetcode.com/problems/walls-and-gates/)**
-**Pattern:** Multi-Source BFS | **Companies:** Meta, Lyft, Airbnb
+**🔗 [LC 1765 — Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/)** · Medium
+**Pattern:** Multi-Source BFS | **Companies:** Google, Amazon
 
-**Problem:** Fill each empty room with its distance to the nearest gate. `-1` = wall, `0` = gate, `INF` = empty room.
-
-**Hint:** Seed BFS with ALL gate cells (0-cells) simultaneously. BFS outward, updating empty rooms with increasing distances. Multi-source BFS is essential — single-source from each gate would be O((m\*n)²).
+**Hint:** Every water cell is height 0 — enqueue them all at once. BFS outward: each unvisited land neighbour gets `height = current + 1`. Adjacent heights then differ by at most 1, and the maximum height is as large as possible.
 
 ---
 
 ### H3 · Minimum Path Sum
 
-**🔗 [LC 64 — Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)**
-**Pattern:** Grid DP (preview of Lecture 21) | **Companies:** Google, Amazon, Adobe
+**🔗 [LC 64 — Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)** · Medium
+**Pattern:** Grid DP (preview of Lecture 26) | **Companies:** Google, Amazon, Adobe
 
 **Problem:** Given a grid of non-negative integers, find the minimum sum path from top-left to bottom-right (can only move right or down).
 
@@ -323,7 +306,7 @@ _Combines multiple patterns or requires advanced BFS state management. These app
 
 ### H4 · Trapping Rain Water II
 
-**🔗 [LC 407 — Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/)**
+**🔗 [LC 407 — Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/)** · Hard
 **Pattern:** Min-Heap (Priority Queue) + BFS from boundary | **Companies:** Google, Amazon
 
 **Problem:** Given an m×n height map, compute how much water it can trap after raining.
@@ -336,7 +319,7 @@ _Combines multiple patterns or requires advanced BFS state management. These app
 
 ### H5 · Word Search II
 
-**🔗 [LC 212 — Word Search II](https://leetcode.com/problems/word-search-ii/)**
+**🔗 [LC 212 — Word Search II](https://leetcode.com/problems/word-search-ii/)** · Hard
 **Pattern:** Grid DFS + Trie | **Companies:** Google, Airbnb, Uber
 
 **Problem:** Given a board and a list of words, return all words that exist in the board.
@@ -347,7 +330,7 @@ _Combines multiple patterns or requires advanced BFS state management. These app
 
 ---
 
-## 🧠 Conceptual Check — Answer Without Looking at Code
+## 🧠 Conceptual Check
 
 These are the kind of questions interviewers ask verbally after you solve the coding problem:
 
@@ -365,28 +348,29 @@ These are the kind of questions interviewers ask verbally after you solve the co
 
 ---
 
-## 🏢 Company Focus Table
+## 🏢 Company Focus
 
-| Company       | Must-Know Problems                                                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **Google**    | Pacific Atlantic (LC 417), Search 2D Matrix II (LC 240), 01 Matrix (LC 542), Trapping Rain Water II (LC 407), Word Search II (LC 212) |
-| **Amazon**    | Number of Islands (LC 200), Rotting Oranges (LC 994), Word Search (LC 79), Spiral Matrix (LC 54), 01 Matrix (LC 542)                  |
-| **Meta**      | Walls and Gates (LC 286), Clone Graph (LC 133), Number of Islands (LC 200)                                                            |
-| **Microsoft** | Rotate Image (LC 48), Set Matrix Zeroes (LC 73), Search 2D Matrix II (LC 240), Word Search (LC 79)                                    |
-| **Goldman**   | Island Perimeter (LC 463), Set Matrix Zeroes (LC 73)                                                                                  |
-| **Airbnb**    | Word Search II (LC 212), Walls and Gates (LC 286)                                                                                     |
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
+| **Google**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
+| **Microsoft** | [Spiral Matrix](https://leetcode.com/problems/spiral-matrix/), [Rotate Image](https://leetcode.com/problems/rotate-image/), [Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/), [Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)                                                 |
+| **Uber**      | [Word Search II](https://leetcode.com/problems/word-search-ii/), [01 Matrix](https://leetcode.com/problems/01-matrix/), [Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)                                                                                                                                        |
+| **Adobe**     | [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Flood Fill](https://leetcode.com/problems/flood-fill/)                                                                                                                                                                                                     |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] Completed all 5 Easy problems
-- [ ] Completed all 14 Medium problems
-- [ ] Attempted all 5 Hard problems
-- [ ] Can answer all 6 Conceptual Check questions verbally
+- [ ] All 5 Easy problems solved
+- [ ] All 14 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] All 6 conceptual questions answered out loud
 - [ ] Can write the 4-direction `dirs` array and `inBounds` check from memory
 - [ ] Can identify the correct pattern within 30 seconds for any matrix problem
 
 ---
 
-**← Topic 13: HashMap & HashSet** &nbsp;&nbsp;|&nbsp;&nbsp; **Topic 15: Trees (Binary Trees & BST) →**
+**← [Lecture 13 · HashMap & HashSet](../Lecture13/Assignment.md)** &nbsp;·&nbsp; **[Lecture 15 · Trees (Binary Trees & BST)](../Lecture15/Assignment.md) →**

@@ -1,4 +1,4 @@
-# 📝 Assignment 04 — Java 8+ Modern Features
+# ⚡ Assignment 4 — Java 8+ Modern Features
 
 > **Lecture:** 4 of 38 — Java 8+ Modern Features
 > **Phase:** 1 — Foundations
@@ -8,191 +8,259 @@
 
 ---
 
-## 🗺️ Problem Map by Pattern
+## 🗺️ Pattern Recognition — Read Before Starting
 
-| Pattern / Topic         | Problems           |
-| ----------------------- | ------------------ |
-| Lambda Basic Sorting    | 01, 02, 03         |
-| Functional Interfaces   | 04, 05, 06         |
-| IntStream / Ranges      | 07, 08             |
-| Stream Filtering & Map  | 09, 10, 11         |
-| Method References       | 12, 13             |
-| Optional Patterns       | 14, 15, 16         |
-| Grouping & Partitioning | 17, 18, 19, 20     |
-| FlatMap & Reduction     | 21, 22, 23         |
-| Parallel Streams        | 24, 25             |
-| Challenge Zone (FAANG)  | 26, 27, 28, 29, 30 |
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
+
+| Signal in the Problem               | Pattern               | Move                                    |
+| ----------------------------------- | --------------------- | --------------------------------------- |
+| "transform every element"           | map                   | `stream().map(f)`                       |
+| "keep only elements that …"         | filter                | `filter(predicate)`                     |
+| "group by / count by"               | Collectors.groupingBy | `groupingBy(key, counting())`           |
+| "list of lists"                     | flatMap               | `flatMap(List::stream)`                 |
+| "combine everything into one value" | reduce                | identity + associative accumulator      |
+| "value might be missing"            | Optional              | `map` / `orElse` instead of null checks |
 
 ---
 
-## 🟢 Easy Tier — 10 Problems (Syntax & Basics)
+## 🟢 Easy Tier (10 Problems)
 
-### Problem 01 — Lambda One-Liner
+_Syntax & Basics._
 
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
+### E1 · Lambda One-Liner
 
-> 🔗 **Practice:** Rewrite an anonymous inner class for `Runnable` into a concise Lambda. Also rewrite
-> `Comparator<Integer> comp = (a, b) -> a - b;` into a method reference `Integer::compare`.
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
 
-### Problem 02 — Sorting a List of Strings
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Create a `List<String> names = Arrays.asList("Apple", "Banana", "Cherry");` and use `names.sort(...)`
-> with a Lambda to sort by **string length** instead of alphabetical order.
-
-### Problem 03 — List to UpperCase
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given a list of strings, use `list.replaceAll(...)` with a Lambda to convert all elements to
-> uppercase.
-
-### Problem 04 — Custom Functional Interface
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-Create a `@FunctionalInterface` called `MathOp` with one method `double operate(double a, double b)`. Implement `Add`,
-`Subtract`, `Multiply`, and `Divide` using only Lambda variables.
-
-### Problem 05 — Predicate Filtering
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Use `Predicate<Integer> isEven = n -> n % 2 == 0;` and use `list.removeIf(isEven)` to filter a list of
-> numbers.
-
-### Problem 06 — Supplier & Consumer
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-Write a `Supplier<Double>` that returns a random number and a `Consumer<Double>` that prints "Random: " followed by that
-number. Execute them 5 times.
-
-### Problem 07 — IntStream Ranges
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Use `IntStream.rangeClosed(1, 100)` to find the sum of all odd numbers between 1 and 100.
-
-### Problem 08 — Array to Stream
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-Convert `int[] nums = {1, 2, 3, 4, 5}` into a stream. Use `.map(n -> n * n)` to square each number and collect it into a
-`List<Integer>`.
-
-### Problem 09 — AnyMatch / AllMatch
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given a list of students, check if **all** students have `gpa > 2.0` and if **any** student has
-> `gpa == 4.0` using Streams.
-
-### Problem 10 — Distinct & Sort
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Join unique names from a list, sorted alphabetically, into a single comma-separated string using
-> `.distinct().sorted().collect(Collectors.joining(", "))`.
+**Task:** Rewrite an anonymous inner class for `Runnable` into a concise Lambda. Also rewrite `Comparator<Integer> comp = (a, b) -> a - b;` into a method reference `Integer::compare`.
 
 ---
 
-## 🟡 Medium Tier — 10 Problems (Pipeline Mastery)
+### E2 · Sorting a List of Strings
 
-### Problem 11 — The `Optional` Rescue
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
 
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Create a method `String getUpperName(Employee e)` that returns
-> `Optional.ofNullable(e.getName()).map(String::toUpperCase).orElse("UNKNOWN")`. Test it with a null employee name.
-
-### Problem 12 — Mapping to Object
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given a `List<String> titles`, use a Stream to convert them into a `List<Book>` objects where the
-> title is passed to the constructor.
-
-### Problem 13 — Grouping By Category
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given `List<Item>` (each with `name` and `category`), create a `Map<String, List<Item>>` grouped by
-> category using `Collectors.groupingBy`.
-
-### Problem 14 — Partitioning By Predicate
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Partition a list of integers into two lists: `primes` and `non-primes` using
-> `Collectors.partitioningBy(n -> isPrime(n))`.
-
-### Problem 15 — FlatMap (List of Lists)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given `List<List<Integer>>`, use `.flatMap(List::stream)` to flatten it into a single `List<Integer>`
-> of all numbers.
-
-### Problem 16 — Count Word Frequencies
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Given a list of words, use `Collectors.groupingBy(Function.identity(), Collectors.counting())` to find
-> the frequency of each word.
-
-### Problem 17 — Max/Min with Streams
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Find the oldest `User` in a list using `.max(Comparator.comparingInt(User::getAge))`. Return as an
-> `Optional<User>`.
-
-### Problem 18 — Parallel Stream Performance
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Perform a complex calculation (e.g., sum of prime factors) on a list of 1,000,000 numbers. Compare the
-> time taken by `.stream()` vs `.parallelStream()`.
-
-### Problem 19 — Reduce (Custom Accumulation)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-
-> 🔗 **Practice:** Use `.reduce(1, (a, b) -> a * b)` to find the factorial of a small number list. Explain the "Identity"
-> parameter.
-
-### Problem 20 — Stream-based Filtering ([LC 438](https://leetcode.com/problems/find-all-anagrams-in-a-string/))
-
-> 🔗 **LeetCode:** [438. Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
-> **`[Pattern: Sliding Window + Stream (optional)]` `[Medium]` `[Companies: Amazon, Meta, Google]`**
-> Use an array freq map to find anagrams. (Hint: Java 8 `Arrays.equals(arr1, arr2)` is the most efficient way to compare
-> the maps inside the loop).
+**Task:** Create a `List<String> names = Arrays.asList("Apple", "Banana", "Cherry");` and use `names.sort(...)` with a Lambda to sort by **string length** instead of alphabetical order.
 
 ---
 
-## 🔴 Challenge Zone — 5 Advanced Problems
+### E3 · List to UpperCase
 
-### P21-25: Real-World Scenarios
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
 
-- **P21: Top K Frequent Words** ([LC 692](https://leetcode.com/problems/top-k-frequent-words/)) - Use `Collectors.groupingBy` and then sort by `Entry.getValue()` DESC and `Entry.getKey()` ASC. `[Companies: Amazon, Google, Uber]`
-
-- **P22: Custom Collector**: Implement a custom collector that computes the **standard deviation** of a stream of  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-  doubles.
-- **P23: Stream of Files**: Use `Files.lines(Path)` to process a 100MB log file. Filter lines starting with "ERROR" and  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-  count them without loading the whole file into RAM.
-- **P24: Optionals in Serialization**: Explain why putting `Optional<T>` as a field in a class is considered "bad  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
-  practice" (it's not Serializable).
-- **P25: Infinite Stream**: Use `Stream.generate(Math::random).limit(10)` to produce random numbers.  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, LinkedIn, Goldman Sachs]`
+**Task:** Given a list of strings, use `list.replaceAll(...)` with a Lambda to convert all elements to uppercase.
 
 ---
 
-## 📊 Complexity Analysis Exercises — 6 Snippets
+### E4 · Custom Functional Interface
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Create a `@FunctionalInterface` called `MathOp` with one method `double operate(double a, double b)`. Implement `Add`, `Subtract`, `Multiply`, and `Divide` using only Lambda variables.
+
+---
+
+### E5 · Predicate Filtering
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Use `Predicate<Integer> isEven = n -> n % 2 == 0;` and use `list.removeIf(isEven)` to filter a list of numbers.
+
+---
+
+### E6 · Supplier & Consumer
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Write a `Supplier<Double>` that returns a random number and a `Consumer<Double>` that prints "Random: " followed by that number. Execute them 5 times.
+
+---
+
+### E7 · IntStream Ranges
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Stream Sources | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Use `IntStream.rangeClosed(1, 100)` to find the sum of all odd numbers between 1 and 100.
+
+---
+
+### E8 · Array to Stream
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Stream Sources | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Convert `int[] nums = {1, 2, 3, 4, 5}` into a stream. Use `.map(n -> n * n)` to square each number and collect it into a `List<Integer>`.
+
+---
+
+### E9 · AnyMatch / AllMatch
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Given a list of students, check if **all** students have `gpa > 2.0` and if **any** student has `gpa == 4.0` using Streams.
+
+---
+
+### E10 · Distinct & Sort
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Join unique names from a list, sorted alphabetically, into a single comma-separated string using `.distinct().sorted().collect(Collectors.joining(", "))`.
+
+---
+
+## 🟡 Medium Tier (10 Problems)
+
+_Pipeline Mastery._
+
+### M1 · The `Optional` Rescue
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Optional | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Create a method `String getUpperName(Employee e)` that returns `Optional.ofNullable(e.getName()).map(String::toUpperCase).orElse("UNKNOWN")`. Test it with a null employee name.
+
+---
+
+### M2 · Mapping to Object
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Given a `List<String> titles`, use a Stream to convert them into a `List<Book>` objects where the title is passed to the constructor.
+
+---
+
+### M3 · Grouping By Category
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Grouping & Partitioning | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Given `List<Item>` (each with `name` and `category`), create a `Map<String, List<Item>>` grouped by category using `Collectors.groupingBy`.
+
+---
+
+### M4 · Partitioning By Predicate
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Grouping & Partitioning | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Partition a list of integers into two lists: `primes` and `non-primes` using `Collectors.partitioningBy(n -> isPrime(n))`.
+
+---
+
+### M5 · FlatMap (List of Lists)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Given `List<List<Integer>>`, use `.flatMap(List::stream)` to flatten it into a single `List<Integer>` of all numbers.
+
+---
+
+### M6 · Uncommon Words from Two Sentences
+
+**🔗 [LC 884 — Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/)** · Easy
+**Pattern:** Collectors.groupingBy + counting | **Companies:** Amazon, Microsoft
+
+**Hint:** Stream the words of both sentences: `Arrays.stream((s1 + " " + s2).split(" "))`, group with `Collectors.groupingBy(Function.identity(), Collectors.counting())`, then filter entries with count 1 and map to keys.
+
+---
+
+### M7 · Max/Min with Streams
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Find the oldest `User` in a list using `.max(Comparator.comparingInt(User::getAge))`. Return as an `Optional<User>`.
+
+---
+
+### M8 · Parallel Stream Performance
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Parallel Streams | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Perform a complex calculation (e.g., sum of prime factors) on a list of 1,000,000 numbers. Compare the time taken by `.stream()` vs `.parallelStream()`.
+
+---
+
+### M9 · Reduce (Custom Accumulation)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Use `.reduce(1, (a, b) -> a * b)` to find the factorial of a small number list. Explain the "Identity" parameter.
+
+---
+
+### M10 · Find Resultant Array After Removing Anagrams
+
+**🔗 [LC 2273 — Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/)** · Easy
+**Pattern:** Stream Filtering with State | **Companies:** Amazon, Google
+
+**Hint:** Two words are anagrams when their sorted characters match. A plain `filter` has no memory of the previous word, so compare against the last kept word — use `IntStream.range` over indices, or a loop, and explain why stateful lambdas are unsafe in parallel streams.
+
+---
+
+## 🔴 Hard Tier (5 Problems)
+
+_5 Advanced Problems._
+
+### H1 · Top K Frequent Words
+
+**🔗 [LC 692 — Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)** · Medium
+**Pattern:** groupingBy + Custom Comparator | **Companies:** Amazon, Google, Uber
+
+**Hint:** Use `Collectors.groupingBy` and then sort by `Entry.getValue()` DESC and `Entry.getKey()` ASC.
+
+---
+
+### H2 · Custom Collector
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Custom Collector | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Implement a custom collector that computes the **standard deviation** of a stream of doubles.
+
+---
+
+### H3 · Stream of Files
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Lazy Streams over Files | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Use `Files.lines(Path)` to process a 100MB log file. Filter lines starting with "ERROR" and count them without loading the whole file into RAM.
+
+---
+
+### H4 · Optionals in Serialization
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Optional Best Practices | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Explain why putting `Optional<T>` as a field in a class is considered "bad practice" (it's not Serializable).
+
+---
+
+### H5 · Infinite Stream
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Infinite Streams + limit | **Companies:** Amazon, LinkedIn, Goldman Sachs
+
+**Task:** Use `Stream.generate(Math::random).limit(10)` to produce random numbers.
+
+---
+
+## 📊 Complexity Analysis Exercises
 
 Wait, are Streams efficient? Let's check.
 
@@ -201,43 +269,36 @@ Wait, are Streams efficient? Let's check.
 long count = IntStream.range(0, n).filter(x -> x % 2 == 0).count();
 
 // Snippet 2
-List<Integer> list = list.stream().sorted().collect(Collectors.toList());
+List<Integer> sorted = list.stream().sorted().collect(Collectors.toList());
 
 // Snippet 3
-Map<Integer, List<String>> map = list.stream().collect(Collectors.groupingBy(String::length));
+Map<Integer, List<String>> byLength = words.stream().collect(Collectors.groupingBy(String::length));
 
 // Snippet 4
-Optional<String> first = list.parallelStream().filter(s -> s.startsWith("A")).findAny();
+Optional<String> first = words.parallelStream().filter(s -> s.startsWith("A")).findAny();
 
 // Snippet 5
 int result = list.stream().reduce(0, Integer::sum);
 
 // Snippet 6
-list.
-
-stream().
-
-flatMap(sublist ->sublist.
-
-stream()).
-
-distinct().
-
-count();
+long distinct = lists.stream()
+        .flatMap(sublist -> sublist.stream())
+        .distinct()
+        .count();
 ```
 
 **Complexity Answers:**
 
-1. **O (n)** Time, O (1) Space. Pipeline lazy evaluation.
-2. **O (n log n)** Time, O (n) Space for sorting result.
-3. **O (n)** Time, O (n) Space for the HashMap.
-4. **O (n/k)** Time where k is CPU cores, O (log n) overhead.
-5. **O (n)** Time, O (1) Space.
-6. **O (Total Elements)** Time, O (Distinct Elements) Space.
+1. **O(n)** Time, O(1) Space. Pipeline lazy evaluation.
+2. **O(n log n)** Time, O(n) Space for sorting result.
+3. **O(n)** Time, O(n) Space for the HashMap.
+4. **O(n/k)** Time where k is CPU cores, O(log n) overhead.
+5. **O(n)** Time, O(1) Space.
+6. **O(Total Elements)** Time, O(Distinct Elements) Space.
 
 ---
 
-## ✅ Self-Assessment — True / False
+## 🔍 Self-Assessment — True / False
 
 1. Lambdas can modify local variables from the outer scope if they are not `final`. → **False** (must be effectively
    final).
@@ -251,7 +312,7 @@ count();
 
 ---
 
-## 🧠 Conceptual Mastery Questions
+## 🧠 Conceptual Check
 
 1. **Lazy Evaluation**: Explain what it means that Java Streams are "lazy". How does it affect performance in a
    `.filter().map().findFirst()` pipeline?
@@ -265,4 +326,30 @@ count();
 
 ---
 
-Next: [Topic 5 — Recursion & Backtracking](../Lecture5/Assignment.md)
+## 🏢 Company Focus
+
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                          |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/), [Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/), [Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/) |
+| **Google**    | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/), [Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/)                                                                                                        |
+| **Microsoft** | [Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/)                                                                                                                                                                                                           |
+| **Uber**      | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)                                                                                                                                                                                                                                     |
+
+---
+
+## ✅ Completion Checklist
+
+- [ ] All 10 Easy problems solved
+- [ ] All 10 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 5 conceptual questions answered out loud
+- [ ] I can rewrite an anonymous class as a lambda or method reference
+- [ ] I can explain when a parallel stream is slower than a sequential one
+
+---
+
+**← [Lecture 3 · OOP & Java Collections Deep Dive](../Lecture3/Assignment.md)** &nbsp;·&nbsp; **[Lecture 5 · Recursion & Backtracking](../Lecture5/Assignment.md) →**

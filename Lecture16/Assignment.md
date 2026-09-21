@@ -19,13 +19,13 @@
 
 ---
 
-## 🟢 Easy Tier (5 Problems)
-
 ---
+
+## 🟢 Easy Tier (5 Problems)
 
 ### E1 · Kth Largest Element in a Stream
 
-**🔗 [LC 703](https://leetcode.com/problems/kth-largest-element-in-a-stream/)**
+**🔗 [LC 703 — Kth Largest Element in a Stream](https://leetcode.com/problems/kth-largest-element-in-a-stream/)** · Easy
 **Pattern:** Single Min-Heap | **Companies:** Amazon, Google
 
 **Hint:** Maintain a min-heap of size k. On each `add(val)`, offer val, poll if size > k. Return `heap.peek()`. Same as Kth Largest in Array but online.
@@ -34,7 +34,7 @@
 
 ### E2 · Last Stone Weight
 
-**🔗 [LC 1046](https://leetcode.com/problems/last-stone-weight/)**
+**🔗 [LC 1046 — Last Stone Weight](https://leetcode.com/problems/last-stone-weight/)** · Easy
 **Pattern:** Max-Heap | **Companies:** Amazon
 
 **Hint:** Push all stones into a max-heap. Each round: poll two heaviest, push back `|y - x|` if not equal. Return remaining stone (or 0).
@@ -43,65 +43,65 @@
 
 ### E3 · Relative Ranks
 
-**🔗 [LC 506](https://leetcode.com/problems/relative-ranks/)**
+**🔗 [LC 506 — Relative Ranks](https://leetcode.com/problems/relative-ranks/)** · Easy
 **Pattern:** Max-Heap | **Companies:** Google
 
 **Hint:** Push `(score, index)` into a max-heap. Poll in order: first gets "Gold Medal", second "Silver Medal", third "Bronze Medal", rest get their rank number.
 
 ---
 
-### E4 · Minimum Cost to Connect Sticks
+### E4 · Take Gifts From the Richest Pile
 
-**🔗 [LC 1167](https://leetcode.com/problems/minimum-cost-to-connect-sticks/)**
-**Pattern:** Min-Heap (Greedy) | **Companies:** Amazon
+**🔗 [LC 2558 — Take Gifts From the Richest Pile](https://leetcode.com/problems/take-gifts-from-the-richest-pile/)** · Easy
+**Pattern:** Max-Heap Simulation | **Companies:** Amazon
 
-**Hint:** Always combine the two smallest sticks (greedy). Use a min-heap. Each round: poll two, push their sum, add sum to total cost. Repeat until one stick remains.
+**Hint:** Put every pile in a max-heap. `k` times: pop the largest, push back `floor(sqrt(x))`. Sum what's left (as `long`). O((n + k) log n).
 
 ---
 
 ### E5 · Sort Characters By Frequency
 
-**🔗 [LC 451](https://leetcode.com/problems/sort-characters-by-frequency/)**
+**🔗 [LC 451 — Sort Characters By Frequency](https://leetcode.com/problems/sort-characters-by-frequency/)** · Medium
 **Pattern:** Max-Heap | **Companies:** Amazon, Google
 
 **Hint:** Count frequencies, push into max-heap. Poll in descending frequency order, append `freq` copies of the character to result.
 
 ---
 
-## 🟡 Medium Tier — Core Interview Patterns (10 Problems)
+## 🟡 Medium Tier (10 Problems)
 
----
+_Core Interview Patterns._
 
-### M1 · Kth Largest Element in an Array ⭐
+### M1 · Kth Largest Element in an Array
 
-**🔗 [LC 215](https://leetcode.com/problems/kth-largest-element-in-an-array/)**
+**🔗 [LC 215 — Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)** · Medium
 **Pattern:** Single Min-Heap | **Companies:** Amazon, Google, Facebook, Microsoft
 
 **Hint:** Size-K min-heap. Offer each element; if size > K, poll. Return peek. Alternative: QuickSelect O(n) average.
 
 ---
 
-### M2 · Top K Frequent Elements ⭐
+### M2 · Top K Frequent Elements
 
-**🔗 [LC 347](https://leetcode.com/problems/top-k-frequent-elements/)**
+**🔗 [LC 347 — Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)** · Medium
 **Pattern:** Top K | **Companies:** Amazon, Google, Facebook
 
 **Hint:** HashMap for frequencies + size-K min-heap sorted by frequency. Alternative: bucket sort in O(n).
 
 ---
 
-### M3 · K Closest Points to Origin ⭐
+### M3 · K Closest Points to Origin
 
-**🔗 [LC 973](https://leetcode.com/problems/k-closest-points-to-origin/)**
+**🔗 [LC 973 — K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)** · Medium
 **Pattern:** Top K | **Companies:** Amazon, Google, Facebook, Uber
 
 **Hint:** Max-heap of size K by squared distance. If new point is closer than farthest in heap, swap. Use squared distance (avoid sqrt). Return heap contents.
 
 ---
 
-### M4 · Sort K Sorted Array
+### M4 · The K Weakest Rows in a Matrix
 
-**🔗 [LC 1337 variant](https://leetcode.com/problems/the-k-weakest-rows-in-a-matrix/)**
+**🔗 [LC 1337 — The K Weakest Rows in a Matrix](https://leetcode.com/problems/the-k-weakest-rows-in-a-matrix/)** · Easy
 **Pattern:** K-way Merge / Min-Heap | **Companies:** Amazon, Google
 
 **Hint (Sort K-sorted array):** Elements are at most K positions from their sorted position. Use a min-heap of size K+1. Slide window: offer next element, poll minimum into result.
@@ -110,7 +110,7 @@
 
 ### M5 · Find K Pairs with Smallest Sums
 
-**🔗 [LC 373](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/)**
+**🔗 [LC 373 — Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/)** · Medium
 **Pattern:** K-way Merge | **Companies:** Google, Amazon
 
 **Hint:** Push `(nums1[0]+nums2[j], 0, j)` for all j=0..k-1 into min-heap. Each poll: output pair, push `(nums1[i+1]+nums2[j], i+1, j)` to continue that "row".
@@ -119,16 +119,16 @@
 
 ### M6 · Reorganize String
 
-**🔗 [LC 767](https://leetcode.com/problems/reorganize-string/)**
+**🔗 [LC 767 — Reorganize String](https://leetcode.com/problems/reorganize-string/)** · Medium
 **Pattern:** Greedy Heap | **Companies:** Google, Amazon, Facebook
 
 **Hint:** Max-heap by frequency. Each round: poll two most frequent chars, append both, decrement. If only one char left and its count > 1 → impossible (return "").
 
 ---
 
-### M7 · Task Scheduler ⭐
+### M7 · Task Scheduler
 
-**🔗 [LC 621](https://leetcode.com/problems/task-scheduler/)**
+**🔗 [LC 621 — Task Scheduler](https://leetcode.com/problems/task-scheduler/)** · Medium
 **Pattern:** Greedy Heap | **Companies:** Amazon, Facebook, Uber
 
 **Hint:** Max-heap + wait queue `[(remaining, available_at)]`. At each tick: if heap non-empty do the most frequent task. Enqueue to wait with `time + n`. Recheck wait queue each tick.
@@ -137,18 +137,18 @@
 
 ---
 
-### M8 · Ugly Number II
+### M8 · Super Ugly Number
 
-**🔗 [LC 264](https://leetcode.com/problems/ugly-number-ii/)**
-**Pattern:** Min-Heap + Set (dedup) | **Companies:** Google, Amazon
+**🔗 [LC 313 — Super Ugly Number](https://leetcode.com/problems/super-ugly-number/)** · Medium
+**Pattern:** K-Way Merge with a Heap | **Companies:** Google, Amazon
 
-**Hint:** Start with 1. Each round: poll min, multiply by 2, 3, 5 and push if not seen. Use HashSet to avoid duplicates. After n polls the answer is found.
+**Hint:** Same idea as Ugly Number II with k pointers. Push `(primes[j], j, index 0)` into a min-heap; pop the smallest, append it if it's new, and push `primes[j] × ugly[index + 1]`. Skip duplicates when popping.
 
 ---
 
 ### M9 · Maximum Subsequence Score
 
-**🔗 [LC 2542](https://leetcode.com/problems/maximum-subsequence-score/)**
+**🔗 [LC 2542 — Maximum Subsequence Score](https://leetcode.com/problems/maximum-subsequence-score/)** · Medium
 **Pattern:** Greedy + Min-Heap | **Companies:** Google
 
 **Hint:** Sort pairs by nums2 descending. Maintain a min-heap of size k for nums1 values. At each step: track sum of top-k nums1 values. Score = sum \* nums2[i]. Update global max.
@@ -157,20 +157,20 @@
 
 ### M10 · Design Twitter
 
-**🔗 [LC 355](https://leetcode.com/problems/design-twitter/)**
+**🔗 [LC 355 — Design Twitter](https://leetcode.com/problems/design-twitter/)** · Medium
 **Pattern:** K-way Merge | **Companies:** Amazon, Twitter
 
 **Hint:** Each user has a tweet list. `getNewsFeed` merges the 10 most recent tweets from the user and all followees using a max-heap (by timestamp). Classic K-way merge with K = number of followees + 1.
 
 ---
 
-## 🔴 Hard Tier — FAANG Mastery (5 Problems)
+## 🔴 Hard Tier (5 Problems)
 
----
+_FAANG Mastery._
 
-### H1 · Find Median from Data Stream ⭐
+### H1 · Find Median from Data Stream
 
-**🔗 [LC 295](https://leetcode.com/problems/find-median-from-data-stream/)**
+**🔗 [LC 295 — Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)** · Hard
 **Pattern:** Two Heaps | **Companies:** Amazon, Google, Microsoft, Apple
 
 **Hint:** maxH (lower half) + minH (upper half). Always push to maxH first, then shuttle max-of-lower to minH. Rebalance if minH grows larger. Median at root(s).
@@ -181,7 +181,7 @@
 
 ### H2 · Sliding Window Median
 
-**🔗 [LC 480](https://leetcode.com/problems/sliding-window-median/)**
+**🔗 [LC 480 — Sliding Window Median](https://leetcode.com/problems/sliding-window-median/)** · Hard
 **Pattern:** Two Heaps + Lazy Deletion | **Companies:** Google, Amazon
 
 **Hint:** Same Two Heaps as LC 295 but must support removal of the element sliding out of the window. Use lazy deletion: a HashMap tracks "cancelled" elements; skip them when they reach the top of the heap during balance checks.
@@ -190,9 +190,9 @@
 
 ---
 
-### H3 · Merge K Sorted Lists ⭐
+### H3 · Merge k Sorted Lists
 
-**🔗 [LC 23](https://leetcode.com/problems/merge-k-sorted-lists/)**
+**🔗 [LC 23 — Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)** · Hard
 **Pattern:** K-way Merge | **Companies:** Amazon, Google, Microsoft, Facebook
 
 **Hint:** Push all K heads. Poll minimum, add to result, push its next. O(N log K).
@@ -203,16 +203,16 @@
 
 ### H4 · Smallest Range Covering Elements from K Lists
 
-**🔗 [LC 632](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/)**
+**🔗 [LC 632 — Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/)** · Hard
 **Pattern:** K-way Merge + Sliding Window | **Companies:** Google, Amazon
 
 **Hint:** Push `(val, listIdx, elemIdx)` for all `list[i][0]` into min-heap. Track current max across all heap elements. Range = `[minHeap.peek(), curMax]`. Slide: poll min, push next from same list. Update range if smaller. Stop when any list is exhausted.
 
 ---
 
-### H5 · IPO (Maximize Capital)
+### H5 · IPO
 
-**🔗 [LC 502](https://leetcode.com/problems/ipo/)**
+**🔗 [LC 502 — IPO](https://leetcode.com/problems/ipo/)** · Hard
 **Pattern:** Two Heaps (Greedy) | **Companies:** Google, Amazon, Microsoft
 
 **Hint:** Sort projects by capital required. Min-heap of `(capital, profit)` for available projects. Max-heap of `profit` for projects you can afford. At each of k rounds: unlock all projects with `capital ≤ w` into profit max-heap. Pick the most profitable one, add profit to `w`.
@@ -235,23 +235,26 @@
 
 ---
 
-## 🏢 Company Focus Table
+## 🏢 Company Focus
 
-| Company       | Must-Know Problems                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| **Amazon**    | Kth Largest (LC 215), Merge K Lists (LC 23), Task Scheduler (LC 621), Find Median (LC 295) |
-| **Google**    | K Closest Points (LC 973), Find K Pairs (LC 373), Smallest Range (LC 632), IPO (LC 502)    |
-| **Microsoft** | Find Median (LC 295), Merge K Lists (LC 23), Top K Frequent (LC 347)                       |
-| **Facebook**  | K Closest (LC 973), Merge K Lists (LC 23), Reorganize String (LC 767)                      |
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/) |
+| **Google**    | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/) |
+| **Facebook**  | [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/), [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/), [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)                             |
+| **Microsoft** | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [IPO](https://leetcode.com/problems/ipo/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)                                                                 |
+| **Uber**      | [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/)                                                                                                                                                                                                                               |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] Completed all 5 Easy problems
-- [ ] Completed all 10 Medium problems
-- [ ] Attempted all 5 Hard problems
-- [ ] Can answer all 5 Conceptual Check questions verbally
+- [ ] All 5 Easy problems solved
+- [ ] All 10 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] All 5 conceptual questions answered out loud
 - [ ] Can write the Two Heaps `addNum`/`findMedian` from memory
 - [ ] Can write K-way Merge for linked lists from memory
 - [ ] Can implement a custom PriorityQueue comparator for any object type
@@ -259,4 +262,4 @@
 
 ---
 
-**← Topic 15: Trees & BST** &nbsp;&nbsp;|&nbsp;&nbsp; **Topic 17: Graphs →**
+**← [Lecture 15 · Trees (Binary Trees & BST)](../Lecture15/Assignment.md)** &nbsp;·&nbsp; **[Lecture 17 · Graphs](../Lecture17/Assignment.md) →**

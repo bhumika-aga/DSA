@@ -1,4 +1,4 @@
-# 📝 Assignment 03 — OOP & Java Collections Deep Dive
+# 🏗️ Assignment 3 — OOP & Java Collections Deep Dive
 
 > **Lecture:** 3 of 38 — OOP & Java Collections Deep Dive
 > **Phase:** 1 — Foundations
@@ -7,266 +7,358 @@
 
 ---
 
-## 🗺️ Problem Map by Pattern
+## 🗺️ Pattern Recognition — Read Before Starting
 
-| Pattern / Topic             | Problems           |
-| --------------------------- | ------------------ |
-| Encapsulation & Access      | 01, 02, 03, 04     |
-| Inheritance & Overriding    | 05, 06, 07         |
-| Polymorphism (Method)       | 08, 09, 10         |
-| Interfaces & Abstraction    | 11, 12, 13, 14, 15 |
-| Abstract Classes            | 16, 17, 18         |
-| Generics (Basic)            | 19, 20             |
-| Bounded Wildcards           | 21, 22, 23         |
-| Design Problems (LC)        | 24, 25, 26, 27, 28 |
-| Sorting (Comparators)       | 29, 30, 31         |
-| Collection Interoperability | 32, 33, 34, 35     |
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
+
+| Signal in the Problem                           | Pattern          | Move                                                  |
+| ----------------------------------------------- | ---------------- | ----------------------------------------------------- |
+| "only valid values allowed"                     | Encapsulation    | private fields + validating methods                   |
+| "is-a" relationship                             | Inheritance      | extend, override, call `super`                        |
+| "can-do" capability shared by unrelated classes | Interface        | program to the interface, not the class               |
+| "design a class that supports …"                | Class Design     | pick the backing structure first, then the invariants |
+| "sort objects by several fields"                | Comparator Chain | `comparing(...).thenComparing(...)`                   |
+| "iterate over my custom collection"             | Iterator Pattern | implement `Iterable<T>` / wrap an `Iterator`          |
 
 ---
 
-## 🟢 Easy Tier — 15 Problems (OOP Foundations)
+## 🟢 Easy Tier (15 Problems)
 
-### Problem 01 — Encapsulation Audit
+_OOP Foundations._
 
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
+### E1 · Encapsulation Audit
 
-Create a `BankAccount` class with a `private` balance. Provide a `deposit()` method that validates the amount is
-positive. Why is `private balance` better than `public balance`?
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
 
-### Problem 02 — Data Hiding
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement a `Person` class where the `age` can only be set between 0 and 150. If an invalid age is passed, print an
-error or throw an exception. This is the core of "Internal State Protection".
-
-### Problem 03 — Primitive vs Reference Packaging
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Create a `WrapperTest` class. Pass a `StringBuilder` to a method and append text. Does the original `StringBuilder`
-change? Now pass an `Integer` and increment it. Does the original change? Explain.
-
-### Problem 04 — Default vs Private Constructors
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-When would you make a constructor `private`? (Hint: Utility classes or Singleton pattern). Implement a `MathUtils` class
-with a private constructor that only has static methods.
-
-### Problem 05 — Simple Inheritance
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Create a `Shape` class with a `draw()` method. Create `Circle` and `Square` subclasses that override `draw()`. Use a
-`Shape` reference to call `draw()` on a `Circle` object.
-
-### Problem 06 — The `super` Keyword
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-In a `Dog` class extending `Animal`, use `super()` to call the parent's constructor and `super.makeSound()` to call the
-parent's method before the dog's bark.
-
-### Problem 07 — Static vs Instance variables
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Create a `Employee` class where `id` is instance-based and `companyName` is `static`. Create 3 employees. Change
-`companyName` for one. Check if it changed for others.
-
-### Problem 08 — Method Overloading
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement `calculateArea(int side)`, `calculateArea(int length, int width)`, and `calculateArea(double radius)`. How
-does the compiler know which one to call? (Static Polymorphism).
-
-### Problem 09 — Final Keyword
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-What happens if you try to extend a `final class`? What happens if you try to override a `final method`? Implement a
-`ConstantManager` class to test this.
-
-### Problem 10 — Overriding `toString()`
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Override the `toString()` method for a `Book` class (`title`, `author`). Print the object directly. Why is this better
-than calling `book.getTitle()`?
-
-### Problem 11 — Interface Basics
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Define a `Switchable` interface with `turnOn()` and `turnOff()`. Implement it in `LightBulb` and `Fan`. Why is an
-interface more flexible than an abstract class here?
-
-### Problem 12 — Multiple Interface Implementation
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement `Readable` and `Writable` interfaces in a `SmartDocument` class.
-
-### Problem 13 — Default Methods in Interfaces
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Can an interface have a method body? Since Java 8, yes. Add a `logActivity()` default method to an interface. Does the
-implementing class _have_ to override it?
-
-### Problem 14 — Comparable Basics
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-> 🔗 **Practice:** Make a `Student` class implement `Comparable<Student>` to sort by `gpa` descending. Use
-> `Collections.sort(students)`.
-
-### Problem 15 — ArrayList vs Raw Arrays
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Convert an `int[]` array to an `ArrayList<Integer>`. Practice `add()`, `remove(index)`, `set(index, val)`, and
-`contains()`. Why does `remove(0)` take O (n) time?
+**Task:** Create a `BankAccount` class with a `private` balance. Provide a `deposit()` method that validates the amount is positive. Why is `private balance` better than `public balance`?
 
 ---
 
-## 🟡 Medium Tier — 15 Problems (Interview Staples)
+### E2 · Data Hiding
 
-### Problem 16 — Abstract Class Design
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
 
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Create an abstract `PaymentMethod` class with an abstract `processPayment(double amount)` and a concrete
-`printReceipt()` method. Why can't you instantiate `PaymentMethod`?
-
-### Problem 17 — Nested Classes
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Explain the difference between a `static nested class` and an `inner class`. When would you use a `Local Inner Class`
-inside a method?
-
-### Problem 18 — Interface vs Abstract Class (The Table)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Write a 5-point comparison table for your notes. Key points: Constructor, Multi-inheritance, State (variables), Method
-visibility, Use cases.
-
-### Problem 19 — Generic Class Implementation
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-> 🔗 **Practice:** Implement a generic `Box<T>` class that can hold any type. Add `set(T item)` and `T get()`.
-
-### Problem 20 — Generic Methods
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Write a generic method `printArray(T[] array)` that prints any array type (Integer, String, Double). Why won't it work
-for primitives like `int[]`? (Hint: Type Erasure).
-
-### Problem 21 — Bounded Wildcards (UL/LL)
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Explain `List<? extends Shape>` (Upper Bound) and `List<? super Circle>` (Lower Bound). Which one allows adding
-elements? Why? (PECS: Producer Extends, Consumer Super).
-
-### Problem 22 — Design a Stack using ArrayList
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement a class `MyStack` that uses an internal `ArrayList`. Methods: `push(T)`, `pop()`, `peek()`, `isEmpty()`.
-
-### Problem 23 — Comparator Chain
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-> 🔗 **Practice:** Sort a `List<Product>` by `category` first (ASC), then by `price` (DESC) within the same category. Use
-> `Comparator.comparing(...).thenComparing(...)`.
-
-### Problem 24 — Design HashMap
-
-> 🔗 **LeetCode:** [706. Design HashMap](https://leetcode.com/problems/design-hashmap/)
-> **`[Pattern: Hashing + Collision Handling]` `[Medium]` `[Companies: Amazon, Google, Microsoft]`**
-> Implement `put`, `get`, and `remove` without using built-in HashMaps. Use an array of buckets (LinkedLists).
-
-### Problem 25 — Design Linked List
-
-> 🔗 **LeetCode:** [707. Design Linked List](https://leetcode.com/problems/design-linked-list/)
-> **`[Pattern: Pointer Manipulation]` `[Medium]` `[Companies: Amazon, Microsoft, Adobe]`**
-> Implement a singly linked list. This cements your understanding of node-based data structures.
-
-### Problem 26 — Implement Stack using Queues
-
-> 🔗 **LeetCode:** [225. Implement Stack using Queues](https://leetcode.com/problems/implement-stack-using-queues/)
-> **`[Pattern: Data Structure Interoperability]` `[Medium]` `[Companies: Amazon, Microsoft, Adobe]`**
-> Use two `Queue` objects to simulate a `Last-In-First-Out` stack.
-
-### Problem 27 — Implement Queue using Stacks
-
-> 🔗 **LeetCode:** [232. Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
-> **`[Pattern: Data Structure Interoperability]` `[Medium]` `[Companies: Amazon, Microsoft, Bloomberg]`**
-> Use two stacks. Amortized O (1) for `enqueue` and `dequeue`.
-
-### Problem 28 — Min Stack (O (1) time)
-
-> 🔗 **LeetCode:** [155. Min Stack](https://leetcode.com/problems/min-stack/)
-> **`[Pattern: Auxiliary State Storage]` `[Amazon] [Google]` `[Medium]` `[Companies: Amazon, Google, Bloomberg]`**
-> Design a stack that supports `push`, `pop`, `top`, and retrieving the minimum element in constant time. Use an
-> auxiliary "min-stack".
-
-### Problem 29 — Iterator Pattern
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement the `Iterable` interface on a custom `BookCollection` class. Allow users to use `for(Book b : collection)` to
-iterate through the books.
-
-### Problem 30 — Deep Copy vs Shallow Copy
-
-`[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-
-Implement `Cloneable` on an `Engine` and a `Car` (which contains an `Engine`). Perform a shallow copy and a deep copy.
-Change the engine details in the clone. Does it affect the original?
+**Task:** Implement a `Person` class where the `age` can only be set between 0 and 150. If an invalid age is passed, print an error or throw an exception. This is the core of "Internal State Protection".
 
 ---
 
-## 🔴 Challenge Zone — 5 Advanced Problems
+### E3 · Primitive vs Reference Packaging
 
-### P31-35: Design Architectures
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
 
-- **P31: Design an LRU Cache** ([LC 146](https://leetcode.com/problems/lru-cache/)) - The ultimate JCF + OOP test. O (1) time complexity requirement. `[Companies: Amazon, Microsoft, Meta, Google]`
-
-- **P32: Generic `MyLinkedList<T>`**: Implement a doubly linked list with Generics. Support `Iterator`, `Generic types`,  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-  and `O(1) size access`.
-- **P33: Frequency Stack** ([LC 895](https://leetcode.com/problems/maximum-frequency-stack/)) - A stack that pops the most frequent element. `[Companies: Amazon, Google, Meta]`
-
-- **P34: Design Browser History** ([LC 1470](https://leetcode.com/problems/design-browser-history/)) - Using two stacks or a doubly linked list. `[Companies: Amazon, Google, Bloomberg]`
-
-- **P35: Dependency Injection Preview**: Write a `EngineInterface` and two implementations: `ElectricEngine` and  
-  `[Concept · no LeetCode equivalent]` `[Companies: Amazon, Microsoft, Oracle]`
-  `GasEngine`. Write a `Car` class that accepts a `EngineInterface` in its constructor. Explain why this is better than
-  "newing" up an engine inside the car.
+**Task:** Create a `WrapperTest` class. Pass a `StringBuilder` to a method and append text. Does the original `StringBuilder` change? Now pass an `Integer` and increment it. Does the original change? Explain.
 
 ---
 
-## 📊 Complexity Analysis Exercises — 8 Snippets
+### E4 · Default vs Private Constructors
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** When would you make a constructor `private`? (Hint: Utility classes or Singleton pattern). Implement a `MathUtils` class with a private constructor that only has static methods.
+
+---
+
+### E5 · Simple Inheritance
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Create a `Shape` class with a `draw()` method. Create `Circle` and `Square` subclasses that override `draw()`. Use a `Shape` reference to call `draw()` on a `Circle` object.
+
+---
+
+### E6 · The `super` Keyword
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** In a `Dog` class extending `Animal`, use `super()` to call the parent's constructor and `super.makeSound()` to call the parent's method before the dog's bark.
+
+---
+
+### E7 · Static vs Instance variables
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Create a `Employee` class where `id` is instance-based and `companyName` is `static`. Create 3 employees. Change `companyName` for one. Check if it changed for others.
+
+---
+
+### E8 · Method Overloading
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Implement `calculateArea(int side)`, `calculateArea(int length, int width)`, and `calculateArea(double radius)`. How does the compiler know which one to call? (Static Polymorphism).
+
+---
+
+### E9 · Final Keyword
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** What happens if you try to extend a `final class`? What happens if you try to override a `final method`? Implement a `ConstantManager` class to test this.
+
+---
+
+### E10 · Overriding `toString()`
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Override the `toString()` method for a `Book` class (`title`, `author`). Print the object directly. Why is this better than calling `book.getTitle()`?
+
+---
+
+### E11 · Interface Basics
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Define a `Switchable` interface with `turnOn()` and `turnOff()`. Implement it in `LightBulb` and `Fan`. Why is an interface more flexible than an abstract class here?
+
+---
+
+### E12 · Multiple Interface Implementation
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Implement `Readable` and `Writable` interfaces in a `SmartDocument` class.
+
+---
+
+### E13 · Default Methods in Interfaces
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Can an interface have a method body? Since Java 8, yes. Add a `logActivity()` default method to an interface. Does the implementing class _have_ to override it?
+
+---
+
+### E14 · Comparable Basics
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Make a `Student` class implement `Comparable<Student>` to sort by `gpa` descending. Use `Collections.sort(students)`.
+
+---
+
+### E15 · ArrayList vs Raw Arrays
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Arrays vs Collections | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Convert an `int[]` array to an `ArrayList<Integer>`. Practice `add()`, `remove(index)`, `set(index, val)`, and `contains()`. Why does `remove(0)` take O(n) time?
+
+---
+
+## 🟡 Medium Tier (15 Problems)
+
+_Interview Staples._
+
+### M1 · Abstract Class Design
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Create an abstract `PaymentMethod` class with an abstract `processPayment(double amount)` and a concrete `printReceipt()` method. Why can't you instantiate `PaymentMethod`?
+
+---
+
+### M2 · Nested Classes
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Explain the difference between a `static nested class` and an `inner class`. When would you use a `Local Inner Class` inside a method?
+
+---
+
+### M3 · Interface vs Abstract Class (The Table)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Write a 5-point comparison table for your notes. Key points: Constructor, Multi-inheritance, State (variables), Method visibility, Use cases.
+
+---
+
+### M4 · Generic Class Implementation
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Implement a generic `Box<T>` class that can hold any type. Add `set(T item)` and `T get()`.
+
+---
+
+### M5 · Generic Methods
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Write a generic method `printArray(T[] array)` that prints any array type (Integer, String, Double). Why won't it work for primitives like `int[]`? (Hint: Type Erasure).
+
+---
+
+### M6 · Bounded Wildcards (UL/LL)
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Explain `List<? extends Shape>` (Upper Bound) and `List<? super Circle>` (Lower Bound). Which one allows adding elements? Why? (PECS: Producer Extends, Consumer Super).
+
+---
+
+### M7 · Design a Stack With Increment Operation
+
+**🔗 [LC 1381 — Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/)** · Medium
+**Pattern:** Class Design — Array-backed Stack | **Companies:** Amazon, Microsoft
+
+**Hint:** Back the stack with an array and a `top` index. For O(1) `increment`, keep a lazy `inc[]` array: add `val` at index `min(k, size) - 1`, and when popping index `i`, carry `inc[i]` down to `inc[i - 1]`.
+
+---
+
+### M8 · Comparator Chain
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Comparators, Iterators & Copying | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Sort a `List<Product>` by `category` first (ASC), then by `price` (DESC) within the same category. Use `Comparator.comparing(...).thenComparing(...)`.
+
+---
+
+### M9 · Design HashMap
+
+**🔗 [LC 706 — Design HashMap](https://leetcode.com/problems/design-hashmap/)** · Easy
+**Pattern:** Hashing + Collision Handling | **Companies:** Amazon, Google, Microsoft
+
+**Hint:** Implement `put`, `get`, and `remove` without using built-in HashMaps. Use an array of buckets (LinkedLists).
+
+---
+
+### M10 · Design Linked List
+
+**🔗 [LC 707 — Design Linked List](https://leetcode.com/problems/design-linked-list/)** · Medium
+**Pattern:** Pointer Manipulation | **Companies:** Amazon, Microsoft, Adobe
+
+**Hint:** Implement a singly linked list. This cements your understanding of node-based data structures.
+
+---
+
+### M11 · Design Parking System
+
+**🔗 [LC 1603 — Design Parking System](https://leetcode.com/problems/design-parking-system/)** · Easy
+**Pattern:** Class Design — Encapsulation | **Companies:** Amazon, Microsoft
+
+**Hint:** Hold the three remaining capacities in a `private` array indexed by car type. `addCar` checks and decrements. Nothing outside the class can change the counts directly — that's encapsulation.
+
+---
+
+### M12 · Design an Ordered Stream
+
+**🔗 [LC 1656 — Design an Ordered Stream](https://leetcode.com/problems/design-an-ordered-stream/)** · Easy
+**Pattern:** Class Design — State | **Companies:** Bloomberg, Amazon
+
+**Hint:** Keep a `String[]` of size n+1 and a `ptr` starting at 1. `insert` stores the value, then collects values while `arr[ptr]` is filled, moving `ptr` forward.
+
+---
+
+### M13 · Simple Bank System
+
+**🔗 [LC 2043 — Simple Bank System](https://leetcode.com/problems/simple-bank-system/)** · Medium
+**Pattern:** Class Design — Validation | **Companies:** Amazon, Microsoft
+
+**Hint:** Wrap the balances in a class with one private helper `valid(account)`. Each operation validates the accounts and balances first and only then mutates — no half-finished transfers.
+
+---
+
+### M14 · Peeking Iterator
+
+**🔗 [LC 284 — Peeking Iterator](https://leetcode.com/problems/peeking-iterator/)** · Medium
+**Pattern:** Iterator Pattern — Decorator | **Companies:** Google, Apple, Amazon
+
+**Hint:** Wrap the given `Iterator` and cache one element ahead (`nextVal`, `hasPeeked`). `peek` fills the cache without consuming; `next` returns the cache if filled. Make it generic: `PeekingIterator<T>`.
+
+---
+
+### M15 · Deep Copy vs Shallow Copy
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Comparators, Iterators & Copying | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Implement `Cloneable` on an `Engine` and a `Car` (which contains an `Engine`). Perform a shallow copy and a deep copy. Change the engine details in the clone. Does it affect the original?
+
+---
+
+## 🔴 Hard Tier (5 Problems)
+
+_5 Advanced Problems._
+
+### H1 · Design a Text Editor
+
+**🔗 [LC 2296 — Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/)** · Hard
+**Pattern:** Class Design — Two Stacks | **Companies:** Amazon, Google
+
+**Hint:** Model the cursor as the gap between two stacks (text left of the cursor, text right of it). Moving the cursor pops from one and pushes onto the other; add and delete touch only the left stack. Use `StringBuilder`s for O(1) pushes and pops at the end.
+
+---
+
+### H2 · Generic `MyLinkedList<T>`
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Generics + Iterator | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Implement a doubly linked list with Generics. Support `Iterator`, `Generic types`, and `O(1) size access`.
+
+---
+
+### H3 · Maximum Frequency Stack
+
+**🔗 [LC 895 — Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/)** · Hard
+**Pattern:** Map of Stacks by Frequency | **Companies:** Amazon, Google, Meta
+
+**Hint:** Keep `freq: value → count` and `group: count → stack of values`, plus `maxFreq`. `push` increments the value's count and pushes it onto that count's stack. `pop` pops from `group[maxFreq]`, decrements the count, and lowers `maxFreq` when that stack empties.
+
+---
+
+### H4 · Design Browser History
+
+**🔗 [LC 1472 — Design Browser History](https://leetcode.com/problems/design-browser-history/)** · Medium
+**Pattern:** Two Stacks / Doubly Linked List | **Companies:** Amazon, Google, Bloomberg
+
+**Hint:** Hold the history in an `ArrayList<String>` with a `cur` index and a `last` index. `visit` overwrites at `cur + 1` and sets `last = cur`; `back` and `forward` just clamp `cur` between 0 and `last`. Every operation is O(1).
+
+---
+
+### H5 · Dependency Injection Preview
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Interfaces & Dependency Injection | **Companies:** Amazon, Microsoft, Oracle
+
+**Task:** Write a `EngineInterface` and two implementations: `ElectricEngine` and `GasEngine`. Write a `Car` class that accepts a `EngineInterface` in its constructor. Explain why this is better than
+
+"newing" up an engine inside the car.
+
+---
+
+## 📊 Complexity Analysis Exercises
 
 Analyze the Time and Space complexity for these OOP/Collection patterns.
 
 ```java
 // Snippet A: Adding N elements to a LinkedList (at the end) vs ArrayList
 List<Integer> list = new LinkedList<>();
-for(
-int i = 0;
-i<n;i++)list.
-
-add(i);
+for (int i = 0; i < n; i++) list.add(i);
 
 // Snippet B: Recursive Fibonacci (Object-based for some reason)
 Integer fib(int n) {
@@ -282,20 +374,13 @@ Integer fib(int n) {
 
 // Snippet E: PriorityQueue (O?)
 PriorityQueue<Integer> pq = new PriorityQueue<>();
-for(
-int x :nums)pq.
-
-offer(x); // N insertions
+for (int x : nums) pq.offer(x); // N insertions
 
 // Snippet F: Binary Search in Sorted ArrayList
-Collections.
-
-binarySearch(myArrayList, target);
+Collections.binarySearch(myArrayList, target);
 
 // Snippet G: Binary Search in Sorted LinkedList
-Collections.
-
-binarySearch(myLinkedList, target); // Warning: Think about random access!
+Collections.binarySearch(myLinkedList, target); // Warning: Think about random access!
 
 // Snippet H: Deep copy of a nested structure (N nodes, depth D)
 ```
@@ -315,7 +400,7 @@ binarySearch(myLinkedList, target); // Warning: Think about random access!
 
 ---
 
-## ✅ Self-Assessment — True / False
+## 🔍 Self-Assessment — True / False
 
 1. You can create an instance of an Abstract Class using `new`. → **False**.
 2. Private attributes are accessible within the same package. → **False** (only within same class).
@@ -328,7 +413,7 @@ binarySearch(myLinkedList, target); // Warning: Think about random access!
 
 ---
 
-## 🧠 Conceptual Mastery Questions
+## 🧠 Conceptual Check
 
 1. **Composition vs Inheritance**: Why do senior engineers say "Favor composition over inheritance"? Give a real-world
    scenario.
@@ -341,4 +426,31 @@ binarySearch(myLinkedList, target); // Warning: Think about random access!
 
 ---
 
-Next: [Topic 4 — Java 8+ Modern Features](../Lecture4/Assignment.md)
+## 🏢 Company Focus
+
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/), [Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/), [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/) |
+| **Google**    | [Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/), [Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/), [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design HashMap](https://leetcode.com/problems/design-hashmap/)                                                   |
+| **Microsoft** | [Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/), [Design HashMap](https://leetcode.com/problems/design-hashmap/), [Design Linked List](https://leetcode.com/problems/design-linked-list/), [Design Parking System](https://leetcode.com/problems/design-parking-system/)                         |
+| **Bloomberg** | [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design an Ordered Stream](https://leetcode.com/problems/design-an-ordered-stream/)                                                                                                                                                                                               |
+| **Adobe**     | [Design Linked List](https://leetcode.com/problems/design-linked-list/)                                                                                                                                                                                                                                                                                            |
+
+---
+
+## ✅ Completion Checklist
+
+- [ ] All 15 Easy problems solved
+- [ ] All 15 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 5 conceptual questions answered out loud
+- [ ] I can explain when to choose an abstract class over an interface
+- [ ] I can override `equals` and `hashCode` correctly together
+
+---
+
+**← [Lecture 2 · Java Memory Management](../Lecture2/Assignment.md)** &nbsp;·&nbsp; **[Lecture 4 · Java 8+ Modern Features](../Lecture4/Assignment.md) →**

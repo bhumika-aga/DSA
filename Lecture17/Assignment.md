@@ -24,13 +24,13 @@
 
 ---
 
-## 🟢 Easy Tier (8 Problems)
-
 ---
+
+## 🟢 Easy Tier (8 Problems)
 
 ### E1 · Find if Path Exists in Graph
 
-**🔗 [LC 1971](https://leetcode.com/problems/find-if-path-exists-in-graph/)**
+**🔗 [LC 1971 — Find if Path Exists in Graph](https://leetcode.com/problems/find-if-path-exists-in-graph/)** · Easy
 **Pattern:** BFS / DFS reachability | **Companies:** Amazon, Google
 
 **Hint:** Build adjacency list. Run BFS or DFS from `source`. If you reach `destination`, return true. Classic
@@ -38,39 +38,36 @@ reachability check — the "hello world" of graph problems.
 
 ---
 
-### E2 · Flood Fill
+### E2 · Find the Town Judge
 
-**🔗 [LC 733](https://leetcode.com/problems/flood-fill/)**
-**Pattern:** DFS on grid | **Companies:** Amazon, Google
+**🔗 [LC 997 — Find the Town Judge](https://leetcode.com/problems/find-the-town-judge/)** · Easy
+**Pattern:** In-degree / Out-degree | **Companies:** Amazon, Microsoft
 
-**Hint:** DFS from the starting cell. At each cell: if it matches the original color and hasn't been recolored yet,
-update it and recurse into 4 neighbors. Early exit if `newColor == oldColor` to avoid infinite recursion.
-
----
-
-### E3 · Number of Connected Components in Undirected Graph
-
-**🔗 [LC 323](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)**
-**Pattern:** DFS connected components | **Companies:** LinkedIn, Amazon
-
-**Hint:** For each unvisited node run DFS/BFS and increment a counter. _(Union-Find is an alternative — covered in
-Lecture 18.)_
+**Hint:** The judge has in-degree `n - 1` and out-degree 0. Track `score[b]++` and `score[a]--` for every trust `a → b`, and look for the person with score `n - 1`.
 
 ---
 
-### E4 · Island Perimeter
+### E3 · Count Unreachable Pairs of Nodes in an Undirected Graph
 
-**🔗 [LC 463](https://leetcode.com/problems/island-perimeter/)**
-**Pattern:** Grid traversal | **Companies:** Google
+**🔗 [LC 2316 — Count Unreachable Pairs of Nodes in an Undirected Graph](https://leetcode.com/problems/count-unreachable-pairs-of-nodes-in-an-undirected-graph/)** · Medium
+**Pattern:** Connected Component Sizes | **Companies:** Amazon, Google
 
-**Hint:** For each land cell, start with contribution = 4. Subtract 1 for each adjacent land neighbor. No DFS needed —
-just a single pass. But can also be solved with DFS marking visited cells.
+**Hint:** Find each component's size with DFS, BFS or Union-Find. Pairs in different components: keep `seen` (nodes processed so far) and for each component of size `s` add `s × seen`, then `seen += s`. Use `long`.
+
+---
+
+### E4 · Destination City
+
+**🔗 [LC 1436 — Destination City](https://leetcode.com/problems/destination-city/)** · Easy
+**Pattern:** Out-degree Zero | **Companies:** Yelp, Amazon
+
+**Hint:** Put every start city in a set. The destination is the only end city that is never a start city.
 
 ---
 
 ### E5 · Find Center of Star Graph
 
-**🔗 [LC 1791](https://leetcode.com/problems/find-center-of-star-graph/)**
+**🔗 [LC 1791 — Find Center of Star Graph](https://leetcode.com/problems/find-center-of-star-graph/)** · Easy
 **Pattern:** Graph properties | **Companies:** Amazon
 
 **Hint:** In a star graph, the center node appears in every edge. Just check which node is common between `edges[0]` and
@@ -80,7 +77,7 @@ just a single pass. But can also be solved with DFS marking visited cells.
 
 ### E6 · Keys and Rooms
 
-**🔗 [LC 841](https://leetcode.com/problems/keys-and-rooms/)**
+**🔗 [LC 841 — Keys and Rooms](https://leetcode.com/problems/keys-and-rooms/)** · Medium
 **Pattern:** DFS reachability | **Companies:** Google, Amazon
 
 **Hint:** Room 0 is unlocked. Keys in each room open other rooms. DFS/BFS from room 0 adding newly reachable rooms.
@@ -88,20 +85,18 @@ Return `visited.size() == n`.
 
 ---
 
-### E7 · Max Area of Island
+### E7 · Find Champion II
 
-**🔗 [LC 695](https://leetcode.com/problems/max-area-of-island/)**
-**Pattern:** DFS flood fill | **Companies:** Amazon, Google, Facebook
+**🔗 [LC 2924 — Find Champion II](https://leetcode.com/problems/find-champion-ii/)** · Medium
+**Pattern:** In-degree Counting (DAG) | **Companies:** Amazon, Google
 
-**Hint:** DFS from each unvisited land cell (`1`). Return the size of the component by accumulating a count at each
-recursive call. Track the global maximum across all DFS calls. Same flood fill template as Number of Islands — just
-return area instead of a boolean.
+**Hint:** The champion is the unique node with in-degree 0. Count in-degrees; if exactly one node has 0, return it, otherwise return -1.
 
 ---
 
 ### E8 · Count Sub Islands
 
-**🔗 [LC 1905](https://leetcode.com/problems/count-sub-islands/)**
+**🔗 [LC 1905 — Count Sub Islands](https://leetcode.com/problems/count-sub-islands/)** · Medium
 **Pattern:** DFS flood fill | **Companies:** Google
 
 **Hint:** DFS across grid2 islands. An island in grid2 is a sub-island of grid1 only if every cell of that island is
@@ -109,43 +104,40 @@ also land in grid1. Track with a flag: if any cell of the DFS is water in grid1,
 
 ---
 
-## 🟡 Medium Tier — Core Interview Patterns (15 Problems)
+## 🟡 Medium Tier (15 Problems)
+
+_Core Interview Patterns._
+
+### M1 · Number of Operations to Make Network Connected
+
+**🔗 [LC 1319 — Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/)** · Medium
+**Pattern:** Connected Components | **Companies:** Amazon, Google, Meta
+
+**Hint:** If `edges < n - 1`, it's impossible. Otherwise count components (DFS/BFS over an adjacency list); you need `components - 1` moves, since each redundant cable can join two components.
 
 ---
 
-### M1 · Number of Islands ⭐
+### M2 · Open the Lock
 
-**🔗 [LC 200](https://leetcode.com/problems/number-of-islands/)**
-**Pattern:** DFS flood fill | **Companies:** Amazon, Google, Facebook, Microsoft
+**🔗 [LC 752 — Open the Lock](https://leetcode.com/problems/open-the-lock/)** · Medium
+**Pattern:** BFS on an Implicit Graph | **Companies:** Google, Amazon, Microsoft
 
-**Hint:** DFS from each unvisited `'1'`, marking visited cells as `'0'` (or use a visited array). Each DFS call = one
-island. Count how many times you start a DFS.
-
----
-
-### M2 · Rotting Oranges ⭐
-
-**🔗 [LC 994](https://leetcode.com/problems/rotting-oranges/)**
-**Pattern:** Multi-source BFS | **Companies:** Amazon, Google, Facebook
-
-**Hint:** Seed all initially rotten oranges into the queue. BFS level by level (each level = 1 minute). Track minutes
-elapsed. After BFS, if any fresh orange remains, return -1.
+**Hint:** Each 4-digit string is a node with 8 neighbours (each wheel ±1). BFS from `"0000"`, skipping deadends and visited states. The level at which you reach the target is the answer.
 
 ---
 
-### M3 · 01 Matrix ⭐
+### M3 · Reorder Routes to Make All Paths Lead to the City Zero
 
-**🔗 [LC 542](https://leetcode.com/problems/01-matrix/)**
-**Pattern:** Multi-source BFS | **Companies:** Amazon, Google
+**🔗 [LC 1466 — Reorder Routes to Make All Paths Lead to the City Zero](https://leetcode.com/problems/reorder-routes-to-make-all-paths-lead-to-the-city-zero/)** · Medium
+**Pattern:** Edge Direction as Cost | **Companies:** Amazon, Google
 
-**Hint:** Seed all `0` cells into the queue at distance 0. BFS outward — `1` cells get their distance from the nearest
-`0` naturally. Don't BFS from each `1` separately (TLE).
+**Hint:** Store each edge in both directions, marked with cost 1 if it's an original direction (away from 0) and 0 if reversed. DFS from city 0 and sum the costs of edges you traverse.
 
 ---
 
-### M4 · Course Schedule ⭐
+### M4 · Course Schedule
 
-**🔗 [LC 207](https://leetcode.com/problems/course-schedule/)**
+**🔗 [LC 207 — Course Schedule](https://leetcode.com/problems/course-schedule/)** · Medium
 **Pattern:** Cycle detection in directed graph | **Companies:** Amazon, Google, Facebook, Microsoft
 
 **Hint:** Build directed graph: prerequisite → course. Run Kahn's topological sort. If you can process all n courses (
@@ -153,9 +145,9 @@ idx == n), no cycle exists → return true.
 
 ---
 
-### M5 · Course Schedule II ⭐
+### M5 · Course Schedule II
 
-**🔗 [LC 210](https://leetcode.com/problems/course-schedule-ii/)**
+**🔗 [LC 210 — Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)** · Medium
 **Pattern:** Topological sort | **Companies:** Amazon, Google, Facebook, Microsoft
 
 **Hint:** Same as LC 207 but return the topological order. Use Kahn's: when in-degree reaches 0, add to queue and to
@@ -165,7 +157,7 @@ result array. If result length < n, cycle exists.
 
 ### M6 · Number of Provinces
 
-**🔗 [LC 547](https://leetcode.com/problems/number-of-provinces/)**
+**🔗 [LC 547 — Number of Provinces](https://leetcode.com/problems/number-of-provinces/)** · Medium
 **Pattern:** DFS connected components | **Companies:** Google, Amazon, Facebook
 
 **Hint:** Input is an adjacency matrix. DFS/BFS from each unvisited city. Each traversal = one province. Very similar to
@@ -173,19 +165,18 @@ Number of Islands but on an adjacency matrix.
 
 ---
 
-### M7 · Pacific Atlantic Water Flow
+### M7 · Find Eventual Safe States
 
-**🔗 [LC 417](https://leetcode.com/problems/pacific-atlantic-water-flow/)**
-**Pattern:** Reverse BFS from borders | **Companies:** Google, Amazon
+**🔗 [LC 802 — Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/)** · Medium
+**Pattern:** Reverse Graph + Topological Sort | **Companies:** Google, Amazon
 
-**Hint:** Instead of checking each cell, run BFS/DFS backward from the Pacific border and separately from the Atlantic
-border. A cell is an answer if it's reachable from both.
+**Hint:** Safe nodes are those that can't reach a cycle. Reverse the edges, start from terminal nodes (out-degree 0), and peel with Kahn's algorithm — every node peeled is safe. Or use DFS three-colouring.
 
 ---
 
 ### M8 · Clone Graph
 
-**🔗 [LC 133](https://leetcode.com/problems/clone-graph/)**
+**🔗 [LC 133 — Clone Graph](https://leetcode.com/problems/clone-graph/)** · Medium
 **Pattern:** DFS/BFS with HashMap | **Companies:** Amazon, Google, Facebook, Microsoft
 
 **Hint:** Use a `HashMap<Node, Node>` (original → clone). DFS: if `map.containsKey(node)`, return its clone. Otherwise
@@ -193,9 +184,9 @@ create a new node, add to map, then clone all neighbors recursively.
 
 ---
 
-### M9 · Word Ladder ⭐
+### M9 · Word Ladder
 
-**🔗 [LC 127](https://leetcode.com/problems/word-ladder/)**
+**🔗 [LC 127 — Word Ladder](https://leetcode.com/problems/word-ladder/)** · Hard
 **Pattern:** BFS on implicit graph | **Companies:** Google, Amazon, Facebook, Microsoft
 
 > ⚠️ LeetCode rates this **Hard** — the core BFS concept is Medium; the challenge is the implicit graph construction and
@@ -207,9 +198,9 @@ steps.
 
 ---
 
-### M10 · Network Delay Time ⭐
+### M10 · Network Delay Time
 
-**🔗 [LC 743](https://leetcode.com/problems/network-delay-time/)**
+**🔗 [LC 743 — Network Delay Time](https://leetcode.com/problems/network-delay-time/)** · Medium
 **Pattern:** Dijkstra | **Companies:** Google, Amazon, Facebook, Uber
 
 **Hint:** Build weighted directed adjacency list. Dijkstra from node `k`. Answer = max of all `dist[i]`. If any node has
@@ -219,7 +210,7 @@ steps.
 
 ### M11 · Path With Minimum Effort
 
-**🔗 [LC 1631](https://leetcode.com/problems/path-with-minimum-effort/)**
+**🔗 [LC 1631 — Path With Minimum Effort](https://leetcode.com/problems/path-with-minimum-effort/)** · Medium
 **Pattern:** Dijkstra on grid | **Companies:** Google, Amazon
 
 **Hint:** Nodes = grid cells. Edge weight = absolute height difference. Dijkstra where `dist[r][c]` = min effort to
@@ -229,7 +220,7 @@ reach that cell. Effort for a path = maximum edge weight along it.
 
 ### M12 · Is Graph Bipartite?
 
-**🔗 [LC 785](https://leetcode.com/problems/is-graph-bipartite/)**
+**🔗 [LC 785 — Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)** · Medium
 **Pattern:** BFS 2-coloring | **Companies:** Google, Amazon, Facebook
 
 **Hint:** BFS coloring: assign color 0 to the start, alternate colors for neighbors. If any neighbor has the same color
@@ -237,18 +228,18 @@ as current node → not bipartite. Must handle disconnected graphs (loop all nod
 
 ---
 
-### M13 · Find the City With the Smallest Number of Neighbors ⭐
+### M13 · Find the City With the Smallest Number of Neighbors at a Threshold Distance
 
-**🔗 [LC 1334](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)**
+**🔗 [LC 1334 — Find the City With the Smallest Number of Neighbors at a Threshold Distance](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/)** · Medium
 **Pattern:** Floyd-Warshall (all-pairs shortest path) | **Companies:** Google, Amazon
 
 **Hint:** Run Floyd-Warshall to compute all-pairs shortest paths. For each city, count how many other cities are reachable within `distanceThreshold`. Return the city with the fewest reachable neighbors (ties broken by largest city index). Floyd-Warshall fits here because n ≤ 100.
 
 ---
 
-### M14 · Min Cost to Connect All Points ⭐
+### M14 · Min Cost to Connect All Points
 
-**🔗 [LC 1584](https://leetcode.com/problems/min-cost-to-connect-all-points/)**
+**🔗 [LC 1584 — Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/)** · Medium
 **Pattern:** MST (Prim's) | **Companies:** Google, Amazon
 
 **Hint:** Each pair of points has an edge with weight = Manhattan distance. MST on this complete graph. Use Prim's with
@@ -257,9 +248,9 @@ upfront.
 
 ---
 
-### M15 · Cheapest Flights Within K Stops ⭐
+### M15 · Cheapest Flights Within K Stops
 
-**🔗 [LC 787](https://leetcode.com/problems/cheapest-flights-within-k-stops/)**
+**🔗 [LC 787 — Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/)** · Medium
 **Pattern:** Modified Bellman-Ford | **Companies:** Google, Amazon, Uber
 
 **Hint:** Bellman-Ford with at most K+1 rounds (K stops = K+1 edges). Key: copy `dist` array before each round to
@@ -268,13 +259,13 @@ state space.
 
 ---
 
-## 🔴 Hard Tier — FAANG Mastery (7 Problems)
+## 🔴 Hard Tier (7 Problems)
 
----
+_FAANG Mastery._
 
 ### H1 · Word Ladder II
 
-**🔗 [LC 126](https://leetcode.com/problems/word-ladder-ii/)**
+**🔗 [LC 126 — Word Ladder II](https://leetcode.com/problems/word-ladder-ii/)** · Hard
 **Pattern:** BFS + DFS (find all shortest paths) | **Companies:** Google, Amazon, Facebook
 
 **Hint:** BFS to compute shortest distance from `beginWord` to every reachable word. Then DFS/backtracking from
@@ -286,23 +277,18 @@ requirement without TLE.
 
 ---
 
-### H2 · Alien Dictionary
+### H2 · Sort Items by Groups Respecting Dependencies
 
-**🔗 [LC 269](https://leetcode.com/problems/alien-dictionary/)** ⚠️ _LeetCode Premium_
-**Pattern:** Topological sort on character ordering | **Companies:** Google, Amazon, Facebook, Microsoft
+**🔗 [LC 1203 — Sort Items by Groups Respecting Dependencies](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/)** · Hard
+**Pattern:** Two-Level Topological Sort | **Companies:** Google, Amazon
 
-**Hint:** Compare adjacent words character by character to find ordering constraints (e.g., `'t' → 'f'`). Build directed
-graph on characters, run Kahn's topo sort. If cycle exists, return `""`. If not all characters appear in constraints,
-include them with in-degree 0 (any order is valid for unconstrained chars).
-
-**Why Hard?** Edge case: `["abc","ab"]` is invalid (longer word before shorter prefix — detect this during comparison).
-Building the constraint graph without missing or duplicating edges is the crux.
+**Hint:** Give every ungrouped item its own new group. Build two graphs — item dependencies and group dependencies (edges between different groups) — and topologically sort both. Then emit items group by group in group order, each group's items in item order. Any cycle means return `[]`.
 
 ---
 
-### H3 · Critical Connections in a Network ⭐
+### H3 · Critical Connections in a Network
 
-**🔗 [LC 1192](https://leetcode.com/problems/critical-connections-in-a-network/)**
+**🔗 [LC 1192 — Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)** · Hard
 **Pattern:** Tarjan's bridges algorithm | **Companies:** Amazon, Google, Uber
 
 **Hint:** DFS tracking `disc[]` (discovery time) and `low[]` (lowest disc reachable via DFS subtree). Edge `(u,v)` is a
@@ -315,7 +301,7 @@ undirected edge bidirectionally.
 
 ### H4 · Reconstruct Itinerary
 
-**🔗 [LC 332](https://leetcode.com/problems/reconstruct-itinerary/)**
+**🔗 [LC 332 — Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/)** · Hard
 **Pattern:** Eulerian path (Hierholzer's algorithm) | **Companies:** Google, Amazon
 
 **Hint:** Build adjacency list with sorted destinations (min-heap or sorted list). DFS Hierholzer: post-order add to
@@ -327,7 +313,7 @@ result. Reverse at end. The post-order trick ensures we don't get stuck in a dea
 
 ### H5 · Swim in Rising Water
 
-**🔗 [LC 778](https://leetcode.com/problems/swim-in-rising-water/)**
+**🔗 [LC 778 — Swim in Rising Water](https://leetcode.com/problems/swim-in-rising-water/)** · Hard
 **Pattern:** Dijkstra / Binary Search + BFS | **Companies:** Google
 
 **Hint:** Dijkstra variant: `dist[r][c]` = min time to reach `(r,c)` = max elevation on the path (bottleneck path). PQ
@@ -337,7 +323,7 @@ ordered by current time. Alternatively: binary search on answer t + BFS to check
 
 ### H6 · Bus Routes
 
-**🔗 [LC 815](https://leetcode.com/problems/bus-routes/)**
+**🔗 [LC 815 — Bus Routes](https://leetcode.com/problems/bus-routes/)** · Hard
 **Pattern:** BFS on route graph | **Companies:** Google, Uber
 
 **Hint:** Nodes are BUS ROUTES (not stops). Two routes are connected if they share a stop. BFS from all routes
@@ -346,9 +332,9 @@ connections.
 
 ---
 
-### H7 · Shortest Path in a Grid with Obstacles Elimination ⭐
+### H7 · Shortest Path in a Grid with Obstacles Elimination
 
-**🔗 [LC 1293](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/)**
+**🔗 [LC 1293 — Shortest Path in a Grid with Obstacles Elimination](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/)** · Hard
 **Pattern:** BFS with state = (row, col, k_remaining) | **Companies:** Google, Amazon, Uber
 
 **Hint:** State is `(r, c, obstacles_remaining)`. BFS on this 3D state space. `visited[r][c][k]` = true if we've visited
@@ -384,24 +370,26 @@ visited must track k too).
 
 ---
 
-## 🏢 Company Focus Table
+## 🏢 Company Focus
 
-| Company       | Must-Know Problems                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | Number of Islands (LC 200), Course Schedule (LC 207), Word Ladder (LC 127), Clone Graph (LC 133)        |
-| **Google**    | Word Ladder (LC 127), Pacific Atlantic (LC 417), Critical Connections (LC 1192), Swim in Water (LC 778) |
-| **Meta**      | Number of Islands (LC 200), Course Schedule II (LC 210), Clone Graph (LC 133), Rotting Oranges (LC 994) |
-| **Microsoft** | Course Schedule (LC 207), Network Delay (LC 743), Word Ladder (LC 127)                                  |
-| **Uber**      | Network Delay (LC 743), Cheapest Flights (LC 787), Shortest Path with Eliminations (LC 1293)            |
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Word Ladder II](https://leetcode.com/problems/word-ladder-ii/), [Sort Items by Groups Respecting Dependencies](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/), [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/), [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/) |
+| **Google**    | [Word Ladder II](https://leetcode.com/problems/word-ladder-ii/), [Sort Items by Groups Respecting Dependencies](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/), [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/), [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/) |
+| **Facebook**  | [Word Ladder II](https://leetcode.com/problems/word-ladder-ii/), [Course Schedule](https://leetcode.com/problems/course-schedule/), [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/), [Number of Provinces](https://leetcode.com/problems/number-of-provinces/)                                                                                             |
+| **Microsoft** | [Open the Lock](https://leetcode.com/problems/open-the-lock/), [Course Schedule](https://leetcode.com/problems/course-schedule/), [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/), [Clone Graph](https://leetcode.com/problems/clone-graph/)                                                                                                               |
+| **Uber**      | [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/), [Bus Routes](https://leetcode.com/problems/bus-routes/), [Shortest Path in a Grid with Obstacles Elimination](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/), [Network Delay Time](https://leetcode.com/problems/network-delay-time/)   |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] Completed all 8 Easy problems
-- [ ] Completed all 15 Medium problems (including LC 1334 Floyd-Warshall)
-- [ ] Attempted all 7 Hard problems
-- [ ] Can answer all 7 Conceptual Check questions verbally
+- [ ] All 8 Easy problems solved
+- [ ] All 15 Medium problems solved
+- [ ] All 7 Hard problems attempted
+- [ ] All 7 conceptual questions answered out loud
 - [ ] Can write BFS shortest path template from memory
 - [ ] Can write DFS flood fill template from memory
 - [ ] Can write Kahn's topological sort from memory
@@ -413,4 +401,4 @@ visited must track k too).
 
 ---
 
-**← Topic 16: Heaps & Priority Queues** &nbsp;&nbsp;|&nbsp;&nbsp; **Topic 18: Union-Find →**
+**← [Lecture 16 · Heaps & Priority Queues](../Lecture16/Assignment.md)** &nbsp;·&nbsp; **[Lecture 18 · Two Pointers & Sliding Window](../Lecture18/Assignment.md) →**

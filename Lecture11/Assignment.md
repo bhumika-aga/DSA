@@ -1,4 +1,4 @@
-# 🔗 Assignment 11 — Linked Lists
+# 🗂️ Assignment 11 — Linked Lists
 
 > **Lecture:** 11 of 38 — Linked Lists
 > **Phase:** 2 — Core Data Structures
@@ -7,65 +7,288 @@
 
 ---
 
-## 📊 Topic Overview
+## 🗺️ Pattern Recognition — Read Before Starting
 
 Linked Lists are the foundational bridge between linear data structures (Arrays) and hierarchical ones (Trees). Mastering them requires a mental shift from "index-based access" to **"reference-based navigation"**.
 
-- **Primary Patterns**: Fast & Slow Pointers, In-place Reversal, Sentinel Head (Dummy), Interweaving, Frequency Mapping.
-- **Key Focus**: Maintaining pointer integrity during complex re-linking.
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
+
+| Signal in the Problem             | Pattern                      | Move                                        |
+| --------------------------------- | ---------------------------- | ------------------------------------------- |
+| "middle", "cycle", "nth from end" | Fast & Slow Pointers         | one moves 2 steps, one moves 1              |
+| "reverse" (all or part)           | In-place Reversal            | `prev`, `curr`, `next` — three pointers     |
+| "head might change"               | Dummy Head                   | start from a sentinel node                  |
+| "merge / sort lists"              | Merge Two Lists              | splice nodes, don't copy values             |
+| "random pointer", "deep copy"     | Interweaving                 | insert copies between originals, then split |
+| "O(1) get and put"                | HashMap + Doubly Linked List | map to nodes, move nodes on access          |
 
 ---
 
-## 🟢 Easy Tier (Foundation & Floyd's)
+## 🟢 Easy Tier (10 Problems)
 
 _Focus on traversing, basic manipulation, and the "Tortoise and Hare" strategy._
 
-1. **[Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) (LC 206)** — The fundamental iterative vs recursive question. `[Pattern: Reversal]` `[Companies: Amazon, Microsoft, Meta, Apple]`
-2. **[Middle of the Linked List](https://leetcode.com/problems/middle-of-the-linked-list/) (LC 876)** — Standard Fast & Slow pointer application. `[Pattern: Fast & Slow]` `[Companies: Amazon, Google, Microsoft]`
-3. **[Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/) (LC 141)** — Detecting cycles using meeting points. `[Pattern: Floyd's Detection]` `[Companies: Amazon, Microsoft, Meta, Bloomberg]`
-4. **[Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) (LC 21)** — Use a Dummy Head to simplify edge cases. `[Pattern: Dummy Head]` `[Companies: Amazon, Apple, Microsoft]`
-5. **[Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/) (LC 237)** — The "O(1) Copy Value" interview trick. `[Pattern: Value Override]` `[Companies: Amazon, Apple, Microsoft]`
-6. **[Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/) (LC 203)** — Clean deletion with Dummy Head. `[LC Easy]` `[Companies: Amazon, Google, Adobe]`
-7. **[Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/) (LC 234)** — Combine Middle + Reverse + Compare. `[Pattern: Composition]` `[Companies: Amazon, Meta, Microsoft]`
-8. **[Intersection of Two Linked Lists](https://leetcode.com/problems/intersection-of-two-linked-lists/) (LC 160)** — Two pointers or length difference method. `[Companies: Amazon, Microsoft, Meta, Bloomberg]`
-9. **[Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/) (LC 83)** — Standard traversal and pointer skipping. `[LC Easy]` `[Companies: Amazon, Microsoft, Adobe]`
-10. **[Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/) (LC 1290)** — Horner's method for binary. `[LC Easy]` `[Companies: Amazon, Adobe]`
+### E1 · Reverse Linked List
+
+**🔗 [LC 206 — Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)** · Easy
+**Pattern:** Reversal | **Companies:** Amazon, Microsoft, Meta, Apple
+
+**Hint:** Iteratively keep `prev = null`, `curr = head`: save `next`, point `curr.next` at `prev`, then advance both. Recursively: reverse the rest, then set `head.next.next = head` and `head.next = null`.
 
 ---
 
-## 🟡 Medium Tier (Advanced Rerouting)
+### E2 · Middle of the Linked List
+
+**🔗 [LC 876 — Middle of the Linked List](https://leetcode.com/problems/middle-of-the-linked-list/)** · Easy
+**Pattern:** Fast & Slow | **Companies:** Amazon, Google, Microsoft
+
+**Hint:** Fast moves two steps, slow moves one. When fast reaches the end, slow is at the middle — for even length, at the second middle node, which is what LeetCode wants.
+
+---
+
+### E3 · Linked List Cycle
+
+**🔗 [LC 141 — Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)** · Easy
+**Pattern:** Floyd's Detection | **Companies:** Amazon, Microsoft, Meta, Bloomberg
+
+**Hint:** Floyd's algorithm: slow moves one step, fast moves two. If there's a cycle, fast eventually lands on slow; if fast hits `null`, there's none. O(1) space.
+
+---
+
+### E4 · Merge Two Sorted Lists
+
+**🔗 [LC 21 — Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)** · Easy
+**Pattern:** Dummy Head | **Companies:** Amazon, Apple, Microsoft
+
+**Hint:** Start from a dummy node and a `tail` pointer. Repeatedly attach the smaller head and advance that list. At the end attach whichever list is left.
+
+---
+
+### E5 · Delete Node in a Linked List
+
+**🔗 [LC 237 — Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/)** · Medium
+**Pattern:** Value Override | **Companies:** Amazon, Apple, Microsoft
+
+**Hint:** You don't have access to the previous node, so copy the next node's value into this node, then skip the next node: `node.val = node.next.val; node.next = node.next.next`.
+
+---
+
+### E6 · Remove Linked List Elements
+
+**🔗 [LC 203 — Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/)** · Easy
+**Pattern:** Dummy Head | **Companies:** Amazon, Google, Adobe
+
+**Hint:** Put a dummy before `head` so deleting the first node isn't special. With `curr` at the dummy: if `curr.next.val == val`, unlink it (don't advance); otherwise advance.
+
+---
+
+### E7 · Palindrome Linked List
+
+**🔗 [LC 234 — Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)** · Easy
+**Pattern:** Composition | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Find the middle with fast and slow pointers, reverse the second half, and compare the two halves node by node. Restore the list afterwards if the caller needs it intact.
+
+---
+
+### E8 · Intersection of Two Linked Lists
+
+**🔗 [LC 160 — Intersection of Two Linked Lists](https://leetcode.com/problems/intersection-of-two-linked-lists/)** · Easy
+**Pattern:** Two Pointers (Switch Heads) | **Companies:** Amazon, Microsoft, Meta, Bloomberg
+
+**Hint:** Walk pointers `a` and `b`; when one reaches the end, jump it to the other list's head. Both travel `lenA + lenB`, so they meet at the intersection — or both reach `null` together.
+
+---
+
+### E9 · Remove Duplicates from Sorted List
+
+**🔗 [LC 83 — Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)** · Easy
+**Pattern:** Pointer Skipping | **Companies:** Amazon, Microsoft, Adobe
+
+**Hint:** The list is sorted, so duplicates are adjacent. While `curr.next` has the same value, skip it (`curr.next = curr.next.next`); otherwise advance `curr`.
+
+---
+
+### E10 · Convert Binary Number in a Linked List to Integer
+
+**🔗 [LC 1290 — Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/)** · Easy
+**Pattern:** Traversal + Accumulation | **Companies:** Amazon, Adobe
+
+**Hint:** Horner's method: start at 0 and for each node do `value = value * 2 + node.val` (or `(value << 1) | node.val`).
+
+---
+
+## 🟡 Medium Tier (13 Problems)
 
 _Focus on multi-step logic and complex pointer state management._
 
-1. **[Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/) (LC 19)** — Use two pointers with a gap of N. `[Pattern: Gap Pointers]` `[Companies: Amazon, Meta, Google, Microsoft]`
-2. **[Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/) (LC 142)** — Find the start of the cycle using the $2x$ vs $1x$ math. `[Pattern: Floyd's]` `[Companies: Amazon, Microsoft, Meta]`
-3. **[Reorder List](https://leetcode.com/problems/reorder-list/) (LC 143)** — Middle + Reverse + Alternating Merge. `[Companies: Amazon, Meta, Microsoft]`
-4. **[Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/) (LC 328)** — Group nodes by index parity in $O(N)$ time. `[Pattern: Multi-Pointer]` `[Companies: Amazon, Microsoft, Bloomberg]`
-5. **[Add Two Numbers](https://leetcode.com/problems/add-two-numbers/) (LC 2)** — The classic "Full Adder" logic on lists. `[Companies: Amazon, Microsoft, Meta, Adobe]`
-6. **[Add Two Numbers II](https://leetcode.com/problems/add-two-numbers-ii/) (LC 445)** — Handling reverse arithmetic using stacks. `[LC Medium]` `[Companies: Amazon, Microsoft, Meta]`
-7. **[Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/) (LC 138)** — Iterative $O(1)$ space "interweaving" strategy. `[Companies: Amazon, Meta, Microsoft, Bloomberg]`
-8. **[Sort List](https://leetcode.com/problems/sort-list/) (LC 148)** — Implementing Merge Sort with $O(N \log N)$ stability. `[Pattern: Divide & Conquer]` `[Companies: Amazon, Google, Meta, Microsoft]`
-9. **[Rotate List](https://leetcode.com/problems/rotate-list/) (LC 61)** — Shifting nodes based on $(k \pmod L)$ index. `[LC Medium]` `[Companies: Amazon, Microsoft, Bloomberg]`
-10. **[Swapping Nodes in a Linked List](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/) (LC 1721)** — Efficient $O(N)$ node swapping. `[LC Medium]` `[Companies: Amazon, Google]`
-11. **[Split Linked List in Parts](https://leetcode.com/problems/split-linked-list-in-parts/) (LC 725)** — Sub-list management and sizing. `[LC Medium]` `[Companies: Amazon, Google]`
-12. **[Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/) (LC 430)** — Pointer manipulation on steroids. `[LC Medium]` `[Companies: Amazon, Meta, Bloomberg]`
-13. **[Partition List](https://leetcode.com/problems/partition-list/) (LC 86)** — Using two separate dummy heads for sorting. `[Pattern: Two-Queue]` `[Companies: Amazon, Meta, Microsoft]`
+### M1 · Remove Nth Node From End of List
+
+**🔗 [LC 19 — Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)** · Medium
+**Pattern:** Gap Pointers | **Companies:** Amazon, Meta, Google, Microsoft
+
+**Hint:** Dummy head, then move `fast` `n + 1` steps ahead of `slow`. Advance both until `fast` is null — `slow` now sits just before the node to delete. One pass.
 
 ---
 
-## 🔴 Challenge Zone (Mastery & Design)
+### M2 · Linked List Cycle II
+
+**🔗 [LC 142 — Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)** · Medium
+**Pattern:** Floyd's | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** After slow and fast meet inside the cycle, reset one pointer to `head` and move both one step at a time. They meet at the cycle's entry, because the distance from the head equals the distance from the meeting point (mod cycle length).
+
+---
+
+### M3 · Reorder List
+
+**🔗 [LC 143 — Reorder List](https://leetcode.com/problems/reorder-list/)** · Medium
+**Pattern:** Middle + Reverse + Merge | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Three steps: find the middle, reverse the second half, then weave the halves together, alternating one node from each. Cut the first half's tail to avoid a cycle.
+
+---
+
+### M4 · Odd Even Linked List
+
+**🔗 [LC 328 — Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/)** · Medium
+**Pattern:** Multi-Pointer | **Companies:** Amazon, Microsoft, Bloomberg
+
+**Hint:** Keep `odd = head`, `even = head.next`, and remember `evenHead`. Repeatedly link `odd.next = even.next` and `even.next = odd.next`, advancing each. Finally attach `evenHead` after the last odd node.
+
+---
+
+### M5 · Add Two Numbers
+
+**🔗 [LC 2 — Add Two Numbers](https://leetcode.com/problems/add-two-numbers/)** · Medium
+**Pattern:** Carry Propagation | **Companies:** Amazon, Microsoft, Meta, Adobe
+
+**Hint:** The digits are stored in reverse, so add from the heads with a carry: `sum = a + b + carry`, create a node with `sum % 10`, and set `carry = sum / 10`. Loop while either list or `carry` remains.
+
+---
+
+### M6 · Add Two Numbers II
+
+**🔗 [LC 445 — Add Two Numbers II](https://leetcode.com/problems/add-two-numbers-ii/)** · Medium
+**Pattern:** Reverse or Stack + Carry | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** The digits are stored most-significant first. Push both lists onto stacks (or reverse them), then add from the top with a carry, inserting each new node at the front of the result.
+
+---
+
+### M7 · Copy List with Random Pointer
+
+**🔗 [LC 138 — Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)** · Medium
+**Pattern:** Interweaving | **Companies:** Amazon, Meta, Microsoft, Bloomberg
+
+**Hint:** Three passes: insert a copy after each original node (`A → A' → B → B'`), set `copy.random = orig.random.next`, then separate the two lists. O(1) extra space. (A `HashMap<orig, copy>` version is simpler.)
+
+---
+
+### M8 · Sort List
+
+**🔗 [LC 148 — Sort List](https://leetcode.com/problems/sort-list/)** · Medium
+**Pattern:** Divide & Conquer | **Companies:** Amazon, Google, Meta, Microsoft
+
+**Hint:** Merge sort on a list: split at the middle with slow and fast pointers (cut `prev.next = null`), sort each half recursively, and merge two sorted lists. O(n log n) time, O(log n) stack.
+
+---
+
+### M9 · Rotate List
+
+**🔗 [LC 61 — Rotate List](https://leetcode.com/problems/rotate-list/)** · Medium
+**Pattern:** Close into a Ring, Then Cut | **Companies:** Amazon, Microsoft, Bloomberg
+
+**Hint:** Find the length `L` and the tail, then reduce `k %= L`. Connect the tail to the head to form a ring, walk `L - k - 1` steps to the new tail, and cut there.
+
+---
+
+### M10 · Swapping Nodes in a Linked List
+
+**🔗 [LC 1721 — Swapping Nodes in a Linked List](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/)** · Medium
+**Pattern:** Gap Pointers | **Companies:** Amazon, Google
+
+**Hint:** Move `fast` `k - 1` steps to find the k-th node from the start, then move `slow` from the head and `fast` to the end together — `slow` lands on the k-th node from the end. Swap their values.
+
+---
+
+### M11 · Split Linked List in Parts
+
+**🔗 [LC 725 — Split Linked List in Parts](https://leetcode.com/problems/split-linked-list-in-parts/)** · Medium
+**Pattern:** Length + Split | **Companies:** Amazon, Google
+
+**Hint:** Count the length `L`. Each part gets `L / k` nodes, and the first `L % k` parts get one extra. Walk and cut each part, filling `null` for any empty parts.
+
+---
+
+### M12 · Flatten a Multilevel Doubly Linked List
+
+**🔗 [LC 430 — Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/)** · Medium
+**Pattern:** DFS on Child Pointers | **Companies:** Amazon, Meta, Bloomberg
+
+**Hint:** DFS: whenever a node has a child, flatten the child, splice it between the node and its `next` (fixing both `prev` pointers), and set `child = null`. Keep track of the flattened child's tail so the splice is O(1).
+
+---
+
+### M13 · Partition List
+
+**🔗 [LC 86 — Partition List](https://leetcode.com/problems/partition-list/)** · Medium
+**Pattern:** Two-Queue | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Use two dummy lists: `less` for nodes `< x` and `greater` for the rest, appending in order. Join `less` to `greater.next` and terminate `greater`'s tail with `null`.
+
+---
+
+## 🔴 Hard Tier (5 Problems)
 
 _Focus on cache design invariants and k-sized re-grouping._
 
-1. **[Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/) (LC 25)** — The ultimate test of pointer control and recursion. `[Pattern: Reversal]` `[Companies: Amazon, Meta, Microsoft, Google]`
-2. **[Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/) (LC 23)** — Use a Min-Heap/PriorityQueue for $O(N \log K)$. `[Pattern: Heap]` `[Companies: Amazon, Google, Meta, Uber]`
-3. **[Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/) (LC 92)** — Reversing a bounded sub-segment in one pass. `[LC Medium/Hard]` `[Companies: Amazon, Meta, Microsoft]`
-4. **[LRU Cache](https://leetcode.com/problems/lru-cache/) (LC 146)** — HashMap + Doubly Linked List for $O(1)$ access. `[Pattern: DLL]` `[Companies: Amazon, Microsoft, Meta, Google]`
-5. **[LFU Cache](https://leetcode.com/problems/lfu-cache/) (LC 460)** — Least Frequently Used using multiple lists. `[Pattern: Freq Maps]` `[Companies: Google, Amazon, Uber]`
+### H1 · Reverse Nodes in k-Group
+
+**🔗 [LC 25 — Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)** · Hard
+**Pattern:** Reversal | **Companies:** Amazon, Meta, Microsoft, Google
+
+**Hint:** Check that `k` nodes remain; if not, leave them as they are. Reverse exactly `k` nodes, connect the previous group's tail to the new head, and move on (iterative, O(1) space) — or recurse on the rest first.
 
 ---
 
-## 📊 Conceptual Check
+### H2 · Design Skiplist
+
+**🔗 [LC 1206 — Design Skiplist](https://leetcode.com/problems/design-skiplist/)** · Hard
+**Pattern:** Linked Levels (Skiplist) | **Companies:** Google, Amazon
+
+**Hint:** Each node has `next[]` pointers, one per level. To search, start at the top level and move right while the next value is smaller, then drop a level. Insert with a random height (coin flips), recording the predecessor at each level.
+
+---
+
+### H3 · Reverse Linked List II
+
+**🔗 [LC 92 — Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)** · Medium
+**Pattern:** In-place Reversal (Sub-list) | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Walk to the node before position `left`. Then do head insertion `right - left` times: take the node after the current segment start and move it to the front of the segment. One pass, O(1) space.
+
+---
+
+### H4 · Design Front Middle Back Queue
+
+**🔗 [LC 1670 — Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/)** · Medium
+**Pattern:** Doubly Linked List Design | **Companies:** Amazon, Google
+
+**Hint:** Use a doubly linked list with sentinels plus a pointer to the middle node (or two deques kept balanced so `left.size()` is `right.size()` or one less). After every push or pop, rebalance the middle.
+
+---
+
+### H5 · LFU Cache
+
+**🔗 [LC 460 — LFU Cache](https://leetcode.com/problems/lfu-cache/)** · Hard
+**Pattern:** Freq Maps | **Companies:** Google, Amazon, Uber
+
+**Hint:** Keep `key → node`, `freq → doubly linked list of nodes` and `minFreq`. On access, move the node from its frequency list to the next one (updating `minFreq` if its old list empties). To evict, remove the tail of the `minFreq` list. Everything is O(1).
+
+---
+
+## 🧠 Conceptual Check
 
 1. **Space Trade-off**: Why is iterative reversal preferred over recursive in production?
 2. **Infinite Loops**: What safety check prevents a cycle in a merged list?
@@ -74,4 +297,29 @@ _Focus on cache design invariants and k-sized re-grouping._
 
 ---
 
-**Next Topic**: Topic 12 — Stacks & Queues →
+## 🏢 Company Focus
+
+The companies that ask this lecture's problems most often, with the problems to start from:
+
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                   |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/), [Design Skiplist](https://leetcode.com/problems/design-skiplist/), [Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/)                 |
+| **Microsoft** | [Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/), [Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/), [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/), [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)   |
+| **Meta**      | [Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/), [Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/), [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/), [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)   |
+| **Google**    | [Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/), [Design Skiplist](https://leetcode.com/problems/design-skiplist/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/), [LFU Cache](https://leetcode.com/problems/lfu-cache/)                                           |
+| **Bloomberg** | [Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/), [Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/), [Rotate List](https://leetcode.com/problems/rotate-list/), [Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/) |
+
+---
+
+## ✅ Completion Checklist
+
+- [ ] All 10 Easy problems solved
+- [ ] All 13 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] All 4 conceptual questions answered out loud
+- [ ] I can reverse a list iteratively and recursively without drawing it
+- [ ] I can find a cycle's entry point and explain why Floyd's algorithm works
+
+---
+
+**← [Lecture 10 · Searching Algorithms](../Lecture10/Assignment.md)** &nbsp;·&nbsp; **[Lecture 12 · Stacks & Queues](../Lecture12/Assignment.md) →**
