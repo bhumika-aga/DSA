@@ -1651,10 +1651,11 @@ adj <span class="pc-kw">&larr;</span> array of V empty lists
             <strong>Grid problems ARE graph problems.</strong> Each cell
             <code>(r,c)</code> is a node. Edges go to the 4 (or 8) adjacent
             cells. You never need to build an explicit adjacency list &mdash;
-            just use the 4-direction delta array. This covers: Number of
-            Islands, Rotting Oranges, 01 Matrix, Pacific Atlantic Water Flow.
-            <br /><br />
-            <code>int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};</code>
+            just use the 4-direction delta array. Lecture 14 works through the
+            grid versions (Number of Islands, Rotting Oranges, 01 Matrix,
+            Pacific Atlantic Water Flow); here the same traversals run on
+            explicit graphs. <br /><br />
+            <code>dirs = [(1,0), (-1,0), (0,1), (0,-1)]</code>
           </div>
         </div>
 
@@ -2481,25 +2482,27 @@ bridges ← empty list
         <!-- ═══ PRACTICE ═══ -->
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
 
-        <!-- PROB 01 -->
+        <!-- PROB 01: Number of Operations to Make Network Connected -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
                 Problem 01 &middot;
                 <a
-                  href="https://leetcode.com/problems/number-of-islands/"
+                  href="https://leetcode.com/problems/number-of-operations-to-make-network-connected/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 200</a
+                  >LC 1319</a
                 >
               </div>
-              <div class="prob-title">Number of Islands</div>
+              <div class="prob-title">
+                Number of Operations to Make Network Connected
+              </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">DFS Flood Fill</span>
+                <span class="tag tag-pat">DFS over an Adjacency List</span>
                 <span class="tag tag-co"
-                  >Amazon · Google · Meta · Microsoft</span
+                  >Amazon &middot; Google &middot; Meta</span
                 >
               </div>
             </div>
@@ -2511,12 +2514,13 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given a 2D grid of <code>'1'</code> (land) and
-                <code>'0'</code> (water), count the number of islands. An island
-                is surrounded by water and connected horizontally/vertically.
+                You have <code>n</code> computers and a list of cables. You may
+                unplug any cable and re-plug it between two other computers.
+                Return the fewest moves to connect every computer, or -1 if it
+                is impossible.
               </p>
               <div class="iobox">
-                Input: [["1","1","0"],["0","1","0"],["0","0","1"]] Output: 2
+                n = 6, connections = [[0,1],[0,2],[0,3],[1,2],[1,3]] &rarr; 2
               </div>
             </div>
             <div class="prob-section">
@@ -2528,7 +2532,8 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Each island is a connected component; the grid is the graph.
+                    How many cables does it take, at minimum, to connect
+                    <code>n</code> computers?
                   </p>
                 </div>
               </details>
@@ -2539,58 +2544,67 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Scan every cell; on an unvisited '1', increment the count
-                    and flood-fill the component away. Sinking it to '0' is your
-                    visited marker.
+                    With fewer than <code>n - 1</code> cables it is impossible.
+                    Otherwise count the connected components: joining
+                    <code>c</code> components takes <code>c - 1</code> moves,
+                    and spare cables always exist.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                DFS from each unvisited <code>'1'</code>, marking all connected
-                land cells as <code>'0'</code> (sinking the island). Each time
-                you start a new DFS, increment the count. The grid itself acts
-                as the visited array.
+                Two separate ideas. First the counting argument: a connected
+                graph on <code>n</code> nodes needs at least
+                <code>n - 1</code> edges, so fewer means -1. Then the graph
+                work: count components with DFS (or Union-Find, in Lecture 24)
+                and the answer is <code>components - 1</code>. Every extra edge
+                inside a component is a spare you can move.
               </p>
             </div>
             <details>
               <summary>
-                <div class="toggle-arrow">&#9654;</div>
-                Solution
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 200</span
+                      >&#128208; Pseudocode &middot; Count Components</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> numIslands(grid):
-    count ← 0
-    <span class="pc-kw">for</span> every cell (r, c):
-        <span class="pc-kw">if</span> grid[r][c] = '1':
-            dfs(grid, r, c)
-            count ← count + 1
-    <span class="pc-kw">return</span> count
+                  <pre><span class="pc-kw">function</span> makeConnected(n, connections):
+    <span class="pc-kw">if</span> length(connections) &lt; n - 1: <span class="pc-kw">return</span> -1      <span class="pc-cm">// not enough cables</span>
 
-<span class="pc-kw">function</span> dfs(g, r, c):
-    <span class="pc-kw">if</span> r, c out of bounds <span class="pc-kw">or</span> g[r][c] ≠ '1': <span class="pc-kw">return</span>
-    g[r][c] ← '0'                          <span class="pc-cm">// sink it</span>
-    dfs(g, r+1, c);  dfs(g, r-1, c);  dfs(g, r, c+1);  dfs(g, r, c-1)</pre>
+    adj ← adjacency list of n empty lists
+    <span class="pc-kw">for</span> (a, b) <span class="pc-kw">in</span> connections:
+        adj[a].append(b)
+        adj[b].append(a)
+
+    visited ← array of n, all false
+    components ← 0
+    <span class="pc-kw">for</span> node <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> visited[node]:
+            components ← components + 1
+            dfs(adj, node, visited)
+    <span class="pc-kw">return</span> components - 1                          <span class="pc-cm">// one move joins two components</span>
+
+<span class="pc-kw">function</span> dfs(adj, node, visited):
+    visited[node] ← true
+    <span class="pc-kw">for</span> nb <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> visited[nb]: dfs(adj, nb, visited)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val">O(m&times;n)</span>
+                    ><span class="cx-val green">O(V + E)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val">O(m&times;n)</span>
+                    ><span class="cx-val green">O(V + E)</span>
                   </div>
                 </div>
               </div>
@@ -2598,24 +2612,26 @@ bridges ← empty list
           </div>
         </div>
 
-        <!-- PROB 02 -->
+        <!-- PROB 02: Open the Lock -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
                 Problem 02 &middot;
                 <a
-                  href="https://leetcode.com/problems/rotting-oranges/"
+                  href="https://leetcode.com/problems/open-the-lock/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 994</a
+                  >LC 752</a
                 >
               </div>
-              <div class="prob-title">Rotting Oranges</div>
+              <div class="prob-title">Open the Lock</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Multi-Source BFS</span>
-                <span class="tag tag-co">Amazon · Google · Meta</span>
+                <span class="tag tag-pat">Shortest Path, Unweighted</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Microsoft</span
+                >
               </div>
             </div>
             <div class="prob-right">
@@ -2626,13 +2642,14 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Grid contains <code>0</code> (empty), <code>1</code> (fresh
-                orange), <code>2</code> (rotten). Each minute a rotten orange
-                rots adjacent fresh oranges. Return the minimum minutes to rot
-                all, or -1 if impossible.
+                A lock has four wheels showing digits 0-9 that wrap around. From
+                <code>"0000"</code>, each move turns one wheel one step. Return
+                the fewest moves to reach <code>target</code> without ever
+                showing a string in <code>deadends</code>, or -1.
               </p>
               <div class="iobox">
-                Input: [[2,1,1],[1,1,0],[0,1,1]] Output: 4
+                deadends = ["0201","0101","0102","1212","2002"], target = "0202"
+                &rarr; 6
               </div>
             </div>
             <div class="prob-section">
@@ -2644,8 +2661,8 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Rot spreads outward one ring per minute, from every rotten
-                    orange simultaneously.
+                    Nothing here looks like a graph &mdash; but what are the
+                    nodes, and what are the edges?
                   </p>
                 </div>
               </details>
@@ -2656,62 +2673,65 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Multi-source BFS: enqueue every rotten orange before the
-                    loop, then count completed levels. Afterwards, any remaining
-                    fresh orange means return -1.
+                    Each 4-digit string is a node with exactly 8 neighbours
+                    (each wheel up or down). Plain BFS from <code>"0000"</code>,
+                    skipping deadends and states you have already reached.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Seed <em>all</em> initially rotten oranges into the BFS queue at
-                time 0. BFS propagates one level (= one minute) per round. After
-                BFS completes, if any <code>1</code> remains in the grid, return
-                -1.
+                The graph is never built &mdash; neighbours are generated on
+                demand, which is what &ldquo;implicit graph&rdquo; means. BFS
+                visits states in order of distance, so the first time you reach
+                the target you have the fewest moves. Mark states visited when
+                you <em>enqueue</em> them, not when you pop, or the same state
+                enters the queue many times.
               </p>
             </div>
             <details>
               <summary>
-                <div class="toggle-arrow">&#9654;</div>
-                Solution
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 994</span
+                      >&#128208; Pseudocode &middot; BFS over States</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> orangesRotting(grid):
-    q ← empty queue;  fresh ← 0;  mins ← 0
-    <span class="pc-kw">for</span> every cell (r, c):
-        <span class="pc-kw">if</span> grid[r][c] = 2: q.enqueue((r, c))
-        <span class="pc-kw">else if</span> grid[r][c] = 1: fresh ← fresh + 1
-    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> fresh &gt; 0:
-        mins ← mins + 1
-        <span class="pc-kw">repeat</span> q.size <span class="pc-kw">times</span>:                 <span class="pc-cm">// one minute = one BFS level</span>
-            (r, c) ← q.dequeue()
-            <span class="pc-kw">for each</span> of the 4 neighbours (nr, nc):
-                <span class="pc-kw">if</span> <span class="pc-kw">in</span> bounds <span class="pc-kw">and</span> grid[nr][nc] = 1:
-                    grid[nr][nc] ← 2
-                    fresh ← fresh - 1
-                    q.enqueue((nr, nc))
-    <span class="pc-kw">if</span> fresh = 0: <span class="pc-kw">return</span> mins
+                  <pre><span class="pc-kw">function</span> openLock(deadends, target):
+    dead ← set of deadends
+    <span class="pc-kw">if</span> &quot;0000&quot; <span class="pc-kw">in</span> dead: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">if</span> target = &quot;0000&quot;: <span class="pc-kw">return</span> 0
+
+    queue ← [&quot;0000&quot;]
+    visited ← {&quot;0000&quot;}
+    steps ← 0
+
+    <span class="pc-kw">while</span> queue <span class="pc-kw">is not empty</span>:
+        steps ← steps + 1
+        <span class="pc-kw">repeat</span> queue.size <span class="pc-kw">times</span>:            <span class="pc-cm">// one whole ring = one move</span>
+            state ← queue.popFront()
+            <span class="pc-kw">for each</span> of the 8 neighbours nb of state:   <span class="pc-cm">// each wheel ±1, wrapping</span>
+                <span class="pc-kw">if</span> nb <span class="pc-kw">in</span> dead <span class="pc-kw">or</span> nb <span class="pc-kw">in</span> visited: <span class="pc-kw">continue</span>
+                <span class="pc-kw">if</span> nb = target: <span class="pc-kw">return</span> steps
+                visited.add(nb)             <span class="pc-cm">// mark on push, never on pop</span>
+                queue.pushBack(nb)
     <span class="pc-kw">return</span> -1</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val">O(m&times;n)</span>
+                    ><span class="cx-val green">O(10⁴ × 8)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val">O(m&times;n)</span>
+                    ><span class="cx-val green">O(10⁴)</span>
                   </div>
                 </div>
               </div>
@@ -2801,8 +2821,7 @@ bridges ← empty list
             </div>
             <details>
               <summary>
-                <div class="toggle-arrow">&#9654;</div>
-                Solution
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2917,8 +2936,7 @@ bridges ← empty list
             </div>
             <details>
               <summary>
-                <div class="toggle-arrow">&#9654;</div>
-                Solution
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -3038,8 +3056,7 @@ bridges ← empty list
             </div>
             <details>
               <summary>
-                <div class="toggle-arrow">&#9654;</div>
-                Solution
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">

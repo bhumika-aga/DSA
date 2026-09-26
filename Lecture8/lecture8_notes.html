@@ -1955,14 +1955,14 @@ count     <span class="pc-kw">&larr;</span> 0
         </div>
 
         <div class="complexity-row">
-          <span class="cx-badge time"
-            ><span class="cx-label">Time</span
-            ><span class="cx-val">O(n) &mdash; one pass</span></span
-          >
-          <span class="cx-badge space"
-            ><span class="cx-label">Space</span
-            ><span class="cx-val">O(1)</span></span
-          >
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(n) &mdash; one pass</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
         </div>
 
         <div class="callout purple">
@@ -2155,24 +2155,26 @@ count     <span class="pc-kw">&larr;</span> 0
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>Master these core patterns through hands-on practice.</p>
 
-        <!-- P1 -->
+        <!-- P1: Rotate Array -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01 · 2D In-Place</div>
-              <div class="prob-title">Rotate Image</div>
+              <div class="prob-num">Problem 01 &middot; Reversal Trick</div>
+              <div class="prob-title">Rotate Array</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/rotate-image/"
+                  href="https://leetcode.com/problems/rotate-array/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 48 - Rotate Image</a
+                  >🔗 LC 189 - Rotate Array</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Amazon · Microsoft · Apple</span>
-                <span class="tag tag-pat">Matrix</span>
+                <span class="tag tag-pat">Three Reversals</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Microsoft &middot; Google</span
+                >
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2183,9 +2185,12 @@ count     <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Rotate an <code>n x n</code> matrix by 90 degrees clockwise
-                in-place.
+                Rotate the array to the right by <code>k</code> steps, in place.
+                <code>k</code> may be larger than the array's length.
               </p>
+              <div class="iobox">
+                nums = [1,2,3,4,5,6,7], k = 3 &rarr; [5,6,7,1,2,3,4]
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2195,7 +2200,10 @@ count     <span class="pc-kw">&larr;</span> 0
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>A rotation can be built from two simpler reflections.</p>
+                  <p>
+                    Copying into a second array is easy. What must you do to
+                    <code>k</code> first, and can you avoid the extra array?
+                  </p>
                 </div>
               </details>
               <details class="hint">
@@ -2205,28 +2213,66 @@ count     <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Transpose (swap across the main diagonal), then reverse each
-                    row. That is a 90&deg; clockwise turn, fully in place.
+                    Reduce <code>k mod n</code>. Then reverse the whole array,
+                    reverse the first <code>k</code> elements, and reverse the
+                    rest.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-              <div class="code-block pseudo">
-                <div class="code-header">
-                  <span class="code-lang"
-                    >&#128208; Pseudocode &middot; Transpose &amp; Flip</span
-                  ><button class="copy-btn" onclick="copyCode(this)">
-                    Copy
-                  </button>
-                </div>
-                <pre><span class="pc-cm">// Rotate 90° clockwise, in place:</span>
-<span class="pc-cm">// 1. Transpose: swap matrix[i][j] with matrix[j][i]</span>
-<span class="pc-cm">// 2. Flip horizontally: reverse each row</span></pre>
-              </div>
+              <p>
+                Reversing flips the order, so reversing the whole array puts the
+                last <code>k</code> elements in front &mdash; backwards.
+                Reversing each of the two blocks fixes them internally. Three
+                linear passes, no extra array. The alternative &mdash; cyclic
+                replacements with a gcd-sized loop count &mdash; is O(1) space
+                too but far easier to get wrong.
+              </p>
             </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Reverse Three Times</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> rotate(nums, k):
+    n ← length(nums)
+    k ← k mod n                     <span class="pc-cm">// rotating by n changes nothing</span>
+    reverse(nums, 0, n - 1)         <span class="pc-cm">// whole array</span>
+    reverse(nums, 0, k - 1)         <span class="pc-cm">// first k</span>
+    reverse(nums, k, n - 1)         <span class="pc-cm">// the rest</span>
+
+<span class="pc-kw">function</span> reverse(a, lo, hi):
+    <span class="pc-kw">while</span> lo &lt; hi:
+        swap a[lo], a[hi]
+        lo ← lo + 1;  hi ← hi - 1
+
+<span class="pc-cm">// [1,2,3,4,5,6,7], k = 3</span>
+<span class="pc-cm">// reverse all   -&gt; [7,6,5,4,3,2,1]</span>
+<span class="pc-cm">// reverse 0..2  -&gt; [5,6,7,4,3,2,1]</span>
+<span class="pc-cm">// reverse 3..6  -&gt; [5,6,7,1,2,3,4]</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -2291,12 +2337,55 @@ count     <span class="pc-kw">&larr;</span> 0
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-
               <p>
-                Solution involves tracking <code>currentSum</code> and resetting
-                to <code>nums[i]</code> if <code>currentSum < 0</code>.
+                Walk the array once, keeping <code>current</code>, the best sum
+                of a subarray that <em>ends here</em>. Extending is only worth
+                it while <code>current</code> is positive &mdash; once it turns
+                negative it can only drag the next element down, so start again
+                from that element. <code>best</code> records the largest
+                <code>current</code> ever seen, which is why it is seeded with
+                the first element rather than 0 (an all-negative array must
+                still return its largest value).
               </p>
             </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Kadane's Algorithm</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxSubArray(nums):
+    current ← nums[0]
+    best ← nums[0]                       <span class="pc-cm">// never seed with 0 — all-negative input</span>
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> length(nums) - 1:
+        current ← max(nums[i], current + nums[i])   <span class="pc-cm">// extend, or restart here</span>
+        best ← max(best, current)
+    <span class="pc-kw">return</span> best
+
+<span class="pc-cm">// [-2,1,-3,4,-1,2,1,-5,4]
+// current: -2, 1, -2, 4, 3, 5, 6, 1, 5
+// best:    -2, 1,  1, 4, 4, 5, 6, 6, 6  ← answer 6 (subarray [4,-1,2,1])</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -2379,7 +2468,7 @@ count     <span class="pc-kw">&larr;</span> 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">▶</span> Solution + Dry Run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2423,26 +2512,24 @@ count     <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
-        <!-- P04 -->
+        <!-- P04: Merge Strings Alternately -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04 · Two Pointers</div>
-              <div class="prob-title">Container With Most Water</div>
+              <div class="prob-num">Problem 04 &middot; Two Index Walk</div>
+              <div class="prob-title">Merge Strings Alternately</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/container-with-most-water/"
+                  href="https://leetcode.com/problems/merge-strings-alternately/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 11</a
+                  >🔗 LC 1768 - Merge Strings Alternately</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co"
-                  >Google · Amazon · Meta · Bloomberg</span
-                >
-                <span class="tag tag-pat">Two Pointers</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Two Pointers (Same Direction)</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2453,13 +2540,12 @@ count     <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given <code>height[]</code> where each value is a vertical
-                line's height, find two lines forming a container that holds the
-                most water.
+                Merge two strings by alternating their characters, starting with
+                <code>word1</code>. When one string runs out, append the rest of
+                the other.
               </p>
-              <div class="ascii-tree">
-                height = [1, 8, 6, 2, 5, 4, 8, 3, 7] lo=0 hi=8 Area = min(1, 7)
-                × 8 = 8 Best: lo=1, hi=8 → min(8,7) × 7 = 49 ← answer
+              <div class="iobox">
+                word1 = "abc", word2 = "pqrs" &rarr; "apbqcrs"
               </div>
             </div>
             <div class="prob-section">
@@ -2471,8 +2557,8 @@ count     <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Area is limited by the shorter of the two lines. Which
-                    pointer should you move?
+                    One index per string, and a single loop that runs while
+                    either index is still in range.
                   </p>
                 </div>
               </details>
@@ -2483,46 +2569,171 @@ count     <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Start wide, at both ends. Always move the pointer at the
-                    shorter line &mdash; moving the taller one can never help,
-                    since width shrinks either way.
+                    Append <code>word1[i]</code> when <code>i</code> is in
+                    range, then <code>word2[j]</code> when <code>j</code> is in
+                    range, and advance both. The tail falls out of the same
+                    loop.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Area = <code>min(H[lo], H[hi]) × (hi-lo)</code>. Start at widest
-                (lo=0, hi=n-1). Moving the <em>taller</em> pointer can never
-                help — it shrinks width AND can't increase height. So always
-                move the <strong>shorter</strong> pointer.
+                The trap is writing two loops and a special case for the
+                leftover. One loop with two independent bounds checks handles
+                both strings of any lengths. Build the answer in a
+                <code>StringBuilder</code>: appending to an immutable
+                <code>String</code> inside a loop would copy the whole string
+                each time, turning O(n) into O(n&sup2;).
               </p>
             </div>
             <details>
-              <summary><span class="toggle-arrow">▶</span> Solution</summary>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Greedy Two Pointers</span
+                      >&#128208; Pseudocode &middot; Alternate and Drain</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> maxArea(h):
-    lo ← 0;  hi ← length(h) - 1;  best ← 0
-    <span class="pc-kw">while</span> lo &lt; hi:
-        best ← max(best, min(h[lo], h[hi]) × (hi - lo))
-        <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo ← lo + 1     <span class="pc-cm">// only a taller short wall can help</span>
-        <span class="pc-kw">else</span>:             hi ← hi - 1
-    <span class="pc-kw">return</span> best</pre>
+                  <pre><span class="pc-kw">function</span> mergeAlternately(word1, word2):
+    i ← 0;  j ← 0
+    out ← empty string builder
+    <span class="pc-kw">while</span> i &lt; length(word1) <span class="pc-kw">or</span> j &lt; length(word2):
+        <span class="pc-kw">if</span> i &lt; length(word1):
+            append word1[i] <span class="pc-kw">to</span> out;  i ← i + 1
+        <span class="pc-kw">if</span> j &lt; length(word2):
+            append word2[j] <span class="pc-kw">to</span> out;  j ← j + 1
+    <span class="pc-kw">return</span> out
+
+<span class="pc-cm">// &quot;abc&quot; + &quot;pqrs&quot; -&gt; a p b q c r, then the leftover s -&gt; &quot;apbqcrs&quot;</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(N)</span>
+                    ><span class="cx-val green">O(n + m)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n + m)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P05: Find Pivot Index -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Prefix Sum</div>
+              <div class="prob-title">Find Pivot Index</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/find-pivot-index/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 724 - Find Pivot Index</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Running Total</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >›</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the leftmost index where the sum of everything to its left
+                equals the sum of everything to its right. Return -1 if there is
+                none.
+              </p>
+              <div class="iobox">
+                nums = [1, 7, 3, 6, 5, 6] &rarr; 3 &nbsp; (1+7+3 = 5+6)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    If you know the total and the sum on the left, do you need
+                    another loop for the right side?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Total first. Then walk left to right keeping
+                    <code>left</code>; the right sum is
+                    <code>total - left - nums[i]</code>. Compare, then add
+                    <code>nums[i]</code> to <code>left</code>.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                One precomputed total turns a nested O(n&sup2;) scan into a
+                single pass. The ordering matters: compare
+                <em>before</em> adding the current element, because the pivot
+                itself belongs to neither side. Negative numbers are fine here
+                &mdash; unlike sliding windows, prefix sums do not care about
+                signs.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Total Minus Left</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> pivotIndex(nums):
+    total ← sum(nums)
+    left ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        right ← total - left - nums[i]     <span class="pc-cm">// exclude the pivot itself</span>
+        <span class="pc-kw">if</span> left = right: <span class="pc-kw">return</span> i
+        left ← left + nums[i]
+    <span class="pc-kw">return</span> -1
+
+<span class="pc-cm">// [1,7,3,6,5,6]: i=3 -&gt; left = 11, right = 22 - 11 - 6 = 5 + 6 = 11</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2534,24 +2745,26 @@ count     <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
-        <!-- P05 -->
+        <!-- P06: Best Time to Buy and Sell Stock -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 · Prefix Sum + HashMap</div>
-              <div class="prob-title">Subarray Sum Equals K</div>
+              <div class="prob-num">Problem 06 &middot; One-Pass Greedy</div>
+              <div class="prob-title">Best Time to Buy and Sell Stock</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/subarray-sum-equals-k/"
+                  href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 560</a
+                  >🔗 LC 121 - Best Time to Buy and Sell Stock</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Meta · Amazon · Google</span>
-                <span class="tag tag-pat">Prefix Sum</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Track the Minimum So Far</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2562,12 +2775,13 @@ count     <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given array <code>nums</code> and integer <code>k</code>, return
-                the total number of subarrays whose sum equals <code>k</code>.
+                Given daily <code>prices</code>, buy on one day and sell on a
+                later day for the largest profit. Return 0 if no profit is
+                possible.
               </p>
-              <div class="ascii-tree">
-                nums=[1,1,1], k=2 Subarrays: [1,1] at 0-1 and [1,1] at 1-2 →
-                Output: 2
+              <div class="iobox">
+                prices = [7, 1, 5, 3, 6, 4] &rarr; 5 &nbsp; (buy at 1, sell at
+                6)
               </div>
             </div>
             <div class="prob-section">
@@ -2579,8 +2793,8 @@ count     <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Sliding window fails here because negative numbers break the
-                    monotonicity.
+                    For a fixed selling day, which buying day is best? Do you
+                    need to search for it?
                   </p>
                 </div>
               </details>
@@ -2591,167 +2805,50 @@ count     <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Use prefix sums in a HashMap. At each index, add the count
-                    of previously seen prefixes equal to running - k. Seed the
-                    map with {0: 1}.
+                    Sweep left to right keeping the smallest price seen so far.
+                    At each day, the best profit ending today is
+                    <code>price - minSoFar</code>.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                If <code>prefix[j] - prefix[i] = k</code>, then subarray
-                <code>[i+1..j]</code> sums to k. Rearranged: we need
-                <code>prefix[i] = prefix[j] - k</code>. As we build prefix sums,
-                look up the count of <code>prefix - k</code> in a HashMap. Seed
-                with <code>{0:1}</code> to handle subarrays starting at index 0.
+                Every pair of days is a candidate, but you never need the inner
+                loop: as you move right, the best buy day is always the cheapest
+                day you have already passed. One variable carries that fact
+                forward, so the sweep is O(n) with O(1) memory &mdash; the same
+                &ldquo;carry one fact forward&rdquo; idea as Kadane's algorithm.
               </p>
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">▶</span> Solution + Trace
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix Sum + HashMap</span
+                      >&#128208; Pseudocode &middot; Min So Far</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> subarraySum(nums, k):
-    freq ← map with {0: 1}          <span class="pc-cm">// the empty prefix</span>
-    prefix ← 0;  count ← 0
-    <span class="pc-kw">for</span> num <span class="pc-kw">in</span> nums:
-        prefix ← prefix + num
-        count ← count + freq[prefix - k]   <span class="pc-cm">// default 0</span>
-        freq[prefix] ← freq[prefix] + 1
-    <span class="pc-kw">return</span> count
-<span class="pc-cm">// k=2, [1,1,1]: prefix 1 → 2 → 3</span>
-<span class="pc-cm">//   prefix=2: look up 0 → {0:1} → count = 1</span>
-<span class="pc-cm">//   prefix=3: look up 1 → {1:1} → count = 2 ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> maxProfit(prices):
+    minPrice ← +infinity
+    best ← 0
+    <span class="pc-kw">for</span> price <span class="pc-kw">in</span> prices:
+        <span class="pc-kw">if</span> price &lt; minPrice: minPrice ← price       <span class="pc-cm">// cheapest day so far</span>
+        <span class="pc-kw">else</span>: best ← max(best, price - minPrice)    <span class="pc-cm">// sell today</span>
+    <span class="pc-kw">return</span> best
+
+<span class="pc-cm">// [7,1,5,3,6,4]: min = 7,1,1,1,1,1 -&gt; profits 0,0,4,2,5,3 -&gt; 5</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(N)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(N)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P06 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 · Sliding Window</div>
-              <div class="prob-title">Minimum Size Subarray Sum</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/minimum-size-subarray-sum/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 209</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Amazon · Google · Meta</span>
-                <span class="tag tag-pat">Sliding Window</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a positive integer <code>target</code> and array of
-                positive integers, find the
-                <strong>minimum length</strong> contiguous subarray with sum ≥
-                target. Return 0 if none exists.
-              </p>
-              <div class="ascii-tree">
-                target=7, nums=[2,3,1,2,4,3] Window [4,3]: sum=7, length=2 ←
-                answer
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    All values are positive, so growing the window only ever
-                    increases the sum.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Expand right to reach the target, then shrink from the left
-                    while the sum still qualifies, recording the length each
-                    time.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Variable sliding window: expand right until
-                <code>sum ≥ target</code>, then shrink left to minimize length.
-                Since all values are positive, shrinking always decreases sum —
-                the window never "wraps around" in a problematic way.
-              </p>
-            </div>
-            <details>
-              <summary><span class="toggle-arrow">▶</span> Solution</summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Variable Sliding
-                      Window</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> minSubArrayLen(target, nums):
-    lo ← 0;  sum ← 0;  best ← INFINITY
-    <span class="pc-kw">for</span> hi <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        sum ← sum + nums[hi]
-        <span class="pc-kw">while</span> sum ≥ target:              <span class="pc-cm">// valid → record, then try to shrink</span>
-            best ← min(best, hi - lo + 1)
-            sum ← sum - nums[lo]
-            lo ← lo + 1
-    <span class="pc-kw">if</span> best = INFINITY: <span class="pc-kw">return</span> 0
-    <span class="pc-kw">return</span> best</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(N)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2837,7 +2934,9 @@ count     <span class="pc-kw">&larr;</span> 0
               </p>
             </div>
             <details>
-              <summary><span class="toggle-arrow">▶</span> Solution</summary>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
@@ -2947,7 +3046,7 @@ count     <span class="pc-kw">&larr;</span> 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">▶</span> Solution + Trace
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">

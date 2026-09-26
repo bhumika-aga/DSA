@@ -2016,8 +2016,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution with full dry
-                run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2133,7 +2132,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2249,7 +2248,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2299,43 +2298,44 @@ longest ← 0
           </div>
         </div>
 
-        <!-- P04: Top K Frequent Elements -->
+        <!-- P04: Count Nice Pairs in an Array -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 04 &middot; Frequency Map + Heap
+                Problem 04 &middot; Frequency Map on a Key
               </div>
-              <div class="prob-title">Top K Frequent Elements</div>
+              <div class="prob-title">Count Nice Pairs in an Array</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/top-k-frequent-elements/"
+                  href="https://leetcode.com/problems/count-nice-pairs-in-an-array/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 347 — Medium</a
+                  >&#128279; LC 1814 - Count Nice Pairs in an Array</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Amazon · Meta · Google</span>
-                <span class="tag tag-pat">Frequency Map</span
-                ><span class="tag tag-pat">Min-Heap</span>
+                <span class="tag tag-pat">Rearrange, Then Count Pairs</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
               >&rsaquo;</span
             >
           </div>
-          <div class="prob-body">
+          <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given an integer array and k, return the k most frequent
-                elements.
+                Let <code>rev(x)</code> be <code>x</code> with its digits
+                reversed. Count pairs <code>(i, j)</code> with
+                <code>i &lt; j</code> and
+                <code>nums[i] + rev(nums[j]) == nums[j] + rev(nums[i])</code>.
+                Return the count modulo 10&#8313;+7.
               </p>
               <div class="iobox">
-                Input: nums=[1,1,1,2,2,3], k=2 → Output: [1,2] Input: nums=[1],
-                k=1 → Output: [1]
+                nums = [42, 11, 1, 97] &rarr; 2 &nbsp; (pairs (0,3) and (1,2))
               </div>
             </div>
             <div class="prob-section">
@@ -2347,8 +2347,8 @@ longest ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Count first. Then it is only about selecting the k largest
-                    counts.
+                    Move everything about <code>i</code> to one side of the
+                    equation and everything about <code>j</code> to the other.
                   </p>
                 </div>
               </details>
@@ -2359,66 +2359,64 @@ longest ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Bucket sort by frequency for O(n), or a size-k min-heap for
-                    O(n log k).
+                    The condition becomes
+                    <code>nums[i] - rev(nums[i]) == nums[j] - rev(nums[j])</code
+                    >. Count how often each value of that difference appears.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Step 1: Build a frequency map (element → count). Step 2: Find
-                the top-K most frequent. Options:<br />
-                a) Sort by frequency descending — O(n log n).<br />
-                b) Use a <mark>min-heap of size K</mark> — O(n log k). Better
-                when k &lt;&lt; n.<br />
-                c) Bucket sort on frequency — O(n). Best theoretical complexity.
+                The algebra is the whole problem: once each element is reduced
+                to the single key <code>x - rev(x)</code>, the question is
+                &ldquo;how many equal pairs?&rdquo; &mdash; the classic
+                complement-counting pass. Add the running count of the key
+                <em>before</em> storing the current element, and take the
+                modulus as you go.
               </p>
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution — Min-Heap
-                approach O(n log k)
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Freq Map + Min-Heap</span
+                      >&#128208; Pseudocode &middot; Key = x - rev(x)</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> topKFrequent(nums, k):
-    <span class="pc-cm">// Step 1: frequency map</span>
-    freq ← empty map
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums: freq[x] ← (freq[x] <span class="pc-kw">if</span> x <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1
+                  <pre><span class="pc-kw">function</span> countNicePairs(nums):
+    MOD ← 1000000007
+    seen ← empty map                    <span class="pc-cm">// key -&gt; how many times seen</span>
+    count ← 0
 
-    <span class="pc-cm">// Step 2: min-heap of size k, ordered by frequency</span>
-    heap ← empty min-heap ordered by freq[value]
-    <span class="pc-kw">for</span> key <span class="pc-kw">in</span> freq:
-        heap.push(key)
-        <span class="pc-kw">if</span> heap.size &gt; k: heap.popMin()      <span class="pc-cm">// evict the least frequent</span>
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+        key ← x - reverseDigits(x)
+        <span class="pc-kw">if</span> key <span class="pc-kw">in</span> seen:
+            count ← (count + seen[key]) mod MOD    <span class="pc-cm">// pairs with every earlier match</span>
+        seen[key] ← (seen[key] <span class="pc-kw">if</span> key <span class="pc-kw">in</span> seen, <span class="pc-kw">else</span> 0) + 1
+    <span class="pc-kw">return</span> count
 
-    <span class="pc-cm">// Step 3: extract answers</span>
-    res ← array of length k
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← heap.popMin()
-    <span class="pc-kw">return</span> res
-
-<span class="pc-cm">// nums=[1,1,1,2,2,3], k=2</span>
-<span class="pc-cm">// freq={1:3, 2:2, 3:1}</span>
-<span class="pc-cm">// heap after all: [2(freq 2), 1(freq 3)] → [1,2] ✓</span></pre>
+<span class="pc-kw">function</span> reverseDigits(x):
+    r ← 0
+    <span class="pc-kw">while</span> x &gt; 0:
+        r ← r × 10 + x mod 10
+        x ← x ÷ 10
+    <span class="pc-kw">return</span> r</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val yellow">O(n log k)</span>
+                    ><span class="cx-val green">O(n × digits)</span>
                   </div>
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val yellow">O(n)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2504,7 +2502,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2630,7 +2628,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution with dry run
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block pseudo">
@@ -2756,8 +2754,7 @@ longest ← 0
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">&#9654;</span>Solution —
-                LinkedHashMap (concise) + DLL (full)
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block">

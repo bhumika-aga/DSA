@@ -2301,7 +2301,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2399,7 +2399,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2497,7 +2497,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2536,24 +2536,26 @@ result <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
-        <!-- P4 -->
+        <!-- P4: Count Number of Maximum Bitwise-OR Subsets -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04 · Bitmask Iteration</div>
-              <div class="prob-title">Subsets</div>
+              <div class="prob-num">Problem 04 &middot; Bitmask Iteration</div>
+              <div class="prob-title">
+                Count Number of Maximum Bitwise-OR Subsets
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/subsets/"
+                  href="https://leetcode.com/problems/count-number-of-maximum-bitwise-or-subsets/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 78 - Subsets</a
+                  >🔗 LC 2044 - Count Number of Maximum Bitwise-OR Subsets</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Meta · Amazon · Google</span>
-                <span class="tag tag-pat">Bitmask Generation</span>
+                <span class="tag tag-pat">Enumerate All Masks</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2564,9 +2566,12 @@ result <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given an integer array nums of unique elements, return all
-                possible subsets (the power set).
+                Return how many non-empty subsets of <code>nums</code> have a
+                bitwise OR equal to the maximum possible OR of the whole array.
               </p>
+              <div class="iobox">
+                nums = [3, 2, 1, 5] &rarr; 6 &nbsp; (max OR = 7)
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2577,8 +2582,8 @@ result <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    There are exactly 2&#8319; subsets, and exactly 2&#8319;
-                    n-bit numbers.
+                    ORing more elements can never lower the result, so what is
+                    the maximum OR of any subset?
                   </p>
                 </div>
               </details>
@@ -2589,53 +2594,65 @@ result <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Loop mask from 0 to 2&#8319;-1. Include element i whenever
-                    mask has bit i set: (mask &gt;&gt; i) &amp; 1.
+                    With n &le; 16, every subset is a bitmask from 1 to 2&#8319;
+                    &minus; 1. For each mask, OR the chosen elements and compare
+                    with the maximum.
                   </p>
                 </div>
               </details>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-
-              <details>
-                <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
-                </summary>
-                <div class="details-body">
-                  <div class="code-block pseudo">
-                    <div class="code-header">
-                      <span class="code-lang"
-                        >&#128208; Pseudocode &middot; Subsets</span
-                      ><button class="copy-btn" onclick="copyCode(this)">
-                        Copy
-                      </button>
-                    </div>
-                    <pre><span class="pc-kw">function</span> subsets(nums):
-    result ← empty list
-    n ← length(nums)
-
-    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2ⁿ - 1:             <span class="pc-cm">// each mask is one subset</span>
-        current ← empty list
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-            <span class="pc-kw">if</span> (mask AND (1 &lt;&lt; j)) ≠ 0:
-                current.append(nums[j])
-        result.append(current)
-    <span class="pc-kw">return</span> result</pre>
+              <p>
+                Two different uses of bits meet in one problem. The
+                <em>values</em> are combined with OR, and the
+                <em>subsets</em> are enumerated with a mask: bit
+                <code>j</code> of the mask says whether <code>nums[j]</code> is
+                included. Because the OR of everything is the ceiling, you only
+                count the masks that reach it.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Subset Masks</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
                   </div>
-                  <div class="complexity-row">
-                    <div class="cx-badge green">
-                      <span class="cx-label">Time</span
-                      ><span class="cx-val yellow">O(n * 2^n)</span>
-                    </div>
-                    <div class="cx-badge green">
-                      <span class="cx-label">Space</span
-                      ><span class="cx-val green">O(1)</span>
-                    </div>
+                  <pre><span class="pc-kw">function</span> countMaxOrSubsets(nums):
+    n ← length(nums)
+    maxOr ← 0
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums: maxOr ← maxOr OR x      <span class="pc-cm">// ORing more can only add bits</span>
+
+    count ← 0
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> 2^n - 1:            <span class="pc-cm">// every non-empty subset</span>
+        cur ← 0
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+            <span class="pc-kw">if</span> mask AND (1 &lt;&lt; j) ≠ 0:      <span class="pc-cm">// is nums[j] in this subset?</span>
+                cur ← cur OR nums[j]
+        <span class="pc-kw">if</span> cur = maxOr: count ← count + 1
+    <span class="pc-kw">return</span> count
+
+<span class="pc-cm">// nums = [3,2,1,5]: maxOr = 7; 6 of the 15 subsets reach 7</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(2^n × n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                 </div>
-              </details>
-            </div>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -2706,7 +2723,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2801,7 +2818,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2900,7 +2917,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -2993,7 +3010,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -3095,7 +3112,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">
@@ -3193,7 +3210,7 @@ result <span class="pc-kw">&larr;</span> 0
 
               <details>
                 <summary>
-                  <span class="toggle-arrow">▶</span>Full solution
+                  <span class="toggle-arrow">&#9654;</span>Full solution
                 </summary>
                 <div class="details-body">
                   <div class="code-block pseudo">

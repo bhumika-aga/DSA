@@ -1810,20 +1810,22 @@ list.sort(combined);
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01 · Design</div>
-              <div class="prob-title">Design a Stack Using ArrayList</div>
+              <div class="prob-num">Problem 01 &middot; Class Design</div>
+              <div class="prob-title">
+                Design a Stack With Increment Operation
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/implement-stack-using-queues/"
+                  href="https://leetcode.com/problems/design-a-stack-with-increment-operation/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 225 (concept)</a
+                  >🔗 LC 1381 - Design a Stack With Increment Operation</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span
-                ><span class="tag tag-co">Amazon · Microsoft · Adobe</span
-                ><span class="tag tag-pat">OOP Design</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Encapsulated State</span>
+                <span class="tag tag-co">Amazon &middot; Microsoft</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px">›</span>
@@ -1832,9 +1834,16 @@ list.sort(combined);
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Implement a generic Stack class using ArrayList with push, pop,
-                peek, isEmpty, size — all O(1).
+                Design a stack with a maximum size supporting <code>push</code>,
+                <code>pop</code> (return -1 when empty) and
+                <code>increment(k, val)</code>, which adds <code>val</code> to
+                the bottom <code>k</code> elements.
               </p>
+              <div class="iobox">
+                CustomStack(3): push 1, push 2, pop &rarr; 2, push 2, push 3,
+                push 4 (ignored), increment(5, 100), increment(2, 100), pop
+                &rarr; 103
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -1845,8 +1854,9 @@ list.sort(combined);
                 </summary>
                 <div class="details-body">
                   <p>
-                    A stack only ever touches one end. Which ArrayList
-                    operations are O(1)?
+                    Start simple: an array plus a <code>size</code> index, with
+                    <code>increment</code> looping over the bottom
+                    <code>k</code> elements.
                   </p>
                 </div>
               </details>
@@ -1857,47 +1867,79 @@ list.sort(combined);
                 </summary>
                 <div class="details-body">
                   <p>
-                    Append and remove at the <em>end</em> &mdash; index
-                    size()-1. Removing from the front would be O(n).
+                    To make <code>increment</code> O(1), record it lazily:
+                    <code>inc[min(k, size) - 1] += val</code>. When you pop
+                    index <code>i</code>, add <code>inc[i]</code> to the value
+                    and pass it down to <code>inc[i - 1]</code>.
                   </p>
                 </div>
               </details>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-
-              <details>
-                <summary><span class="toggle-arrow">►</span>Solution</summary>
-                <div class="details-body">
-                  <div class="code-block">
-                    <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
-                        Copy
-                      </button>
+              <p>
+                This is encapsulation doing real work. Callers see only
+                <code>push</code>, <code>pop</code> and <code>increment</code>;
+                the class decides how state is stored. Because the fields are
+                <code>private</code>, you can replace the O(k) increment with
+                the lazy O(1) version without touching a single caller &mdash;
+                exactly the argument for hiding fields behind methods.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block">
+                  <div class="code-header">
+                    <div class="code-lang">
+                      &#9749; Java &middot; Array + Lazy Increment
                     </div>
-                    <pre><span class="kw">class</span> <span class="cls">Stack</span>&lt;T&gt; {
-    <span class="kw">private</span> <span class="cls">List</span>&lt;T&gt; data = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">void</span> <span class="fn">push</span>(T val) { data.add(val); }      <span class="cm">// append to END = O(1)</span>
-    T <span class="fn">pop</span>() { <span class="ret">return</span> data.remove(data.size()-1); } <span class="cm">// remove last = O(1)</span>
-    T <span class="fn">peek</span>() { <span class="ret">return</span> data.get(data.size()-1); }
-    <span class="kw">boolean</span> <span class="fn">isEmpty</span>() { <span class="ret">return</span> data.isEmpty(); }
-    <span class="kw">int</span> <span class="fn">size</span>() { <span class="ret">return</span> data.size(); }
-}</pre>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
                   </div>
-                  <div class="complexity-row">
-                    <div class="cx-badge yellow">
-                      <span class="cx-label">Time</span
-                      ><span class="cx-val yellow">O(1) all ops</span>
-                    </div>
-                    <div class="cx-badge yellow">
-                      <span class="cx-label">Space</span
-                      ><span class="cx-val yellow">O(n)</span>
-                    </div>
+                  <pre><span class="kw">class</span> <span class="cls">CustomStack</span> {
+    <span class="kw">private</span> <span class="kw">final</span> <span class="kw">int</span>[] stack, inc;
+    <span class="kw">private</span> <span class="kw">int</span> size = <span class="num">0</span>;
+
+    <span class="fn">CustomStack</span>(<span class="kw">int</span> maxSize) {
+        stack = <span class="kw">new</span> <span class="kw">int</span>[maxSize];
+        inc = <span class="kw">new</span> <span class="kw">int</span>[maxSize];
+    }
+
+    <span class="kw">void</span> <span class="fn">push</span>(<span class="kw">int</span> x) {
+        <span class="kw">if</span> (size &lt; stack.length) stack[size++] = x;
+    }
+
+    <span class="kw">int</span> <span class="fn">pop</span>() {
+        <span class="kw">if</span> (size == <span class="num">0</span>) <span class="ret">return</span> -<span class="num">1</span>;
+        <span class="kw">int</span> i = --size;
+        <span class="kw">int</span> result = stack[i] + inc[i];
+        <span class="kw">if</span> (i &gt; <span class="num">0</span>) inc[i - <span class="num">1</span>] += inc[i];   <span class="cm">// hand the pending increment down</span>
+        inc[i] = <span class="num">0</span>;
+        <span class="ret">return</span> result;
+    }
+
+    <span class="kw">void</span> <span class="fn">increment</span>(<span class="kw">int</span> k, <span class="kw">int</span> val) {
+        <span class="kw">int</span> i = <span class="cls">Math</span>.<span class="fn">min</span>(k, size) - <span class="num">1</span>;
+        <span class="kw">if</span> (i &gt;= <span class="num">0</span>) inc[i] += val;         <span class="cm">// applied later, on pop</span>
+    }
+}</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) per operation</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(maxSize)</span>
                   </div>
                 </div>
-              </details>
-            </div>
+              </div>
+            </details>
           </div>
         </div>
         <div class="prob-card">
@@ -1956,7 +1998,9 @@ list.sort(combined);
               <div class="prob-section-label">Solution</div>
 
               <details>
-                <summary><span class="toggle-arrow">►</span>Solution</summary>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
                 <div class="details-body">
                   <div class="code-block">
                     <div class="code-header">
@@ -1993,24 +2037,28 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
           </div>
         </div>
 
-        <!-- P03 -->
+        <!-- P03: Design Underground System -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 03 · HashMap Grouping</div>
-              <div class="prob-title">Group Anagrams</div>
+              <div class="prob-num">
+                Problem 03 &middot; Composition + HashMap
+              </div>
+              <div class="prob-title">Design Underground System</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/group-anagrams/"
+                  href="https://leetcode.com/problems/design-underground-system/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 49</a
+                  >🔗 LC 1396 - Design Underground System</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span
-                ><span class="tag tag-co">Amazon · Meta · Uber</span
-                ><span class="tag tag-pat">HashMap</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Objects as Map Values</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Bloomberg &middot; Uber</span
+                >
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px">›</span>
@@ -2019,12 +2067,16 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given an array of strings, group the strings that are anagrams
-                of each other.
+                Design a subway system with
+                <code>checkIn(id, station, t)</code>,
+                <code>checkOut(id, station, t)</code> and
+                <code>getAverageTime(start, end)</code>, the average travel time
+                over all completed trips between two stations.
               </p>
               <div class="iobox">
-                ["eat","tea","tan","ate","nat","bat"] →
-                [["bat"],["nat","tan"],["ate","eat","tea"]]
+                checkIn(1, "A", 3) &middot; checkOut(1, "B", 8) &middot;
+                checkIn(2, "A", 10) &middot; checkOut(2, "B", 16) &middot;
+                getAverageTime("A", "B") &rarr; 5.5
               </div>
             </div>
             <div class="prob-section">
@@ -2035,7 +2087,10 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>Every anagram of a word must produce the same map key.</p>
+                  <p>
+                    What has to be remembered between a check-in and the
+                    matching check-out?
+                  </p>
                 </div>
               </details>
               <details class="hint">
@@ -2045,54 +2100,72 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                 </summary>
                 <div class="details-body">
                   <p>
-                    Sort the characters to build the key, then groupingBy that
-                    key. O(n &times; k log k).
+                    Two maps: <code>id &rarr; (station, time)</code> for trips
+                    in progress, and
+                    <code>"start,end" &rarr; (total, count)</code> for finished
+                    trips. Small classes make the values self-describing.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Two strings are anagrams if their sorted characters are
-                identical. Use a
-                <code>HashMap&lt;String, List&lt;String&gt;&gt;</code> where the
-                key is the sorted version of each word. All words with the same
-                sorted key belong in the same group.
+                Model the domain before writing methods: a
+                <code>CheckIn</code> holds a station and a time, and a
+                <code>Route</code> accumulates a total and a count. The service
+                <em>composes</em> two <code>HashMap</code>s of those objects and
+                keeps them <code>private</code>. A <code>record</code> is
+                perfect for the immutable pair; a small mutable class suits the
+                running totals. Every operation is O(1).
               </p>
             </div>
             <details>
               <summary>
-                <span class="toggle-arrow">►</span>Solution + Trace
+                <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
                 <div class="code-block">
                   <div class="code-header">
-                    <div class="code-lang">☕ Java · Sort-key HashMap</div>
+                    <div class="code-lang">
+                      &#9749; Java &middot; Two Maps of Small Objects
+                    </div>
                     <button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">public</span> List&lt;List&lt;String&gt;&gt; <span class="fn">groupAnagrams</span>(String[] strs) {
-    Map&lt;String, List&lt;String&gt;&gt; map = <span class="kw">new</span> HashMap&lt;&gt;();
-    <span class="kw">for</span> (String s : strs) {
-        <span class="kw">char</span>[] ch = s.<span class="fn">toCharArray</span>(); Arrays.<span class="fn">sort</span>(ch);
-        String key = <span class="kw">new</span> String(ch);
-        map.<span class="fn">computeIfAbsent</span>(key, k -&gt; <span class="kw">new</span> ArrayList&lt;&gt;()).<span class="fn">add</span>(s);
+                  <pre><span class="kw">class</span> <span class="cls">UndergroundSystem</span> {
+    <span class="kw">private</span> <span class="kw">record</span> <span class="fn">CheckIn</span>(<span class="cls">String</span> station, <span class="kw">int</span> time) {}
+    <span class="kw">private</span> <span class="kw">static</span> <span class="kw">class</span> <span class="cls">Route</span> { <span class="kw">long</span> total; <span class="kw">int</span> count; }
+
+    <span class="kw">private</span> <span class="kw">final</span> <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">CheckIn</span>&gt; active = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+    <span class="kw">private</span> <span class="kw">final</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Route</span>&gt; routes = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+
+    <span class="kw">void</span> <span class="fn">checkIn</span>(<span class="kw">int</span> id, <span class="cls">String</span> station, <span class="kw">int</span> t) {
+        active.<span class="fn">put</span>(id, <span class="kw">new</span> <span class="fn">CheckIn</span>(station, t));
     }
-    <span class="ret">return new</span> ArrayList&lt;&gt;(map.<span class="fn">values</span>());
-}
-<span class="cm">// "eat"→sort→"aet", "tea"→sort→"aet" → same group ✓</span></pre>
+
+    <span class="kw">void</span> <span class="fn">checkOut</span>(<span class="kw">int</span> id, <span class="cls">String</span> station, <span class="kw">int</span> t) {
+        <span class="cls">CheckIn</span> in = active.<span class="fn">remove</span>(id);
+        <span class="cls">Route</span> r = routes.<span class="fn">computeIfAbsent</span>(in.<span class="fn">station</span>() + <span class="str">&quot;,&quot;</span> + station, k -&gt; <span class="kw">new</span> <span class="fn">Route</span>());
+        r.total += t - in.<span class="fn">time</span>();
+        r.count++;
+    }
+
+    <span class="kw">double</span> <span class="fn">getAverageTime</span>(<span class="cls">String</span> start, <span class="cls">String</span> end) {
+        <span class="cls">Route</span> r = routes.<span class="fn">get</span>(start + <span class="str">&quot;,&quot;</span> + end);
+        <span class="ret">return</span> (<span class="kw">double</span>) r.total / r.count;
+    }
+}</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val yellow">O(N·K log K)</span>
+                    ><span class="cx-val green">O(1) per operation</span>
                   </div>
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val yellow">O(N·K)</span>
+                    ><span class="cx-val green">O(riders + routes)</span>
                   </div>
                 </div>
               </div>
@@ -2100,24 +2173,24 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
           </div>
         </div>
 
-        <!-- P04 -->
+        <!-- P04: Design an Ordered Stream -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04 · Two-Stack OOP</div>
-              <div class="prob-title">Implement Queue Using Two Stacks</div>
+              <div class="prob-num">Problem 04 &middot; Encapsulated State</div>
+              <div class="prob-title">Design an Ordered Stream</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/implement-queue-using-stacks/"
+                  href="https://leetcode.com/problems/design-an-ordered-stream/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 232</a
+                  >🔗 LC 1656 - Design an Ordered Stream</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span
-                ><span class="tag tag-co">Amazon · Microsoft · Bloomberg</span
-                ><span class="tag tag-pat">OOP Design</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Class Design</span>
+                <span class="tag tag-co">Bloomberg &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px">›</span>
@@ -2126,12 +2199,14 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Implement a first-in-first-out (FIFO) queue using two stacks.
-                Support <code>push</code>, <code>pop</code>, <code>peek</code>,
-                and <code>empty</code>.
+                An ordered stream receives <code>(idKey, value)</code> pairs for
+                ids 1..n in any order. Each <code>insert</code> returns the
+                longest run of values that can now be emitted in id order,
+                starting from the current pointer.
               </p>
               <div class="iobox">
-                push(1)→push(2)→peek()=1→pop()=1→empty()=false
+                OrderedStream(5): insert(3, "c") &rarr; [] &middot; insert(1,
+                "a") &rarr; ["a"] &middot; insert(2, "b") &rarr; ["b", "c"]
               </div>
             </div>
             <div class="prob-section">
@@ -2142,10 +2217,7 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>
-                    One stack reverses order. What does a second stack do to
-                    that?
-                  </p>
+                  <p>What must the object remember between two calls?</p>
                 </div>
               </details>
               <details class="hint">
@@ -2155,63 +2227,62 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                 </summary>
                 <div class="details-body">
                   <p>
-                    Push onto an inbox stack. When popping, if the outbox is
-                    empty tip the whole inbox into it. Each element moves at
-                    most twice &mdash; O(1) amortised.
+                    A <code>String[]</code> of size n + 1 and a private pointer
+                    starting at 1. After storing the value, collect values while
+                    the slot at the pointer is filled, moving the pointer
+                    forward.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Use two stacks: <code>inbox</code> and <code>outbox</code>. Push
-                always goes to <code>inbox</code>. Pop/peek: if
-                <code>outbox</code> is empty, pour all of
-                <code>inbox</code> into <code>outbox</code> (this reverses
-                order, making the oldest element on top). Then pop/peek from
-                <code>outbox</code>. Amortised O(1) per operation.
+                The pointer is the object's hidden state, which is precisely why
+                it is <code>private</code> &mdash; no caller can push it out of
+                step with the array. Each id is emitted exactly once, so
+                although a single <code>insert</code> can return many values,
+                the total work across all inserts is O(n): amortised O(1) each.
               </p>
             </div>
             <details>
-              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
               <div class="details-body">
                 <div class="code-block">
                   <div class="code-header">
                     <div class="code-lang">
-                      ☕ Java · Inbox/Outbox Two-Stack Queue
+                      &#9749; Java &middot; Array + Pointer
                     </div>
                     <button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">class</span> MyQueue {
-    Deque&lt;Integer&gt; inbox = <span class="kw">new</span> ArrayDeque&lt;&gt;();
-    Deque&lt;Integer&gt; outbox = <span class="kw">new</span> ArrayDeque&lt;&gt;();
+                  <pre><span class="kw">class</span> <span class="cls">OrderedStream</span> {
+    <span class="kw">private</span> <span class="kw">final</span> <span class="cls">String</span>[] values;
+    <span class="kw">private</span> <span class="kw">int</span> ptr = <span class="num">1</span>;
 
-    <span class="kw">public void</span> <span class="fn">push</span>(<span class="kw">int</span> x) { inbox.<span class="fn">push</span>(x); }
+    <span class="fn">OrderedStream</span>(<span class="kw">int</span> n) { values = <span class="kw">new</span> <span class="cls">String</span>[n + <span class="num">1</span>]; }
 
-    <span class="kw">public int</span> <span class="fn">pop</span>() { <span class="fn">refill</span>(); <span class="ret">return</span> outbox.<span class="fn">pop</span>(); }
-    <span class="kw">public int</span> <span class="fn">peek</span>(){ <span class="fn">refill</span>(); <span class="ret">return</span> outbox.<span class="fn">peek</span>(); }
-    <span class="kw">public boolean</span> <span class="fn">empty</span>(){ <span class="ret">return</span> inbox.<span class="fn">isEmpty</span>() &amp;&amp; outbox.<span class="fn">isEmpty</span>(); }
-
-    <span class="kw">private void</span> <span class="fn">refill</span>() {
-        <span class="kw">if</span> (outbox.<span class="fn">isEmpty</span>())
-            <span class="kw">while</span> (!inbox.<span class="fn">isEmpty</span>()) outbox.<span class="fn">push</span>(inbox.<span class="fn">pop</span>());
+    <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; <span class="fn">insert</span>(<span class="kw">int</span> idKey, <span class="cls">String</span> value) {
+        values[idKey] = value;
+        <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; chunk = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+        <span class="kw">while</span> (ptr &lt; values.length &amp;&amp; values[ptr] != <span class="kw">null</span>) {
+            chunk.<span class="fn">add</span>(values[ptr++]);
+        }
+        <span class="ret">return</span> chunk;
     }
-}
-<span class="cm">// push(1)push(2): inbox=[2,1]
-// peek(): outbox empty → pour → outbox=[1,2], peek=1 ✓</span></pre>
+}</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(1) amortised</span>
+                    ><span class="cx-val green">O(n) total</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(N)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2219,24 +2290,26 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
           </div>
         </div>
 
-        <!-- P05 -->
+        <!-- P05: Peeking Iterator -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 · Polymorphism</div>
-              <div class="prob-title">Iterator Pattern — Reverse Iterator</div>
+              <div class="prob-num">Problem 05 &middot; Polymorphism</div>
+              <div class="prob-title">Peeking Iterator</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/binary-search-tree-iterator/"
+                  href="https://leetcode.com/problems/peeking-iterator/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 173 (concept)</a
+                  >🔗 LC 284 - Peeking Iterator</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span
-                ><span class="tag tag-co">Google · Amazon · Microsoft</span
-                ><span class="tag tag-pat">Iterator / Interface</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Iterator / Decorator</span>
+                <span class="tag tag-co"
+                  >Google &middot; Apple &middot; Amazon</span
+                >
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px">›</span>
@@ -2245,11 +2318,16 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Implement a <code>ReverseIterator&lt;T&gt;</code> class that
-                allows iterating a <code>List&lt;T&gt;</code> in reverse order
-                while implementing Java's <code>Iterator&lt;T&gt;</code>
-                interface.
+                Wrap an existing <code>Iterator&lt;Integer&gt;</code> so that it
+                also offers <code>peek()</code> &mdash; the next element without
+                consuming it &mdash; alongside <code>next()</code> and
+                <code>hasNext()</code>.
               </p>
+              <div class="iobox">
+                over [1, 2, 3]: next &rarr; 1 &middot; peek &rarr; 2 &middot;
+                next &rarr; 2 &middot; next &rarr; 3 &middot; hasNext &rarr;
+                false
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2260,8 +2338,8 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                 </summary>
                 <div class="details-body">
                   <p>
-                    An iterator must answer hasNext() without doing the work of
-                    next().
+                    You cannot push a value back into the inner iterator, so
+                    what do you do with the one you read early?
                   </p>
                 </div>
               </details>
@@ -2272,53 +2350,69 @@ employees.sort((<span class="kw">a</span>,<span class="kw">b</span>) -> {
                 </summary>
                 <div class="details-body">
                   <p>
-                    Keep the cursor as state and let hasNext() only inspect it.
-                    For a reverse iterator start at the end and walk backwards.
+                    Cache one element ahead: a <code>nextVal</code> field and a
+                    <code>hasPeeked</code> flag. <code>peek</code> fills the
+                    cache, <code>next</code> returns the cache if it is filled
+                    and otherwise delegates.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Implementing <code>Iterator&lt;T&gt;</code> requires
-                <code>hasNext()</code> and <code>next()</code>. Start your index
-                pointer at <code>list.size() - 1</code> and decrement it each
-                call. This exercises interface implementation, generics, and
-                polymorphism simultaneously — all OOP concepts from this
-                lecture.
+                This is the <strong>decorator</strong> pattern.
+                <code>PeekingIterator</code> implements
+                <code>Iterator&lt;T&gt;</code> and wraps another one, so it can
+                stand anywhere an iterator is expected &mdash; that
+                substitutability is polymorphism in practice. Making it generic
+                costs nothing and lets it wrap any element type, which is the
+                whole argument for generics over raw types.
               </p>
             </div>
             <details>
-              <summary><span class="toggle-arrow">►</span>Solution</summary>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
               <div class="details-body">
                 <div class="code-block">
                   <div class="code-header">
                     <div class="code-lang">
-                      ☕ Java · Implementing Iterator&lt;T&gt;
+                      &#9749; Java &middot; Cache One Ahead
                     </div>
                     <button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">class</span> ReverseIterator&lt;T&gt; <span class="kw">implements</span> Iterator&lt;T&gt; {
-    <span class="kw">private final</span> List&lt;T&gt; list;
-    <span class="kw">private int</span> idx;
+                  <pre><span class="kw">class</span> <span class="cls">PeekingIterator</span>&lt;<span class="cls">T</span>&gt; <span class="kw">implements</span> <span class="cls">Iterator</span>&lt;<span class="cls">T</span>&gt; {
+    <span class="kw">private</span> <span class="kw">final</span> <span class="cls">Iterator</span>&lt;<span class="cls">T</span>&gt; inner;
+    <span class="kw">private</span> <span class="cls">T</span> nextVal;
+    <span class="kw">private</span> <span class="kw">boolean</span> hasPeeked = <span class="kw">false</span>;
 
-    <span class="fn">ReverseIterator</span>(List&lt;T&gt; list) {
-        <span class="kw">this</span>.list = list;
-        <span class="kw">this</span>.idx = list.<span class="fn">size</span>() - <span class="num">1</span>;
+    <span class="fn">PeekingIterator</span>(<span class="cls">Iterator</span>&lt;<span class="cls">T</span>&gt; iterator) { <span class="kw">this</span>.inner = iterator; }
+
+    <span class="kw">public</span> <span class="cls">T</span> <span class="fn">peek</span>() {
+        <span class="kw">if</span> (!hasPeeked) {
+            nextVal = inner.<span class="fn">next</span>();
+            hasPeeked = <span class="kw">true</span>;
+        }
+        <span class="ret">return</span> nextVal;
     }
 
-    @Override <span class="kw">public boolean</span> <span class="fn">hasNext</span>() { <span class="ret">return</span> idx &gt;= <span class="num">0</span>; }
-    @Override <span class="kw">public</span> T <span class="fn">next</span>() {
-        <span class="kw">if</span> (!<span class="fn">hasNext</span>()) <span class="kw">throw new</span> NoSuchElementException();
-        <span class="ret">return</span> list.<span class="fn">get</span>(idx--);
+    @<span class="cls">Override</span>
+    <span class="kw">public</span> <span class="cls">T</span> <span class="fn">next</span>() {
+        <span class="kw">if</span> (hasPeeked) {
+            hasPeeked = <span class="kw">false</span>;
+            <span class="ret">return</span> nextVal;
+        }
+        <span class="ret">return</span> inner.<span class="fn">next</span>();
     }
-}
-<span class="cm">// Usage: Iterator&lt;Integer&gt; it = new ReverseIterator&lt;&gt;(List.of(1,2,3));
-// it.next() → 3, 2, 1</span></pre>
+
+    @<span class="cls">Override</span>
+    <span class="kw">public</span> <span class="kw">boolean</span> <span class="fn">hasNext</span>() {
+        <span class="ret">return</span> hasPeeked || inner.<span class="fn">hasNext</span>();
+    }
+}</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
