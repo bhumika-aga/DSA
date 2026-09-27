@@ -343,4 +343,4 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ---
 
-**← [Lecture 17 · Graphs](../Lecture17/Assignment.md)** &nbsp;·&nbsp; **Lecture 19 · Prefix Sums & Difference Arrays — coming soon →**
+**← [Lecture 17 · Graphs](../Lecture17/Assignment.md)** &nbsp;·&nbsp; **[Lecture 19 · Prefix Sums & Difference Arrays](../Lecture19/Assignment.md) →**

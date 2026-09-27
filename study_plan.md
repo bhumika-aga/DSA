@@ -14,7 +14,7 @@
 | **Study Days**     | 202 days of content                                  |
 | **Duration**       | ~31 weeks at one lecture block at a time             |
 | **Total Problems** | 976                                                  |
-| **Written So Far** | 18 lectures · 545 problems                           |
+| **Written So Far** | 22 lectures · 628 problems                           |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 ### How to Use This Plan
@@ -57,10 +57,10 @@
 | 16  | ⛰️ Heaps & Priority Queues                                  | Phase 2 | 5d   | 20       | ✅     |
 | 17  | 🕸️ Graphs                                                   | Phase 2 | 12d  | 30       | ✅     |
 | 18  | 🎯 Two Pointers & Sliding Window                            | Phase 3 | 6d   | 30       | ✅     |
-| 19  | 🧾 Prefix Sums & Difference Arrays                          | Phase 3 | 4d   | 20       | 📝     |
-| 20  | 📉 Monotonic Stack & Queue                                  | Phase 3 | 4d   | 20       | 📝     |
-| 21  | 📐 Intervals & Sweep Line                                   | Phase 3 | 4d   | 18       | 📝     |
-| 22  | 💡 Greedy Algorithms                                        | Phase 3 | 5d   | 25       | 📝     |
+| 19  | 🧾 Prefix Sums & Difference Arrays                          | Phase 3 | 4d   | 20       | ✅     |
+| 20  | 📉 Monotonic Stack & Queue                                  | Phase 3 | 4d   | 20       | ✅     |
+| 21  | 📐 Intervals & Sweep Line                                   | Phase 3 | 4d   | 18       | ✅     |
+| 22  | 💡 Greedy Algorithms                                        | Phase 3 | 5d   | 25       | ✅     |
 | 23  | 🔍 Divide & Conquer                                         | Phase 3 | 4d   | 18       | 📝     |
 | 24  | 🔗 Union-Find (Disjoint Set Union)                          | Phase 3 | 4d   | 20       | 📝     |
 | 25  | 🧩 Dynamic Programming I — Foundations & 1D                 | Phase 4 | 6d   | 25       | 📝     |
@@ -878,13 +878,14 @@
 
 ### Lecture 19: 🧾 Prefix Sums & Difference Arrays
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 20                         |
-| **Difficulty Split** | 7 Easy · 9 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 8, 13             |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 7 Easy · 9 Medium · 4 Hard                                                              |
+| **Prerequisites**    | Lectures 8, 13                                                                          |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture19/lecture19_notes.html) · [Assignment](Lecture19/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -919,13 +920,14 @@
 
 ### Lecture 20: 📉 Monotonic Stack & Queue
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 5 Easy · 11 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 12, 18             |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 5 Easy · 11 Medium · 4 Hard                                                             |
+| **Prerequisites**    | Lectures 12, 18                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture20/lecture20_notes.html) · [Assignment](Lecture20/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -949,6 +951,7 @@
 1. **Day 1:** Unified template for all 4 variants — NGE, NSE, PGE, PSE — with direction analysis
 2. **Day 2:** Area problems — Largest Rectangle in Histogram, Maximal Rectangle in Binary Matrix
 3. **Day 3:** Contribution technique — Sum of Subarray Minimums, Sum of Subarray Maximums, Subarray Ranges
+4. **Day 4:** Monotone deque — sliding window extremes, deque over a DP table, and deque vs heap
 
 #### 🏢 Companies That Ask These
 
@@ -958,13 +961,14 @@
 
 ### Lecture 21: 📐 Intervals & Sweep Line
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 18                          |
-| **Difficulty Split** | 5 Easy · 10 Medium · 3 Hard |
-| **Prerequisites**    | Lectures 9, 19              |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 18                                                                                      |
+| **Difficulty Split** | 5 Easy · 10 Medium · 3 Hard                                                             |
+| **Prerequisites**    | Lectures 9, 19                                                                          |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture21/lecture21_notes.html) · [Assignment](Lecture21/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -988,6 +992,7 @@
 1. **Day 1:** Interval fundamentals — overlap check (a.end > b.start), merge, insert, min meeting rooms
 2. **Day 2:** Difference array — range increment/decrement O(1), car pooling, corporate flight bookings
 3. **Day 3:** Sweep line — Skyline Problem, Rectangle Area Union, Employee Free Time
+4. **Day 4:** Coordinate compression, sweep + heap, and choosing between sweep, difference array and greedy
 
 #### 🏢 Companies That Ask These
 
@@ -1003,7 +1008,8 @@
 | **Problems**         | 25                          |
 | **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard |
 | **Prerequisites**    | Lectures 9, 16              |
-| **Status**           | 📝 Planned                  |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture22/lecture22_notes.html) · [Assignment](Lecture22/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
