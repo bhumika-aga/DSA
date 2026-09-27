@@ -1772,5 +1772,5 @@
 
 ---
 
-<sub>This file and `dsa_study_plan.html` are both generated from `tools/curriculum.json` by `tools/build_plan.py`. Edit
+<sub>This file and `index.html` are both generated from `tools/curriculum.json` by `tools/build_plan.py`. Edit
 the JSON, then rerun the script — never edit these two by hand, or they will drift apart again.</sub>
