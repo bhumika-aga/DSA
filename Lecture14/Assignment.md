@@ -232,7 +232,7 @@ function dfs(r, c):
 
 **Hint:** Encode intermediate states: use `2` for "was alive, now dead" and `-1` for "was dead, now alive". Apply rules using original values (treat 2 as 1 and -1 as 0 when counting neighbours). Second pass: convert 2→0 and -1→1.
 
-**8-directional movement:** Use `int[][] dirs = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};`
+**8-directional movement:** Use `int[][] dirs = { {-1,-1}, {-1,0}, {-1,1}, {0,-1}, {0,1}, {1,-1}, {1,0}, {1,1} };`
 
 ---
 
