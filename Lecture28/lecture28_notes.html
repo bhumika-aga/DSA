@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 26 &mdash; Dynamic Programming II</title>
+    <title>Lecture 28 &mdash; Dynamic Programming IV</title>
     <meta
       name="description"
       content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
@@ -1396,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Dynamic Programming II</div>
+        <div class="sb-title">Dynamic Programming IV</div>
         <div class="sb-meta">
-          Lecture 26 of 38 &middot; Phase 4 &mdash; Dynamic Programming
+          Lecture 28 of 38 &middot; Phase 4 &mdash; Dynamic Programming
         </div>
       </div>
       <div class="sb-scroll">
@@ -1406,23 +1406,23 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127757;</span>Introduction</a
         >
-        <a class="toc-item" href="#grid"
-          ><span class="toc-icon">&#129521;</span>The Grid Family</a
+        <a class="toc-item" href="#interval"
+          ><span class="toc-icon">&#128207;</span>Interval DP</a
         >
-        <a class="toc-item toc-sub" href="#g-order">Filling Order</a>
-        <a class="toc-item toc-sub" href="#g-backwards"
-          >When to Fill Backwards</a
+        <a class="toc-item toc-sub" href="#i-last">Think Last, Not First</a>
+        <a class="toc-item toc-sub" href="#i-games">Games on a Range</a>
+        <a class="toc-item" href="#tree"
+          ><span class="toc-icon">&#127795;</span>Tree DP</a
         >
-        <a class="toc-item" href="#twostrings"
-          ><span class="toc-icon">&#128290;</span>Two Strings, One Table</a
+        <a class="toc-item toc-sub" href="#t-reroot">Rerooting</a>
+        <a class="toc-item" href="#bitmask"
+          ><span class="toc-icon">&#128290;</span>Bitmask DP</a
         >
-        <a class="toc-item toc-sub" href="#ts-lcs">Match / Mismatch</a>
-        <a class="toc-item toc-sub" href="#ts-edit">Edit Distance</a>
-        <a class="toc-item" href="#palindrome"
-          ><span class="toc-icon">&#128257;</span>Palindromes</a
+        <a class="toc-item" href="#digit"
+          ><span class="toc-icon">&#128290;</span>Digit DP</a
         >
-        <a class="toc-item" href="#rolling"
-          ><span class="toc-icon">&#127890;</span>Rolling the Table</a
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129513;</span>Choosing the State</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1439,12 +1439,11 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture25/lecture25_notes.html"
-          >&larr; Lecture 25 &middot; Dynamic Programming I</a
-        >
         <a class="toc-item" href="../Lecture27/lecture27_notes.html"
-          >&rarr; Lecture 27 &middot; Dynamic Programming III — Knapsack &amp;
-          Subsets</a
+          >&larr; Lecture 27 &middot; Dynamic Programming III</a
+        >
+        <a class="toc-item" href="../Lecture29/lecture29_notes.html"
+          >&rarr; Lecture 29 &middot; Tries (Prefix Trees)</a
         >
         <a class="toc-item" href="../dsa_study_plan.html"
           >&uarr; All 38 lectures</a
@@ -1459,7 +1458,7 @@
           <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
           <a href="../dsa_study_plan.html#phase4">Phase 4</a
           ><span>&rsaquo;</span>
-          <span>Lecture 26 &mdash; Dynamic Programming II</span>
+          <span>Lecture 28 &mdash; Dynamic Programming IV</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1477,24 +1476,23 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129521;</span>
+          <span class="page-emoji">&#127899;&#65039;</span>
           <h1 class="page-title">
-            Dynamic Programming II &mdash; Grids &amp; Strings
+            Dynamic Programming IV &mdash; Interval, Tree, Bitmask &amp; Digit
           </h1>
           <p class="page-sub">
-            &ldquo;Two indices instead of one. Same four steps &mdash; but now
-            the loop order is part of the answer.&rdquo;
+            &ldquo;When the state is no longer an index: a range, a node, a set,
+            or a position in a number.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 26 of 38</span>
+            <span class="meta-chip accent">&#128218; Lecture 28 of 38</span>
             <span class="meta-chip accent"
               >Phase 4 &mdash; Dynamic Programming</span
             >
             <span class="meta-chip yellow">&#9201; 7 days</span>
-            <span class="meta-chip green">&#127919; 30 problems</span>
+            <span class="meta-chip green">&#127919; 25 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta &middot;
-              Microsoft</span
+              >&#128188; Google &middot; Amazon &middot; Meta</span
             >
           </div>
         </div>
@@ -1504,310 +1502,343 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Two-dimensional DP is where the interview questions actually live.
-            Edit distance, longest common subsequence and the palindrome family
-            appear constantly &mdash; and all three come from the same
-            match/mismatch recurrence. The grid problems are the gentle way in:
-            the table <em>is</em> the grid, so you can see the dependencies
-            instead of imagining them.
+            The last three lectures used indices and budgets as states. These
+            four families use stranger ones, and each has a trick that makes it
+            possible: interval DP asks which element is handled
+            <em>last</em>, tree DP returns several numbers from a post-order
+            walk, bitmask DP packs a whole subset into an integer, and digit DP
+            counts numbers without visiting them. They are the hard tier of most
+            interview loops, and they all reuse the machinery you already have.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Set up a 2D table and say which cells each entry depends on</li>
             <li>
-              Choose the filling order &mdash; forwards, backwards, or by length
+              Write interval DP by looping over length and splitting at a pivot
             </li>
+            <li>Carry several values up a tree in one post-order pass</li>
+            <li>Encode a subset of up to about 20 items as a bitmask state</li>
+            <li>Count numbers with a property using a tight flag</li>
             <li>
-              Derive LCS and edit distance from one match/mismatch template
+              Say which of the four a new problem needs, from its constraints
             </li>
-            <li>Handle palindromes by iterating over substring length</li>
-            <li>Roll a 2D table down to one or two rows</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="grid">&#129521; The Grid Family</h2>
+        <h2 class="h1" id="interval">&#128207; Interval DP</h2>
         <p>
-          Start here because nothing is hidden: <code>dp[i][j]</code> is the
-          answer for the cell at row <code>i</code>, column <code>j</code>, and
-          the arrows point where you would expect.
+          The state is a range: <code>dp[i][j]</code> is the answer for
+          <code>arr[i..j]</code>. You saw the shape with palindromes in Lecture
+          26; here it gains a pivot.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Paths Through a Grid</span
+              >&#128208; Pseudocode &middot; The Interval Template</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-cm">// dp[i][j] = number of ways to reach cell (i, j) moving only right or down</span>
-dp ← m × n table of zeros
-dp[0][0] ← 1
+          <pre><span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:                  <span class="pc-cm">// shortest ranges first</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+        j ← i + len - 1
+        dp[i][j] ← worst possible value
+        <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i <span class="pc-kw">to</span> j:          <span class="pc-cm">// the pivot: what happens LAST</span>
+            candidate ← dp[i][k-1] + cost(i, k, j) + dp[k+1][j]
+            dp[i][j] ← best(dp[i][j], candidate)
 
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> grid[i][j] is an obstacle:
-            dp[i][j] ← 0                 <span class="pc-cm">// unreachable, and blocks everything behind it</span>
-        <span class="pc-kw">else</span>:
-            <span class="pc-kw">if</span> i &gt; 0: dp[i][j] ← dp[i][j] + dp[i-1][j]    <span class="pc-cm">// from above</span>
-            <span class="pc-kw">if</span> j &gt; 0: dp[i][j] ← dp[i][j] + dp[i][j-1]    <span class="pc-cm">// from the left</span>
+<span class="pc-kw">return</span> dp[0][n-1]
 
-<span class="pc-kw">return</span> dp[m-1][n-1]
-
-<span class="pc-cm">// Swap "+" for min() and add the cell's cost, and this is Minimum Path Sum.
-// Swap it for max() and it is the best-collectible-value problem.</span></pre>
+<span class="pc-cm">// Three nested loops → O(n³). That is the normal price of interval DP.</span></pre>
         </div>
 
-        <h3 class="h2" id="g-order">Filling Order Is Part of the Recurrence</h3>
-        <p>
-          A cell may only be read after it has been written. Draw the arrows
-          once and the loop order follows.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>dp[i][j] depends on</th>
-              <th>Loop order</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>top and left</td>
-              <td>rows top to bottom, columns left to right</td>
-              <td>Unique Paths, Minimum Path Sum</td>
-            </tr>
-            <tr>
-              <td>bottom and right</td>
-              <td>rows bottom to top, columns right to left</td>
-              <td>Dungeon Game</td>
-            </tr>
-            <tr>
-              <td>the row above only</td>
-              <td>top to bottom; one row of memory is enough</td>
-              <td>Triangle, Minimum Falling Path Sum</td>
-            </tr>
-            <tr>
-              <td>shorter substrings</td>
-              <td>by length, then by start index</td>
-              <td>palindromes, interval DP (Lecture 28)</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h3 class="h2" id="g-backwards">When Forwards Does Not Work</h3>
+        <h3 class="h2" id="i-last">Think Last, Not First</h3>
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>Dungeon Game is the classic reversal.</strong> Walking
-            forwards, the health you need at a cell depends on what is still
-            ahead of you &mdash; information a forward pass does not have.
-            Define <code>dp[i][j]</code> as &ldquo;the minimum health needed
-            <em>on entering</em> this cell to survive to the end&rdquo; and fill
-            from the bottom-right corner instead. The lesson generalises: if the
-            recurrence needs the future, flip the direction.
+            <strong>Burst Balloons is the lesson.</strong> Asking &ldquo;which
+            balloon do I burst first?&rdquo; leaves two ranges whose neighbours
+            have changed &mdash; the subproblems are not independent. Asking
+            &ldquo;which balloon bursts <em>last</em> in this range?&rdquo;
+            fixes its neighbours as the untouched boundaries, and the two sides
+            become independent subproblems. Whenever a choice damages its
+            neighbours, reverse the question.
           </div>
         </div>
 
-        <h2 class="h1" id="twostrings">&#128290; Two Strings, One Table</h2>
+        <h3 class="h2" id="i-games">Games on a Range</h3>
         <p>
-          Now the table is not a picture of anything.
-          <code>dp[i][j]</code> means &ldquo;the answer for the first
-          <code>i</code> characters of <code>a</code> and the first
-          <code>j</code> characters of <code>b</code>&rdquo;. Almost every
-          two-string problem uses the same skeleton.
+          Two players taking turns from the ends of an array is interval DP with
+          a sign flip. Define <code>dp[i][j]</code> as
+          <em>the current player&#39;s advantage</em> over the other, and the
+          opponent&#39;s best play is simply your loss.
         </p>
 
-        <h3 class="h2" id="ts-lcs">Match / Mismatch</h3>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Longest Common Subsequence</span
+              >&#128208; Pseudocode &middot; Take From Either End</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-cm">// dp[i][j] = LCS of a[0..i) and b[0..j).  Row 0 and column 0 mean "empty".</span>
-dp ← (n+1) × (m+1) table of zeros
+          <pre><span class="pc-cm">// dp[i][j] = (current player&#39;s score − opponent&#39;s score) on arr[i..j]</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← arr[i]
 
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-        <span class="pc-kw">if</span> a[i-1] = b[j-1]:
-            dp[i][j] ← dp[i-1][j-1] + 1        <span class="pc-cm">// match: take it and step both back</span>
-        <span class="pc-kw">else</span>:
-            dp[i][j] ← max(dp[i-1][j], dp[i][j-1])   <span class="pc-cm">// drop one character, try both</span>
+<span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+        j ← i + len - 1
+        dp[i][j] ← max(arr[i] - dp[i+1][j],     <span class="pc-cm">// take the left end</span>
+                       arr[j] - dp[i][j-1])     <span class="pc-cm">// take the right end</span>
 
-<span class="pc-kw">return</span> dp[n][m]
+<span class="pc-kw">return</span> dp[0][n-1] ≥ 0                        <span class="pc-cm">// first player at least ties</span>
 
-<span class="pc-cm">// The offset matters: dp indices count characters, string indices count
-// positions, so a[i-1] is "the i-th character".</span></pre>
+<span class="pc-cm">// The minus sign is the whole trick: after your move, the opponent faces
+// the smaller range and their advantage counts against you.</span></pre>
         </div>
 
+        <h2 class="h1" id="tree">&#127795; Tree DP</h2>
         <p>
-          Four well-known problems are this table with the answer read
-          differently:
+          The state is a node, and the recursion is the post-order traversal
+          from Lecture 15. The only new idea is that a node may need to return
+          <em>more than one number</em>.
         </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Two Values per Node</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Classic: the best you can take from a subtree, with and without its root.</span>
+<span class="pc-kw">function</span> solve(node):
+    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span> (0, 0)          <span class="pc-cm">// (taken, skipped)</span>
+
+    (lTake, lSkip) ← solve(node.left)
+    (rTake, rSkip) ← solve(node.right)
+
+    take ← node.value + lSkip + rSkip         <span class="pc-cm">// children must be skipped</span>
+    skip ← max(lTake, lSkip) + max(rTake, rSkip)
+    <span class="pc-kw">return</span> (take, skip)
+
+<span class="pc-cm">// The answer is max(take, skip) at the root. One walk, O(n).</span></pre>
+        </div>
+
+        <h3 class="h2" id="t-reroot">
+          Rerooting &mdash; Answers for Every Node
+        </h3>
+        <p>
+          Some problems want the answer <em>for every node as the root</em>.
+          Running the whole DP n times is O(n&sup2;); two passes are enough.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Two-Pass Rerooting</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Pass 1 (post-order from node 0): subtree sizes and distances downward.</span>
+<span class="pc-kw">function</span> down(u, parent):
+    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+        down(v, u)
+        size[u] ← size[u] + size[v]
+        answer[u] ← answer[u] + answer[v] + size[v]
+
+<span class="pc-cm">// Pass 2 (pre-order): move the root one edge and patch the answer.</span>
+<span class="pc-kw">function</span> up(u, parent):
+    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+        answer[v] ← answer[u] - size[v] + (n - size[v])
+        <span class="pc-cm">// everything inside v got 1 closer; everything outside got 1 further</span>
+        up(v, u)
+
+<span class="pc-cm">// Two O(n) walks answer n questions. Sum of Distances in Tree is exactly this.</span></pre>
+        </div>
+
+        <h2 class="h1" id="bitmask">&#128290; Bitmask DP</h2>
+        <p>
+          When the state is &ldquo;which of these items have I already
+          used?&rdquo;, and there are at most about twenty of them, the whole
+          subset fits in one integer. Bit <code>i</code> set means item
+          <code>i</code> is used.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Assignment over Subsets</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[mask] = answer when exactly the items in mask are used.
+// popcount(mask) tells you how many are placed, so position = popcount.</span>
+dp ← array of 2ⁿ, all zero (or -infinity)
+dp[0] ← 1
+
+<span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2ⁿ - 1:
+    position ← popcount(mask)              <span class="pc-cm">// next slot to fill</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> mask AND (1 &lt;&lt; i) ≠ 0: <span class="pc-kw">continue</span>   <span class="pc-cm">// item i already used</span>
+        <span class="pc-kw">if</span> item i is allowed at position:
+            dp[mask OR (1 &lt;&lt; i)] ← dp[mask OR (1 &lt;&lt; i)] + dp[mask]
+
+<span class="pc-kw">return</span> dp[2ⁿ - 1]                        <span class="pc-cm">// everything used</span></pre>
+        </div>
+
         <table>
           <thead>
             <tr>
-              <th>Problem</th>
-              <th>Change</th>
+              <th>Operation</th>
+              <th>Expression</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Longest Common Subsequence</td>
-              <td>the table itself</td>
+              <td>Is item <code>i</code> in the set?</td>
+              <td><code>mask AND (1 &lt;&lt; i) &ne; 0</code></td>
             </tr>
             <tr>
-              <td>Uncrossed Lines</td>
-              <td>identical &mdash; numbers instead of characters</td>
+              <td>Add item <code>i</code></td>
+              <td><code>mask OR (1 &lt;&lt; i)</code></td>
             </tr>
             <tr>
-              <td>Delete Operation for Two Strings</td>
-              <td><code>n + m &minus; 2 &times; LCS</code></td>
+              <td>Remove item <code>i</code></td>
+              <td><code>mask AND NOT (1 &lt;&lt; i)</code></td>
             </tr>
             <tr>
-              <td>Maximum Length of Repeated Subarray</td>
+              <td>Full set</td>
+              <td><code>(1 &lt;&lt; n) - 1</code></td>
+            </tr>
+            <tr>
+              <td>How many are used</td>
+              <td><code>popcount(mask)</code> &mdash; Lecture 6</td>
+            </tr>
+            <tr>
+              <td>Every submask of <code>mask</code></td>
               <td>
-                reset to 0 on a mismatch &mdash; that makes it a
-                <em>substring</em>
+                <code>s = mask; while s &gt; 0: s = (s - 1) AND mask</code>
               </td>
             </tr>
           </tbody>
         </table>
 
-        <h3 class="h2" id="ts-edit">Edit Distance</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Edit Distance</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// dp[i][j] = edits to turn a[0..i) into b[0..j)</span>
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n: dp[i][0] ← i      <span class="pc-cm">// delete everything</span>
-<span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m: dp[0][j] ← j      <span class="pc-cm">// insert everything</span>
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-        <span class="pc-kw">if</span> a[i-1] = b[j-1]:
-            dp[i][j] ← dp[i-1][j-1]            <span class="pc-cm">// free — no edit needed</span>
-        <span class="pc-kw">else</span>:
-            dp[i][j] ← 1 + min(dp[i-1][j-1],   <span class="pc-cm">// replace</span>
-                               dp[i-1][j],     <span class="pc-cm">// delete from a</span>
-                               dp[i][j-1])     <span class="pc-cm">// insert into a</span>
-
-<span class="pc-kw">return</span> dp[n][m]</pre>
-        </div>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
           <div class="callout-body">
-            <strong>Know which neighbour is which edit.</strong> Diagonal =
-            replace (both strings advance), up = delete from the first string,
-            left = insert into it. Interviewers ask this, and it is also how you
-            reconstruct the actual edit sequence: walk backwards from
-            <code>dp[n][m]</code> and record which neighbour you came from.
+            <strong>Read n before reaching for a bitmask.</strong> 2&#8319;
+            states is fine for n &le; 20 and hopeless by n = 30. A constraint
+            like &ldquo;<code>n &le; 12</code>&rdquo; or &ldquo;at most 16
+            people&rdquo; is the problem telling you which technique it wants
+            &mdash; small, strange limits usually mean bitmask or meet in the
+            middle.
           </div>
-        </div>
-
-        <h2 class="h1" id="palindrome">
-          &#128257; Palindromes &mdash; Iterate by Length
-        </h2>
-        <p>
-          A palindrome table is indexed by <em>substring</em>:
-          <code>dp[i][j]</code> is a fact about <code>s[i..j]</code>. Its
-          recurrence looks inward, so neither row order nor column order works
-          &mdash; you must fill by increasing length.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Longest Palindromic
-              Subsequence</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// dp[i][j] = longest palindromic subsequence inside s[i..j]</span>
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← 1      <span class="pc-cm">// every single character</span>
-
-<span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:               <span class="pc-cm">// ← the loop that makes it work</span>
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
-        j ← i + len - 1
-        <span class="pc-kw">if</span> s[i] = s[j]:
-            dp[i][j] ← dp[i+1][j-1] + 2    <span class="pc-cm">// both ends join the palindrome</span>
-        <span class="pc-kw">else</span>:
-            dp[i][j] ← max(dp[i+1][j], dp[i][j-1])
-
-<span class="pc-kw">return</span> dp[0][n-1]
-
-<span class="pc-cm">// dp[i+1][j-1] is a SHORTER substring, so it must already be filled —
-// which is exactly what looping over length guarantees.</span></pre>
         </div>
 
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>One table, three questions.</strong> The same
-            <code>dp[i][j]</code> answers &ldquo;is <code>s[i..j]</code> a
-            palindrome?&rdquo; (boolean), &ldquo;how many palindromic substrings
-            are there?&rdquo; (count the trues) and &ldquo;how many characters
-            must I insert to make <code>s</code> a palindrome?&rdquo; (which is
-            <code>n &minus; longest palindromic subsequence</code>). Recognising
-            that last identity turns a Hard problem into a solved one.
+            <strong>Bitmask plus BFS.</strong> Shortest Path Visiting All Nodes
+            needs the state <code>(node, visitedMask)</code> &mdash; the same
+            node is worth revisiting with a different set of visited nodes. Once
+            the state is a pair, it is ordinary BFS from Lecture 17 over
+            <code>n &middot; 2&#8319;</code> states.
           </div>
         </div>
 
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Subsequence or substring?</strong> A subsequence may skip
-            characters; a substring may not. Longest Palindromic
-            <em>Substring</em> is better solved by expanding around each of the
-            2n&minus;1 centres in O(1) space (Lecture 8), while the
-            <em>subsequence</em> version needs this table. Read the word in the
-            title before choosing.
-          </div>
-        </div>
-
-        <h2 class="h1" id="rolling">&#127890; Rolling the Table</h2>
+        <h2 class="h1" id="digit">&#128290; Digit DP</h2>
         <p>
-          When <code>dp[i][j]</code> only reads row <code>i</code> and row
-          <code>i-1</code>, the rest of the table is dead weight. Two rows are
-          enough &mdash; sometimes one, if the overwrite order is chosen
-          carefully.
+          &ldquo;How many numbers below N have property P?&rdquo; N can be
+          10&#185;&#8312;, so the numbers cannot be visited. Build them digit by
+          digit instead, carrying one crucial flag.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; LCS in O(min(n, m)) Space</span
+              >&#128208; Pseudocode &middot; The Digit DP Skeleton</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>prev ← array of m + 1 zeros
-curr ← array of m + 1 zeros
+          <pre>digits ← decimal digits of N
 
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-        <span class="pc-kw">if</span> a[i-1] = b[j-1]: curr[j] ← prev[j-1] + 1
-        <span class="pc-kw">else</span>: curr[j] ← max(prev[j], curr[j-1])
-    prev, curr ← curr, prev              <span class="pc-cm">// swap, then clear curr if needed</span>
+<span class="pc-kw">function</span> count(pos, tight, started, state):
+    <span class="pc-cm">// tight   = the prefix so far equals N&#39;s prefix, so this digit is capped
+    // started = we have placed a non-zero digit (handles leading zeros)
+    // state   = whatever the property needs (last digit, remainder, mask…)</span>
+    <span class="pc-kw">if</span> pos = length(digits): <span class="pc-kw">return</span> 1 <span class="pc-kw">if</span> state is acceptable <span class="pc-kw">else</span> 0
+    <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight <span class="pc-kw">and</span> memo[pos][started][state] is known:
+        <span class="pc-kw">return</span> memo[pos][started][state]
 
-<span class="pc-kw">return</span> prev[m]
+    limit ← digits[pos] <span class="pc-kw">if</span> tight <span class="pc-kw">else</span> 9
+    total ← 0
+    <span class="pc-kw">for</span> d <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> limit:
+        total ← total + count(pos + 1,
+                             tight <span class="pc-kw">and</span> d = limit,
+                             started <span class="pc-kw">or</span> d &gt; 0,
+                             updated state)
 
-<span class="pc-cm">// One-row version: keep a single array plus one saved diagonal value,
-// because prev[j-1] is destroyed as soon as curr[j-1] is written.</span></pre>
+    <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight: memo[pos][started][state] ← total
+    <span class="pc-kw">return</span> total
+
+<span class="pc-cm">// "Between A and B" = count(B) − count(A − 1). Always.</span></pre>
         </div>
 
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>Rolling costs you the path.</strong> Reconstructing the
-            actual subsequence, alignment or route needs the whole table to walk
-            backwards through. If the problem asks for the answer&#39;s
-            <em>value</em>, roll; if it asks for the answer <em>itself</em>,
-            keep the table &mdash; or store parent pointers as you go.
+            <strong>Only memoise the loose states.</strong> A tight prefix
+            happens once per position, so caching it would poison the table for
+            every other prefix of the same length. Memoise when
+            <code>tight</code> is false &mdash; that is where the reuse is, and
+            it is what makes the whole thing O(digits &times; states &times;
+            10).
           </div>
         </div>
+
+        <h2 class="h1" id="choose">&#129513; Choosing the State</h2>
+        <p>
+          All four families answer the same question differently: what is the
+          smallest description of &ldquo;where I am&rdquo; that makes the future
+          independent of the past?
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>The state is</th>
+              <th>Family</th>
+              <th>Typical size</th>
+              <th>Constraint that hints at it</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>a range <code>[i, j]</code></td>
+              <td>Interval</td>
+              <td>O(n&sup2;) states, O(n&sup3;) time</td>
+              <td>n &le; 500, and choices damage neighbours</td>
+            </tr>
+            <tr>
+              <td>a node</td>
+              <td>Tree</td>
+              <td>O(n) states</td>
+              <td>the input is a tree or a rooted graph</td>
+            </tr>
+            <tr>
+              <td>a subset</td>
+              <td>Bitmask</td>
+              <td>O(2&#8319;) states</td>
+              <td>n &le; 20, &ldquo;assign each to each&rdquo;</td>
+            </tr>
+            <tr>
+              <td>a position in a number</td>
+              <td>Digit</td>
+              <td>O(digits &times; state)</td>
+              <td>&ldquo;count numbers up to 10&#185;&#8312;&rdquo;</td>
+            </tr>
+            <tr>
+              <td>a node of a DAG</td>
+              <td>DP on a DAG</td>
+              <td>O(V + E)</td>
+              <td>longest path, counting paths</td>
+            </tr>
+          </tbody>
+        </table>
 
         <h2 class="h1" id="pitfalls">
           &#9888;&#65039; Complexity &amp; The Classic Bugs
@@ -1817,40 +1848,46 @@ curr ← array of m + 1 zeros
             <tr>
               <th>Family</th>
               <th>States</th>
-              <th>Time</th>
-              <th>Space (rolled)</th>
+              <th>Per state</th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Grid paths</td>
-              <td>m &times; n</td>
-              <td>O(m &middot; n)</td>
+              <td>Interval</td>
+              <td>n&sup2;</td>
+              <td>O(n) pivots</td>
+              <td>O(n&sup3;)</td>
+            </tr>
+            <tr>
+              <td>Tree</td>
+              <td>n</td>
+              <td>O(children)</td>
               <td>O(n)</td>
             </tr>
             <tr>
-              <td>LCS / edit distance</td>
-              <td>n &times; m</td>
-              <td>O(n &middot; m)</td>
-              <td>O(min(n, m))</td>
+              <td>Rerooting</td>
+              <td>n</td>
+              <td>O(1) patch</td>
+              <td>O(n), two passes</td>
             </tr>
             <tr>
-              <td>Palindrome table</td>
-              <td>n&sup2; substrings</td>
-              <td>O(n&sup2;)</td>
-              <td>O(n&sup2;) &mdash; rarely rollable</td>
+              <td>Bitmask</td>
+              <td>2&#8319;</td>
+              <td>O(n)</td>
+              <td>O(n &middot; 2&#8319;)</td>
             </tr>
             <tr>
-              <td>Pattern matching (regex, wildcard)</td>
-              <td>n &times; m</td>
-              <td>O(n &middot; m)</td>
-              <td>O(m)</td>
+              <td>Bitmask over submasks</td>
+              <td>2&#8319;</td>
+              <td>submasks</td>
+              <td>O(3&#8319;)</td>
             </tr>
             <tr>
-              <td>Longest path in a grid</td>
-              <td>m &times; n</td>
-              <td>O(m &middot; n)</td>
-              <td>O(m &middot; n) memo</td>
+              <td>Digit</td>
+              <td>digits &times; state</td>
+              <td>10</td>
+              <td>O(10 &middot; digits &middot; state)</td>
             </tr>
           </tbody>
         </table>
@@ -1865,37 +1902,39 @@ curr ← array of m + 1 zeros
           </thead>
           <tbody>
             <tr>
-              <td>Off-by-one between table and string indices</td>
-              <td>Answers short by one, or an index error</td>
-              <td>
-                Table counts characters; compare <code>a[i-1]</code> with
-                <code>b[j-1]</code>
-              </td>
+              <td>Interval loops by index instead of length</td>
+              <td>Reads an inner range that is still empty</td>
+              <td>Loop over length, or i downward and j upward</td>
             </tr>
             <tr>
-              <td>Row 0 / column 0 left as zeros in edit distance</td>
-              <td>Turning a string into &ldquo;&rdquo; looks free</td>
-              <td>Seed them with <code>i</code> and <code>j</code></td>
+              <td>Choosing what happens first in Burst Balloons</td>
+              <td>Subproblems are not independent; answers too low</td>
+              <td>Pick what happens <em>last</em> in the range</td>
             </tr>
             <tr>
-              <td>Filling a palindrome table by row</td>
-              <td>Reads <code>dp[i+1][j-1]</code> before it exists</td>
-              <td>Loop over length, or start <code>i</code> from the end</td>
+              <td>Forgetting the sign flip in a game DP</td>
+              <td>Both players appear to cooperate</td>
+              <td>Store the advantage and subtract the opponent&#39;s</td>
             </tr>
             <tr>
-              <td>Obstacle cell left non-zero</td>
-              <td>Paths leak through walls</td>
-              <td>Set it to 0 and continue</td>
+              <td>Returning one value per tree node</td>
+              <td>Cannot express &ldquo;with or without this node&rdquo;</td>
+              <td>Return a pair (or a small tuple) and combine both</td>
             </tr>
             <tr>
-              <td>Rolling one row without saving the diagonal</td>
-              <td>Uses the new value where the old was needed</td>
-              <td>Keep the previous <code>dp[i-1][j-1]</code> in a variable</td>
+              <td>Bitmask with n = 25</td>
+              <td>Out of memory or time</td>
+              <td>Check n first &mdash; this needs another technique</td>
             </tr>
             <tr>
-              <td>Solving longest path with plain tabulation</td>
-              <td>Wrong results &mdash; the grid has no fixed order</td>
-              <td>Memoised DFS: the dependencies follow the values</td>
+              <td>Memoising tight states in digit DP</td>
+              <td>Counts are wrong for some bounds only</td>
+              <td>Cache only when <code>tight</code> is false</td>
+            </tr>
+            <tr>
+              <td>Ignoring leading zeros</td>
+              <td>&ldquo;007&rdquo; counted as a three-digit number</td>
+              <td>Carry a <code>started</code> flag in the state</td>
             </tr>
           </tbody>
         </table>
@@ -1903,647 +1942,38 @@ curr ← array of m + 1 zeros
         <div class="callout green">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> Two sequences to
-            compare, a grid to cross, or one string examined as substrings. Say
-            what <code>dp[i][j]</code> means, then ask which cells it reads
-            &mdash; those two sentences decide the loops, and the rest is
-            typing.
+            <strong>How to spot it in an interview.</strong> Read the
+            constraints first. <code>n &le; 20</code> means bitmask;
+            <code>n &le; 500</code> with merging or bursting means interval; a
+            tree input with a &ldquo;for every node&rdquo; question means
+            rerooting; and a bound like 10&#185;&#8312; means you are counting
+            digits, not numbers.
           </div>
         </div>
 
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems: a grid, the two string classics, a palindrome table, a
-          backwards fill and a pattern matcher. For each, say what
-          <code>dp[i][j]</code> means and which cells it reads.
+          Six problems, one per family plus two on intervals. Read the
+          constraints first &mdash; in this lecture they tell you the answer.
         </p>
 
-        <!-- Problem 01: Unique Paths II -->
+        <!-- Problem 01: Burst Balloons -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">
-                Problem 01 &middot; Grid with Obstacles
-              </div>
-              <div class="prob-title">Unique Paths II</div>
+              <div class="prob-num">Problem 01 &middot; Think Last</div>
+              <div class="prob-title">Burst Balloons</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/unique-paths-ii/"
+                  href="https://leetcode.com/problems/burst-balloons/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 63 - Unique Paths II</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Grid Path DP</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Count the paths from the top-left to the bottom-right of a grid,
-                moving only right or down. Cells marked <code>1</code> are
-                obstacles.
-              </p>
-              <div class="iobox">grid = [[0,0,0],[0,1,0],[0,0,0]] → 2</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Without obstacles, every cell is the sum of the cell above
-                    and the cell to the left. What should an obstacle
-                    contribute?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Zero — it is unreachable, and it also blocks everything
-                    behind it automatically, because later cells read its zero.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The obstacle case needs no special logic beyond setting the cell
-                to 0, which then propagates. The one trap is the starting cell:
-                if <code>grid[0][0]</code> is an obstacle the answer is 0, so
-                seed carefully. Because each row only reads the row above and
-                the cell to the left, a single rolling array of width
-                <code>n</code> is enough.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sum from Above and
-                      Left</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> uniquePathsWithObstacles(grid):
-    m ← rows(grid);  n ← cols(grid)
-    dp ← array of n zeros
-    <span class="pc-kw">if</span> grid[0][0] = 1: <span class="pc-kw">return</span> 0
-    dp[0] ← 1
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-            <span class="pc-kw">if</span> grid[i][j] = 1:
-                dp[j] ← 0                      <span class="pc-cm">// blocked: nothing arrives here</span>
-            <span class="pc-kw">else</span> <span class="pc-kw">if</span> j &gt; 0:
-                dp[j] ← dp[j] + dp[j - 1]      <span class="pc-cm">// dp[j] is still the row above</span>
-
-    <span class="pc-kw">return</span> dp[n - 1]
-
-<span class="pc-cm">// [[0,0,0],[0,1,0],[0,0,0]] → rows: [1,1,1] → [1,0,1] → [1,1,2] → 2 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(m × n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 02: Longest Common Subsequence -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Match / Mismatch</div>
-              <div class="prob-title">Longest Common Subsequence</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/longest-common-subsequence/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1143 - Longest Common Subsequence</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Two-String DP</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the length of the longest subsequence present in both
-                strings. A subsequence keeps order but may skip characters.
-              </p>
-              <div class="iobox">
-                text1 = "abcde", text2 = "ace" → 3 &nbsp;("ace")
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Compare the last characters of the two prefixes. What are
-                    the only two cases?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    They match — take both and recurse on the shorter prefixes.
-                    They differ — drop the last character of one string or the
-                    other, and keep the better result.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This recurrence is the parent of half of Phase 4. The table has
-                an extra row and column for the empty prefixes, which removes
-                every boundary check. Mind the offset:
-                <code>dp[i][j]</code> talks about <em>i characters</em>, so the
-                characters compared are <code>a[i-1]</code> and
-                <code>b[j-1]</code>. Rolling two rows gives O(min(n, m)) space,
-                but keep the full table if the actual subsequence must be
-                reconstructed.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; The Two Cases</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> longestCommonSubsequence(a, b):
-    n ← length(a);  m ← length(b)
-    dp ← (n+1) × (m+1) table of zeros          <span class="pc-cm">// row/col 0 = empty prefix</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-            <span class="pc-kw">if</span> a[i-1] = b[j-1]:
-                dp[i][j] ← dp[i-1][j-1] + 1
-            <span class="pc-kw">else</span>:
-                dp[i][j] ← max(dp[i-1][j], dp[i][j-1])
-
-    <span class="pc-kw">return</span> dp[n][m]
-
-<span class="pc-cm">// "abcde" vs "ace": matches at a, c, e → 3 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n × m)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(min(n, m))</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 03: Edit Distance -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Three Transitions</div>
-              <div class="prob-title">Edit Distance</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/edit-distance/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 72 - Edit Distance</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Two-String DP</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the minimum number of insertions, deletions and
-                replacements needed to turn <code>word1</code> into
-                <code>word2</code>.
-              </p>
-              <div class="iobox">word1 = "horse", word2 = "ros" → 3</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Start from the ends. If the last characters match, what does
-                    that cost?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Nothing — move both back. Otherwise pay one edit and take
-                    the best of three moves: replace (diagonal), delete (up),
-                    insert (left).
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Same skeleton as LCS, with <code>min</code> instead of
-                <code>max</code> and real base cases: turning a prefix into the
-                empty string costs one deletion per character, so row 0 and
-                column 0 count up. Knowing which neighbour means which edit is
-                what lets you reconstruct the edit script &mdash; walk back from
-                <code>dp[n][m]</code> and note the direction you came from.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Replace, Delete,
-                      Insert</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> minDistance(a, b):
-    n ← length(a);  m ← length(b)
-    dp ← (n+1) × (m+1) table
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n: dp[i][0] ← i      <span class="pc-cm">// delete every character</span>
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m: dp[0][j] ← j      <span class="pc-cm">// insert every character</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-            <span class="pc-kw">if</span> a[i-1] = b[j-1]:
-                dp[i][j] ← dp[i-1][j-1]                 <span class="pc-cm">// free</span>
-            <span class="pc-kw">else</span>:
-                dp[i][j] ← 1 + min(dp[i-1][j-1],        <span class="pc-cm">// replace</span>
-                                   dp[i-1][j],          <span class="pc-cm">// delete</span>
-                                   dp[i][j-1])          <span class="pc-cm">// insert</span>
-
-    <span class="pc-kw">return</span> dp[n][m]</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n × m)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(m)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 04: Longest Palindromic Subsequence -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Iterate by Length</div>
-              <div class="prob-title">Longest Palindromic Subsequence</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/longest-palindromic-subsequence/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 516 - Longest Palindromic Subsequence</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Substring DP</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the length of the longest palindromic subsequence of
-                <code>s</code>.
-              </p>
-              <div class="iobox">
-                s = "bbbab" → 4 &nbsp;("bbbb")&nbsp;&nbsp;|&nbsp;&nbsp; s =
-                "cbbd" → 2
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Look at the two ends of a substring. What happens when they
-                    are equal?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Both join the palindrome:
-                    <code>dp[i][j] = dp[i+1][j-1] + 2</code>. Otherwise drop one
-                    end or the other. Fill the table by increasing substring
-                    length so the inner values exist.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two teaching points. First, a shortcut: this is exactly the LCS
-                of <code>s</code> with its own reverse, so you could reuse the
-                previous problem wholesale. Second, the direct table &mdash;
-                which is the one worth writing &mdash; must be filled by length,
-                because <code>dp[i][j]</code> reads <code>dp[i+1][j-1]</code>, a
-                strictly shorter substring. Looping rows downward and columns
-                upward achieves the same order.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Ends In, By Length</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> longestPalindromeSubseq(s):
-    n ← length(s)
-    dp ← n × n table of zeros
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← 1        <span class="pc-cm">// one character is a palindrome</span>
-
-    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
-        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
-            j ← i + len - 1
-            <span class="pc-kw">if</span> s[i] = s[j]:
-                dp[i][j] ← dp[i+1][j-1] + 2
-            <span class="pc-kw">else</span>:
-                dp[i][j] ← max(dp[i+1][j], dp[i][j-1])
-
-    <span class="pc-kw">return</span> dp[0][n-1]
-
-<span class="pc-cm">// Minimum insertions to make s a palindrome = n − this answer.</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n²)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n²)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 05: Dungeon Game -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Fill Backwards</div>
-              <div class="prob-title">Dungeon Game</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/dungeon-game/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 174 - Dungeon Game</a
+                  >&#128279; LC 312 - Burst Balloons</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Reverse Grid DP</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                A knight walks right and down through a grid of damage and
-                healing values. Return the smallest starting health that keeps
-                him above 0 the whole way.
-              </p>
-              <div class="iobox">
-                dungeon = [[-2,-3,3],[-5,-10,1],[10,30,-5]] → 7
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Try filling forwards and watch it fail: the health you need
-                    at a cell depends on what comes after it, not before.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Define <code>dp[i][j]</code> as the minimum health needed
-                    <em>on entering</em> that cell, and fill from the
-                    bottom-right corner backwards.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The reversal is the whole problem. Going backwards, the
-                requirement at a cell is
-                <code>max(1, min(right, down) − value)</code>: you need enough
-                to survive the best onward route, and never less than 1. Forward
-                accumulation cannot work, because a big reward early does not
-                license dying later. Pad the borders with infinity so the edges
-                need no special cases.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Bottom-Right to
-                      Top-Left</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> calculateMinimumHP(dungeon):
-    m ← rows;  n ← cols
-    dp ← (m+1) × (n+1) table filled with infinity
-    dp[m][n-1] ← 1;  dp[m-1][n] ← 1            <span class="pc-cm">// just past the exit: need 1 HP</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> m - 1 <span class="pc-kw">down to</span> 0:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:
-            need ← min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j]
-            dp[i][j] ← max(1, need)            <span class="pc-cm">// never drop to 0 or below</span>
-
-    <span class="pc-kw">return</span> dp[0][0]</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(m × n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 06: Regular Expression Matching -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Pattern Matching</div>
-              <div class="prob-title">Regular Expression Matching</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/regular-expression-matching/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 10 - Regular Expression Matching</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Two-String DP</span>
+                <span class="tag tag-pat">Interval DP</span>
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
@@ -2557,13 +1987,256 @@ curr ← array of m + 1 zeros
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Implement matching for <code>.</code> (any single character) and
-                <code>*</code> (zero or more of the preceding element). The
-                pattern must match the <em>entire</em> string.
+                Bursting balloon <code>i</code> earns
+                <code>nums[left] × nums[i] × nums[right]</code>, where the
+                neighbours are the balloons currently beside it. Return the
+                maximum coins from bursting them all.
+              </p>
+              <div class="iobox">nums = [3, 1, 5, 8] → 167</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Try choosing which balloon to burst first, and watch the two
+                    halves stop being independent — their neighbours change.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Choose which balloon bursts <strong>last</strong> in a range
+                    instead. Its neighbours are then the untouched boundaries,
+                    and the two sides never interact.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The reversal is the whole problem. Pad the array with virtual 1s
+                at both ends, then let <code>dp[i][j]</code> be the best coins
+                from bursting everything strictly inside <code>(i, j)</code>.
+                Choosing the last balloon <code>k</code> fixes its multipliers
+                as <code>nums[i]</code> and <code>nums[j]</code> &mdash; both
+                still present &mdash; so the answer is
+                <code>dp[i][k] + nums[i]·nums[k]·nums[j] + dp[k][j]</code>. Loop
+                over length so inner ranges are ready.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Last Balloon in the
+                      Range</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxCoins(nums):
+    a ← [1] + nums + [1]                    <span class="pc-cm">// virtual boundaries</span>
+    n ← length(a)
+    dp ← n × n table of zeros                <span class="pc-cm">// dp[i][j]: strictly between i and j</span>
+
+    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n - 1:            <span class="pc-cm">// distance between the boundaries</span>
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1 - len:
+            j ← i + len
+            <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> j - 1:   <span class="pc-cm">// k bursts LAST</span>
+                gain ← a[i] × a[k] × a[j]
+                dp[i][j] ← max(dp[i][j], dp[i][k] + gain + dp[k][j])
+
+    <span class="pc-kw">return</span> dp[0][n-1]
+
+<span class="pc-cm">// [3,1,5,8] → 167 ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n³)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n²)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Minimum Cost to Cut a Stick -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Interval on Coordinates
+              </div>
+              <div class="prob-title">Minimum Cost to Cut a Stick</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/minimum-cost-to-cut-a-stick/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1547 - Minimum Cost to Cut a Stick</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Interval DP</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A stick of length <code>n</code> must be cut at the given
+                positions, in any order. Each cut costs the length of the piece
+                being cut. Return the minimum total cost.
+              </p>
+              <div class="iobox">n = 7, cuts = [1, 3, 4, 5] → 16</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The state is not an index into the stick — it is a pair of
+                    cut positions. What should the array of cuts include?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Add 0 and <code>n</code> as sentinels and sort. Then
+                    <code>dp[i][j]</code> is the cost of cutting the piece
+                    between cut <code>i</code> and cut <code>j</code>, and you
+                    pick which cut happens first inside it.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Same template as Burst Balloons, with coordinates instead of
+                values. Adding the two endpoints means every piece is described
+                by a pair of cut indices, so the cost of a cut is
+                <code>cuts[j] − cuts[i]</code> regardless of order. Here you may
+                think &ldquo;first&rdquo; rather than &ldquo;last&rdquo;,
+                because a cut splits the piece cleanly into two independent
+                pieces &mdash; the damage that ruins Burst Balloons does not
+                happen.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sentinels + Pivot</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> minCost(n, cuts):
+    c ← sort([0] + cuts + [n])
+    m ← length(c)
+    dp ← m × m table of zeros
+
+    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> m - 1:
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1 - len:
+            j ← i + len
+            best ← infinity
+            <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> j - 1:      <span class="pc-cm">// k cut first</span>
+                best ← min(best, dp[i][k] + dp[k][j])
+            dp[i][j] ← best + (c[j] - c[i])          <span class="pc-cm">// this piece&#39;s length</span>
+
+    <span class="pc-kw">return</span> dp[0][m-1]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m³)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m²)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Sum of Distances in Tree -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Rerooting</div>
+              <div class="prob-title">Sum of Distances in Tree</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sum-of-distances-in-tree/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 834 - Sum of Distances in Tree</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Tree DP (Two Passes)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For every node of a tree, return the sum of the distances from
+                it to all other nodes.
               </p>
               <div class="iobox">
-                s = "aab", p = "c*a*b" → true &nbsp;&nbsp;|&nbsp;&nbsp; s =
-                "mississippi", p = "mis*is*p*." → false
+                n = 6, edges = [[0,1],[0,2],[2,3],[2,4],[2,5]] → [8, 12, 6, 10,
+                10, 10]
               </div>
             </div>
             <div class="prob-section">
@@ -2575,9 +2248,9 @@ curr ← array of m + 1 zeros
                 </summary>
                 <div class="details-body">
                   <p>
-                    <code>*</code> belongs to the character before it, so treat
-                    <code>x*</code> as one unit. What are that unit's two
-                    options?
+                    Computing one node&rsquo;s answer is an easy DFS. Doing that
+                    n times is O(n²) — what changes when the root moves one
+                    edge?
                   </p>
                 </div>
               </details>
@@ -2588,9 +2261,12 @@ curr ← array of m + 1 zeros
                 </summary>
                 <div class="details-body">
                   <p>
-                    Use it zero times — skip both pattern characters — or, if
-                    the current character matches, use it once more and keep the
-                    pattern where it is.
+                    Everything inside the new root&rsquo;s subtree gets one step
+                    closer, and everything else gets one step further:
+                    <code
+                      >answer[child] = answer[parent] − size[child] + (n −
+                      size[child])</code
+                    >.
                   </p>
                 </div>
               </details>
@@ -2598,12 +2274,12 @@ curr ← array of m + 1 zeros
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The table is the LCS skeleton with a third case. The subtle part
-                is the base row: a pattern like <code>a*b*c*</code> can match
-                the empty string, so <code>dp[0][j]</code> must be computed
-                rather than left false. Everything else falls out of the two
-                <code>*</code> options, and a plain character or
-                <code>.</code> just steps both indices back.
+                Two passes. The first, post-order from node 0, computes subtree
+                sizes and the distance sum <em>within</em> each subtree. The
+                second, pre-order, moves the root down one edge at a time and
+                patches the answer in O(1) using the size split. This rerooting
+                pattern answers &ldquo;for every node&rdquo; questions in linear
+                time, and it generalises far beyond distances.
               </p>
             </div>
             <details>
@@ -2614,38 +2290,409 @@ curr ← array of m + 1 zeros
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Star as Zero or More</span
+                      >&#128208; Pseudocode &middot; Down, Then Up</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> isMatch(s, p):
-    n ← length(s);  m ← length(p)
-    dp ← (n+1) × (m+1) table of false
-    dp[0][0] ← true
+                  <pre><span class="pc-kw">function</span> sumOfDistancesInTree(n, edges):
+    adj ← adjacency list
+    size ← array of 1s;  ans ← array of zeros
 
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> m:                       <span class="pc-cm">// empty string vs patterns like a*b*</span>
-        <span class="pc-kw">if</span> p[j-1] = &#39;*&#39;: dp[0][j] ← dp[0][j-2]
+    <span class="pc-kw">function</span> down(u, parent):                <span class="pc-cm">// post-order</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+            down(v, u)
+            size[u] ← size[u] + size[v]
+            ans[u] ← ans[u] + ans[v] + size[v]
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-            <span class="pc-kw">if</span> p[j-1] = &#39;*&#39;:
-                dp[i][j] ← dp[i][j-2]                        <span class="pc-cm">// zero occurrences</span>
-                <span class="pc-kw">if</span> p[j-2] = s[i-1] <span class="pc-kw">or</span> p[j-2] = &#39;.&#39;:
-                    dp[i][j] ← dp[i][j] <span class="pc-kw">or</span> dp[i-1][j]       <span class="pc-cm">// one more occurrence</span>
-            <span class="pc-kw">else</span> <span class="pc-kw">if</span> p[j-1] = s[i-1] <span class="pc-kw">or</span> p[j-1] = &#39;.&#39;:
-                dp[i][j] ← dp[i-1][j-1]
+    <span class="pc-kw">function</span> up(u, parent):                  <span class="pc-cm">// pre-order</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+            ans[v] ← ans[u] - size[v] + (n - size[v])
+            up(v, u)
 
-    <span class="pc-kw">return</span> dp[n][m]</pre>
+    down(0, -1);  up(0, -1)
+    <span class="pc-kw">return</span> ans</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n × m)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n × m)</span>
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Beautiful Arrangement -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Subset as a State</div>
+              <div class="prob-title">Beautiful Arrangement</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/beautiful-arrangement/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 526 - Beautiful Arrangement</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Bitmask DP</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the permutations of <code>1..n</code> where, at every
+                position <code>i</code> (1-based), either the value divides
+                <code>i</code> or <code>i</code> divides the value.
+              </p>
+              <div class="iobox">
+                n = 2 → 2 &nbsp;([1,2] and [2,1])&nbsp;&nbsp;|&nbsp;&nbsp; n = 3
+                → 3
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Backtracking works but revisits the same situations. What
+                    actually distinguishes one partial arrangement from another?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Only the <em>set</em> of numbers already placed — not their
+                    order. Encode that set as a bitmask, and the next position
+                    is <code>popcount(mask) + 1</code>.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two different partial arrangements using the same numbers have
+                identical futures, which is exactly the overlapping-subproblems
+                signal. With the set as a bitmask, the position is free (it is
+                the popcount), so a single array of 2&#8319; entries suffices.
+                <code>n ≤ 15</code> in the constraints is the giveaway that a
+                bitmask is intended.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; dp[mask] = ways to fill
+                      popcount(mask) slots</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> countArrangement(n):
+    full ← (1 &lt;&lt; n) - 1
+    dp ← array of full + 1 zeros
+    dp[0] ← 1
+
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> full:
+        <span class="pc-kw">if</span> dp[mask] = 0: <span class="pc-kw">continue</span>
+        pos ← popcount(mask) + 1               <span class="pc-cm">// next slot, 1-based</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+            bit ← 1 &lt;&lt; (v - 1)
+            <span class="pc-kw">if</span> mask AND bit ≠ 0: <span class="pc-kw">continue</span>      <span class="pc-cm">// already used</span>
+            <span class="pc-kw">if</span> v mod pos = 0 <span class="pc-kw">or</span> pos mod v = 0:
+                dp[mask OR bit] ← dp[mask OR bit] + dp[mask]
+
+    <span class="pc-kw">return</span> dp[full]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n · 2ⁿ)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(2ⁿ)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Shortest Path Visiting All Nodes -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Bitmask + BFS</div>
+              <div class="prob-title">Shortest Path Visiting All Nodes</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/shortest-path-visiting-all-nodes/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 847 - Shortest Path Visiting All Nodes</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">State = (node, mask)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a connected undirected graph, return the length of the
+                shortest walk that visits every node. You may start anywhere and
+                revisit nodes and edges.
+              </p>
+              <div class="iobox">graph = [[1,2,3],[0],[0],[0]] → 4</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Plain BFS marks a node visited once. Why is that wrong here?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Because arriving at the same node with a different set of
+                    visited nodes is a genuinely different situation. Make the
+                    state <code>(node, visitedMask)</code> and BFS over that.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The lesson is that &ldquo;visited&rdquo; is part of the state,
+                not a side effect. Start the queue with every node (each with
+                only its own bit set), then expand: moving to a neighbour sets
+                that neighbour&rsquo;s bit. The first state whose mask is full
+                gives the answer, since BFS explores by distance. There are
+                <code>n · 2&#8319;</code> states, which is why
+                <code>n ≤ 12</code>.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; BFS over n · 2ⁿ
+                      States</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> shortestPathLength(graph):
+    n ← length(graph);  full ← (1 &lt;&lt; n) - 1
+    queue ← empty;  seen ← empty set
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        queue.push((i, 1 &lt;&lt; i));  seen.add((i, 1 &lt;&lt; i))    <span class="pc-cm">// start anywhere</span>
+
+    steps ← 0
+    <span class="pc-kw">while</span> queue is not empty:
+        <span class="pc-kw">repeat</span> queue.size <span class="pc-kw">times</span>:
+            (node, mask) ← queue.popFront()
+            <span class="pc-kw">if</span> mask = full: <span class="pc-kw">return</span> steps
+            <span class="pc-kw">for</span> nb <span class="pc-kw">in</span> graph[node]:
+                state ← (nb, mask OR (1 &lt;&lt; nb))
+                <span class="pc-kw">if</span> state <span class="pc-kw">not</span> <span class="pc-kw">in</span> seen:
+                    seen.add(state);  queue.pushBack(state)
+        steps ← steps + 1</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n² · 2ⁿ)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n · 2ⁿ)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Non-negative Integers without Consecutive Ones -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Digit DP</div>
+              <div class="prob-title">
+                Non-negative Integers without Consecutive Ones
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 600 - Non-negative Integers without Consecutive
+                  Ones</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Digit DP (Binary)</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the integers in <code>[0, n]</code> whose binary
+                representation contains no two adjacent 1s.
+              </p>
+              <div class="iobox">
+                n = 5 → 5 &nbsp;(0, 1, 2, 4, 5 — but not 3)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    <code>n</code> can be a billion, so the numbers cannot be
+                    enumerated. Build them bit by bit from the most significant
+                    end.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Carry two things: whether the prefix still matches
+                    <code>n</code> (tight), and the previous bit. Without tight,
+                    the count depends only on the position and the previous bit
+                    — so memoise those.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Digit DP in its smallest form, in base 2. Once the prefix is
+                strictly below <code>n</code>, everything after it is free, and
+                the number of valid suffixes is a Fibonacci count &mdash; which
+                is why the closed-form solution people quote works. Writing the
+                general skeleton is more useful than the shortcut: change the
+                state and the same code counts numbers with no repeated digit, a
+                digit sum divisible by k, and so on.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Tight Flag + Previous
+                      Bit</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> findIntegers(n):
+    bits ← binary digits of n, most significant first
+    memo ← empty map
+
+    <span class="pc-kw">function</span> count(pos, prevOne, tight):
+        <span class="pc-kw">if</span> pos = length(bits): <span class="pc-kw">return</span> 1        <span class="pc-cm">// a complete valid number</span>
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight <span class="pc-kw">and</span> (pos, prevOne) <span class="pc-kw">in</span> memo:
+            <span class="pc-kw">return</span> memo[(pos, prevOne)]
+
+        limit ← bits[pos] <span class="pc-kw">if</span> tight <span class="pc-kw">else</span> 1
+        total ← 0
+        <span class="pc-kw">for</span> d <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> limit:
+            <span class="pc-kw">if</span> d = 1 <span class="pc-kw">and</span> prevOne: <span class="pc-kw">continue</span>       <span class="pc-cm">// no two adjacent ones</span>
+            total ← total + count(pos + 1, d = 1, tight <span class="pc-kw">and</span> d = limit)
+
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight: memo[(pos, prevOne)] ← total
+        <span class="pc-kw">return</span> total
+
+    <span class="pc-kw">return</span> count(0, false, true)</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(bits)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(bits)</span>
                   </div>
                 </div>
               </div>
@@ -2659,13 +2706,13 @@ curr ← array of m + 1 zeros
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 26 Assignment &mdash; 30 Problems (10 Easy &middot; 15
-              Medium &middot; 5 Hard)</strong
+              >Lecture 28 Assignment &mdash; 25 Problems (5 Easy &middot; 12
+              Medium &middot; 8 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged, grouped by the
-            table it needs. Complete it before moving to Lecture 27.<br /><br />
+            kind of state it needs. Complete it before moving to Phase 5.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture26/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture28/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2682,80 +2729,80 @@ curr ← array of m + 1 zeros
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 27.</p>
+        <p>Check each item before advancing to Lecture 29.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can state what dp[i][j] means and list the cells it depends on
+            I can write the interval template and explain the length loop
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can pick the loop order from the dependency arrows alone
+            I can say why Burst Balloons picks the last balloon, not the first
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the match/mismatch recurrence without looking it up
+            I can write a game DP as an advantage, with the sign flip
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I know which neighbour is insert, which is delete and which is
-            replace
+            I can return a tuple from a post-order walk and combine it at the
+            parent
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I fill palindrome tables by substring length, and can say why
+            I can reroot a tree DP in two passes and derive the patch formula
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can tell a substring problem from a subsequence problem instantly
+            I know the bitmask operations by heart, and the n where they stop
+            being viable
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can roll a 2D table to one or two rows, and know what that costs
-            me
+            I can write the digit DP skeleton with tight and started flags
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I completed all 30 assignment problems and can state the dp
-            definition for each
+            I completed all 25 assignment problems and can name the state for
+            each
           </div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
             <strong
-              >You're ready for Lecture 27: Dynamic Programming III &mdash;
-              Knapsack &amp; Subsets</strong
+              >Phase 4 complete &mdash; next up, Phase 5: Advanced
+              Structures</strong
             ><br />
-            Coin Change let you reuse a coin as often as you liked. The next
-            lecture asks what changes when each item may be taken only once
-            &mdash; and the answer is one reversed loop.
+            Four lectures of dynamic programming are behind you. Phase 5 returns
+            to data structures, starting with Tries &mdash; the structure that
+            makes prefix questions disappear, and the one behind the maximum-XOR
+            problem you met in Lecture 6.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture25/lecture25_notes.html"
-            >&larr; Lecture 25 &middot; Dynamic Programming I</a
+          <a href="../Lecture27/lecture27_notes.html"
+            >&larr; Lecture 27 &middot; Dynamic Programming III</a
           >
-          <a class="next" href="../Lecture27/lecture27_notes.html"
-            >Lecture 27 &middot; Dynamic Programming III — Knapsack &amp;
-            Subsets &rarr;</a
+          <a class="next" href="../Lecture29/lecture29_notes.html"
+            >Lecture 29 &middot; Tries (Prefix Trees) &rarr;</a
           >
         </div>
       </div>

@@ -317,16 +317,16 @@ _Combines multiple patterns or requires advanced BFS state management. These app
 
 ---
 
-### H5 · Word Search II
+### H5 · Cut Off Trees for Golf Event
 
-**🔗 [LC 212 — Word Search II](https://leetcode.com/problems/word-search-ii/)** · Hard
-**Pattern:** Grid DFS + Trie | **Companies:** Google, Airbnb, Uber
+**🔗 [LC 675 — Cut Off Trees for Golf Event](https://leetcode.com/problems/cut-off-trees-for-golf-event/)** · Hard
+**Pattern:** Sort + Repeated BFS | **Companies:** Google, Amazon, Uber
 
-**Problem:** Given a board and a list of words, return all words that exist in the board.
+**Problem:** Cut every tree in a forest in order of increasing height, starting from (0, 0). Return the total number of steps, or −1 if some tree is unreachable.
 
-**Hint:** Build a Trie from all words. DFS from every cell, navigating the Trie character by character. When you reach a Trie node that marks a complete word, add it to results. Prune Trie nodes after a word is found to avoid duplicates. This reduces the complexity from O(words × m × n × 4^L) to near-linear in practice.
+**Hint:** The order is forced — sort the trees by height. Then the problem is just a sequence of shortest-path queries, so run a BFS from each tree to the next and add the distances. The only real trap is forgetting that a 0 cell is a wall while a 1 cell is walkable ground.
 
-**Why Hard?** Requires implementing a Trie, integrating it with DFS backtracking, and pruning correctly.
+**Why Hard?** Combines sorting, repeated BFS with correct start/end handling, and an unreachability check that has to return −1 for the whole answer.
 
 ---
 
@@ -357,7 +357,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | **Amazon**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
 | **Google**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
 | **Microsoft** | [Spiral Matrix](https://leetcode.com/problems/spiral-matrix/), [Rotate Image](https://leetcode.com/problems/rotate-image/), [Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/), [Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)                                                 |
-| **Uber**      | [Word Search II](https://leetcode.com/problems/word-search-ii/), [01 Matrix](https://leetcode.com/problems/01-matrix/), [Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)                                                                                                                                        |
+| **Uber**      | [Cut Off Trees for Golf Event](https://leetcode.com/problems/cut-off-trees-for-golf-event/), [01 Matrix](https://leetcode.com/problems/01-matrix/), [Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)                                                                                                            |
 | **Adobe**     | [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Flood Fill](https://leetcode.com/problems/flood-fill/)                                                                                                                                                                                                     |
 
 ---

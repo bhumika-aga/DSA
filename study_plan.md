@@ -14,7 +14,7 @@
 | **Study Days**     | 202 days of content                                  |
 | **Duration**       | ~31 weeks at one lecture block at a time             |
 | **Total Problems** | 976                                                  |
-| **Written So Far** | 26 lectures · 721 problems                           |
+| **Written So Far** | 30 lectures · 811 problems                           |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 ### How to Use This Plan
@@ -65,10 +65,10 @@
 | 24  | 🔗 Union-Find (Disjoint Set Union)                          | Phase 3 | 4d   | 20       | ✅     |
 | 25  | 🧩 Dynamic Programming I — Foundations & 1D                 | Phase 4 | 6d   | 25       | ✅     |
 | 26  | 🧱 Dynamic Programming II — Grids & Strings                 | Phase 4 | 7d   | 30       | ✅     |
-| 27  | 🎒 Dynamic Programming III — Knapsack & Subsets             | Phase 4 | 6d   | 25       | 📝     |
-| 28  | 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit | Phase 4 | 7d   | 25       | 📝     |
-| 29  | 🔤 Tries (Prefix Trees)                                     | Phase 5 | 4d   | 18       | 📝     |
-| 30  | 📶 Segment Trees & Fenwick Trees                            | Phase 5 | 6d   | 22       | 📝     |
+| 27  | 🎒 Dynamic Programming III — Knapsack & Subsets             | Phase 4 | 6d   | 25       | ✅     |
+| 28  | 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit | Phase 4 | 7d   | 25       | ✅     |
+| 29  | 🔤 Tries (Prefix Trees)                                     | Phase 5 | 4d   | 18       | ✅     |
+| 30  | 📶 Segment Trees & Fenwick Trees                            | Phase 5 | 6d   | 22       | ✅     |
 | 31  | 🪵 Square Root Decomposition & Mo's Algorithm               | Phase 5 | 3d   | 12       | 📝     |
 | 32  | 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)         | Phase 5 | 5d   | 20       | 📝     |
 | 33  | 🕳️ Advanced Graph Algorithms                                | Phase 5 | 6d   | 22       | 📝     |
@@ -1197,13 +1197,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern              | Description                                      | Example Problem               |
-| -------------------- | ------------------------------------------------ | ----------------------------- |
-| **Grid path DP**     | dp[i][j] built from its top and left neighbours  | Unique Paths                  |
-| **Match / mismatch** | Chars equal → diagonal + 1, else best of the two | Longest Common Subsequence    |
-| **Edit distance**    | Insert, delete and replace as three transitions  | Edit Distance                 |
-| **Palindrome DP**    | Iterate over substring length, not index         | Longest Palindromic Substring |
-| **Row rolling**      | Keep the previous row only, dropping a dimension | LCS in O(n) space             |
+| Pattern              | Description                                       | Example Problem               |
+| -------------------- | ------------------------------------------------- | ----------------------------- |
+| **Grid path DP**     | dp`[i][j]` built from its top and left neighbours | Unique Paths                  |
+| **Match / mismatch** | Chars equal → diagonal + 1, else best of the two  | Longest Common Subsequence    |
+| **Edit distance**    | Insert, delete and replace as three transitions   | Edit Distance                 |
+| **Palindrome DP**    | Iterate over substring length, not index          | Longest Palindromic Substring |
+| **Row rolling**      | Keep the previous row only, dropping a dimension  | LCS in O(n) space             |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1223,13 +1223,14 @@
 
 ### Lecture 27: 🎒 Dynamic Programming III — Knapsack & Subsets
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 6 days                      |
-| **Problems**         | 25                          |
-| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard |
-| **Prerequisites**    | Lecture 25                  |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard                                                             |
+| **Prerequisites**    | Lecture 25                                                                              |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture27/lecture27_notes.html) · [Assignment](Lecture27/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1266,13 +1267,14 @@
 
 ### Lecture 28: 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 7 days                      |
-| **Problems**         | 25                          |
-| **Difficulty Split** | 5 Easy · 12 Medium · 8 Hard |
-| **Prerequisites**    | Lectures 15, 17, 25–27      |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 7 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 5 Easy · 12 Medium · 8 Hard                                                             |
+| **Prerequisites**    | Lectures 15, 17, 25–27                                                                  |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture28/lecture28_notes.html) · [Assignment](Lecture28/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1284,13 +1286,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern         | Description                                          | Example Problem                     |
-| --------------- | ---------------------------------------------------- | ----------------------------------- |
-| **Interval DP** | dp[i][j] over a range, split at every k between them | Burst Balloons                      |
-| **Tree DP**     | Post-order return of (take, skip) for each node      | House Robber III                    |
-| **Bitmask DP**  | State is a subset bitmask; viable while n ≤ 20       | Shortest Path Visiting All Nodes    |
-| **Digit DP**    | Build the number digit by digit with a tight flag    | Numbers With Repeated Digits        |
-| **DP on a DAG** | Longest path in topological order                    | Longest Increasing Path in a Matrix |
+| Pattern         | Description                                            | Example Problem                     |
+| --------------- | ------------------------------------------------------ | ----------------------------------- |
+| **Interval DP** | dp`[i][j]` over a range, split at every k between them | Burst Balloons                      |
+| **Tree DP**     | Post-order return of (take, skip) for each node        | House Robber III                    |
+| **Bitmask DP**  | State is a subset bitmask; viable while n ≤ 20         | Shortest Path Visiting All Nodes    |
+| **Digit DP**    | Build the number digit by digit with a tight flag      | Numbers With Repeated Digits        |
+| **DP on a DAG** | Longest path in topological order                      | Longest Increasing Path in a Matrix |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1318,13 +1320,14 @@
 
 ### Lecture 29: 🔤 Tries (Prefix Trees)
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 18                         |
-| **Difficulty Split** | 5 Easy · 9 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 13, 15            |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 18                                                                                      |
+| **Difficulty Split** | 5 Easy · 9 Medium · 4 Hard                                                              |
+| **Prerequisites**    | Lectures 13, 15                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture29/lecture29_notes.html) · [Assignment](Lecture29/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1339,7 +1342,7 @@
 | ------------------- | --------------------------------------------- | ----------------------------------- |
 | **Prefix Lookup**   | Check if any inserted word starts with prefix | Implement Trie (Prefix Tree)        |
 | **Auto-complete**   | Return all words sharing a given prefix       | Search Suggestions System           |
-| **XOR Max Trie**    | Bit-by-bit trie to find maximum XOR pair      | Maximum XOR of Two Numbers in Array |
+| **XOR Max Trie**    | Bit-by-bit trie to find maximum XOR pair      | Maximum XOR With Element From Array |
 | **Trie + DFS**      | DFS on board guided by trie for multi-word    | Word Search II                      |
 | **Wildcard Search** | TrieNode + DFS handles '.' wildcards          | Design Add and Search Words         |
 
@@ -1348,7 +1351,7 @@
 1. **Day 1:** Trie fundamentals — TrieNode class, insert, search, startsWith, memory layout
 2. **Day 2:** Applications — Word Break (trie-based), Replace Words, Map Sum Pairs
 3. **Day 3:** Trie + DFS — Word Search II (Boggle), Design Add and Search Words (wildcards)
-4. **Day 4:** XOR Trie — Maximum XOR of Two Numbers in Array, Maximum XOR With Element From Array
+4. **Day 4:** XOR Trie — Maximum XOR With an Element From Array, Maximum Genetic Difference Query
 
 #### 🏢 Companies That Ask These
 
@@ -1358,13 +1361,14 @@
 
 ### Lecture 30: 📶 Segment Trees & Fenwick Trees
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 6 days                      |
-| **Problems**         | 22                          |
-| **Difficulty Split** | 3 Easy · 12 Medium · 7 Hard |
-| **Prerequisites**    | Lectures 15, 19             |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 22                                                                                      |
+| **Difficulty Split** | 3 Easy · 12 Medium · 7 Hard                                                             |
+| **Prerequisites**    | Lectures 15, 19                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture30/lecture30_notes.html) · [Assignment](Lecture30/Assignment.md) |
 
 #### 🎓 Learning Objectives
 

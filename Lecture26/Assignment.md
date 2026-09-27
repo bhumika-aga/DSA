@@ -341,4 +341,4 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ---
 
-**← [Lecture 25 · Dynamic Programming I — Foundations & 1D](../Lecture25/Assignment.md)** &nbsp;·&nbsp; **Lecture 27 · Dynamic Programming III — Knapsack & Subsets — coming soon →**
+**← [Lecture 25 · Dynamic Programming I — Foundations & 1D](../Lecture25/Assignment.md)** &nbsp;·&nbsp; **[Lecture 27 · Dynamic Programming III — Knapsack & Subsets](../Lecture27/Assignment.md) →**
