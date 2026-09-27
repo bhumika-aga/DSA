@@ -14,7 +14,7 @@
 | **Study Days**     | 202 days of content                                  |
 | **Duration**       | ~31 weeks at one lecture block at a time             |
 | **Total Problems** | 976                                                  |
-| **Written So Far** | 22 lectures · 628 problems                           |
+| **Written So Far** | 26 lectures · 721 problems                           |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 ### How to Use This Plan
@@ -61,10 +61,10 @@
 | 20  | 📉 Monotonic Stack & Queue                                  | Phase 3 | 4d   | 20       | ✅     |
 | 21  | 📐 Intervals & Sweep Line                                   | Phase 3 | 4d   | 18       | ✅     |
 | 22  | 💡 Greedy Algorithms                                        | Phase 3 | 5d   | 25       | ✅     |
-| 23  | 🔍 Divide & Conquer                                         | Phase 3 | 4d   | 18       | 📝     |
-| 24  | 🔗 Union-Find (Disjoint Set Union)                          | Phase 3 | 4d   | 20       | 📝     |
-| 25  | 🧩 Dynamic Programming I — Foundations & 1D                 | Phase 4 | 6d   | 25       | 📝     |
-| 26  | 🧱 Dynamic Programming II — Grids & Strings                 | Phase 4 | 7d   | 30       | 📝     |
+| 23  | 🔍 Divide & Conquer                                         | Phase 3 | 4d   | 18       | ✅     |
+| 24  | 🔗 Union-Find (Disjoint Set Union)                          | Phase 3 | 4d   | 20       | ✅     |
+| 25  | 🧩 Dynamic Programming I — Foundations & 1D                 | Phase 4 | 6d   | 25       | ✅     |
+| 26  | 🧱 Dynamic Programming II — Grids & Strings                 | Phase 4 | 7d   | 30       | ✅     |
 | 27  | 🎒 Dynamic Programming III — Knapsack & Subsets             | Phase 4 | 6d   | 25       | 📝     |
 | 28  | 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit | Phase 4 | 7d   | 25       | 📝     |
 | 29  | 🔤 Tries (Prefix Trees)                                     | Phase 5 | 4d   | 18       | 📝     |
@@ -1002,12 +1002,12 @@
 
 ### Lecture 22: 💡 Greedy Algorithms
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 25                          |
-| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 9, 16              |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 8 Easy · 13 Medium · 4 Hard                                                             |
+| **Prerequisites**    | Lectures 9, 16                                                                          |
 | **Status**           | ✅ Notes + assignment written                                                           |
 | **Material**         | [Lecture Notes](Lecture22/lecture22_notes.html) · [Assignment](Lecture22/Assignment.md) |
 
@@ -1044,13 +1044,14 @@
 
 ### Lecture 23: 🔍 Divide & Conquer
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 18                          |
-| **Difficulty Split** | 4 Easy · 10 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 5, 9               |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 18                                                                                      |
+| **Difficulty Split** | 4 Easy · 10 Medium · 4 Hard                                                             |
+| **Prerequisites**    | Lectures 5, 9                                                                           |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture23/lecture23_notes.html) · [Assignment](Lecture23/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1083,13 +1084,14 @@
 
 ### Lecture 24: 🔗 Union-Find (Disjoint Set Union)
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 4 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 6 Easy · 10 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 15, 17             |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 6 Easy · 10 Medium · 4 Hard                                                             |
+| **Prerequisites**    | Lectures 15, 17                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture24/lecture24_notes.html) · [Assignment](Lecture24/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1130,13 +1132,14 @@
 
 ### Lecture 25: 🧩 Dynamic Programming I — Foundations & 1D
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 6 days                       |
-| **Problems**         | 25                           |
-| **Difficulty Split** | 10 Easy · 12 Medium · 3 Hard |
-| **Prerequisites**    | Lectures 5, 8                |
-| **Status**           | 📝 Planned                   |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 25                                                                                      |
+| **Difficulty Split** | 10 Easy · 12 Medium · 3 Hard                                                            |
+| **Prerequisites**    | Lectures 5, 8                                                                           |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture25/lecture25_notes.html) · [Assignment](Lecture25/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1175,13 +1178,14 @@
 
 ### Lecture 26: 🧱 Dynamic Programming II — Grids & Strings
 
-| Detail               | Value                        |
-| -------------------- | ---------------------------- |
-| **Duration**         | 7 days                       |
-| **Problems**         | 30                           |
-| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard |
-| **Prerequisites**    | Lecture 25                   |
-| **Status**           | 📝 Planned                   |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 7 days                                                                                  |
+| **Problems**         | 30                                                                                      |
+| **Difficulty Split** | 10 Easy · 15 Medium · 5 Hard                                                            |
+| **Prerequisites**    | Lecture 25                                                                              |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture26/lecture26_notes.html) · [Assignment](Lecture26/Assignment.md) |
 
 #### 🎓 Learning Objectives
 

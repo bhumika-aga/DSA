@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 22 &mdash; Greedy Algorithms</title>
+    <title>Lecture 26 &mdash; Dynamic Programming II</title>
     <meta
       name="description"
       content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
@@ -1396,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Greedy Algorithms</div>
+        <div class="sb-title">Dynamic Programming II</div>
         <div class="sb-meta">
-          Lecture 22 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 26 of 38 &middot; Phase 4 &mdash; Dynamic Programming
         </div>
       </div>
       <div class="sb-scroll">
@@ -1406,25 +1406,23 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127757;</span>Introduction</a
         >
-        <a class="toc-item" href="#what"
-          ><span class="toc-icon">&#128161;</span>What Greedy Means</a
+        <a class="toc-item" href="#grid"
+          ><span class="toc-icon">&#129521;</span>The Grid Family</a
         >
-        <a class="toc-item" href="#proof"
-          ><span class="toc-icon">&#9878;&#65039;</span>Proving It Works</a
+        <a class="toc-item toc-sub" href="#g-order">Filling Order</a>
+        <a class="toc-item toc-sub" href="#g-backwards"
+          >When to Fill Backwards</a
         >
-        <a class="toc-item toc-sub" href="#pr-exchange">Exchange Argument</a>
-        <a class="toc-item toc-sub" href="#pr-fails">When Greedy Fails</a>
-        <a class="toc-item" href="#sorting"
-          ><span class="toc-icon">&#128202;</span>Greedy by Sorting</a
+        <a class="toc-item" href="#twostrings"
+          ><span class="toc-icon">&#128290;</span>Two Strings, One Table</a
         >
-        <a class="toc-item" href="#reach"
-          ><span class="toc-icon">&#127950;</span>Greedy by Reach</a
+        <a class="toc-item toc-sub" href="#ts-lcs">Match / Mismatch</a>
+        <a class="toc-item toc-sub" href="#ts-edit">Edit Distance</a>
+        <a class="toc-item" href="#palindrome"
+          ><span class="toc-icon">&#128257;</span>Palindromes</a
         >
-        <a class="toc-item" href="#regret"
-          ><span class="toc-icon">&#128260;</span>Greedy with Regret</a
-        >
-        <a class="toc-item" href="#vs-dp"
-          ><span class="toc-icon">&#129518;</span>Greedy vs DP</a
+        <a class="toc-item" href="#rolling"
+          ><span class="toc-icon">&#127890;</span>Rolling the Table</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1441,11 +1439,11 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture21/lecture21_notes.html"
-          >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+        <a class="toc-item" href="../Lecture25/lecture25_notes.html"
+          >&larr; Lecture 25 &middot; Dynamic Programming I</a
         >
-        <a class="toc-item" href="../Lecture23/lecture23_notes.html"
-          >&rarr; Lecture 23 &middot; Divide &amp; Conquer</a
+        <a class="toc-item" href="../dsa_study_plan.html"
+          >&rarr; Lecture 27 &middot; coming soon</a
         >
         <a class="toc-item" href="../dsa_study_plan.html"
           >&uarr; All 38 lectures</a
@@ -1458,9 +1456,9 @@
       <div id="topbar">
         <div class="breadcrumb">
           <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
+          <a href="../dsa_study_plan.html#phase4">Phase 4</a
           ><span>&rsaquo;</span>
-          <span>Lecture 22 &mdash; Greedy Algorithms</span>
+          <span>Lecture 26 &mdash; Dynamic Programming II</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1478,18 +1476,21 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128161;</span>
-          <h1 class="page-title">Greedy Algorithms</h1>
+          <span class="page-emoji">&#129521;</span>
+          <h1 class="page-title">
+            Dynamic Programming II &mdash; Grids &amp; Strings
+          </h1>
           <p class="page-sub">
-            &ldquo;Take the best-looking step and never look back. The hard part
-            is not the code &mdash; it is knowing that you are allowed
-            to.&rdquo;
+            &ldquo;Two indices instead of one. Same four steps &mdash; but now
+            the loop order is part of the answer.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 22 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
-            <span class="meta-chip yellow">&#9201; 5 days</span>
-            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip accent">&#128218; Lecture 26 of 38</span>
+            <span class="meta-chip accent"
+              >Phase 4 &mdash; Dynamic Programming</span
+            >
+            <span class="meta-chip yellow">&#9201; 7 days</span>
+            <span class="meta-chip green">&#127919; 30 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
@@ -1502,357 +1503,308 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            You have already written greedy algorithms without calling them
-            that: sorting by end time in Lecture 21, Kadane&#39;s reset in
-            Lecture 8, the heap that always took the most frequent task in
-            Lecture 16. What those have in common is a decision made once and
-            never revisited. This lecture is about the hard half &mdash; knowing
-            which rule to be greedy about, and being able to say why it cannot
-            go wrong.
+            Two-dimensional DP is where the interview questions actually live.
+            Edit distance, longest common subsequence and the palindrome family
+            appear constantly &mdash; and all three come from the same
+            match/mismatch recurrence. The grid problems are the gentle way in:
+            the table <em>is</em> the grid, so you can see the dependencies
+            instead of imagining them.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>State the greedy-choice property and the exchange argument</li>
+            <li>Set up a 2D table and say which cells each entry depends on</li>
             <li>
-              Test a candidate rule against the inputs designed to break it
+              Choose the filling order &mdash; forwards, backwards, or by length
             </li>
             <li>
-              Recognise the three shapes: sort-then-take, reach, and regret
+              Derive LCS and edit distance from one match/mismatch template
             </li>
-            <li>
-              Say when a problem needs DP instead, and why greedy fails there
-            </li>
-            <li>
-              Write each pattern in a few lines, because the code is never the
-              hard part
-            </li>
+            <li>Handle palindromes by iterating over substring length</li>
+            <li>Roll a 2D table down to one or two rows</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="what">&#128161; What Greedy Actually Means</h2>
+        <h2 class="h1" id="grid">&#129521; The Grid Family</h2>
         <p>
-          A greedy algorithm builds an answer one step at a time. At each step
-          it applies a fixed rule &mdash; take the cheapest, the earliest, the
-          largest &mdash; and it <strong>never undoes</strong> a step. That is
-          the whole definition, and also the whole risk.
+          Start here because nothing is hidden: <code>dp[i][j]</code> is the
+          answer for the cell at row <code>i</code>, column <code>j</code>, and
+          the arrows point where you would expect.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Shape of Every Greedy
-              Solution</span
+              >&#128208; Pseudocode &middot; Paths Through a Grid</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>order the items by the rule           <span class="pc-cm">// the only creative step</span>
-answer ← empty
+          <pre><span class="pc-cm">// dp[i][j] = number of ways to reach cell (i, j) moving only right or down</span>
+dp ← m × n table of zeros
+dp[0][0] ← 1
 
-<span class="pc-kw">for</span> item <span class="pc-kw">in</span> items:
-    <span class="pc-kw">if</span> item still fits the constraints:
-        take it                       <span class="pc-cm">// irrevocably</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> grid[i][j] is an obstacle:
+            dp[i][j] ← 0                 <span class="pc-cm">// unreachable, and blocks everything behind it</span>
+        <span class="pc-kw">else</span>:
+            <span class="pc-kw">if</span> i &gt; 0: dp[i][j] ← dp[i][j] + dp[i-1][j]    <span class="pc-cm">// from above</span>
+            <span class="pc-kw">if</span> j &gt; 0: dp[i][j] ← dp[i][j] + dp[i][j-1]    <span class="pc-cm">// from the left</span>
 
-<span class="pc-kw">return</span> answer
+<span class="pc-kw">return</span> dp[m-1][n-1]
 
-<span class="pc-cm">// The code is five lines. Choosing the rule — and proving it — is the work.</span></pre>
+<span class="pc-cm">// Swap "+" for min() and add the cell's cost, and this is Minimum Path Sum.
+// Swap it for max() and it is the best-collectible-value problem.</span></pre>
         </div>
 
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Two properties have to hold.</strong>
-            <em>Greedy choice:</em> some optimal answer contains the choice your
-            rule makes first. <em>Optimal substructure:</em> after making it,
-            what remains is the same problem on a smaller input. Interval
-            scheduling has both. Making change with coins {1, 3, 4} has neither
-            &mdash; which is why 6 becomes 4+1+1 instead of 3+3.
-          </div>
-        </div>
-
-        <h2 class="h1" id="proof">&#9878;&#65039; Proving It Works</h2>
+        <h3 class="h2" id="g-order">Filling Order Is Part of the Recurrence</h3>
         <p>
-          In an interview you will not write a formal proof, but you will be
-          asked <em>&ldquo;why does that work?&rdquo;</em> There is one answer
-          that fits almost every greedy problem.
-        </p>
-
-        <h3 class="h2" id="pr-exchange">The Exchange Argument</h3>
-        <div class="callout yellow">
-          <span class="callout-icon">&#128270;</span>
-          <div class="callout-body">
-            <strong>The argument in three sentences.</strong> Suppose an optimal
-            answer disagrees with your first greedy choice. Swap your choice
-            into it, in place of whatever it used. Show the result is still
-            valid and no worse &mdash; so an optimal answer containing your
-            choice exists, and by repeating the argument, the whole greedy
-            answer is optimal.
-          </div>
-        </div>
-        <p>
-          For interval scheduling it reads: the optimal set&#39;s first meeting
-          ends no earlier than the earliest-ending meeting, so swapping yours in
-          cannot clash with anything that followed. Same size, still valid,
-          done.
-        </p>
-
-        <h3 class="h2" id="pr-fails">When Greedy Fails</h3>
-        <p>
-          Before trusting a rule, throw the standard counter-examples at it.
-          Most wrong greedy rules die to one of these four:
+          A cell may only be read after it has been written. Draw the arrows
+          once and the loop order follows.
         </p>
         <table>
           <thead>
             <tr>
-              <th>Trap</th>
+              <th>dp[i][j] depends on</th>
+              <th>Loop order</th>
               <th>Example</th>
-              <th>What breaks</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>A big item blocks two small ones</td>
-              <td>intervals [1, 10], [2, 3], [4, 5]</td>
-              <td>&ldquo;take the longest&rdquo; keeps 1 instead of 2</td>
+              <td>top and left</td>
+              <td>rows top to bottom, columns left to right</td>
+              <td>Unique Paths, Minimum Path Sum</td>
             </tr>
             <tr>
-              <td>A cheap step now costs more later</td>
-              <td>coins {1, 3, 4}, target 6</td>
-              <td>largest-first gives 3 coins, best is 2</td>
+              <td>bottom and right</td>
+              <td>rows bottom to top, columns right to left</td>
+              <td>Dungeon Game</td>
             </tr>
             <tr>
-              <td>Negative or zero values</td>
-              <td>weights that can reduce a total</td>
-              <td>&ldquo;always add&rdquo; stops being safe</td>
+              <td>the row above only</td>
+              <td>top to bottom; one row of memory is enough</td>
+              <td>Triangle, Minimum Falling Path Sum</td>
             </tr>
             <tr>
-              <td>A choice that must be undone</td>
-              <td>0/1 knapsack with tight capacity</td>
-              <td>needs DP: items interact</td>
+              <td>shorter substrings</td>
+              <td>by length, then by start index</td>
+              <td>palindromes, interval DP (Lecture 28)</td>
             </tr>
           </tbody>
         </table>
 
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong>The two-minute test.</strong> Write your rule down, then
-            spend two minutes trying to build a five-element input that beats
-            it. If you cannot, sketch the exchange argument and commit. If you
-            can, you have just saved yourself a wrong solution &mdash; and the
-            counter-example usually points straight at DP.
-          </div>
-        </div>
-
-        <h2 class="h1" id="sorting">
-          &#128202; Shape 1 &mdash; Sort, Then Take
-        </h2>
-        <p>
-          The most common shape. Put the items in the right order and a single
-          pass is the whole algorithm. Everything depends on the sort key.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Two-Pointer Matching (Assign
-              Cookies)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending;  sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
-
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:       <span class="pc-cm">// smallest cookie that satisfies the least greedy child</span>
-            fed ← fed + 1;  i ← i + 1
-        j ← j + 1                       <span class="pc-cm">// a cookie too small is wasted on everyone</span>
-    <span class="pc-kw">return</span> fed
-
-<span class="pc-cm">// Exchange argument: giving a child a bigger cookie than needed can only
-// hurt, since that cookie might have been the only one for someone else.</span></pre>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Sort key</th>
-              <th>Problem shape</th>
-              <th>Why that key</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>end time ascending</td>
-              <td>keep the most non-overlapping items</td>
-              <td>finishing early leaves the most room</td>
-            </tr>
-            <tr>
-              <td>value per unit, descending</td>
-              <td>fractional knapsack, units on a truck</td>
-              <td>every unit of capacity should carry the most</td>
-            </tr>
-            <tr>
-              <td>both arrays ascending</td>
-              <td>matching two sets (cookies, boats)</td>
-              <td>spend the smallest resource that still works</td>
-            </tr>
-            <tr>
-              <td>tallest first, then insert by index</td>
-              <td>queue reconstruction</td>
-              <td>shorter people do not disturb taller ones</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="h1" id="reach">&#127950; Shape 2 &mdash; Track the Reach</h2>
-        <p>
-          No sorting at all: scan left to right, keeping the furthest point you
-          could get to. The greedy choice is invisible &mdash; it is the
-          decision to only ever extend the frontier.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Minimum Jumps</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0
-    currentEnd ← 0        <span class="pc-cm">// the last index reachable with the jumps taken</span>
-    farthest ← 0          <span class="pc-cm">// the best we could reach with one more</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:            <span class="pc-cm">// the current jump is used up</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest      <span class="pc-cm">// commit to the best frontier we saw</span>
-    <span class="pc-kw">return</span> jumps
-
-<span class="pc-cm">// [2,3,1,1,4]: frontier 0→2, then 2→4 → 2 jumps.
-// You never choose WHICH index to jump to — only how far the level reaches.</span></pre>
-        </div>
-
+        <h3 class="h2" id="g-backwards">When Forwards Does Not Work</h3>
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>It is BFS in disguise.</strong> Each &ldquo;level&rdquo; is
-            the set of indices reachable with one more jump, and
-            <code>currentEnd</code> marks the end of the level &mdash; exactly
-            the ring-by-ring sweep from Lecture 17, done with two integers
-            instead of a queue.
+            <strong>Dungeon Game is the classic reversal.</strong> Walking
+            forwards, the health you need at a cell depends on what is still
+            ahead of you &mdash; information a forward pass does not have.
+            Define <code>dp[i][j]</code> as &ldquo;the minimum health needed
+            <em>on entering</em> this cell to survive to the end&rdquo; and fill
+            from the bottom-right corner instead. The lesson generalises: if the
+            recurrence needs the future, flip the direction.
           </div>
         </div>
 
+        <h2 class="h1" id="twostrings">&#128290; Two Strings, One Table</h2>
         <p>
-          The same frontier idea, differently dressed: Gas Station asks where a
-          circular tour can start. If the total gas is at least the total cost a
-          solution exists, and the only possible start is just after the point
-          where the running tank hits its lowest value.
+          Now the table is not a picture of anything.
+          <code>dp[i][j]</code> means &ldquo;the answer for the first
+          <code>i</code> characters of <code>a</code> and the first
+          <code>j</code> characters of <code>b</code>&rdquo;. Almost every
+          two-string problem uses the same skeleton.
         </p>
 
+        <h3 class="h2" id="ts-lcs">Match / Mismatch</h3>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Gas Station &mdash; Start at the
-              Valley</span
+              >&#128208; Pseudocode &middot; Longest Common Subsequence</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
+          <pre><span class="pc-cm">// dp[i][j] = LCS of a[0..i) and b[0..j).  Row 0 and column 0 mean "empty".</span>
+dp ← (n+1) × (m+1) table of zeros
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:                 <span class="pc-cm">// cannot reach i + 1 from the current start</span>
-            start ← i + 1              <span class="pc-cm">// so no station in between works either</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start</pre>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+        <span class="pc-kw">if</span> a[i-1] = b[j-1]:
+            dp[i][j] ← dp[i-1][j-1] + 1        <span class="pc-cm">// match: take it and step both back</span>
+        <span class="pc-kw">else</span>:
+            dp[i][j] ← max(dp[i-1][j], dp[i][j-1])   <span class="pc-cm">// drop one character, try both</span>
+
+<span class="pc-kw">return</span> dp[n][m]
+
+<span class="pc-cm">// The offset matters: dp indices count characters, string indices count
+// positions, so a[i-1] is "the i-th character".</span></pre>
         </div>
 
-        <h2 class="h1" id="regret">
-          &#128260; Shape 3 &mdash; Greedy with Regret
-        </h2>
         <p>
-          Sometimes you must take things as they arrive, and only later discover
-          you cannot afford them all. The fix is a heap: take everything, and
-          when a constraint breaks, give back the worst thing you have taken.
-          The decision is still never re-examined &mdash; only the worst item is
-          ever dropped.
+          Four well-known problems are this table with the answer read
+          differently:
         </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Course Schedule III</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending      <span class="pc-cm">// handle the most urgent first</span>
-    heap ← empty max-heap of durations
-    time ← 0
-
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration);  time ← time + duration    <span class="pc-cm">// take it first</span>
-
-        <span class="pc-kw">if</span> time &gt; deadline:                 <span class="pc-cm">// over budget — regret the longest course</span>
-            time ← time - heap.popMax()
-    <span class="pc-kw">return</span> heap.size
-
-<span class="pc-cm">// Dropping the longest course taken so far never reduces the count,
-// and always frees the most time. Same trick as Minimum Refueling Stops.</span></pre>
-        </div>
-
-        <h2 class="h1" id="vs-dp">&#129518; Greedy vs Dynamic Programming</h2>
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>Greedy</th>
-              <th>Dynamic programming</th>
+              <th>Problem</th>
+              <th>Change</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Decisions</td>
-              <td>one rule, never revisited</td>
-              <td>every option explored, best kept</td>
+              <td>Longest Common Subsequence</td>
+              <td>the table itself</td>
             </tr>
             <tr>
-              <td>Cost</td>
-              <td>usually O(n log n), often O(n)</td>
-              <td>states &times; transitions</td>
+              <td>Uncrossed Lines</td>
+              <td>identical &mdash; numbers instead of characters</td>
             </tr>
             <tr>
-              <td>Needs</td>
-              <td>greedy choice + optimal substructure</td>
-              <td>optimal substructure alone</td>
+              <td>Delete Operation for Two Strings</td>
+              <td><code>n + m &minus; 2 &times; LCS</code></td>
             </tr>
             <tr>
-              <td>Fails when</td>
-              <td>a local best blocks a better global answer</td>
-              <td>rarely &mdash; but may be too slow or too big</td>
-            </tr>
-            <tr>
-              <td>Example pair</td>
-              <td>fractional knapsack</td>
-              <td>0/1 knapsack (Lecture 27)</td>
+              <td>Maximum Length of Repeated Subarray</td>
+              <td>
+                reset to 0 on a mismatch &mdash; that makes it a
+                <em>substring</em>
+              </td>
             </tr>
           </tbody>
         </table>
+
+        <h3 class="h2" id="ts-edit">Edit Distance</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Edit Distance</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[i][j] = edits to turn a[0..i) into b[0..j)</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n: dp[i][0] ← i      <span class="pc-cm">// delete everything</span>
+<span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m: dp[0][j] ← j      <span class="pc-cm">// insert everything</span>
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+        <span class="pc-kw">if</span> a[i-1] = b[j-1]:
+            dp[i][j] ← dp[i-1][j-1]            <span class="pc-cm">// free — no edit needed</span>
+        <span class="pc-kw">else</span>:
+            dp[i][j] ← 1 + min(dp[i-1][j-1],   <span class="pc-cm">// replace</span>
+                               dp[i-1][j],     <span class="pc-cm">// delete from a</span>
+                               dp[i][j-1])     <span class="pc-cm">// insert into a</span>
+
+<span class="pc-kw">return</span> dp[n][m]</pre>
+        </div>
 
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>The tell.</strong> If taking an item can make a later,
-            better item unaffordable &mdash; and you cannot fix that by sorting
-            &mdash; greedy is wrong and DP is right. If the items never interact
-            except through one running quantity (time, capacity, reach), greedy
-            usually wins.
+            <strong>Know which neighbour is which edit.</strong> Diagonal =
+            replace (both strings advance), up = delete from the first string,
+            left = insert into it. Interviewers ask this, and it is also how you
+            reconstruct the actual edit sequence: walk backwards from
+            <code>dp[n][m]</code> and record which neighbour you came from.
+          </div>
+        </div>
+
+        <h2 class="h1" id="palindrome">
+          &#128257; Palindromes &mdash; Iterate by Length
+        </h2>
+        <p>
+          A palindrome table is indexed by <em>substring</em>:
+          <code>dp[i][j]</code> is a fact about <code>s[i..j]</code>. Its
+          recurrence looks inward, so neither row order nor column order works
+          &mdash; you must fill by increasing length.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Longest Palindromic
+              Subsequence</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[i][j] = longest palindromic subsequence inside s[i..j]</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← 1      <span class="pc-cm">// every single character</span>
+
+<span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:               <span class="pc-cm">// ← the loop that makes it work</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+        j ← i + len - 1
+        <span class="pc-kw">if</span> s[i] = s[j]:
+            dp[i][j] ← dp[i+1][j-1] + 2    <span class="pc-cm">// both ends join the palindrome</span>
+        <span class="pc-kw">else</span>:
+            dp[i][j] ← max(dp[i+1][j], dp[i][j-1])
+
+<span class="pc-kw">return</span> dp[0][n-1]
+
+<span class="pc-cm">// dp[i+1][j-1] is a SHORTER substring, so it must already be filled —
+// which is exactly what looping over length guarantees.</span></pre>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>One table, three questions.</strong> The same
+            <code>dp[i][j]</code> answers &ldquo;is <code>s[i..j]</code> a
+            palindrome?&rdquo; (boolean), &ldquo;how many palindromic substrings
+            are there?&rdquo; (count the trues) and &ldquo;how many characters
+            must I insert to make <code>s</code> a palindrome?&rdquo; (which is
+            <code>n &minus; longest palindromic subsequence</code>). Recognising
+            that last identity turns a Hard problem into a solved one.
+          </div>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Subsequence or substring?</strong> A subsequence may skip
+            characters; a substring may not. Longest Palindromic
+            <em>Substring</em> is better solved by expanding around each of the
+            2n&minus;1 centres in O(1) space (Lecture 8), while the
+            <em>subsequence</em> version needs this table. Read the word in the
+            title before choosing.
+          </div>
+        </div>
+
+        <h2 class="h1" id="rolling">&#127890; Rolling the Table</h2>
+        <p>
+          When <code>dp[i][j]</code> only reads row <code>i</code> and row
+          <code>i-1</code>, the rest of the table is dead weight. Two rows are
+          enough &mdash; sometimes one, if the overwrite order is chosen
+          carefully.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; LCS in O(min(n, m)) Space</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>prev ← array of m + 1 zeros
+curr ← array of m + 1 zeros
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+        <span class="pc-kw">if</span> a[i-1] = b[j-1]: curr[j] ← prev[j-1] + 1
+        <span class="pc-kw">else</span>: curr[j] ← max(prev[j], curr[j-1])
+    prev, curr ← curr, prev              <span class="pc-cm">// swap, then clear curr if needed</span>
+
+<span class="pc-kw">return</span> prev[m]
+
+<span class="pc-cm">// One-row version: keep a single array plus one saved diagonal value,
+// because prev[j-1] is destroyed as soon as curr[j-1] is written.</span></pre>
+        </div>
+
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
+          <div class="callout-body">
+            <strong>Rolling costs you the path.</strong> Reconstructing the
+            actual subsequence, alignment or route needs the whole table to walk
+            backwards through. If the problem asks for the answer&#39;s
+            <em>value</em>, roll; if it asks for the answer <em>itself</em>,
+            keep the table &mdash; or store parent pointers as you go.
           </div>
         </div>
 
@@ -1862,36 +1814,42 @@ answer ← empty
         <table>
           <thead>
             <tr>
-              <th>Shape</th>
+              <th>Family</th>
+              <th>States</th>
               <th>Time</th>
-              <th>Space</th>
-              <th>Typical problems</th>
+              <th>Space (rolled)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Sort, then one pass</td>
-              <td>O(n log n)</td>
-              <td>O(1)</td>
-              <td>Assign Cookies, Boats, Non-overlapping Intervals</td>
+              <td>Grid paths</td>
+              <td>m &times; n</td>
+              <td>O(m &middot; n)</td>
+              <td>O(n)</td>
             </tr>
             <tr>
-              <td>Track the reach</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Jump Game I / II, Gas Station</td>
+              <td>LCS / edit distance</td>
+              <td>n &times; m</td>
+              <td>O(n &middot; m)</td>
+              <td>O(min(n, m))</td>
             </tr>
             <tr>
-              <td>Greedy with regret (heap)</td>
-              <td>O(n log n)</td>
-              <td>O(n)</td>
-              <td>Course Schedule III, Refueling Stops</td>
+              <td>Palindrome table</td>
+              <td>n&sup2; substrings</td>
+              <td>O(n&sup2;)</td>
+              <td>O(n&sup2;) &mdash; rarely rollable</td>
             </tr>
             <tr>
-              <td>Counting greedy</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Lemonade Change, Valid Parenthesis String</td>
+              <td>Pattern matching (regex, wildcard)</td>
+              <td>n &times; m</td>
+              <td>O(n &middot; m)</td>
+              <td>O(m)</td>
+            </tr>
+            <tr>
+              <td>Longest path in a grid</td>
+              <td>m &times; n</td>
+              <td>O(m &middot; n)</td>
+              <td>O(m &middot; n) memo</td>
             </tr>
           </tbody>
         </table>
@@ -1906,36 +1864,37 @@ answer ← empty
           </thead>
           <tbody>
             <tr>
-              <td>Guessing the sort key</td>
-              <td>Passes the samples, fails hidden tests</td>
-              <td>Sketch the exchange argument before coding</td>
-            </tr>
-            <tr>
+              <td>Off-by-one between table and string indices</td>
+              <td>Answers short by one, or an index error</td>
               <td>
-                Sorting by start for a &ldquo;keep the most&rdquo; question
+                Table counts characters; compare <code>a[i-1]</code> with
+                <code>b[j-1]</code>
               </td>
-              <td>One long item blocks two short ones</td>
-              <td>Sort by end</td>
             </tr>
             <tr>
-              <td>Greedy where items interact</td>
-              <td>Answer is close but never optimal</td>
-              <td>Switch to DP &mdash; the counter-example shows why</td>
+              <td>Row 0 / column 0 left as zeros in edit distance</td>
+              <td>Turning a string into &ldquo;&rdquo; looks free</td>
+              <td>Seed them with <code>i</code> and <code>j</code></td>
             </tr>
             <tr>
-              <td>No feasibility check</td>
-              <td>Returns an answer where none exists</td>
-              <td>Test the total first (Gas Station, Taps)</td>
+              <td>Filling a palindrome table by row</td>
+              <td>Reads <code>dp[i+1][j-1]</code> before it exists</td>
+              <td>Loop over length, or start <code>i</code> from the end</td>
             </tr>
             <tr>
-              <td>Regret heap keyed on the wrong field</td>
-              <td>Drops an item that was not the costly one</td>
-              <td>The heap orders by what you want back, not by arrival</td>
+              <td>Obstacle cell left non-zero</td>
+              <td>Paths leak through walls</td>
+              <td>Set it to 0 and continue</td>
             </tr>
             <tr>
-              <td>Ties left to the default order</td>
-              <td>Unstable results on equal keys</td>
-              <td>Make the tie-break explicit in the comparator</td>
+              <td>Rolling one row without saving the diagonal</td>
+              <td>Uses the new value where the old was needed</td>
+              <td>Keep the previous <code>dp[i-1][j-1]</code> in a variable</td>
+            </tr>
+            <tr>
+              <td>Solving longest path with plain tabulation</td>
+              <td>Wrong results &mdash; the grid has no fixed order</td>
+              <td>Memoised DFS: the dependencies follow the values</td>
             </tr>
           </tbody>
         </table>
@@ -1943,398 +1902,40 @@ answer ← empty
         <div class="callout green">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong>
-            &ldquo;Maximum number of&hellip;&rdquo;, &ldquo;minimum steps
-            to&hellip;&rdquo;, &ldquo;can you finish&hellip;&rdquo; &mdash; with
-            no requirement to report the actual arrangement, and items that only
-            interact through one running quantity. Say the rule out loud, test
-            it against two adversarial inputs, then write the five lines.
+            <strong>How to spot it in an interview.</strong> Two sequences to
+            compare, a grid to cross, or one string examined as substrings. Say
+            what <code>dp[i][j]</code> means, then ask which cells it reads
+            &mdash; those two sentences decide the loops, and the rest is
+            typing.
           </div>
         </div>
 
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems across the three shapes. For each one, say the rule out
-          loud and try to break it before you write any code.
+          Six problems: a grid, the two string classics, a palindrome table, a
+          backwards fill and a pattern matcher. For each, say what
+          <code>dp[i][j]</code> means and which cells it reads.
         </p>
 
-        <!-- Problem 01: Assign Cookies -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Sort, Then Match</div>
-              <div class="prob-title">Assign Cookies</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/assign-cookies/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 455 - Assign Cookies</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Two-Pointer Matching</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each child has a greed factor and each cookie a size. A child is
-                content if the cookie is at least their greed. Maximise the
-                number of content children.
-              </p>
-              <div class="iobox">
-                greed = [1, 2, 3], cookies = [1, 1] → 1
-                &nbsp;&nbsp;|&nbsp;&nbsp; greed = [1, 2], cookies = [1, 2, 3] →
-                2
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Which cookie should go to the least greedy child? The
-                    smallest that works, or the largest?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sort both. Walk them with two pointers, giving the smallest
-                    cookie that satisfies the current child and skipping cookies
-                    that satisfy nobody.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The exchange argument: if an optimal solution gives a child a
-                larger cookie than needed, swapping in the smallest sufficient
-                one keeps everyone content and frees the larger cookie for
-                someone else. So the greedy match is never worse. Both pointers
-                only move forward, so after the sort it is one linear pass.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Smallest Sufficient
-                      Cookie</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending
-    sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
-
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:
-            fed ← fed + 1
-            i ← i + 1                 <span class="pc-cm">// this child is done</span>
-        j ← j + 1                     <span class="pc-cm">// the cookie is used or useless either way</span>
-    <span class="pc-kw">return</span> fed
-
-<span class="pc-cm">// greed [1,2,3], cookies [1,1]: cookie 1 feeds child 1; the second
-// cookie satisfies nobody → 1 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n + m log m)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 02: Lemonade Change -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Counting Greedy</div>
-              <div class="prob-title">Lemonade Change</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/lemonade-change/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 860 - Lemonade Change</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Spend the Largest First</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Customers pay with $5, $10 or $20 bills for a $5 drink. You
-                start with no change. Return true if you can serve everyone in
-                order.
-              </p>
-              <div class="iobox">
-                bills = [5, 5, 5, 10, 20] → true &nbsp;&nbsp;|&nbsp;&nbsp; bills
-                = [5, 5, 10, 10, 20] → false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    For a $20 you owe $15. Two ways to make it &mdash; which do
-                    you use?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Prefer a $10 plus a $5. Fives are useful for every kind of
-                    change, so keep as many as you can.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Only two counters are needed; twenties are never given as
-                change, so they are not worth tracking. The greedy rule is to
-                spend the least flexible bill first: a $10 can only ever be part
-                of $15, while a $5 can pay change for a $10 or a $20. Giving
-                away three fives when a ten was available is the classic
-                failure.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Counters</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> lemonadeChange(bills):
-    fives ← 0;  tens ← 0
-
-    <span class="pc-kw">for</span> bill <span class="pc-kw">in</span> bills:
-        <span class="pc-kw">if</span> bill = 5: fives ← fives + 1
-        <span class="pc-kw">else</span> <span class="pc-kw">if</span> bill = 10:
-            <span class="pc-kw">if</span> fives = 0: <span class="pc-kw">return</span> false
-            fives ← fives - 1;  tens ← tens + 1
-        <span class="pc-kw">else</span>:                              <span class="pc-cm">// a 20 needs 15 back</span>
-            <span class="pc-kw">if</span> tens &gt; 0 <span class="pc-kw">and</span> fives &gt; 0:
-                tens ← tens - 1;  fives ← fives - 1   <span class="pc-cm">// prefer 10 + 5</span>
-            <span class="pc-kw">else</span> <span class="pc-kw">if</span> fives ≥ 3:
-                fives ← fives - 3
-            <span class="pc-kw">else</span>: <span class="pc-kw">return</span> false
-    <span class="pc-kw">return</span> true</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 03: Jump Game II -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Track the Reach</div>
-              <div class="prob-title">Jump Game II</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/jump-game-ii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 45 - Jump Game II</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Frontier / Implicit BFS</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each <code>nums[i]</code> is the maximum jump length from index
-                <code>i</code>. Return the minimum number of jumps to reach the
-                last index (always possible).
-              </p>
-              <div class="iobox">
-                nums = [2, 3, 1, 1, 4] → 2 &nbsp;(index 0 → 1 → 4)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You never need to decide which index to land on. What do you
-                    actually need to track?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep the end of the current jump&rsquo;s range and the
-                    furthest index reachable with one more. When you hit the end
-                    of the range, take a jump and move the frontier out.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is breadth-first search with two integers instead of a
-                queue: each jump is one BFS level, and
-                <code>currentEnd</code> marks where that level stops. Because
-                you only ever extend the frontier, no backtracking is possible
-                &mdash; the greedy choice is to always jump to the level that
-                reaches furthest. Stop the loop at <code>n - 2</code> so
-                arriving exactly at the last index does not count an extra jump.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Level by Level</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0;  currentEnd ← 0;  farthest ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:          <span class="pc-cm">// this jump can go no further</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest
-    <span class="pc-kw">return</span> jumps
-
-<span class="pc-cm">// [2,3,1,1,4]: i=0 farthest=2, i=currentEnd → jump 1, end=2
-// i=1 farthest=4; i=2 = end → jump 2, end=4 → answer 2 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 04: Gas Station -->
+        <!-- Problem 01: Unique Paths II -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 04 &middot; Start at the Valley
+                Problem 01 &middot; Grid with Obstacles
               </div>
-              <div class="prob-title">Gas Station</div>
+              <div class="prob-title">Unique Paths II</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/gas-station/"
+                  href="https://leetcode.com/problems/unique-paths-ii/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 134 - Gas Station</a
+                  >&#128279; LC 63 - Unique Paths II</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Running Total + Restart</span>
+                <span class="tag tag-pat">Grid Path DP</span>
                 <span class="tag tag-co"
                   >Amazon &middot; Google &middot; Microsoft</span
                 >
@@ -2348,12 +1949,11 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Around a circular route, station <code>i</code> gives
-                <code>gas[i]</code> and driving to the next costs
-                <code>cost[i]</code>. Return the starting station that lets you
-                complete the circuit, or &minus;1.
+                Count the paths from the top-left to the bottom-right of a grid,
+                moving only right or down. Cells marked <code>1</code> are
+                obstacles.
               </p>
-              <div class="iobox">gas = [1,2,3,4,5], cost = [3,4,5,1,2] → 3</div>
+              <div class="iobox">grid = [[0,0,0],[0,1,0],[0,0,0]] → 2</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2364,8 +1964,9 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    First, when is the trip impossible at all? That question has
-                    nothing to do with the starting point.
+                    Without obstacles, every cell is the sum of the cell above
+                    and the cell to the left. What should an obstacle
+                    contribute?
                   </p>
                 </div>
               </details>
@@ -2376,9 +1977,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    If the tank goes negative somewhere, no station between the
-                    old start and that point can work either &mdash; so restart
-                    from the next station and reset the tank.
+                    Zero — it is unreachable, and it also blocks everything
+                    behind it automatically, because later cells read its zero.
                   </p>
                 </div>
               </details>
@@ -2386,11 +1986,12 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Two separate facts. Feasibility is global: if total gas is at
-                least total cost, some start works. Location is local: whenever
-                the running tank dips below zero, every station in the failed
-                stretch is also a failure, so the search can jump past all of
-                them. That is what makes it one pass instead of n simulations.
+                The obstacle case needs no special logic beyond setting the cell
+                to 0, which then propagates. The one trap is the starting cell:
+                if <code>grid[0][0]</code> is an obstacle the answer is 0, so
+                seed carefully. Because each row only reads the row above and
+                the cell to the left, a single rolling array of width
+                <code>n</code> is enough.
               </p>
             </div>
             <details>
@@ -2401,34 +2002,37 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Total + Restart Point</span
+                      >&#128208; Pseudocode &middot; Sum from Above and
+                      Left</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
+                  <pre><span class="pc-kw">function</span> uniquePathsWithObstacles(grid):
+    m ← rows(grid);  n ← cols(grid)
+    dp ← array of n zeros
+    <span class="pc-kw">if</span> grid[0][0] = 1: <span class="pc-kw">return</span> 0
+    dp[0] ← 1
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:
-            start ← i + 1              <span class="pc-cm">// skip the whole failed stretch</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+            <span class="pc-kw">if</span> grid[i][j] = 1:
+                dp[j] ← 0                      <span class="pc-cm">// blocked: nothing arrives here</span>
+            <span class="pc-kw">else</span> <span class="pc-kw">if</span> j &gt; 0:
+                dp[j] ← dp[j] + dp[j - 1]      <span class="pc-cm">// dp[j] is still the row above</span>
 
-<span class="pc-cm">// gains: -2, -2, -2, +3, +3 → total 0; tank dips at 0,1,2 → start = 3 ✓</span></pre>
+    <span class="pc-kw">return</span> dp[n - 1]
+
+<span class="pc-cm">// [[0,0,0],[0,1,0],[0,0,0]] → rows: [1,1,1] → [1,0,1] → [1,1,2] → 2 ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(m × n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2436,23 +2040,266 @@ answer ← empty
           </div>
         </div>
 
-        <!-- Problem 05: Queue Reconstruction by Height -->
+        <!-- Problem 02: Longest Common Subsequence -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Sort by Height</div>
-              <div class="prob-title">Queue Reconstruction by Height</div>
+              <div class="prob-num">Problem 02 &middot; Match / Mismatch</div>
+              <div class="prob-title">Longest Common Subsequence</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/queue-reconstruction-by-height/"
+                  href="https://leetcode.com/problems/longest-common-subsequence/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 406 - Queue Reconstruction by Height</a
+                  >&#128279; LC 1143 - Longest Common Subsequence</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Insert in the Right Order</span>
+                <span class="tag tag-pat">Two-String DP</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return the length of the longest subsequence present in both
+                strings. A subsequence keeps order but may skip characters.
+              </p>
+              <div class="iobox">
+                text1 = "abcde", text2 = "ace" → 3 &nbsp;("ace")
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Compare the last characters of the two prefixes. What are
+                    the only two cases?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    They match — take both and recurse on the shorter prefixes.
+                    They differ — drop the last character of one string or the
+                    other, and keep the better result.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This recurrence is the parent of half of Phase 4. The table has
+                an extra row and column for the empty prefixes, which removes
+                every boundary check. Mind the offset:
+                <code>dp[i][j]</code> talks about <em>i characters</em>, so the
+                characters compared are <code>a[i-1]</code> and
+                <code>b[j-1]</code>. Rolling two rows gives O(min(n, m)) space,
+                but keep the full table if the actual subsequence must be
+                reconstructed.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; The Two Cases</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> longestCommonSubsequence(a, b):
+    n ← length(a);  m ← length(b)
+    dp ← (n+1) × (m+1) table of zeros          <span class="pc-cm">// row/col 0 = empty prefix</span>
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+            <span class="pc-kw">if</span> a[i-1] = b[j-1]:
+                dp[i][j] ← dp[i-1][j-1] + 1
+            <span class="pc-kw">else</span>:
+                dp[i][j] ← max(dp[i-1][j], dp[i][j-1])
+
+    <span class="pc-kw">return</span> dp[n][m]
+
+<span class="pc-cm">// "abcde" vs "ace": matches at a, c, e → 3 ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n × m)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(min(n, m))</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Edit Distance -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Three Transitions</div>
+              <div class="prob-title">Edit Distance</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/edit-distance/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 72 - Edit Distance</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Two-String DP</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return the minimum number of insertions, deletions and
+                replacements needed to turn <code>word1</code> into
+                <code>word2</code>.
+              </p>
+              <div class="iobox">word1 = "horse", word2 = "ros" → 3</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Start from the ends. If the last characters match, what does
+                    that cost?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Nothing — move both back. Otherwise pay one edit and take
+                    the best of three moves: replace (diagonal), delete (up),
+                    insert (left).
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Same skeleton as LCS, with <code>min</code> instead of
+                <code>max</code> and real base cases: turning a prefix into the
+                empty string costs one deletion per character, so row 0 and
+                column 0 count up. Knowing which neighbour means which edit is
+                what lets you reconstruct the edit script &mdash; walk back from
+                <code>dp[n][m]</code> and note the direction you came from.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Replace, Delete,
+                      Insert</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> minDistance(a, b):
+    n ← length(a);  m ← length(b)
+    dp ← (n+1) × (m+1) table
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n: dp[i][0] ← i      <span class="pc-cm">// delete every character</span>
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m: dp[0][j] ← j      <span class="pc-cm">// insert every character</span>
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+            <span class="pc-kw">if</span> a[i-1] = b[j-1]:
+                dp[i][j] ← dp[i-1][j-1]                 <span class="pc-cm">// free</span>
+            <span class="pc-kw">else</span>:
+                dp[i][j] ← 1 + min(dp[i-1][j-1],        <span class="pc-cm">// replace</span>
+                                   dp[i-1][j],          <span class="pc-cm">// delete</span>
+                                   dp[i][j-1])          <span class="pc-cm">// insert</span>
+
+    <span class="pc-kw">return</span> dp[n][m]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n × m)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Longest Palindromic Subsequence -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Iterate by Length</div>
+              <div class="prob-title">Longest Palindromic Subsequence</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/longest-palindromic-subsequence/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 516 - Longest Palindromic Subsequence</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Substring DP</span>
                 <span class="tag tag-co"
                   >Amazon &middot; Google &middot; Meta</span
                 >
@@ -2466,13 +2313,12 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Each person is <code>[h, k]</code>: height <code>h</code>, with
-                exactly <code>k</code> people of height at least
-                <code>h</code> in front of them. Rebuild the queue.
+                Return the length of the longest palindromic subsequence of
+                <code>s</code>.
               </p>
               <div class="iobox">
-                people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]] →
-                [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+                s = "bbbab" → 4 &nbsp;("bbbb")&nbsp;&nbsp;|&nbsp;&nbsp; s =
+                "cbbd" → 2
               </div>
             </div>
             <div class="prob-section">
@@ -2484,8 +2330,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Whose position can you be certain about before placing
-                    anyone else?
+                    Look at the two ends of a substring. What happens when they
+                    are equal?
                   </p>
                 </div>
               </details>
@@ -2496,9 +2342,10 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Place the tallest first: for them, <code>k</code> is
-                    literally the index. Shorter people inserted later are
-                    invisible to them, so earlier placements never break.
+                    Both join the palindrome:
+                    <code>dp[i][j] = dp[i+1][j-1] + 2</code>. Otherwise drop one
+                    end or the other. Fill the table by increasing substring
+                    length so the inner values exist.
                   </p>
                 </div>
               </details>
@@ -2506,12 +2353,13 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Sort by height descending, and by <code>k</code> ascending
-                within the same height. Then insert each person at index
-                <code>k</code>. The invariant is what makes it work: everyone
-                already placed is at least as tall, so the count in front of
-                them is unaffected by a later, shorter insertion. It is a greedy
-                order plus a list insert, not a rearrangement.
+                Two teaching points. First, a shortcut: this is exactly the LCS
+                of <code>s</code> with its own reverse, so you could reuse the
+                previous problem wholesale. Second, the direct table &mdash;
+                which is the one worth writing &mdash; must be filled by length,
+                because <code>dp[i][j]</code> reads <code>dp[i+1][j-1]</code>, a
+                strictly shorter substring. Looping rows downward and columns
+                upward achieves the same order.
               </p>
             </div>
             <details>
@@ -2522,27 +2370,151 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Tallest First, Insert at
-                      k</span
+                      >&#128208; Pseudocode &middot; Ends In, By Length</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> reconstructQueue(people):
-    sort people by height DESCENDING, <span class="pc-kw">and</span> by k ASCENDING on ties
+                  <pre><span class="pc-kw">function</span> longestPalindromeSubseq(s):
+    n ← length(s)
+    dp ← n × n table of zeros
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← 1        <span class="pc-cm">// one character is a palindrome</span>
 
-    queue ← empty list
-    <span class="pc-kw">for</span> (h, k) <span class="pc-kw">in</span> people:
-        insert (h, k) into queue at index k     <span class="pc-cm">// everyone already there is ≥ h</span>
-    <span class="pc-kw">return</span> queue
+    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+            j ← i + len - 1
+            <span class="pc-kw">if</span> s[i] = s[j]:
+                dp[i][j] ← dp[i+1][j-1] + 2
+            <span class="pc-kw">else</span>:
+                dp[i][j] ← max(dp[i+1][j], dp[i][j-1])
 
-<span class="pc-cm">// [7,0] [7,1] [6,1] [5,0] [5,2] [4,4]
-// → [7,0]; [7,0][7,1]; [7,0][6,1][7,1]; [5,0] at 0; [5,2] at 2; [4,4] at 4</span></pre>
+    <span class="pc-kw">return</span> dp[0][n-1]
+
+<span class="pc-cm">// Minimum insertions to make s a palindrome = n − this answer.</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
                     ><span class="cx-val green">O(n²)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n²)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Dungeon Game -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Fill Backwards</div>
+              <div class="prob-title">Dungeon Game</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/dungeon-game/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 174 - Dungeon Game</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Reverse Grid DP</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A knight walks right and down through a grid of damage and
+                healing values. Return the smallest starting health that keeps
+                him above 0 the whole way.
+              </p>
+              <div class="iobox">
+                dungeon = [[-2,-3,3],[-5,-10,1],[10,30,-5]] → 7
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Try filling forwards and watch it fail: the health you need
+                    at a cell depends on what comes after it, not before.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Define <code>dp[i][j]</code> as the minimum health needed
+                    <em>on entering</em> that cell, and fill from the
+                    bottom-right corner backwards.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The reversal is the whole problem. Going backwards, the
+                requirement at a cell is
+                <code>max(1, min(right, down) − value)</code>: you need enough
+                to survive the best onward route, and never less than 1. Forward
+                accumulation cannot work, because a big reward early does not
+                license dying later. Pad the borders with infinity so the edges
+                need no special cases.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Bottom-Right to
+                      Top-Left</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> calculateMinimumHP(dungeon):
+    m ← rows;  n ← cols
+    dp ← (m+1) × (n+1) table filled with infinity
+    dp[m][n-1] ← 1;  dp[m-1][n] ← 1            <span class="pc-cm">// just past the exit: need 1 HP</span>
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> m - 1 <span class="pc-kw">down to</span> 0:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:
+            need ← min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j]
+            dp[i][j] ← max(1, need)            <span class="pc-cm">// never drop to 0 or below</span>
+
+    <span class="pc-kw">return</span> dp[0][0]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m × n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2554,23 +2526,23 @@ answer ← empty
           </div>
         </div>
 
-        <!-- Problem 06: Course Schedule III -->
+        <!-- Problem 06: Regular Expression Matching -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Greedy with Regret</div>
-              <div class="prob-title">Course Schedule III</div>
+              <div class="prob-num">Problem 06 &middot; Pattern Matching</div>
+              <div class="prob-title">Regular Expression Matching</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/course-schedule-iii/"
+                  href="https://leetcode.com/problems/regular-expression-matching/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 630 - Course Schedule III</a
+                  >&#128279; LC 10 - Regular Expression Matching</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Sort by Deadline + Max-Heap</span>
+                <span class="tag tag-pat">Two-String DP</span>
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
@@ -2584,12 +2556,13 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Each course takes <code>duration</code> days and must finish by
-                <code>deadline</code>. Starting at day 1 and taking courses one
-                at a time, return the maximum number you can complete.
+                Implement matching for <code>.</code> (any single character) and
+                <code>*</code> (zero or more of the preceding element). The
+                pattern must match the <em>entire</em> string.
               </p>
               <div class="iobox">
-                courses = [[100,200],[200,1300],[1000,1250],[2000,3200]] → 3
+                s = "aab", p = "c*a*b" → true &nbsp;&nbsp;|&nbsp;&nbsp; s =
+                "mississippi", p = "mis*is*p*." → false
               </div>
             </div>
             <div class="prob-section">
@@ -2601,8 +2574,9 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Process the courses in deadline order. What do you do when
-                    the next course pushes you past its deadline?
+                    <code>*</code> belongs to the character before it, so treat
+                    <code>x*</code> as one unit. What are that unit's two
+                    options?
                   </p>
                 </div>
               </details>
@@ -2613,9 +2587,9 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Take it anyway, then give back the longest course taken so
-                    far. Swapping a longer course for a shorter one keeps the
-                    count and frees time.
+                    Use it zero times — skip both pattern characters — or, if
+                    the current character matches, use it once more and keep the
+                    pattern where it is.
                   </p>
                 </div>
               </details>
@@ -2623,12 +2597,12 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The regret heap is the key idea. Sorting by deadline means every
-                course you have taken is still valid so far; when the total time
-                exceeds the current deadline, dropping the longest course taken
-                restores feasibility with the same number of courses and the
-                most time reclaimed. The count never decreases, so the final
-                heap size is the answer.
+                The table is the LCS skeleton with a third case. The subtle part
+                is the base row: a pattern like <code>a*b*c*</code> can match
+                the empty string, so <code>dp[0][j]</code> must be computed
+                rather than left false. Everything else falls out of the two
+                <code>*</code> options, and a plain character or
+                <code>.</code> just steps both indices back.
               </p>
             </div>
             <details>
@@ -2639,35 +2613,38 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Take, Then Regret</span
+                      >&#128208; Pseudocode &middot; Star as Zero or More</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending
-    heap ← empty max-heap of durations
-    time ← 0
+                  <pre><span class="pc-kw">function</span> isMatch(s, p):
+    n ← length(s);  m ← length(p)
+    dp ← (n+1) × (m+1) table of false
+    dp[0][0] ← true
 
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration)
-        time ← time + duration                 <span class="pc-cm">// optimistically take it</span>
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> m:                       <span class="pc-cm">// empty string vs patterns like a*b*</span>
+        <span class="pc-kw">if</span> p[j-1] = &#39;*&#39;: dp[0][j] ← dp[0][j-2]
 
-        <span class="pc-kw">if</span> time &gt; deadline:
-            time ← time - heap.popMax()        <span class="pc-cm">// undo the costliest choice</span>
-    <span class="pc-kw">return</span> heap.size
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
+            <span class="pc-kw">if</span> p[j-1] = &#39;*&#39;:
+                dp[i][j] ← dp[i][j-2]                        <span class="pc-cm">// zero occurrences</span>
+                <span class="pc-kw">if</span> p[j-2] = s[i-1] <span class="pc-kw">or</span> p[j-2] = &#39;.&#39;:
+                    dp[i][j] ← dp[i][j] <span class="pc-kw">or</span> dp[i-1][j]       <span class="pc-cm">// one more occurrence</span>
+            <span class="pc-kw">else</span> <span class="pc-kw">if</span> p[j-1] = s[i-1] <span class="pc-kw">or</span> p[j-1] = &#39;.&#39;:
+                dp[i][j] ← dp[i-1][j-1]
 
-<span class="pc-cm">// [100,200] ok; [1000,1250] ok (1100); [200,1300]: 1300 ≤ 1300 ok;
-// [2000,3200]: 3300 &gt; 3200 → drop 2000 → 3 courses ✓</span></pre>
+    <span class="pc-kw">return</span> dp[n][m]</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
+                    ><span class="cx-val green">O(n × m)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(n × m)</span>
                   </div>
                 </div>
               </div>
@@ -2681,13 +2658,13 @@ answer ← empty
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 22 Assignment &mdash; 25 Problems (8 Easy &middot; 13
-              Medium &middot; 4 Hard)</strong
+              >Lecture 26 Assignment &mdash; 30 Problems (10 Easy &middot; 15
+              Medium &middot; 5 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged, grouped by the
-            greedy shape it needs. Complete it before moving to Lecture 23.<br /><br />
+            table it needs. Complete it before moving to Lecture 27.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture22/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture26/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2704,79 +2681,79 @@ answer ← empty
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 23.</p>
+        <p>Check each item before advancing to Lecture 27.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can state the greedy choice property and optimal substructure in
-            my own words
+            I can state what dp[i][j] means and list the cells it depends on
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can give an exchange argument for interval scheduling
+            I can pick the loop order from the dependency arrows alone
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I test a candidate rule against adversarial inputs before coding it
+            I can write the match/mismatch recurrence without looking it up
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can name the three shapes and give a problem for each
+            I know which neighbour is insert, which is delete and which is
+            replace
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why Jump Game II is breadth-first search with two
-            integers
+            I fill palindrome tables by substring length, and can say why
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can use a heap to undo the worst choice without rethinking the
-            others
+            I can tell a substring problem from a subsequence problem instantly
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say which problems need DP instead, and show the input that
-            proves it
+            I can roll a 2D table to one or two rows, and know what that costs
+            me
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I completed all 25 assignment problems and can name the rule for
-            each
+            I completed all 30 assignment problems and can state the dp
+            definition for each
           </div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#128640;</span>
           <div class="callout-body">
-            <strong>You're ready for Lecture 23: Divide &amp; Conquer</strong
+            <strong
+              >You're ready for Lecture 27: Dynamic Programming III &mdash;
+              Knapsack &amp; Subsets</strong
             ><br />
-            Greedy commits to one path and never looks back. The next lecture
-            takes the opposite route: split the problem in half, solve both
-            sides, and spend the real work on combining them.
+            Coin Change let you reuse a coin as often as you liked. The next
+            lecture asks what changes when each item may be taken only once
+            &mdash; and the answer is one reversed loop.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture21/lecture21_notes.html"
-            >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+          <a href="../Lecture25/lecture25_notes.html"
+            >&larr; Lecture 25 &middot; Dynamic Programming I</a
           >
-          <a class="next" href="../Lecture23/lecture23_notes.html"
-            >Lecture 23 &middot; Divide &amp; Conquer &rarr;</a
+          <a class="next" href="../dsa_study_plan.html"
+            >Lecture 27 &middot; coming soon &rarr;</a
           >
         </div>
       </div>

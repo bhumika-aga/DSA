@@ -297,4 +297,4 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ---
 
-**← [Lecture 21 · Intervals & Sweep Line](../Lecture21/Assignment.md)** &nbsp;·&nbsp; **Lecture 23 · Divide & Conquer — coming soon →**
+**← [Lecture 21 · Intervals & Sweep Line](../Lecture21/Assignment.md)** &nbsp;·&nbsp; **[Lecture 23 · Divide & Conquer](../Lecture23/Assignment.md) →**

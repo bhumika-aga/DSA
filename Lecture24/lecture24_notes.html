@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 22 &mdash; Greedy Algorithms</title>
+    <title>Lecture 24 &mdash; Union-Find (Disjoint Set Union)</title>
     <meta
       name="description"
       content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
@@ -1396,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Greedy Algorithms</div>
+        <div class="sb-title">Union-Find (Disjoint Set Union)</div>
         <div class="sb-meta">
-          Lecture 22 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 24 of 38 &middot; Phase 3 &mdash; Core Patterns
         </div>
       </div>
       <div class="sb-scroll">
@@ -1406,25 +1406,26 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127757;</span>Introduction</a
         >
-        <a class="toc-item" href="#what"
-          ><span class="toc-icon">&#128161;</span>What Greedy Means</a
+        <a class="toc-item" href="#idea"
+          ><span class="toc-icon">&#128101;</span>Forests of Groups</a
         >
-        <a class="toc-item" href="#proof"
-          ><span class="toc-icon">&#9878;&#65039;</span>Proving It Works</a
+        <a class="toc-item" href="#optim"
+          ><span class="toc-icon">&#9889;</span>The Two Optimisations</a
         >
-        <a class="toc-item toc-sub" href="#pr-exchange">Exchange Argument</a>
-        <a class="toc-item toc-sub" href="#pr-fails">When Greedy Fails</a>
-        <a class="toc-item" href="#sorting"
-          ><span class="toc-icon">&#128202;</span>Greedy by Sorting</a
+        <a class="toc-item toc-sub" href="#op-compress">Path Compression</a>
+        <a class="toc-item toc-sub" href="#op-rank">Union by Size</a>
+        <a class="toc-item" href="#uses"
+          ><span class="toc-icon">&#129513;</span>What It Is For</a
         >
-        <a class="toc-item" href="#reach"
-          ><span class="toc-icon">&#127950;</span>Greedy by Reach</a
+        <a class="toc-item toc-sub" href="#u-cycle">Cycle Detection</a>
+        <a class="toc-item toc-sub" href="#u-keys"
+          >Uniting Things That Are Not Numbers</a
         >
-        <a class="toc-item" href="#regret"
-          ><span class="toc-icon">&#128260;</span>Greedy with Regret</a
+        <a class="toc-item" href="#weighted"
+          ><span class="toc-icon">&#9878;&#65039;</span>Weighted Union-Find</a
         >
-        <a class="toc-item" href="#vs-dp"
-          ><span class="toc-icon">&#129518;</span>Greedy vs DP</a
+        <a class="toc-item" href="#vs"
+          ><span class="toc-icon">&#128202;</span>DSU vs BFS/DFS</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1441,11 +1442,12 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture21/lecture21_notes.html"
-          >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
-        >
         <a class="toc-item" href="../Lecture23/lecture23_notes.html"
-          >&rarr; Lecture 23 &middot; Divide &amp; Conquer</a
+          >&larr; Lecture 23 &middot; Divide &amp; Conquer</a
+        >
+        <a class="toc-item" href="../Lecture25/lecture25_notes.html"
+          >&rarr; Lecture 25 &middot; Dynamic Programming I — Foundations &amp;
+          1D</a
         >
         <a class="toc-item" href="../dsa_study_plan.html"
           >&uarr; All 38 lectures</a
@@ -1460,7 +1462,7 @@
           <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
           <a href="../dsa_study_plan.html#phase3">Phase 3</a
           ><span>&rsaquo;</span>
-          <span>Lecture 22 &mdash; Greedy Algorithms</span>
+          <span>Lecture 24 &mdash; Union-Find (Disjoint Set Union)</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1478,18 +1480,17 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128161;</span>
-          <h1 class="page-title">Greedy Algorithms</h1>
+          <span class="page-emoji">&#128279;</span>
+          <h1 class="page-title">Union-Find (Disjoint Set Union)</h1>
           <p class="page-sub">
-            &ldquo;Take the best-looking step and never look back. The hard part
-            is not the code &mdash; it is knowing that you are allowed
-            to.&rdquo;
+            &ldquo;Two arrays and ten lines of code that answer &lsquo;are these
+            two in the same group?&rsquo; faster than you can ask.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 22 of 38</span>
+            <span class="meta-chip accent">&#128218; Lecture 24 of 38</span>
             <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
-            <span class="meta-chip yellow">&#9201; 5 days</span>
-            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 20 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
@@ -1502,345 +1503,208 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            You have already written greedy algorithms without calling them
-            that: sorting by end time in Lecture 21, Kadane&#39;s reset in
-            Lecture 8, the heap that always took the most frequent task in
-            Lecture 16. What those have in common is a decision made once and
-            never revisited. This lecture is about the hard half &mdash; knowing
-            which rule to be greedy about, and being able to say why it cannot
-            go wrong.
+            Lecture 17 counted connected components with DFS, and Kruskal&#39;s
+            algorithm quietly borrowed a structure it never explained. This is
+            that structure. DFS answers connectivity for a graph that has
+            stopped changing; Union-Find answers it while edges are still
+            arriving, in near-constant time per query &mdash; and it is short
+            enough to write from memory under interview pressure.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>State the greedy-choice property and the exchange argument</li>
+            <li>Write find and union with both optimisations, from memory</li>
             <li>
-              Test a candidate rule against the inputs designed to break it
+              Explain path compression and union by size, and what each one
+              fixes
             </li>
             <li>
-              Recognise the three shapes: sort-then-take, reach, and regret
+              Detect a cycle in an undirected graph with one pass of unions
             </li>
             <li>
-              Say when a problem needs DP instead, and why greedy fails there
+              Union things that are not integers &mdash; strings, emails,
+              coordinates
             </li>
-            <li>
-              Write each pattern in a few lines, because the code is never the
-              hard part
-            </li>
+            <li>Choose between Union-Find and DFS for a given problem</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="what">&#128161; What Greedy Actually Means</h2>
+        <h2 class="h1" id="idea">&#128101; A Forest of Groups</h2>
         <p>
-          A greedy algorithm builds an answer one step at a time. At each step
-          it applies a fixed rule &mdash; take the cheapest, the earliest, the
-          largest &mdash; and it <strong>never undoes</strong> a step. That is
-          the whole definition, and also the whole risk.
+          Every element starts alone. Each group is a tree, and the group is
+          identified by its root &mdash; not by anything meaningful, just
+          &ldquo;whoever is at the top&rdquo;. Two elements are in the same
+          group exactly when they reach the same root.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Shape of Every Greedy
-              Solution</span
+              >&#128208; Pseudocode &middot; The Naive Version</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>order the items by the rule           <span class="pc-cm">// the only creative step</span>
-answer ← empty
+          <pre>parent ← array where parent[i] = i      <span class="pc-cm">// everyone is their own root</span>
 
-<span class="pc-kw">for</span> item <span class="pc-kw">in</span> items:
-    <span class="pc-kw">if</span> item still fits the constraints:
-        take it                       <span class="pc-cm">// irrevocably</span>
+<span class="pc-kw">function</span> find(x):
+    <span class="pc-kw">while</span> parent[x] ≠ x: x ← parent[x]   <span class="pc-cm">// walk up to the root</span>
+    <span class="pc-kw">return</span> x
 
-<span class="pc-kw">return</span> answer
+<span class="pc-kw">function</span> union(a, b):
+    ra ← find(a);  rb ← find(b)
+    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false          <span class="pc-cm">// already together</span>
+    parent[ra] ← rb                      <span class="pc-cm">// hang one root under the other</span>
+    <span class="pc-kw">return</span> true
 
-<span class="pc-cm">// The code is five lines. Choosing the rule — and proving it — is the work.</span></pre>
+<span class="pc-cm">// Correct, but a long chain makes find() O(n) — one union at a time can
+// build 1 → 2 → 3 → ... → n. The next section fixes exactly that.</span></pre>
+        </div>
+
+        <div class="ascii-tree">
+          union(1,2) union(3,4) union(2,4) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; 1
+          &rarr; 2 &rarr; 4 &nbsp;&nbsp; 3 &rarr; 4 &nbsp;&nbsp;&nbsp; root of
+          everything = 4 &nbsp;|&nbsp; find(1) walks 1 &rarr; 2 &rarr; 4
+        </div>
+
+        <h2 class="h1" id="optim">&#9889; The Two Optimisations</h2>
+        <p>
+          Both are one line each, and together they take the cost of an
+          operation from O(n) to almost O(1). Write both, always &mdash; there
+          is no reason not to.
+        </p>
+
+        <h3 class="h2" id="op-compress">Path Compression</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; find, with Compression</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> find(x):
+    <span class="pc-kw">if</span> parent[x] ≠ x:
+        parent[x] ← find(parent[x])      <span class="pc-cm">// point straight at the root on the way back</span>
+    <span class="pc-kw">return</span> parent[x]
+
+<span class="pc-cm">// Iterative version, if recursion depth is a worry:
+// root ← x; while parent[root] ≠ root: root ← parent[root]
+// while parent[x] ≠ root: parent[x], x ← root, parent[x]</span></pre>
+        </div>
+        <p>
+          Every node touched by a lookup is re-pointed at the root, so the same
+          walk is never paid for twice. The tree flattens as you use it.
+        </p>
+
+        <h3 class="h2" id="op-rank">Union by Size (or Rank)</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; union, by Size</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>size ← array of 1s                       <span class="pc-cm">// how many nodes each root owns</span>
+components ← n                           <span class="pc-cm">// handy free statistic</span>
+
+<span class="pc-kw">function</span> union(a, b):
+    ra ← find(a);  rb ← find(b)
+    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false
+
+    <span class="pc-kw">if</span> size[ra] &lt; size[rb]: swap ra, rb    <span class="pc-cm">// always attach the smaller tree</span>
+    parent[rb] ← ra
+    size[ra] ← size[ra] + size[rb]
+    components ← components - 1
+    <span class="pc-kw">return</span> true</pre>
         </div>
 
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>Two properties have to hold.</strong>
-            <em>Greedy choice:</em> some optimal answer contains the choice your
-            rule makes first. <em>Optimal substructure:</em> after making it,
-            what remains is the same problem on a smaller input. Interval
-            scheduling has both. Making change with coins {1, 3, 4} has neither
-            &mdash; which is why 6 becomes 4+1+1 instead of 3+3.
+            <strong>Why &ldquo;smaller under larger&rdquo;?</strong> A
+            node&#39;s depth only grows when its tree is the one being attached.
+            Attaching the smaller tree means a node&#39;s depth can increase
+            only when its group at least doubles in size &mdash; so no node is
+            ever deeper than log&#8322;n, even before compression.
           </div>
         </div>
 
-        <h2 class="h1" id="proof">&#9878;&#65039; Proving It Works</h2>
-        <p>
-          In an interview you will not write a formal proof, but you will be
-          asked <em>&ldquo;why does that work?&rdquo;</em> There is one answer
-          that fits almost every greedy problem.
-        </p>
-
-        <h3 class="h2" id="pr-exchange">The Exchange Argument</h3>
         <div class="callout yellow">
-          <span class="callout-icon">&#128270;</span>
+          <span class="callout-icon">&#128207;</span>
           <div class="callout-body">
-            <strong>The argument in three sentences.</strong> Suppose an optimal
-            answer disagrees with your first greedy choice. Swap your choice
-            into it, in place of whatever it used. Show the result is still
-            valid and no worse &mdash; so an optimal answer containing your
-            choice exists, and by repeating the argument, the whole greedy
-            answer is optimal.
+            <strong>The complexity, honestly.</strong> With both optimisations,
+            m operations on n elements cost O(m &middot; &alpha;(n)), where
+            &alpha; is the inverse Ackermann function. For any n you can write
+            down &mdash; including the number of atoms in the universe &mdash;
+            &alpha;(n) &le; 4. Treat it as constant, and say &ldquo;amortised
+            near-constant, inverse Ackermann&rdquo; when asked.
           </div>
         </div>
+
+        <h2 class="h1" id="uses">&#129513; What It Is Actually For</h2>
         <p>
-          For interval scheduling it reads: the optimal set&#39;s first meeting
-          ends no earlier than the earliest-ending meeting, so swapping yours in
-          cannot clash with anything that followed. Same size, still valid,
-          done.
+          Three questions, all answered by the same ten lines: how many groups
+          are there, are these two together, and does this new edge close a
+          cycle.
         </p>
 
-        <h3 class="h2" id="pr-fails">When Greedy Fails</h3>
+        <h3 class="h2" id="u-cycle">Cycle Detection</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Redundant Edge</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// In an undirected graph, an edge whose endpoints are ALREADY connected
+// must close a cycle.</span>
+dsu ← new DSU(n)
+<span class="pc-kw">for</span> (a, b) <span class="pc-kw">in</span> edges:
+    <span class="pc-kw">if</span> <span class="pc-kw">not</span> dsu.union(a, b):
+        <span class="pc-kw">return</span> (a, b)                  <span class="pc-cm">// the first edge that connects two connected nodes</span>
+
+<span class="pc-cm">// This is also the whole of Kruskal's MST from Lecture 17: sort the edges
+// by weight and keep the ones whose union succeeds.</span></pre>
+        </div>
+
+        <h3 class="h2" id="u-keys">Uniting Things That Are Not Numbers</h3>
         <p>
-          Before trusting a rule, throw the standard counter-examples at it.
-          Most wrong greedy rules die to one of these four:
+          DSU indexes an array, so anything else needs a mapping first. That
+          mapping is usually the interesting half of the problem.
         </p>
         <table>
           <thead>
             <tr>
-              <th>Trap</th>
-              <th>Example</th>
-              <th>What breaks</th>
+              <th>Problem</th>
+              <th>What gets united</th>
+              <th>The mapping trick</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>A big item blocks two small ones</td>
-              <td>intervals [1, 10], [2, 3], [4, 5]</td>
-              <td>&ldquo;take the longest&rdquo; keeps 1 instead of 2</td>
+              <td>Accounts Merge</td>
+              <td>email addresses</td>
+              <td>map each email to an id; union all emails of one account</td>
             </tr>
             <tr>
-              <td>A cheap step now costs more later</td>
-              <td>coins {1, 3, 4}, target 6</td>
-              <td>largest-first gives 3 coins, best is 2</td>
+              <td>Equality Equations</td>
+              <td>lowercase letters</td>
+              <td>
+                26 slots; union on <code>==</code>, then check every
+                <code>!=</code>
+              </td>
             </tr>
             <tr>
-              <td>Negative or zero values</td>
-              <td>weights that can reduce a total</td>
-              <td>&ldquo;always add&rdquo; stops being safe</td>
+              <td>Most Stones Removed</td>
+              <td>rows and columns</td>
+              <td>
+                union row <code>r</code> with column <code>~c</code>, so the two
+                spaces never collide
+              </td>
             </tr>
             <tr>
-              <td>A choice that must be undone</td>
-              <td>0/1 knapsack with tight capacity</td>
-              <td>needs DP: items interact</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong>The two-minute test.</strong> Write your rule down, then
-            spend two minutes trying to build a five-element input that beats
-            it. If you cannot, sketch the exchange argument and commit. If you
-            can, you have just saved yourself a wrong solution &mdash; and the
-            counter-example usually points straight at DP.
-          </div>
-        </div>
-
-        <h2 class="h1" id="sorting">
-          &#128202; Shape 1 &mdash; Sort, Then Take
-        </h2>
-        <p>
-          The most common shape. Put the items in the right order and a single
-          pass is the whole algorithm. Everything depends on the sort key.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Two-Pointer Matching (Assign
-              Cookies)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending;  sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
-
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:       <span class="pc-cm">// smallest cookie that satisfies the least greedy child</span>
-            fed ← fed + 1;  i ← i + 1
-        j ← j + 1                       <span class="pc-cm">// a cookie too small is wasted on everyone</span>
-    <span class="pc-kw">return</span> fed
-
-<span class="pc-cm">// Exchange argument: giving a child a bigger cookie than needed can only
-// hurt, since that cookie might have been the only one for someone else.</span></pre>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Sort key</th>
-              <th>Problem shape</th>
-              <th>Why that key</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>end time ascending</td>
-              <td>keep the most non-overlapping items</td>
-              <td>finishing early leaves the most room</td>
-            </tr>
-            <tr>
-              <td>value per unit, descending</td>
-              <td>fractional knapsack, units on a truck</td>
-              <td>every unit of capacity should carry the most</td>
-            </tr>
-            <tr>
-              <td>both arrays ascending</td>
-              <td>matching two sets (cookies, boats)</td>
-              <td>spend the smallest resource that still works</td>
-            </tr>
-            <tr>
-              <td>tallest first, then insert by index</td>
-              <td>queue reconstruction</td>
-              <td>shorter people do not disturb taller ones</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="h1" id="reach">&#127950; Shape 2 &mdash; Track the Reach</h2>
-        <p>
-          No sorting at all: scan left to right, keeping the furthest point you
-          could get to. The greedy choice is invisible &mdash; it is the
-          decision to only ever extend the frontier.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Minimum Jumps</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0
-    currentEnd ← 0        <span class="pc-cm">// the last index reachable with the jumps taken</span>
-    farthest ← 0          <span class="pc-cm">// the best we could reach with one more</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:            <span class="pc-cm">// the current jump is used up</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest      <span class="pc-cm">// commit to the best frontier we saw</span>
-    <span class="pc-kw">return</span> jumps
-
-<span class="pc-cm">// [2,3,1,1,4]: frontier 0→2, then 2→4 → 2 jumps.
-// You never choose WHICH index to jump to — only how far the level reaches.</span></pre>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>It is BFS in disguise.</strong> Each &ldquo;level&rdquo; is
-            the set of indices reachable with one more jump, and
-            <code>currentEnd</code> marks the end of the level &mdash; exactly
-            the ring-by-ring sweep from Lecture 17, done with two integers
-            instead of a queue.
-          </div>
-        </div>
-
-        <p>
-          The same frontier idea, differently dressed: Gas Station asks where a
-          circular tour can start. If the total gas is at least the total cost a
-          solution exists, and the only possible start is just after the point
-          where the running tank hits its lowest value.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Gas Station &mdash; Start at the
-              Valley</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:                 <span class="pc-cm">// cannot reach i + 1 from the current start</span>
-            start ← i + 1              <span class="pc-cm">// so no station in between works either</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start</pre>
-        </div>
-
-        <h2 class="h1" id="regret">
-          &#128260; Shape 3 &mdash; Greedy with Regret
-        </h2>
-        <p>
-          Sometimes you must take things as they arrive, and only later discover
-          you cannot afford them all. The fix is a heap: take everything, and
-          when a constraint breaks, give back the worst thing you have taken.
-          The decision is still never re-examined &mdash; only the worst item is
-          ever dropped.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Course Schedule III</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending      <span class="pc-cm">// handle the most urgent first</span>
-    heap ← empty max-heap of durations
-    time ← 0
-
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration);  time ← time + duration    <span class="pc-cm">// take it first</span>
-
-        <span class="pc-kw">if</span> time &gt; deadline:                 <span class="pc-cm">// over budget — regret the longest course</span>
-            time ← time - heap.popMax()
-    <span class="pc-kw">return</span> heap.size
-
-<span class="pc-cm">// Dropping the longest course taken so far never reduces the count,
-// and always frees the most time. Same trick as Minimum Refueling Stops.</span></pre>
-        </div>
-
-        <h2 class="h1" id="vs-dp">&#129518; Greedy vs Dynamic Programming</h2>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Greedy</th>
-              <th>Dynamic programming</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Decisions</td>
-              <td>one rule, never revisited</td>
-              <td>every option explored, best kept</td>
-            </tr>
-            <tr>
-              <td>Cost</td>
-              <td>usually O(n log n), often O(n)</td>
-              <td>states &times; transitions</td>
-            </tr>
-            <tr>
-              <td>Needs</td>
-              <td>greedy choice + optimal substructure</td>
-              <td>optimal substructure alone</td>
-            </tr>
-            <tr>
-              <td>Fails when</td>
-              <td>a local best blocks a better global answer</td>
-              <td>rarely &mdash; but may be too slow or too big</td>
-            </tr>
-            <tr>
-              <td>Example pair</td>
-              <td>fractional knapsack</td>
-              <td>0/1 knapsack (Lecture 27)</td>
+              <td>Regions Cut By Slashes</td>
+              <td>quarters of a cell</td>
+              <td>
+                split each cell into 4 triangles, union across the borders
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1848,11 +1712,99 @@ answer ← empty
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>The tell.</strong> If taking an item can make a later,
-            better item unaffordable &mdash; and you cannot fix that by sorting
-            &mdash; greedy is wrong and DP is right. If the items never interact
-            except through one running quantity (time, capacity, reach), greedy
-            usually wins.
+            <strong>Two id spaces, one array.</strong> When you union two kinds
+            of thing (rows and columns, people and groups), give each kind its
+            own range of indices &mdash; <code>row r</code> at
+            <code>r</code> and <code>column c</code> at <code>n + c</code>, for
+            example. Overlapping the ranges silently merges unrelated things,
+            and the answer comes out too small.
+          </div>
+        </div>
+
+        <h2 class="h1" id="weighted">&#9878;&#65039; Weighted Union-Find</h2>
+        <p>
+          A variation worth knowing: store a value on each edge to the parent,
+          so the structure answers <em>relations</em> rather than just
+          membership. Evaluate Division is the classic &mdash; if a/b = 2 and
+          b/c = 3, then a/c = 6.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; DSU with Ratios</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>parent ← map from name to name
+ratio ← map from name to number          <span class="pc-cm">// value of this node ÷ value of its parent</span>
+
+<span class="pc-kw">function</span> find(x):                       <span class="pc-cm">// returns (root, x ÷ root)</span>
+    <span class="pc-kw">if</span> parent[x] = x: <span class="pc-kw">return</span> (x, 1)
+    (root, r) ← find(parent[x])
+    parent[x] ← root                     <span class="pc-cm">// compress</span>
+    ratio[x] ← ratio[x] × r              <span class="pc-cm">// and fix the stored ratio to match</span>
+    <span class="pc-kw">return</span> (root, ratio[x])
+
+<span class="pc-kw">function</span> union(a, b, value):             <span class="pc-cm">// a ÷ b = value</span>
+    (ra, va) ← find(a);  (rb, vb) ← find(b)
+    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span>
+    parent[ra] ← rb
+    ratio[ra] ← value × vb ÷ va
+
+<span class="pc-cm">// query(a, b): same root → ratio[a] ÷ ratio[b]; different roots → unknown</span></pre>
+        </div>
+
+        <h2 class="h1" id="vs">&#128202; DSU vs BFS / DFS</h2>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Union-Find</th>
+              <th>BFS / DFS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Edges arrive over time</td>
+              <td>&#9989; natural &mdash; union as they come</td>
+              <td>&#10060; rebuild the traversal each time</td>
+            </tr>
+            <tr>
+              <td>&ldquo;Are these two connected?&rdquo; queries</td>
+              <td>&#9989; near O(1) each</td>
+              <td>O(V + E) per query</td>
+            </tr>
+            <tr>
+              <td>Shortest path</td>
+              <td>&#10060; knows groups, not distances</td>
+              <td>&#9989; BFS</td>
+            </tr>
+            <tr>
+              <td>Which nodes are in my component</td>
+              <td>needs a second pass to list them</td>
+              <td>&#9989; the traversal visits them</td>
+            </tr>
+            <tr>
+              <td>Directed graphs</td>
+              <td>&#10060; union is symmetric</td>
+              <td>&#9989; DFS with colours</td>
+            </tr>
+            <tr>
+              <td>Removing edges</td>
+              <td>&#10060; &mdash; process in reverse instead</td>
+              <td>&#9989; rebuild</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>When edges disappear, run time backwards.</strong> DSU
+            cannot split a group. Problems that remove things &mdash; bricks
+            falling, islands sinking &mdash; are solved by processing the
+            removals in reverse, so every step becomes an addition. That trick
+            turns several Hard problems into ordinary ones.
           </div>
         </div>
 
@@ -1862,36 +1814,36 @@ answer ← empty
         <table>
           <thead>
             <tr>
-              <th>Shape</th>
-              <th>Time</th>
-              <th>Space</th>
-              <th>Typical problems</th>
+              <th>Version</th>
+              <th>find</th>
+              <th>union</th>
+              <th>Notes</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Sort, then one pass</td>
-              <td>O(n log n)</td>
-              <td>O(1)</td>
-              <td>Assign Cookies, Boats, Non-overlapping Intervals</td>
+              <td>Naive parent array</td>
+              <td>O(n)</td>
+              <td>O(n)</td>
+              <td>a chain of unions degenerates to a linked list</td>
             </tr>
             <tr>
-              <td>Track the reach</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Jump Game I / II, Gas Station</td>
+              <td>Union by size only</td>
+              <td>O(log n)</td>
+              <td>O(log n)</td>
+              <td>depth is bounded by doubling</td>
             </tr>
             <tr>
-              <td>Greedy with regret (heap)</td>
-              <td>O(n log n)</td>
-              <td>O(n)</td>
-              <td>Course Schedule III, Refueling Stops</td>
+              <td>Path compression only</td>
+              <td>O(log n) amortised</td>
+              <td>O(log n)</td>
+              <td>flattens as it is used</td>
             </tr>
             <tr>
-              <td>Counting greedy</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Lemonade Change, Valid Parenthesis String</td>
+              <td><strong>Both</strong></td>
+              <td><strong>O(&alpha;(n))</strong></td>
+              <td><strong>O(&alpha;(n))</strong></td>
+              <td>at most 4 for any real input</td>
             </tr>
           </tbody>
         </table>
@@ -1906,36 +1858,41 @@ answer ← empty
           </thead>
           <tbody>
             <tr>
-              <td>Guessing the sort key</td>
-              <td>Passes the samples, fails hidden tests</td>
-              <td>Sketch the exchange argument before coding</td>
+              <td>
+                Comparing <code>parent[a]</code> with <code>parent[b]</code>
+              </td>
+              <td>Elements in one group look separate</td>
+              <td>
+                Always compare <code>find(a)</code> with <code>find(b)</code>
+              </td>
+            </tr>
+            <tr>
+              <td>Attaching a node instead of its root</td>
+              <td>The structure stops being a forest</td>
+              <td>Union works on roots only</td>
+            </tr>
+            <tr>
+              <td>Overlapping id ranges</td>
+              <td>Unrelated things merge; count too low</td>
+              <td>Offset the second kind of id</td>
             </tr>
             <tr>
               <td>
-                Sorting by start for a &ldquo;keep the most&rdquo; question
+                Counting components by scanning
+                <code>parent[i] == i</code> mid-run
               </td>
-              <td>One long item blocks two short ones</td>
-              <td>Sort by end</td>
+              <td>Wrong count if compression has not run</td>
+              <td>Keep a counter, decremented on each successful union</td>
             </tr>
             <tr>
-              <td>Greedy where items interact</td>
-              <td>Answer is close but never optimal</td>
-              <td>Switch to DP &mdash; the counter-example shows why</td>
+              <td>Expecting a group to split</td>
+              <td>Deletions give nonsense</td>
+              <td>Process the operations in reverse</td>
             </tr>
             <tr>
-              <td>No feasibility check</td>
-              <td>Returns an answer where none exists</td>
-              <td>Test the total first (Gas Station, Taps)</td>
-            </tr>
-            <tr>
-              <td>Regret heap keyed on the wrong field</td>
-              <td>Drops an item that was not the costly one</td>
-              <td>The heap orders by what you want back, not by arrival</td>
-            </tr>
-            <tr>
-              <td>Ties left to the default order</td>
-              <td>Unstable results on equal keys</td>
-              <td>Make the tie-break explicit in the comparator</td>
+              <td>Recursive find on a deep chain</td>
+              <td>Stack overflow before compression kicks in</td>
+              <td>Use the iterative find, or union by size</td>
             </tr>
           </tbody>
         </table>
@@ -1943,39 +1900,41 @@ answer ← empty
         <div class="callout green">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong>
-            &ldquo;Maximum number of&hellip;&rdquo;, &ldquo;minimum steps
-            to&hellip;&rdquo;, &ldquo;can you finish&hellip;&rdquo; &mdash; with
-            no requirement to report the actual arrangement, and items that only
-            interact through one running quantity. Say the rule out loud, test
-            it against two adversarial inputs, then write the five lines.
+            <strong>How to spot it in an interview.</strong> &ldquo;Are these
+            two connected?&rdquo;, &ldquo;how many groups?&rdquo;, &ldquo;merge
+            these accounts&rdquo;, &ldquo;which edge creates a cycle?&rdquo;, or
+            edges that arrive one at a time. If the question also needs paths or
+            distances, it is BFS instead &mdash; and if things get removed,
+            reverse the timeline and use DSU anyway.
           </div>
         </div>
 
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems across the three shapes. For each one, say the rule out
-          loud and try to break it before you write any code.
+          Six problems: the same ten lines each time. What changes is what you
+          decide to union &mdash; nodes, letters, emails, rows, or ratios.
         </p>
 
-        <!-- Problem 01: Assign Cookies -->
+        <!-- Problem 01: Redundant Connection -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Sort, Then Match</div>
-              <div class="prob-title">Assign Cookies</div>
+              <div class="prob-num">Problem 01 &middot; Cycle Detection</div>
+              <div class="prob-title">Redundant Connection</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/assign-cookies/"
+                  href="https://leetcode.com/problems/redundant-connection/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 455 - Assign Cookies</a
+                  >&#128279; LC 684 - Redundant Connection</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Two-Pointer Matching</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Union-Find</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -1986,15 +1945,11 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Each child has a greed factor and each cookie a size. A child is
-                content if the cookie is at least their greed. Maximise the
-                number of content children.
+                A tree with <code>n</code> nodes had one extra edge added.
+                Return the edge that can be removed so the graph is a tree
+                again; if several work, return the last one in the input.
               </p>
-              <div class="iobox">
-                greed = [1, 2, 3], cookies = [1, 1] → 1
-                &nbsp;&nbsp;|&nbsp;&nbsp; greed = [1, 2], cookies = [1, 2, 3] →
-                2
-              </div>
+              <div class="iobox">edges = [[1,2],[1,3],[2,3]] → [2,3]</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2005,8 +1960,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Which cookie should go to the least greedy child? The
-                    smallest that works, or the largest?
+                    What is special about an edge whose two endpoints are
+                    already connected?
                   </p>
                 </div>
               </details>
@@ -2017,9 +1972,9 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Sort both. Walk them with two pointers, giving the smallest
-                    cookie that satisfies the current child and skipping cookies
-                    that satisfy nobody.
+                    Union the edges in order. The first union that fails &mdash;
+                    both endpoints already share a root &mdash; is the redundant
+                    edge.
                   </p>
                 </div>
               </details>
@@ -2027,11 +1982,11 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The exchange argument: if an optimal solution gives a child a
-                larger cookie than needed, swapping in the smallest sufficient
-                one keeps everyone content and frees the larger cookie for
-                someone else. So the greedy match is never worse. Both pointers
-                only move forward, so after the sort it is one linear pass.
+                The canonical first Union-Find problem. Processing edges in
+                order means the first failing union is also the last edge of the
+                cycle in input order, which is exactly what the problem asks
+                for. No graph is ever built: the DSU alone answers it in one
+                pass, at near-constant cost per edge.
               </p>
             </div>
             <details>
@@ -2042,154 +1997,38 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Smallest Sufficient
-                      Cookie</span
+                      >&#128208; Pseudocode &middot; Union Until One Fails</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending
-    sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
+                  <pre><span class="pc-kw">function</span> findRedundantConnection(edges):
+    n ← length(edges)
+    parent ← array 0..n where parent[i] = i
+    size ← array of 1s
 
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:
-            fed ← fed + 1
-            i ← i + 1                 <span class="pc-cm">// this child is done</span>
-        j ← j + 1                     <span class="pc-cm">// the cookie is used or useless either way</span>
-    <span class="pc-kw">return</span> fed
+    <span class="pc-kw">for</span> (a, b) <span class="pc-kw">in</span> edges:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> union(a, b): <span class="pc-kw">return</span> (a, b)   <span class="pc-cm">// already connected → closes a cycle</span>
 
-<span class="pc-cm">// greed [1,2,3], cookies [1,1]: cookie 1 feeds child 1; the second
-// cookie satisfies nobody → 1 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n + m log m)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
+<span class="pc-kw">function</span> find(x):
+    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent[x])
+    <span class="pc-kw">return</span> parent[x]
 
-        <!-- Problem 02: Lemonade Change -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Counting Greedy</div>
-              <div class="prob-title">Lemonade Change</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/lemonade-change/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 860 - Lemonade Change</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Spend the Largest First</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Customers pay with $5, $10 or $20 bills for a $5 drink. You
-                start with no change. Return true if you can serve everyone in
-                order.
-              </p>
-              <div class="iobox">
-                bills = [5, 5, 5, 10, 20] → true &nbsp;&nbsp;|&nbsp;&nbsp; bills
-                = [5, 5, 10, 10, 20] → false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    For a $20 you owe $15. Two ways to make it &mdash; which do
-                    you use?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Prefer a $10 plus a $5. Fives are useful for every kind of
-                    change, so keep as many as you can.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Only two counters are needed; twenties are never given as
-                change, so they are not worth tracking. The greedy rule is to
-                spend the least flexible bill first: a $10 can only ever be part
-                of $15, while a $5 can pay change for a $10 or a $20. Giving
-                away three fives when a ten was available is the classic
-                failure.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Counters</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> lemonadeChange(bills):
-    fives ← 0;  tens ← 0
-
-    <span class="pc-kw">for</span> bill <span class="pc-kw">in</span> bills:
-        <span class="pc-kw">if</span> bill = 5: fives ← fives + 1
-        <span class="pc-kw">else</span> <span class="pc-kw">if</span> bill = 10:
-            <span class="pc-kw">if</span> fives = 0: <span class="pc-kw">return</span> false
-            fives ← fives - 1;  tens ← tens + 1
-        <span class="pc-kw">else</span>:                              <span class="pc-cm">// a 20 needs 15 back</span>
-            <span class="pc-kw">if</span> tens &gt; 0 <span class="pc-kw">and</span> fives &gt; 0:
-                tens ← tens - 1;  fives ← fives - 1   <span class="pc-cm">// prefer 10 + 5</span>
-            <span class="pc-kw">else</span> <span class="pc-kw">if</span> fives ≥ 3:
-                fives ← fives - 3
-            <span class="pc-kw">else</span>: <span class="pc-kw">return</span> false
+<span class="pc-kw">function</span> union(a, b):
+    ra ← find(a);  rb ← find(b)
+    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> size[ra] &lt; size[rb]: swap ra, rb
+    parent[rb] ← ra;  size[ra] ← size[ra] + size[rb]
     <span class="pc-kw">return</span> true</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(n α(n))</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2197,380 +2036,23 @@ answer ← empty
           </div>
         </div>
 
-        <!-- Problem 03: Jump Game II -->
+        <!-- Problem 02: Satisfiability of Equality Equations -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Track the Reach</div>
-              <div class="prob-title">Jump Game II</div>
+              <div class="prob-num">Problem 02 &middot; Union on Letters</div>
+              <div class="prob-title">Satisfiability of Equality Equations</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/jump-game-ii/"
+                  href="https://leetcode.com/problems/satisfiability-of-equality-equations/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 45 - Jump Game II</a
+                  >&#128279; LC 990 - Satisfiability of Equality Equations</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Frontier / Implicit BFS</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each <code>nums[i]</code> is the maximum jump length from index
-                <code>i</code>. Return the minimum number of jumps to reach the
-                last index (always possible).
-              </p>
-              <div class="iobox">
-                nums = [2, 3, 1, 1, 4] → 2 &nbsp;(index 0 → 1 → 4)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You never need to decide which index to land on. What do you
-                    actually need to track?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep the end of the current jump&rsquo;s range and the
-                    furthest index reachable with one more. When you hit the end
-                    of the range, take a jump and move the frontier out.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is breadth-first search with two integers instead of a
-                queue: each jump is one BFS level, and
-                <code>currentEnd</code> marks where that level stops. Because
-                you only ever extend the frontier, no backtracking is possible
-                &mdash; the greedy choice is to always jump to the level that
-                reaches furthest. Stop the loop at <code>n - 2</code> so
-                arriving exactly at the last index does not count an extra jump.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Level by Level</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0;  currentEnd ← 0;  farthest ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:          <span class="pc-cm">// this jump can go no further</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest
-    <span class="pc-kw">return</span> jumps
-
-<span class="pc-cm">// [2,3,1,1,4]: i=0 farthest=2, i=currentEnd → jump 1, end=2
-// i=1 farthest=4; i=2 = end → jump 2, end=4 → answer 2 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 04: Gas Station -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 04 &middot; Start at the Valley
-              </div>
-              <div class="prob-title">Gas Station</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/gas-station/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 134 - Gas Station</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Running Total + Restart</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Around a circular route, station <code>i</code> gives
-                <code>gas[i]</code> and driving to the next costs
-                <code>cost[i]</code>. Return the starting station that lets you
-                complete the circuit, or &minus;1.
-              </p>
-              <div class="iobox">gas = [1,2,3,4,5], cost = [3,4,5,1,2] → 3</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    First, when is the trip impossible at all? That question has
-                    nothing to do with the starting point.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    If the tank goes negative somewhere, no station between the
-                    old start and that point can work either &mdash; so restart
-                    from the next station and reset the tank.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two separate facts. Feasibility is global: if total gas is at
-                least total cost, some start works. Location is local: whenever
-                the running tank dips below zero, every station in the failed
-                stretch is also a failure, so the search can jump past all of
-                them. That is what makes it one pass instead of n simulations.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Total + Restart Point</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:
-            start ← i + 1              <span class="pc-cm">// skip the whole failed stretch</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start
-
-<span class="pc-cm">// gains: -2, -2, -2, +3, +3 → total 0; tank dips at 0,1,2 → start = 3 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 05: Queue Reconstruction by Height -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Sort by Height</div>
-              <div class="prob-title">Queue Reconstruction by Height</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/queue-reconstruction-by-height/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 406 - Queue Reconstruction by Height</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Insert in the Right Order</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each person is <code>[h, k]</code>: height <code>h</code>, with
-                exactly <code>k</code> people of height at least
-                <code>h</code> in front of them. Rebuild the queue.
-              </p>
-              <div class="iobox">
-                people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]] →
-                [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Whose position can you be certain about before placing
-                    anyone else?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Place the tallest first: for them, <code>k</code> is
-                    literally the index. Shorter people inserted later are
-                    invisible to them, so earlier placements never break.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Sort by height descending, and by <code>k</code> ascending
-                within the same height. Then insert each person at index
-                <code>k</code>. The invariant is what makes it work: everyone
-                already placed is at least as tall, so the count in front of
-                them is unaffected by a later, shorter insertion. It is a greedy
-                order plus a list insert, not a rearrangement.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Tallest First, Insert at
-                      k</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> reconstructQueue(people):
-    sort people by height DESCENDING, <span class="pc-kw">and</span> by k ASCENDING on ties
-
-    queue ← empty list
-    <span class="pc-kw">for</span> (h, k) <span class="pc-kw">in</span> people:
-        insert (h, k) into queue at index k     <span class="pc-cm">// everyone already there is ≥ h</span>
-    <span class="pc-kw">return</span> queue
-
-<span class="pc-cm">// [7,0] [7,1] [6,1] [5,0] [5,2] [4,4]
-// → [7,0]; [7,0][7,1]; [7,0][6,1][7,1]; [5,0] at 0; [5,2] at 2; [4,4] at 4</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n²)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 06: Course Schedule III -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Greedy with Regret</div>
-              <div class="prob-title">Course Schedule III</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/course-schedule-iii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 630 - Course Schedule III</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Sort by Deadline + Max-Heap</span>
+                <span class="tag tag-pat">Union, Then Verify</span>
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
@@ -2584,12 +2066,13 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Each course takes <code>duration</code> days and must finish by
-                <code>deadline</code>. Starting at day 1 and taking courses one
-                at a time, return the maximum number you can complete.
+                Given equations like <code>"a==b"</code> and
+                <code>"b!=c"</code> over single lowercase letters, return true
+                if some assignment satisfies all of them.
               </p>
               <div class="iobox">
-                courses = [[100,200],[200,1300],[1000,1250],[2000,3200]] → 3
+                ["a==b","b!=a"] → false &nbsp;&nbsp;|&nbsp;&nbsp;
+                ["a==b","b==c","a==c"] → true
               </div>
             </div>
             <div class="prob-section">
@@ -2601,8 +2084,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Process the courses in deadline order. What do you do when
-                    the next course pushes you past its deadline?
+                    Equality is transitive; inequality is not. Which one should
+                    build the groups?
                   </p>
                 </div>
               </details>
@@ -2613,9 +2096,9 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Take it anyway, then give back the longest course taken so
-                    far. Swapping a longer course for a shorter one keeps the
-                    count and frees time.
+                    Two passes. First union every <code>==</code> pair. Then
+                    check every <code>!=</code> pair: if both sides share a
+                    root, the constraints contradict each other.
                   </p>
                 </div>
               </details>
@@ -2623,12 +2106,12 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The regret heap is the key idea. Sorting by deadline means every
-                course you have taken is still valid so far; when the total time
-                exceeds the current deadline, dropping the longest course taken
-                restores feasibility with the same number of courses and the
-                most time reclaimed. The count never decreases, so the final
-                heap size is the answer.
+                The order matters and the reason is worth saying out loud:
+                equality is an equivalence relation, so it can be merged
+                incrementally, while <code>!=</code> is only a test. Doing both
+                in one pass would let a later equality invalidate an inequality
+                you already accepted. Only 26 slots are needed, so the DSU is an
+                array of 26.
               </p>
             </div>
             <details>
@@ -2639,26 +2122,148 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Take, Then Regret</span
+                      >&#128208; Pseudocode &middot; Merge Equalities
+                      First</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending
-    heap ← empty max-heap of durations
-    time ← 0
+                  <pre><span class="pc-kw">function</span> equationsPossible(equations):
+    dsu ← new DSU(26)
 
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration)
-        time ← time + duration                 <span class="pc-cm">// optimistically take it</span>
+    <span class="pc-kw">for</span> eq <span class="pc-kw">in</span> equations:                    <span class="pc-cm">// pass 1: build the groups</span>
+        <span class="pc-kw">if</span> eq[1] = &#39;=&#39;:
+            dsu.union(index(eq[0]), index(eq[3]))
 
-        <span class="pc-kw">if</span> time &gt; deadline:
-            time ← time - heap.popMax()        <span class="pc-cm">// undo the costliest choice</span>
-    <span class="pc-kw">return</span> heap.size
+    <span class="pc-kw">for</span> eq <span class="pc-kw">in</span> equations:                    <span class="pc-cm">// pass 2: test the rest</span>
+        <span class="pc-kw">if</span> eq[1] = &#39;!&#39;:
+            <span class="pc-kw">if</span> dsu.find(index(eq[0])) = dsu.find(index(eq[3])):
+                <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> true</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n α(26))</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
 
-<span class="pc-cm">// [100,200] ok; [1000,1250] ok (1100); [200,1300]: 1300 ≤ 1300 ok;
-// [2000,3200]: 3300 &gt; 3200 → drop 2000 → 3 courses ✓</span></pre>
+        <!-- Problem 03: Accounts Merge -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Union on Strings</div>
+              <div class="prob-title">Accounts Merge</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/accounts-merge/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 721 - Accounts Merge</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Map to Ids, Then Union</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Each account is a name plus a list of emails. Two accounts
+                belong to the same person if they share any email. Merge them
+                and return each person&rsquo;s sorted email list.
+              </p>
+              <div class="iobox">
+                [["John","a@x","b@x"],["John","b@x","c@x"],["Mary","m@x"]] →
+                John: [a@x, b@x, c@x]; Mary: [m@x]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Union-Find works on integers. What has to happen to the
+                    emails first?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Give every distinct email an id, and remember which name it
+                    belongs to. Within one account, union the first email with
+                    each of the others; then group the emails by root.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two maps carry the problem: email to id, and email to owner
+                name. Uniting each account&rsquo;s emails to its first email
+                links every account that shares any address, however long the
+                chain. Grouping by root and sorting each list gives the output;
+                the name comes from any member, since all of them agree.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Emails to Ids</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> accountsMerge(accounts):
+    id ← empty map;  owner ← empty map
+    <span class="pc-kw">for</span> account <span class="pc-kw">in</span> accounts:
+        <span class="pc-kw">for</span> email <span class="pc-kw">in</span> account.emails:
+            <span class="pc-kw">if</span> email <span class="pc-kw">not</span> <span class="pc-kw">in</span> id: id[email] ← size(id)
+            owner[email] ← account.name
+
+    dsu ← new DSU(size(id))
+    <span class="pc-kw">for</span> account <span class="pc-kw">in</span> accounts:
+        first ← id[account.emails[0]]
+        <span class="pc-kw">for</span> email <span class="pc-kw">in</span> account.emails:
+            dsu.union(first, id[email])          <span class="pc-cm">// one account = one group</span>
+
+    groups ← empty map                            <span class="pc-cm">// root → emails</span>
+    <span class="pc-kw">for</span> email <span class="pc-kw">in</span> id:
+        groups[dsu.find(id[email])].append(email)
+
+    <span class="pc-kw">return</span> for each group: [owner of any member] + sorted(emails)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2675,19 +2280,399 @@ answer ← empty
           </div>
         </div>
 
+        <!-- Problem 04: Most Stones Removed with Same Row or Column -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Two Id Spaces</div>
+              <div class="prob-title">
+                Most Stones Removed with Same Row or Column
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 947 - Most Stones Removed with Same Row or
+                  Column</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Union Rows with Columns</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Stones sit on a grid. A stone may be removed if it shares a row
+                or column with another remaining stone. Return the largest
+                number of stones that can be removed.
+              </p>
+              <div class="iobox">
+                stones = [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]] → 5
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Think about one connected group of stones. How many of them
+                    can you remove?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    All but one &mdash; so the answer is
+                    <code>stones − components</code>. Build the components by
+                    uniting each stone&rsquo;s row with its column.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two ideas. The counting argument (a group of size k loses k−1
+                stones, because removals can always be ordered to leave one
+                behind) turns the problem into counting components. Then the
+                modelling trick: union row <code>r</code> with column
+                <code>c</code>, keeping the two kinds of id in separate ranges
+                &mdash; <code>10000 + c</code>, or <code>~c</code> &mdash; so a
+                row never collides with a column.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Rows and Columns as
+                      Nodes</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> removeStones(stones):
+    dsu ← new DSU over a map of ids            <span class="pc-cm">// ids created on demand</span>
+
+    <span class="pc-kw">for</span> (r, c) <span class="pc-kw">in</span> stones:
+        dsu.union(rowId(r), colId(c))          <span class="pc-cm">// colId offset so the spaces never overlap</span>
+
+    roots ← empty set
+    <span class="pc-kw">for</span> (r, c) <span class="pc-kw">in</span> stones:
+        roots.add(dsu.find(rowId(r)))          <span class="pc-cm">// one root per component of stones</span>
+
+    <span class="pc-kw">return</span> length(stones) - size(roots)
+
+<span class="pc-cm">// 6 stones forming 1 component → 6 − 1 = 5 removable ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n α(n))</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Evaluate Division -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Weighted DSU</div>
+              <div class="prob-title">Evaluate Division</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/evaluate-division/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 399 - Evaluate Division</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Union-Find with Ratios</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given equations like <code>a / b = 2.0</code>, answer queries
+                such as <code>a / c</code>. Return &minus;1 when the answer
+                cannot be determined.
+              </p>
+              <div class="iobox">
+                equations a/b = 2, b/c = 3 · queries a/c → 6.0, c/a → 0.333, x/x
+                → -1.0
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Variables in the same group have a fixed ratio to each
+                    other. Where can that ratio be stored?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    On the edge to the parent: <code>ratio[x]</code> is the
+                    value of <code>x</code> divided by the value of its root.
+                    Multiply the ratios as <code>find</code> compresses the
+                    path.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is Union-Find carrying data. Each node stores its value
+                relative to the root; when path compression re-points a node at
+                the root, the stored ratio must be multiplied by its old
+                parent&rsquo;s ratio to stay correct. A query on two variables
+                with the same root is a division of their stored ratios, and
+                different roots (or an unknown variable) means &minus;1. Build
+                with a DFS over an explicit graph if the weighted version feels
+                risky under pressure.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Ratios on the Edges</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>parent ← map name → name;  ratio ← map name → number
+
+<span class="pc-kw">function</span> find(x):                      <span class="pc-cm">// returns (root, x ÷ root)</span>
+    <span class="pc-kw">if</span> parent[x] = x: <span class="pc-kw">return</span> (x, 1)
+    (root, r) ← find(parent[x])
+    parent[x] ← root
+    ratio[x] ← ratio[x] × r             <span class="pc-cm">// keep the stored ratio consistent</span>
+    <span class="pc-kw">return</span> (root, ratio[x])
+
+<span class="pc-kw">function</span> union(a, b, value):            <span class="pc-cm">// a ÷ b = value</span>
+    (ra, va) ← find(a);  (rb, vb) ← find(b)
+    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span>
+    parent[ra] ← rb
+    ratio[ra] ← value × vb ÷ va
+
+<span class="pc-kw">function</span> query(a, b):
+    <span class="pc-kw">if</span> a <span class="pc-kw">not</span> <span class="pc-kw">in</span> parent <span class="pc-kw">or</span> b <span class="pc-kw">not</span> <span class="pc-kw">in</span> parent: <span class="pc-kw">return</span> -1
+    (ra, va) ← find(a);  (rb, vb) ← find(b)
+    <span class="pc-kw">if</span> ra ≠ rb: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">return</span> va ÷ vb</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O((n + q) α(n))</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Checking Existence of Edge Length Limited Paths -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Offline Queries</div>
+              <div class="prob-title">
+                Checking Existence of Edge Length Limited Paths
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1697 - Checking Existence of Edge Length Limited
+                  Paths</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Sort Edges + Sort Queries</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For each query <code>[p, q, limit]</code>, answer whether a path
+                exists between <code>p</code> and <code>q</code> using only
+                edges strictly shorter than <code>limit</code>.
+              </p>
+              <div class="iobox">
+                n = 3, edges = [[0,1,2],[1,2,4],[2,0,8]], queries =
+                [[0,1,2],[0,2,5]] → [false, true]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Answering each query on its own means rebuilding the graph
+                    every time. What if the queries did not have to be answered
+                    in order?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Sort the edges by weight and the queries by limit. Sweep
+                    both: add every edge below the current limit, then answer
+                    the query with a single connectivity check.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The <em>offline</em> trick: nothing says you must answer queries
+                in the order given. Keep each query&rsquo;s original index, sort
+                everything by weight, and let the DSU grow monotonically as the
+                limit rises &mdash; each edge is added once across all queries.
+                Union-Find is the right structure precisely because edges only
+                ever get added, never removed.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sweep Both Sorted
+                      Lists</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> distanceLimitedPathsExist(n, edges, queries):
+    sort edges by weight ascending
+    tagged ← queries, each remembering its original index
+    sort tagged by limit ascending
+
+    dsu ← new DSU(n)
+    answer ← array of length(queries)
+    i ← 0
+
+    <span class="pc-kw">for</span> (p, q, limit, index) <span class="pc-kw">in</span> tagged:
+        <span class="pc-kw">while</span> i &lt; length(edges) <span class="pc-kw">and</span> edges[i].weight &lt; limit:
+            dsu.union(edges[i].a, edges[i].b)      <span class="pc-cm">// every edge added once, ever</span>
+            i ← i + 1
+        answer[index] ← (dsu.find(p) = dsu.find(q))
+
+    <span class="pc-kw">return</span> answer</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(E log E + Q log Q)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n + Q)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
         <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
         <div class="callout orange" style="margin: 14px 0">
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 22 Assignment &mdash; 25 Problems (8 Easy &middot; 13
+              >Lecture 24 Assignment &mdash; 20 Problems (6 Easy &middot; 10
               Medium &middot; 4 Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by the
-            greedy shape it needs. Complete it before moving to Lecture 23.<br /><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by what
+            gets united. Complete it before moving to Phase 4.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture22/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture24/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2704,79 +2689,82 @@ answer ← empty
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 23.</p>
+        <p>Check each item before advancing to Lecture 25.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can state the greedy choice property and optimal substructure in
-            my own words
+            I can write find and union with both optimisations from memory
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can give an exchange argument for interval scheduling
+            I can explain path compression and union by size, and what each one
+            fixes
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I test a candidate rule against adversarial inputs before coding it
+            I can say what &alpha;(n) means and why it behaves like a constant
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can name the three shapes and give a problem for each
+            I detect a cycle with a failed union, and recognise Kruskal's
+            algorithm as the same loop
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why Jump Game II is breadth-first search with two
-            integers
+            I can map non-integer things &mdash; emails, letters, rows and
+            columns &mdash; onto DSU indices without collisions
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can use a heap to undo the worst choice without rethinking the
-            others
+            I can choose between Union-Find and BFS/DFS and justify it
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say which problems need DP instead, and show the input that
-            proves it
+            I know to reverse the timeline when things are removed rather than
+            added
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I completed all 25 assignment problems and can name the rule for
-            each
+            I completed all 20 assignment problems and can say what each one
+            unites
           </div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>You're ready for Lecture 23: Divide &amp; Conquer</strong
+            <strong
+              >Phase 3 complete &mdash; next up, Phase 4: Dynamic
+              Programming</strong
             ><br />
-            Greedy commits to one path and never looks back. The next lecture
-            takes the opposite route: split the problem in half, solve both
-            sides, and spend the real work on combining them.
+            Seven lectures of reusable techniques are behind you. Phase 4 starts
+            with the one topic that decides most interviews: recognising
+            overlapping subproblems, and turning recursion into a table.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture21/lecture21_notes.html"
-            >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+          <a href="../Lecture23/lecture23_notes.html"
+            >&larr; Lecture 23 &middot; Divide &amp; Conquer</a
           >
-          <a class="next" href="../Lecture23/lecture23_notes.html"
-            >Lecture 23 &middot; Divide &amp; Conquer &rarr;</a
+          <a class="next" href="../Lecture25/lecture25_notes.html"
+            >Lecture 25 &middot; Dynamic Programming I — Foundations &amp; 1D
+            &rarr;</a
           >
         </div>
       </div>
