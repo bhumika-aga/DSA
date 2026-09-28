@@ -1573,14 +1573,360 @@
 
         <hr />
 
+        <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
+        <section id="overview" class="section">
+          <h2 class="h1">🌐 Search Overview</h2>
+          <p>
+            The goal of searching algorithms is simply to locate a target
+            element in a dataset. Optimisation comes from leveraging the
+            properties of the dataset:
+          </p>
+          <ul>
+            <li>
+              <strong>Linear Search:</strong> The universal fallback. Scans one
+              by one. Required when data is unsorted.
+            </li>
+            <li>
+              <strong>Binary Search:</strong> The divide-and-conquer king.
+              Slices domains in half, but requires sorted data.
+            </li>
+            <li>
+              <strong>Ternary Search:</strong> Divides space into thirds.
+              Specialized for finding peaks/valleys in unimodal functions.
+            </li>
+            <li>
+              <strong>Interpolation Search:</strong> Guesses the location based
+              on values. Incredible speed, but requires uniformly distributed
+              data.
+            </li>
+          </ul>
+        </section>
+
+        <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
+        <section id="deep-dive" class="section">
+          <h2 class="h1">🔬 Algorithms Deep Dive</h2>
+
+          <h3 class="h2">Linear Search</h3>
+          <p>
+            While mathematically <code>O(n)</code> is slow, it is paradoxically
+            the <em>fastest</em> search for tiny arrays (<code>n &lt; 100</code
+            >) due to CPU contiguous memory caching avoiding pointer jumping
+            overhead.
+          </p>
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Recursion Trap:</strong> Writing Linear
+              Search recursively occupies <code>O(n)</code> Space due to the
+              Call Stack. Always write Linear Search iteratively in Java!
+            </p>
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Linear Search (Iterative vs
+                Recursive)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Iterative: space O(1)</span>
+<span class="pc-kw">function</span> linearSearch(nums, target):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        <span class="pc-kw">if</span> nums[i] = target: <span class="pc-kw">return</span> i
+    <span class="pc-kw">return</span> NOT_FOUND
+
+<span class="pc-cm">// Recursive: space O(n) — one call-stack frame per element</span>
+<span class="pc-kw">function</span> recursiveLinear(nums, target, index):
+    <span class="pc-kw">if</span> index ≥ length(nums): <span class="pc-kw">return</span> NOT_FOUND
+    <span class="pc-kw">if</span> nums[index] = target: <span class="pc-kw">return</span> index
+    <span class="pc-kw">return</span> recursiveLinear(nums, target, index + 1)</pre>
+          </div>
+
+          <h3 class="h2">Binary Search</h3>
+          <p>
+            Guess a number between 1 and 100, and after each guess you are told
+            &ldquo;higher&rdquo; or &ldquo;lower&rdquo;. The best strategy is to
+            guess 50: whatever the answer, half the numbers are gone. Then guess
+            the middle of what is left, and so on. Seven guesses always suffice
+            for 100 numbers, and twenty for a million. That is binary search,
+            and it only works because the numbers are <em>in order</em> &mdash;
+            &ldquo;higher&rdquo; tells you which half to throw away.
+          </p>
+          <p>
+            In code, <code>lo</code> and <code>hi</code> mark the part of the
+            array that could still hold the target. Every step looks at the
+            middle and moves one of them past it. The search ends when the
+            target is found or the range is empty (<code>lo &gt; hi</code>).
+            Here it is finding 23 in <code>[2, 5, 8, 12, 16, 23, 38, 56]</code>:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th>lo</th>
+                  <th>hi</th>
+                  <th>mid</th>
+                  <th>nums[mid]</th>
+                  <th>Decision</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>0</td>
+                  <td>7</td>
+                  <td>3</td>
+                  <td>12</td>
+                  <td>
+                    12 &lt; 23: target is right of mid, so <code>lo ← 4</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>4</td>
+                  <td>7</td>
+                  <td>5</td>
+                  <td>23</td>
+                  <td>Found at index 5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Overflow Bug:</strong> Calculating
+              <code>mid = (low + high) / 2</code> overflows the 32-bit integer
+              limit if boundaries are massive. <strong>Always use:</strong>
+              <code>mid = low + (high - low) / 2</code>.
+            </p>
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Classic Binary Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-kw">function</span> binarySearch(nums, target):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo ≤ hi:                   <span class="pc-cm">// '≤' so a one-element range is still checked</span>
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
+        <span class="pc-kw">if</span> nums[mid] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                  hi ← mid - 1
+    <span class="pc-kw">return</span> NOT_FOUND</pre>
+          </div>
+
+          <h3 class="h2">Interpolation Search</h3>
+          <p>
+            Instead of blindly checking the middle, it estimates position:
+            <code
+              >pos = lo + ((target - arr[lo]) * (hi - lo) / (arr[hi] -
+              arr[lo]))</code
+            >.
+          </p>
+          <div class="callout green">
+            <p>
+              <strong>Good to Know:</strong> Outperforms Binary Search by
+              reaching <code>O(log log n)</code>, <em>but only</em> if data is
+              linearly uniform (e.g., 10, 20, 30...). If clumped heavily, it
+              crashes to <code>O(n)</code>.
+            </p>
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Interpolation Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Guess the position from the VALUE, like opening a dictionary near 'M' for "mango".</span>
+<span class="pc-kw">while</span> lo ≤ hi <span class="pc-kw">and</span> arr[lo] ≤ target ≤ arr[hi]:
+    <span class="pc-kw">if</span> arr[hi] = arr[lo]:                        <span class="pc-cm">// flat range — avoid dividing by zero</span>
+        <span class="pc-kw">if</span> arr[lo] = target: <span class="pc-kw">return</span> lo
+        <span class="pc-kw">return</span> NOT_FOUND
+
+    <span class="pc-cm">// multiply BEFORE dividing: dividing first truncates to 0 and the probe collapses to lo</span>
+    pos ← lo + (target - arr[lo]) × (hi - lo) ÷ (arr[hi] - arr[lo])
+
+    <span class="pc-kw">if</span> arr[pos] = target: <span class="pc-kw">return</span> pos
+    <span class="pc-kw">if</span> arr[pos] &lt; target: lo ← pos + 1
+    <span class="pc-kw">else</span>:                 hi ← pos - 1
+<span class="pc-kw">return</span> NOT_FOUND
+<span class="pc-cm">// O(log log n) on uniformly spread values; degrades to O(n) on skewed data.</span></pre>
+          </div>
+
+          <h3 class="h2">Ternary Search</h3>
+          <p>
+            Calculates <code>mid1</code> and <code>mid2</code> to eliminate a
+            third of the array per pass. It is mathematically slower than Binary
+            Search (<code>2 * log_3(N) &gt; log_2(N)</code>), so it is
+            <strong>never</strong> used for exact targeting natively.
+          </p>
+          <div class="callout purple">
+            <p>
+              <strong>Primary Use Case:</strong> Finding the maximum/minimum
+              point in a continuous <em>Unimodal</em> function (a curve that
+              goes strictly up, then strictly down).
+            </p>
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Ternary Search (Peak
+                Finding)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Find the maximum of a function that rises then falls (unimodal)</span>
+<span class="pc-kw">while</span> hi - lo &gt; 2:
+    mid1 ← lo + (hi - lo) ÷ 3
+    mid2 ← hi - (hi - lo) ÷ 3
+    <span class="pc-kw">if</span> f(mid1) &lt; f(mid2): lo ← mid1      <span class="pc-cm">// the peak is right of mid1</span>
+    <span class="pc-kw">else</span>:                 hi ← mid2      <span class="pc-cm">// the peak is left of mid2</span>
+<span class="pc-cm">// then check the last ≤ 3 points directly</span></pre>
+          </div>
+        </section>
+
+        <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
+        <section id="variations" class="section">
+          <h2 class="h1">🔄 Algorithm Variations</h2>
+
+          <h3 class="h2">Upper / Lower Bounds (Duplicates)</h3>
+          <p>
+            With duplicates, &ldquo;find the target&rdquo; is ambiguous: in
+            <code>[1, 3, 3, 3, 7]</code>, which 3? Often you want the
+            <em>first</em> one (the lower bound) or the position just after the
+            last one (the upper bound). The change is small but important: when
+            <code>nums[mid]</code> equals the target, do not stop. Record
+            <code>mid</code> as the best answer so far, then keep searching to
+            the left (<code>hi ← mid − 1</code>) in case an earlier copy exists.
+          </p>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; First / Last Occurrence</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Don't return on the first match — record it and keep shrinking</span>
+<span class="pc-cm">// towards the side you want.</span>
+lo <span class="pc-kw">&larr;</span> 0; hi <span class="pc-kw">&larr;</span> length(a) - 1; ans <span class="pc-kw">&larr;</span> -1
+
+<span class="pc-kw">while</span> lo &le; hi:
+    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
+    <span class="pc-kw">if</span> a[mid] = target:
+        ans <span class="pc-kw">&larr;</span> mid
+        hi <span class="pc-kw">&larr;</span> mid - 1        <span class="pc-cm">// FIRST occurrence: keep looking left</span>
+        <span class="pc-cm">// lo &lt;- mid + 1     // LAST occurrence: keep looking right</span>
+    <span class="pc-kw">else if</span> a[mid] &lt; target: lo <span class="pc-kw">&larr;</span> mid + 1
+    <span class="pc-kw">else</span>:                    hi <span class="pc-kw">&larr;</span> mid - 1
+
+<span class="pc-kw">return</span> ans</pre>
+          </div>
+
+          <h3 class="h2">Search in Rotated Sorted Array</h3>
+          <p>
+            A rotated array is a sorted array cut in two and swapped round, such
+            as
+            <code>[4, 5, 6, 7, 0, 1, 2]</code>. It is no longer sorted as a
+            whole, but here is the key fact: whichever <code>mid</code> you
+            pick, at least <em>one</em> of its two halves is still perfectly
+            sorted. If <code>nums[lo] ≤ nums[mid]</code>, the left half is the
+            sorted one; otherwise the right half is. Check whether the target
+            lies inside the sorted half &mdash; that is easy, because it is
+            sorted &mdash; and throw away the other half if it does not.
+          </p>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Sorted Half Validation</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                     <span class="pc-cm">// left half is sorted</span>
+    <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             lo ← mid + 1   <span class="pc-cm">// so it must be on the right</span>
+<span class="pc-kw">else</span>:                                        <span class="pc-cm">// right half is sorted</span>
+    <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             hi ← mid - 1   <span class="pc-cm">// so it must be on the left</span></pre>
+          </div>
+
+          <h3 class="h2">Binary Search on Answer Space</h3>
+          <p>
+            Sometimes there is no array to search &mdash; you are searching for
+            an
+            <em>answer</em>. &ldquo;What is the slowest eating speed that still
+            finishes the bananas in h hours?&rdquo; You cannot see the answer,
+            but you can check any guess: at speed 5, do I finish in time? The
+            answers line up as <em>no, no, no, yes, yes, yes</em> &mdash; too
+            slow, then fast enough from some point on. Binary search finds the
+            first &ldquo;yes&rdquo;, exactly like the higher/lower game, over
+            the range of possible answers instead of array positions.
+          </p>
+          <ol>
+            <li>
+              <strong>Domain:</strong> Establish <code>lo</code> = absolute min
+              answer, <code>hi</code> = absolute max.
+            </li>
+            <li>
+              <strong>isValid(mid):</strong> Write a secondary
+              <code>O(n)</code> function to test if <code>mid</code> properly
+              satisfies all constraints.
+            </li>
+            <li>
+              <strong>Optimise:</strong> If <code>isValid(mid)</code> is
+              logically valid, try optimising further by lowering requirements:
+              <code>hi = mid</code>. Otherwise, <code>lo = mid + 1</code>.
+            </li>
+          </ol>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Binary Search on the Answer</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Use when you can't search the input, but you CAN ask</span>
+<span class="pc-cm">// 'is candidate answer x feasible?' — and that answer is</span>
+<span class="pc-cm">// monotonic: false, false, ..., false, true, true, ..., true.</span>
+lo <span class="pc-kw">&larr;</span> smallest conceivable answer
+hi <span class="pc-kw">&larr;</span> largest conceivable answer
+ans <span class="pc-kw">&larr;</span> hi
+
+<span class="pc-kw">while</span> lo &le; hi:
+    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
+    <span class="pc-kw">if</span> feasible(mid):
+        ans <span class="pc-kw">&larr;</span> mid            <span class="pc-cm">// works — try to do better</span>
+        hi  <span class="pc-kw">&larr;</span> mid - 1
+    <span class="pc-kw">else</span>:
+        lo <span class="pc-kw">&larr;</span> mid + 1         <span class="pc-cm">// too tight — relax</span>
+
+<span class="pc-kw">return</span> ans
+
+<span class="pc-cm">// Koko eating bananas: feasible(speed) = hours needed &lt;= H</span>
+<span class="pc-cm">// Ship packages in D days: feasible(cap)  = days needed &lt;= D</span>
+
+<span class="pc-cm">// Equivalent form without `ans`: shrink the range until lo = hi.</span>
+<span class="pc-cm">// Here lo always points at the smallest answer not yet ruled out.</span>
+<span class="pc-kw">while</span> lo &lt; hi:
+    mid ← lo + (hi - lo) ÷ 2
+    <span class="pc-kw">if</span> feasible(mid): hi ← mid         <span class="pc-cm">// mid works — keep it in range</span>
+    <span class="pc-kw">else</span>:             lo ← mid + 1     <span class="pc-cm">// mid fails — discard it</span>
+<span class="pc-kw">return</span> lo</pre>
+          </div>
+        </section>
+
         <!-- EXPONENTIAL SEARCH & INTEGER SQRT -->
         <h2 class="h1" id="exp-sqrt">
           &#128640; Exponential Search &amp; Integer Square Root
         </h2>
         <p>
-          Two variants that come up constantly and that plain binary search does
-          not cover: searching a sequence whose length you don't know, and
-          searching a range of <em>answers</em> rather than a range of indices.
+          Two more variants built on everything above. The first searches a
+          sequence whose length you do not know; the second, integer square
+          root, is a classic example of the binary search on the answer you just
+          met.
         </p>
 
         <h3 class="h3" id="exp-search">Exponential (Galloping) Search</h3>
@@ -1680,288 +2026,6 @@ ans <span class="pc-kw">&larr;</span> 1
 
         <hr />
 
-        <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
-        <section id="overview" class="section">
-          <h2 class="h1">🌐 Search Overview</h2>
-          <p>
-            The goal of searching algorithms is simply to locate a target
-            element in a dataset. Optimisation comes from leveraging the
-            properties of the dataset:
-          </p>
-          <ul>
-            <li>
-              <strong>Linear Search:</strong> The universal fallback. Scans one
-              by one. Required when data is unsorted.
-            </li>
-            <li>
-              <strong>Binary Search:</strong> The divide-and-conquer king.
-              Slices domains in half, but requires sorted data.
-            </li>
-            <li>
-              <strong>Ternary Search:</strong> Divides space into thirds.
-              Specialized for finding peaks/valleys in unimodal functions.
-            </li>
-            <li>
-              <strong>Interpolation Search:</strong> Guesses the location based
-              on values. Incredible speed, but requires uniformly distributed
-              data.
-            </li>
-          </ul>
-        </section>
-
-        <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
-        <section id="deep-dive" class="section">
-          <h2 class="h1">🔬 Algorithms Deep Dive</h2>
-
-          <h3 class="h2">Linear Search</h3>
-          <p>
-            While mathematically <code>O(n)</code> is slow, it is paradoxically
-            the <em>fastest</em> search for tiny arrays (<code>n &lt; 100</code
-            >) due to CPU contiguous memory caching avoiding pointer jumping
-            overhead.
-          </p>
-          <div class="callout orange">
-            <p>
-              <strong>Caveat - The Recursion Trap:</strong> Writing Linear
-              Search recursively occupies <code>O(n)</code> Space due to the
-              Call Stack. Always write Linear Search iteratively in Java!
-            </p>
-          </div>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Linear Search (Iterative vs
-                Recursive)</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-cm">// Iterative: space O(1)</span>
-<span class="pc-kw">function</span> linearSearch(nums, target):
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">if</span> nums[i] = target: <span class="pc-kw">return</span> i
-    <span class="pc-kw">return</span> NOT_FOUND
-
-<span class="pc-cm">// Recursive: space O(n) — one call-stack frame per element</span>
-<span class="pc-kw">function</span> recursiveLinear(nums, target, index):
-    <span class="pc-kw">if</span> index ≥ length(nums): <span class="pc-kw">return</span> NOT_FOUND
-    <span class="pc-kw">if</span> nums[index] = target: <span class="pc-kw">return</span> index
-    <span class="pc-kw">return</span> recursiveLinear(nums, target, index + 1)</pre>
-          </div>
-
-          <h3 class="h2">Binary Search</h3>
-          <p>
-            Systematically eliminates halves. Heavily vulnerable to infinite
-            loops if boundaries (`low`, `high`) overlap incorrectly.
-          </p>
-          <div class="callout orange">
-            <p>
-              <strong>Caveat - The Overflow Bug:</strong> Calculating
-              <code>mid = (low + high) / 2</code> overflows the 32-bit integer
-              limit if boundaries are massive. <strong>Always use:</strong>
-              <code>mid = low + (high - low) / 2</code>.
-            </p>
-          </div>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Classic Binary Search</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-kw">function</span> binarySearch(nums, target):
-    lo ← 0;  hi ← length(nums) - 1
-    <span class="pc-kw">while</span> lo ≤ hi:                   <span class="pc-cm">// '≤' so a one-element range is still checked</span>
-        mid ← lo + (hi - lo) ÷ 2
-        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
-        <span class="pc-kw">if</span> nums[mid] &lt; target: lo ← mid + 1
-        <span class="pc-kw">else</span>:                  hi ← mid - 1
-    <span class="pc-kw">return</span> NOT_FOUND</pre>
-          </div>
-
-          <h3 class="h2">Interpolation Search</h3>
-          <p>
-            Instead of blindly checking the middle, it estimates position:
-            <code
-              >pos = lo + ((target - arr[lo]) * (hi - lo) / (arr[hi] -
-              arr[lo]))</code
-            >.
-          </p>
-          <div class="callout green">
-            <p>
-              <strong>Good to Know:</strong> Outperforms Binary Search by
-              reaching <code>O(log log n)</code>, <em>but only</em> if data is
-              linearly uniform (e.g., 10, 20, 30...). If clumped heavily, it
-              crashes to <code>O(n)</code>.
-            </p>
-          </div>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Interpolation Search</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-cm">// Guess the position from the VALUE, like opening a dictionary near 'M' for "mango".</span>
-<span class="pc-kw">while</span> lo ≤ hi <span class="pc-kw">and</span> arr[lo] ≤ target ≤ arr[hi]:
-    <span class="pc-kw">if</span> arr[hi] = arr[lo]:                        <span class="pc-cm">// flat range — avoid dividing by zero</span>
-        <span class="pc-kw">if</span> arr[lo] = target: <span class="pc-kw">return</span> lo
-        <span class="pc-kw">return</span> NOT_FOUND
-
-    <span class="pc-cm">// multiply BEFORE dividing: dividing first truncates to 0 and the probe collapses to lo</span>
-    pos ← lo + (target - arr[lo]) × (hi - lo) ÷ (arr[hi] - arr[lo])
-
-    <span class="pc-kw">if</span> arr[pos] = target: <span class="pc-kw">return</span> pos
-    <span class="pc-kw">if</span> arr[pos] &lt; target: lo ← pos + 1
-    <span class="pc-kw">else</span>:                 hi ← pos - 1
-<span class="pc-kw">return</span> NOT_FOUND
-<span class="pc-cm">// O(log log n) on uniformly spread values; degrades to O(n) on skewed data.</span></pre>
-          </div>
-
-          <h3 class="h2">Ternary Search</h3>
-          <p>
-            Calculates <code>mid1</code> and <code>mid2</code> to eliminate a
-            third of the array per pass. It is mathematically slower than Binary
-            Search (`2 * log_3(N) > log_2(N)`), so it is
-            <strong>never</strong> used for exact targeting natively.
-          </p>
-          <div class="callout purple">
-            <p>
-              <strong>Primary Use Case:</strong> Finding the maximum/minimum
-              point in a continuous <em>Unimodal</em> function (a curve that
-              goes strictly up, then strictly down).
-            </p>
-          </div>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Ternary Search (Peak
-                Finding)</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-cm">// Find the maximum of a function that rises then falls (unimodal)</span>
-<span class="pc-kw">while</span> hi - lo &gt; 2:
-    mid1 ← lo + (hi - lo) ÷ 3
-    mid2 ← hi - (hi - lo) ÷ 3
-    <span class="pc-kw">if</span> f(mid1) &lt; f(mid2): lo ← mid1      <span class="pc-cm">// the peak is right of mid1</span>
-    <span class="pc-kw">else</span>:                 hi ← mid2      <span class="pc-cm">// the peak is left of mid2</span>
-<span class="pc-cm">// then check the last ≤ 3 points directly</span></pre>
-          </div>
-        </section>
-
-        <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
-        <section id="variations" class="section">
-          <h2 class="h1">🔄 Algorithm Variations</h2>
-
-          <h3 class="h2">Upper / Lower Bounds (Duplicates)</h3>
-          <p>
-            If finding the <strong>first</strong> occurrence of a duplicate,
-            when `nums[mid] == target`, don't stop! Keep searching left:
-            <code>ans = mid; high = mid - 1;</code> to capture the earliest
-            index boundary.
-          </p>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; First / Last Occurrence</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-cm">// Don't return on the first match — record it and keep shrinking</span>
-<span class="pc-cm">// towards the side you want.</span>
-lo <span class="pc-kw">&larr;</span> 0; hi <span class="pc-kw">&larr;</span> length(a) - 1; ans <span class="pc-kw">&larr;</span> -1
-
-<span class="pc-kw">while</span> lo &le; hi:
-    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
-    <span class="pc-kw">if</span> a[mid] = target:
-        ans <span class="pc-kw">&larr;</span> mid
-        hi <span class="pc-kw">&larr;</span> mid - 1        <span class="pc-cm">// FIRST occurrence: keep looking left</span>
-        <span class="pc-cm">// lo &lt;- mid + 1     // LAST occurrence: keep looking right</span>
-    <span class="pc-kw">else if</span> a[mid] &lt; target: lo <span class="pc-kw">&larr;</span> mid + 1
-    <span class="pc-kw">else</span>:                    hi <span class="pc-kw">&larr;</span> mid - 1
-
-<span class="pc-kw">return</span> ans</pre>
-          </div>
-
-          <h3 class="h2">Search in Rotated Sorted Array</h3>
-          <p>
-            If an array is shifted (`[4, 5, 6, 7, 0, 1, 2]`), you test which
-            half is strictly monotonic. If `nums[lo] <= nums[mid]`, the left
-            side is perfectly sorted, and you can evaluate containment safely.
-          </p>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Sorted Half Validation</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                     <span class="pc-cm">// left half is sorted</span>
-    <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1   <span class="pc-cm">// target is inside it</span>
-    <span class="pc-kw">else</span>:                             lo ← mid + 1   <span class="pc-cm">// so it must be on the right</span>
-<span class="pc-kw">else</span>:                                        <span class="pc-cm">// right half is sorted</span>
-    <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1   <span class="pc-cm">// target is inside it</span>
-    <span class="pc-kw">else</span>:                             hi ← mid - 1   <span class="pc-cm">// so it must be on the left</span></pre>
-          </div>
-
-          <h3 class="h2">Binary Search on Answer Space</h3>
-          <p>
-            Searching for an abstract minimum/maximum configuration instead of
-            an array index.
-          </p>
-          <ol>
-            <li>
-              <strong>Domain:</strong> Establish `lo` = absolute min answer,
-              `hi` = absolute max.
-            </li>
-            <li>
-              <strong>isValid(mid):</strong> Write a secondary
-              <code>O(n)</code> function to test if `mid` properly satisfies all
-              constraints.
-            </li>
-            <li>
-              <strong>Optimise:</strong> If `isValid(mid)` is logically valid,
-              try optimising further by lowering requirements: `hi = mid`.
-              Otherwise, `lo = mid + 1`.
-            </li>
-          </ol>
-
-          <div class="code-block pseudo">
-            <div class="code-header">
-              <span class="code-lang"
-                >&#128208; Pseudocode &middot; Binary Search on the Answer</span
-              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><span class="pc-cm">// Use when you can't search the input, but you CAN ask</span>
-<span class="pc-cm">// 'is candidate answer x feasible?' — and that answer is</span>
-<span class="pc-cm">// monotonic: false, false, ..., false, true, true, ..., true.</span>
-lo <span class="pc-kw">&larr;</span> smallest conceivable answer
-hi <span class="pc-kw">&larr;</span> largest conceivable answer
-ans <span class="pc-kw">&larr;</span> hi
-
-<span class="pc-kw">while</span> lo &le; hi:
-    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
-    <span class="pc-kw">if</span> feasible(mid):
-        ans <span class="pc-kw">&larr;</span> mid            <span class="pc-cm">// works — try to do better</span>
-        hi  <span class="pc-kw">&larr;</span> mid - 1
-    <span class="pc-kw">else</span>:
-        lo <span class="pc-kw">&larr;</span> mid + 1         <span class="pc-cm">// too tight — relax</span>
-
-<span class="pc-kw">return</span> ans
-
-<span class="pc-cm">// Koko eating bananas: feasible(speed) = hours needed &lt;= H</span>
-<span class="pc-cm">// Ship packages in D days: feasible(cap)  = days needed &lt;= D</span>
-
-<span class="pc-cm">// Equivalent form without `ans`: shrink the range until lo = hi.</span>
-<span class="pc-cm">// Here lo always points at the smallest answer not yet ruled out.</span>
-<span class="pc-kw">while</span> lo &lt; hi:
-    mid ← lo + (hi - lo) ÷ 2
-    <span class="pc-kw">if</span> feasible(mid): hi ← mid         <span class="pc-cm">// mid works — keep it in range</span>
-    <span class="pc-kw">else</span>:             lo ← mid + 1     <span class="pc-cm">// mid fails — discard it</span>
-<span class="pc-kw">return</span> lo</pre>
-          </div>
-        </section>
-
         <!-- ══ 3. COMPLEXITY ANALYSIS ════════════════════════════ -->
         <section id="complexity" class="section">
           <h2 class="h1">⏱️ Complexity Analysis</h2>
@@ -2021,9 +2085,9 @@ ans <span class="pc-kw">&larr;</span> hi
 
           <h3 class="h2">Perfectly Flattened Binary Search</h3>
           <p>
-            If a matrix `M x C` is strictly sorted universally (the end of Row 1
-            is less than the start of Row 2), treat it like a 1D array of length
-            `M * C`.
+            If a matrix <code>M x C</code> is strictly sorted universally (the
+            end of Row 1 is less than the start of Row 2), treat it like a 1D
+            array of length <code>M * C</code>.
           </p>
           <div class="callout green">
             <p>
@@ -2610,7 +2674,8 @@ lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the mat
                 <div class="prob-section-label">Problem</div>
                 <p>
                   Write an efficient algorithm that searches for a value inside
-                  an `M x N` matrix uniformly sorted perfectly across rows.
+                  an <code>M x N</code> matrix uniformly sorted perfectly across
+                  rows.
                 </p>
               </div>
               <div class="prob-section">
@@ -2979,7 +3044,8 @@ lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the mat
           <div class="checklist-item" onclick="this.classList.toggle('done')">
             <div class="cb-box">✓</div>
             <div class="cb-text">
-              I understand why `mid = low + (high - low) / 2` prevents integer
+              I understand why
+              <code>mid = low + (high - low) / 2</code> prevents integer
               overflow
             </div>
           </div>
@@ -2999,7 +3065,8 @@ lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the mat
           <div class="checklist-item" onclick="this.classList.toggle('done')">
             <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can map a 1D index to a 2D matrix safely via `[mid/nc][mid%nc]`
+              I can map a 1D index to a 2D matrix safely via
+              <code>[mid/nc][mid%nc]</code>
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
@@ -3018,7 +3085,8 @@ lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the mat
           <div class="checklist-item" onclick="this.classList.toggle('done')">
             <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can formulate `isValid(mid)` checks for Answer Space patterns
+              I can formulate <code>isValid(mid)</code> checks for Answer Space
+              patterns
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">

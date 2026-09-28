@@ -1702,7 +1702,7 @@
               <tr>
                 <td><code>Integer.lowestOneBit(n)</code></td>
                 <td>Returns an int with only the LSB set</td>
-                <td><code>n & (-n)</code></td>
+                <td><code>n &amp; (-n)</code></td>
               </tr>
               <tr>
                 <td><code>Integer.toBinaryString(n)</code></td>
@@ -1729,6 +1729,18 @@
         <h3 class="h2" id="twos-complement">
           🔄 Two's Complement — How Negatives Work
         </h3>
+        <p>
+          Why &ldquo;flip and add 1&rdquo;? Think of a car odometer with 3
+          digits that rolls from 999 back to 000. On that odometer, going back
+          one step from 000 lands on 999 &mdash; so 999 behaves exactly like
+          &minus;1. Computers do the same with bits: in 8 bits, the number that
+          plus 1 gives 0 is
+          <code>11111111</code>, so that pattern <em>is</em> &minus;1. The
+          leftmost bit ends up telling you the sign: 0 for positive, 1 for
+          negative. This is why a Java <code>int</code> runs from
+          &minus;2,147,483,648 to 2,147,483,647 &mdash; one more negative than
+          positive, because zero takes a spot on the positive side.
+        </p>
 
         <p>
           Java uses <strong>two's complement</strong> to store negative numbers.
@@ -1745,11 +1757,12 @@
 
 <span class="cm">// Key insight: -n == ~n + 1
 // So: n & (-n) gives you the LOWEST SET BIT of n
-// Example: 12 = 1100, -12 = 0100 → 12 & (-12) = 0100 = 4</span></pre>
+// Example (8 bits): 12 = 00001100, -12 = 11110100
+//   12 &amp; (-12) = 00000100 = 4  — the lowest set bit of 12</span></pre>
         </div>
 
         <p>
-          This <code>n & (-n)</code> trick (isolating the lowest set bit)
+          This <code>n &amp; (-n)</code> trick (isolating the lowest set bit)
           appears constantly in advanced problems like Binary Indexed Trees
           (Lecture 37).
         </p>
@@ -1910,6 +1923,56 @@ count <span class="pc-kw">&larr;</span> 0
 <span class="pc-cm">// EDGE CASE: n must be &gt; 0 — zero is NOT a power of 2</span></pre>
         </div>
 
+        <p>
+          Why does <code>n &amp; (n − 1)</code> test it? Subtracting 1 turns the
+          lowest 1-bit into a 0 and every 0 below it into a 1. If that was the
+          <em>only</em> 1-bit, nothing is left in common and the AND is zero. If
+          there was another 1-bit higher up, it survives.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>n</th>
+                <th>Binary</th>
+                <th>n − 1</th>
+                <th>n &amp; (n − 1)</th>
+                <th>Power of 2?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>8</td>
+                <td>1000</td>
+                <td>0111</td>
+                <td>0000</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>0110</td>
+                <td>0101</td>
+                <td>0100</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>0001</td>
+                <td>0000</td>
+                <td>0000</td>
+                <td>Yes (2&#8304;)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Zero is the trap.</strong> <code>0 &amp; (0 − 1)</code> is
+            also 0, but 0 is not a power of two. Always check
+            <code>n &gt; 0</code> first.
+          </div>
+        </div>
         <hr />
         <!-- ═══ SECTION 3: XOR PATTERNS ══════════════════════════ -->
         <h2 class="h1" id="xor">🎯 XOR Patterns — The Interview Favorite</h2>
@@ -2007,6 +2070,37 @@ result <span class="pc-kw">&larr;</span> 0
         <h3 class="h2" id="xor-partition">
           🔀 XOR Partitioning — Find TWO Unique Elements
         </h3>
+        <p>
+          Here is the trick on a real input, <code>[1, 2, 1, 3, 2, 5]</code>,
+          where 3 and 5 each appear once. XOR of everything leaves
+          <code>3 XOR 5 = 110</code>. Its lowest set bit is
+          <code>010</code> &mdash; a position where 3 and 5 must differ.
+          Splitting on that bit sends each unique number to a different group,
+          and the pairs cancel inside each group.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Group</th>
+                <th>Numbers in it</th>
+                <th>XOR of the group</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Bit <code>010</code> set</td>
+                <td>2, 3, 2</td>
+                <td><strong>3</strong></td>
+              </tr>
+              <tr>
+                <td>Bit <code>010</code> clear</td>
+                <td>1, 1, 5</td>
+                <td><strong>5</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <p>
           When TWO elements are unique, XOR gives us their combined XOR. We then
@@ -2085,6 +2179,69 @@ result <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
+        <p>
+          Every number from 0 to 2&#8319; − 1 is one subset. Read its bits from
+          the right: bit 0 says whether the first item is in, bit 1 the second,
+          and so on. For the items <code>[a, b, c]</code>:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>mask</th>
+                <th>Bits (c b a)</th>
+                <th>Subset</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0</td>
+                <td>000</td>
+                <td>{ }</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>001</td>
+                <td>{a}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>010</td>
+                <td>{b}</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>011</td>
+                <td>{a, b}</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>100</td>
+                <td>{c}</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>101</td>
+                <td>{a, c}</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>110</td>
+                <td>{b, c}</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>111</td>
+                <td>{a, b, c}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Eight masks, eight subsets &mdash; every one exactly once, with no
+          recursion. Lecture 24 builds the same list by backtracking, which is
+          easier to prune.
+        </p>
         <h3 class="h2" id="shift-tricks">⚡ Useful Shift Tricks</h3>
 
         <div class="table-wrap">
@@ -2119,7 +2276,7 @@ result <span class="pc-kw">&larr;</span> 0
               </tr>
               <tr>
                 <td>Lowest set bit</td>
-                <td><code>n & (-n)</code></td>
+                <td><code>n &amp; (-n)</code></td>
                 <td>Isolates rightmost 1-bit</td>
               </tr>
               <tr>
@@ -2137,7 +2294,7 @@ result <span class="pc-kw">&larr;</span> 0
         </div>
 
         <h3 class="h2" id="half-adder">
-          🧮 The Half-Adder Pattern (Addition without `+`)
+          🧮 The Half-Adder Pattern (Addition without <code>+</code>)
         </h3>
         <p>
           This is a universally asked FAANG question (<a
