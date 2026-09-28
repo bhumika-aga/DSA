@@ -1,9 +1,9 @@
-# 🧾 Assignment 19 — Prefix Sums & Difference Arrays
+# 🌲 Assignment 19 — Trees II — BST, LCA & Construction
 
-> **Lecture:** 19 of 38 — Prefix Sums & Difference Arrays
-> **Phase:** 3 — Core Patterns
-> **Estimated Time:** 4 days · **Total Problems:** 20 (7 Easy · 9 Medium · 4 Hard)
-> **Goal:** Pay O(n) once so every range question costs O(1) — and recognise the difference array as the same trick run backwards.
+> **Lecture:** 19 of 45 — Trees II — BST, LCA & Construction
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 4 days · **Total Problems:** 16 (4 Easy · 10 Medium · 2 Hard)
+> **Goal:** Use the BST ordering property deliberately, find lowest common ancestors in one pass, and rebuild a tree from its traversals.
 
 ---
 
@@ -11,206 +11,212 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                          | Pattern          | Move                                       |
-| ---------------------------------------------- | ---------------- | ------------------------------------------ |
-| "sum between index i and j", many queries      | Prefix Sum Array | `P[r+1] - P[l]`, built once                |
-| "how many subarrays sum to k"                  | Prefix + HashMap | count earlier prefixes equal to `sum - k`  |
-| "add v to every element in [l, r]", many times | Difference Array | `+v` at `l`, `-v` at `r+1`, sweep once     |
-| "sum of a sub-rectangle"                       | 2D Prefix Sum    | four corners, inclusion–exclusion          |
-| "XOR of a range"                               | Prefix XOR       | `px[r+1] ^ px[l]` — XOR undoes itself      |
-| a sliding window that breaks on negatives      | Prefix Sums      | windows need monotonicity; prefixes do not |
+| Signal in the Problem                | Pattern                 | Move                                                               |
+| ------------------------------------ | ----------------------- | ------------------------------------------------------------------ |
+| Tree is a BST — exploit the ordering | Range check or in-order | Pass (min, max) down, or check the in-order sequence is increasing |
+| k-th smallest / largest in a BST     | In-order with a counter | Stop the walk the moment the counter hits k                        |
+| Find where two nodes diverge         | LCA                     | Return the node up the recursion; the first split is the answer    |
+| LCA in a BST specifically            | Ordering shortcut       | Descend while both targets are on the same side                    |
+| Rebuild a tree from traversals       | Divide and conquer      | Pre/post gives the root, in-order splits the subtrees              |
+| O(1) extra space traversal           | Morris                  | Thread a temporary link to the in-order predecessor                |
 
 ---
 
-## 🟢 Easy Tier (7 Problems)
+## 🟢 Easy Tier (4 Problems)
 
-_Build the array, query it, and meet the difference array on small ranges._
+_The BST property at its simplest — searching, summing a range, and building a balanced tree from sorted input._
 
-### E1 · Left and Right Sum Differences
+### E1 · Search in a Binary Search Tree
 
-**🔗 [LC 2574 — Left and Right Sum Differences](https://leetcode.com/problems/left-and-right-sum-differences/)** · Easy
-**Pattern:** Prefix + Suffix Sums | **Companies:** Amazon, Google
+**🔗 [LC 700 — Search in a Binary Search Tree](https://leetcode.com/problems/search-in-a-binary-search-tree/)** · Easy
+**Pattern:** BST Property | **Companies:** Amazon, Google
 
-**Hint:** Build the running sum from the left and from the right (or take the total and subtract). `answer[i] = |leftSum[i] - rightSum[i]|`, with the element itself in neither side.
-
----
-
-### E2 · Minimum Value to Get Positive Step by Step Sum
-
-**🔗 [LC 1413 — Minimum Value to Get Positive Step by Step Sum](https://leetcode.com/problems/minimum-value-to-get-positive-step-by-step-sum/)** · Easy
-**Pattern:** Running Minimum of Prefixes | **Companies:** Amazon, Microsoft
-
-**Hint:** Track the running sum and the smallest value it ever reaches. The starting value must be at least `1 - minPrefix`, and never below 1.
+**Hint:** If `node.val == val` return node. If `val < node.val` search left, else search right. Base case: null → return null.
 
 ---
 
-### E3 · Find the Middle Index in Array
+### E2 · Range Sum of BST
 
-**🔗 [LC 1991 — Find the Middle Index in Array](https://leetcode.com/problems/find-the-middle-index-in-array/)** · Easy
-**Pattern:** Prefix Sum | **Companies:** Amazon, Google, Meta
+**🔗 [LC 938 — Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/)** · Easy
+**Pattern:** BST Property | **Companies:** Amazon, Facebook
 
-**Hint:** Total first, then a running `left`. The right side is `total - left - nums[i]`; compare before adding the pivot to `left`.
-
----
-
-### E4 · Points That Intersect With Cars
-
-**🔗 [LC 2848 — Points That Intersect With Cars](https://leetcode.com/problems/points-that-intersect-with-cars/)** · Easy
-**Pattern:** Difference Array | **Companies:** Amazon
-
-**Hint:** Coordinates are at most 100, so allocate a small difference array: `+1` at `start`, `-1` after `end`. Sweep once and count the positions with a positive value.
+**Hint:** Use BST pruning — if node.val < low go right only; if node.val > high go left only; else add node.val and recurse both.
 
 ---
 
-### E5 · Maximum Population Year
+### E3 · Find Mode in Binary Search Tree
 
-**🔗 [LC 1854 — Maximum Population Year](https://leetcode.com/problems/maximum-population-year/)** · Easy
-**Pattern:** Difference Array | **Companies:** Amazon, Adobe
+**🔗 [LC 501 — Find Mode in Binary Search Tree](https://leetcode.com/problems/find-mode-in-binary-search-tree/)** · Easy
+**Pattern:** BST Inorder | **Companies:** Microsoft
 
-**Hint:** A person alive from `birth` to `death - 1` is a range update: `+1` at birth, `-1` at death. Sweep the years and return the earliest year holding the maximum.
-
----
-
-### E6 · Check if All the Integers in a Range Are Covered
-
-**🔗 [LC 1893 — Check if All the Integers in a Range Are Covered](https://leetcode.com/problems/check-if-all-the-integers-in-a-range-are-covered/)** · Easy
-**Pattern:** Difference Array | **Companies:** Amazon, Microsoft
-
-**Hint:** Mark `+1` at each range start and `-1` just after each end, prefix once, then check that every value in `[left, right]` is at least 1.
+**Hint:** Inorder traversal gives sorted order. Track current number and its count; update modes when count hits max.
 
 ---
 
-### E7 · Sum of All Odd Length Subarrays
+### E4 · Convert Sorted Array to Binary Search Tree
 
-**🔗 [LC 1588 — Sum of All Odd Length Subarrays](https://leetcode.com/problems/sum-of-all-odd-length-subarrays/)** · Easy
-**Pattern:** Contribution Counting | **Companies:** Amazon, Google
+**🔗 [LC 108 — Convert Sorted Array to Binary Search Tree](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/)** · Easy
+**Pattern:** DFS + Divide & Conquer | **Companies:** Amazon, Google
 
-**Hint:** Brute force with prefix sums is O(n²). Better: count how many odd-length subarrays contain index `i` — `((i + 1) * (n - i) + 1) / 2` — and weight each element by that.
-
----
-
-## 🟡 Medium Tier (9 Problems)
-
-_The two workhorses: prefix + HashMap for counting, difference arrays for bulk updates._
-
-### M1 · Corporate Flight Bookings
-
-**🔗 [LC 1109 — Corporate Flight Bookings](https://leetcode.com/problems/corporate-flight-bookings/)** · Medium
-**Pattern:** Difference Array | **Companies:** Amazon, Google, Microsoft
-
-**Hint:** Each booking is two writes: `+seats` at `first - 1`, `-seats` at `last`. One prefix sweep at the end produces every flight's total. Watch the 1-based indexing.
+**Hint:** The middle element of the sorted array is the root (ensures balanced). Recurse on left half for left subtree, right half for right subtree.
 
 ---
 
-### M2 · Car Pooling
+## 🟡 Medium Tier (10 Problems)
 
-**🔗 [LC 1094 — Car Pooling](https://leetcode.com/problems/car-pooling/)** · Medium
-**Pattern:** Difference Array on Locations | **Companies:** Amazon, Google, Meta
+_The working set: validating, ordering, inserting, deleting, finding ancestors, and rebuilding from traversals._
 
-**Hint:** Locations go up to 1000, so use a difference array over stops: `+passengers` at `from`, `-passengers` at `to`. Sweep, and fail if the running total ever exceeds capacity.
+### M1 · Validate Binary Search Tree
 
----
+**🔗 [LC 98 — Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)** · Medium
+**Pattern:** BST Property | **Companies:** Amazon, Microsoft, Bloomberg
 
-### M3 · Matrix Block Sum
-
-**🔗 [LC 1314 — Matrix Block Sum](https://leetcode.com/problems/matrix-block-sum/)** · Medium
-**Pattern:** 2D Prefix Sum | **Companies:** Amazon, Google, Microsoft
-
-**Hint:** Build the integral image once, then clamp each block's corners to the grid: rows `max(0, i-k)` to `min(m-1, i+k)`. Each answer cell is four lookups.
+**Hint:** Pass a valid range `[min, max]` down. Use `Long` to avoid edge cases with `Integer.MIN_VALUE`/`MAX_VALUE`. Going left: `max` becomes `node.val`. Going right: `min` becomes `node.val`.
 
 ---
 
-### M4 · XOR Queries of a Subarray
+### M2 · Kth Smallest Element in a BST
 
-**🔗 [LC 1310 — XOR Queries of a Subarray](https://leetcode.com/problems/xor-queries-of-a-subarray/)** · Medium
-**Pattern:** Prefix XOR | **Companies:** Amazon, Google
+**🔗 [LC 230 — Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)** · Medium
+**Pattern:** BST Inorder | **Companies:** Amazon, Google, Bloomberg, Uber
 
-**Hint:** `x ^ x = 0`, so XOR is its own inverse: build `px` with a leading 0 and answer each query with `px[r+1] ^ px[l]`.
-
----
-
-### M5 · Plates Between Candles
-
-**🔗 [LC 2055 — Plates Between Candles](https://leetcode.com/problems/plates-between-candles/)** · Medium
-**Pattern:** Prefix Counts + Nearest Candle | **Companies:** Amazon, Google, Meta
-
-**Hint:** Precompute three arrays: plates before each index, the nearest candle to the left, and the nearest candle to the right. Each query is then a subtraction between the two inner candles.
+**Hint:** Inorder of a BST = sorted order. Count nodes during inorder. When count hits k, record the answer. Use a class-level counter and result variable.
 
 ---
 
-### M6 · Shifting Letters II
+### M3 · Insert into a Binary Search Tree
 
-**🔗 [LC 2381 — Shifting Letters II](https://leetcode.com/problems/shifting-letters-ii/)** · Medium
-**Pattern:** Difference Array over Shifts | **Companies:** Amazon, Google
+**🔗 [LC 701 — Insert into a Binary Search Tree](https://leetcode.com/problems/insert-into-a-binary-search-tree/)** · Medium
+**Pattern:** BST Property | **Companies:** Amazon, Google
 
-**Hint:** Each shift is a range update of `+1` or `-1`. Accumulate them in a difference array, sweep once, then rotate each letter by its total shift modulo 26 (normalise negatives).
-
----
-
-### M7 · Count the Hidden Sequences
-
-**🔗 [LC 2145 — Count the Hidden Sequences](https://leetcode.com/problems/count-the-hidden-sequences/)** · Medium
-**Pattern:** Prefix Sums of Differences | **Companies:** Amazon, Google
-
-**Hint:** The differences fix the whole sequence up to one offset. Take the running sum of `differences`, find its minimum and maximum, and count how many starting values keep the range inside `[lower, upper]`.
+**Hint:** Navigate left/right like BST search. When you hit null, create a new node there. Recursively: if val < node.val, `node.left = insert(node.left, val)`, else `node.right = insert(node.right, val)`.
 
 ---
 
-### M8 · Binary Subarrays With Sum
+### M4 · Delete Node in a BST
 
-**🔗 [LC 930 — Binary Subarrays With Sum](https://leetcode.com/problems/binary-subarrays-with-sum/)** · Medium
-**Pattern:** Prefix + HashMap | **Companies:** Amazon, Google, Meta
+**🔗 [LC 450 — Delete Node in a BST](https://leetcode.com/problems/delete-node-in-a-bst/)** · Medium
+**Pattern:** BST Property | **Companies:** Amazon, Microsoft
 
-**Hint:** Two prefixes differing by `goal` bound a valid subarray. Keep a map of prefix counts seeded with `{0: 1}` and add `map[sum - goal]` at each step. (The at-most trick also works.)
-
----
-
-### M9 · Number of Sub-arrays With Odd Sum
-
-**🔗 [LC 1524 — Number of Sub-arrays With Odd Sum](https://leetcode.com/problems/number-of-sub-arrays-with-odd-sum/)** · Medium
-**Pattern:** Prefix Parity Counting | **Companies:** Amazon, Google
-
-**Hint:** Only the parity of each prefix matters. Count how many prefixes so far were even and how many odd; a subarray is odd exactly when its two ends have different parity. Take the answer modulo 1e9+7.
+**Hint:** 3 cases: (1) node is a leaf → return null. (2) node has one child → return that child. (3) node has two children → find inorder successor (smallest in right subtree), copy its value, delete the successor.
 
 ---
 
-## 🔴 Hard Tier (4 Problems)
+### M5 · Lowest Common Ancestor of a Binary Tree
 
-_Prefix sums combined with another structure — a deque, a stack, or a segment tree._
+**🔗 [LC 236 — Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)** · Medium
+**Pattern:** LCA | **Companies:** Amazon, Google, Facebook, Microsoft
 
-### H1 · Shortest Subarray with Sum at Least K
-
-**🔗 [LC 862 — Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/)** · Hard
-**Pattern:** Prefix + Monotonic Deque | **Companies:** Google, Amazon, Meta
-
-**Hint:** Negatives break sliding windows, so work on prefix sums: find the shortest `j - i` with `P[j] - P[i] >= k`. Keep a deque of increasing prefixes, popping the front once it qualifies and the back when a new prefix is no larger.
+**Hint:** Return node when null/p/q found. If both left and right return non-null → split here → current is LCA. Else bubble up whichever side is non-null.
 
 ---
 
-### H2 · Number of Submatrices That Sum to Target
+### M6 · Lowest Common Ancestor of a Binary Search Tree
 
-**🔗 [LC 1074 — Number of Submatrices That Sum to Target](https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/)** · Hard
-**Pattern:** 2D Compression + Prefix Map | **Companies:** Google, Amazon, Meta
+**🔗 [LC 235 — Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)** · Medium
+**Pattern:** BST Property + LCA | **Companies:** Amazon, Google, Facebook
 
-**Hint:** Fix a pair of rows, collapse the columns between them into a 1D array of sums, and count subarrays equal to `target` with the prefix-map trick. O(m² · n).
-
----
-
-### H3 · Handling Sum Queries After Update
-
-**🔗 [LC 2569 — Handling Sum Queries After Update](https://leetcode.com/problems/handling-sum-queries-after-update/)** · Hard
-**Pattern:** Difference Array + Segment Tree | **Companies:** Google, Amazon
-
-**Hint:** `nums1` only ever flips, so track the count of ones in each range with a lazy segment tree; `nums2`'s total changes by `p × onesCount` per operation. The answers are then a running sum.
+**Hint:** Simpler than LC 236. If both p and q are less than node.val → go left. If both greater → go right. Otherwise → this IS the LCA (split point).
 
 ---
 
-### H4 · Sum of Total Strength of Wizards
+### M7 · Construct Binary Tree from Preorder and Inorder Traversal
 
-**🔗 [LC 2281 — Sum of Total Strength of Wizards](https://leetcode.com/problems/sum-of-total-strength-of-wizards/)** · Hard
-**Pattern:** Prefix of Prefix Sums + Monotonic Stack | **Companies:** Google, Amazon
+**🔗 [LC 105 — Construct Binary Tree from Preorder and Inorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)** · Medium
+**Pattern:** DFS + Divide & Conquer | **Companies:** Amazon, Google, Facebook, Microsoft
 
-**Hint:** For each element as the minimum (bounds from a monotonic stack), you need the sum of all subarray sums in that span — which is a prefix sum of the prefix sums. Keep everything modulo 1e9+7 and use 64-bit.
+**Hint:** Preorder[0] is always the root. Find that value in inorder — everything to its left is the left subtree, everything to its right is the right subtree. Use a HashMap for O(1) inorder index lookup. Recurse with adjusted index bounds.
+
+---
+
+### M8 · Construct Binary Tree from Inorder and Postorder Traversal
+
+**🔗 [LC 106 — Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)** · Medium
+**Pattern:** DFS + Divide & Conquer | **Companies:** Amazon, Microsoft
+
+**Hint:** Same as M16 but root is at `postorder[last]`. Process postorder from right to left. Build right subtree before left subtree.
+
+---
+
+### M9 · Binary Search Tree Iterator
+
+**🔗 [LC 173 — Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/)** · Medium
+**Pattern:** BST Inorder (Lazy) | **Companies:** Amazon, Microsoft, Facebook
+
+**Hint:** Use an explicit stack for iterative inorder. `next()` = pop from stack, push right child and its leftmost chain. `hasNext()` = check stack is not empty. Amortised O(1) per call, O(h) space.
+
+---
+
+### M10 · Recover Binary Search Tree
+
+**🔗 [LC 99 — Recover Binary Search Tree](https://leetcode.com/problems/recover-binary-search-tree/)** · Medium
+**Pattern:** BST Inorder | **Companies:** Amazon, Google, Microsoft
+
+**Hint:** Inorder should be sorted. Find the two nodes that are out of order (first: where `prev.val > curr.val` first time; second: where it happens second time). Swap their values. O(1) space using Morris traversal.
+
+---
+
+## 🔴 Hard Tier (2 Problems)
+
+_Two problems that combine the ordering property with a post-order walk that must return several values at once._
+
+### H1 · Serialize and Deserialize Binary Tree
+
+**🔗 [LC 297 — Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)** · Hard
+**Pattern:** DFS Preorder | **Companies:** Google, Amazon, Facebook, Microsoft, Uber
+
+**Hint:** Serialize using preorder DFS — write node value, then left, then right; write "null" for null nodes. Deserialize using a queue of tokens — poll the front, create a node, recurse for left and right.
+
+**Why Hard?** Requires careful null handling and understanding of how preorder uniquely reconstructs a tree.
+
+---
+
+### H2 · Maximum Sum BST in Binary Tree
+
+**🔗 [LC 1373 — Maximum Sum BST in Binary Tree](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/)** · Hard
+**Pattern:** Postorder DFS — Return a Tuple | **Companies:** Amazon, Google
+
+**Hint:** Each node returns `(isBST, min, max, sum)` for its subtree. The subtree is a BST if both children are BSTs and `left.max < node.val < right.min`. If it is, update the global best with its sum. Empty children return `(true, +∞, -∞, 0)`.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — search a BST of height h
+
+// Snippet 2 — search a BST built by inserting 1, 2, 3, …, n in order
+
+// Snippet 3 — validate a BST by passing (min, max) bounds down
+
+// Snippet 4 — LCA in a general binary tree
+
+// Snippet 5 — LCA in a BST
+
+// Snippet 6 — build a tree from pre-order + in-order, searching the in-order array for each root
+```
+
+**Complexity Answers:**
+
+1. **O(h)** time.
+2. **O(n)** — the tree is a straight line, so h = n.
+3. **O(n)** time, O(h) space.
+4. **O(n)** time.
+5. **O(h)** time — walk down one path.
+6. **O(n²)** — each root search is O(n); an index map makes it O(n).
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. BST search is always O(log n). → **False** — O(h); a skewed BST has h = n
+2. An in-order walk of a valid BST gives sorted order. → **True**
+3. Checking each node against only its parent is enough to validate a BST. → **False** — a deeper node can violate an ancestor's bound
+4. Pre-order plus in-order uniquely determine a binary tree with distinct values. → **True**
+5. Pre-order plus post-order uniquely determine any binary tree. → **False** — a single child could be left or right
+6. Morris traversal uses O(1) extra space. → **True** — it borrows null pointers temporarily
 
 ---
 
@@ -218,12 +224,13 @@ _Prefix sums combined with another structure — a deque, a stack, or a segment 
 
 Answer these out loud, without looking at the notes:
 
-1. **The extra slot:** Why does `prefix` have `n + 1` entries, and what breaks if you drop the leading zero?
-2. **The seed:** Why is the prefix map initialised with `{0: 1}`? Give an input that returns the wrong answer without it.
-3. **Order of operations:** Why must you look up `sum - k` before inserting the current prefix? Which value of `k` exposes the bug?
-4. **Count vs index:** When do you store a _count_ in the prefix map, and when do you store the _first index_? What question does each one answer?
-5. **Inverses:** Prefix sums work for `+` and `^` but not for `min`. State the property that decides it.
-6. **Updates:** An interviewer adds "and the array can change between queries". Why does a prefix sum stop being the right answer, and what replaces it?
+1. **The real property:** Why is "left child < parent < right child" not enough to validate a BST? Give a three-node counterexample.
+2. **Range check:** What min and max do you pass into the left and right child, and what are the values at the root?
+3. **In-order proof:** Explain why an in-order walk of a valid BST is sorted, from the property alone.
+4. **LCA in one pass:** In the general-tree LCA, what does a non-null return from both children mean?
+5. **BST shortcut:** Why is LCA on a BST O(height) with no recursion into both sides?
+6. **Which two traversals:** Pre+in and post+in both rebuild a tree. Why does pre+post fail?
+7. **Morris cost:** What does Morris traversal do to the tree while it runs, and what is the price of O(1) space?
 
 ---
 
@@ -231,25 +238,28 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/), [Number of Submatrices That Sum to Target](https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/), [Handling Sum Queries After Update](https://leetcode.com/problems/handling-sum-queries-after-update/), [Sum of Total Strength of Wizards](https://leetcode.com/problems/sum-of-total-strength-of-wizards/) |
-| **Google**    | [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/), [Number of Submatrices That Sum to Target](https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/), [Handling Sum Queries After Update](https://leetcode.com/problems/handling-sum-queries-after-update/), [Sum of Total Strength of Wizards](https://leetcode.com/problems/sum-of-total-strength-of-wizards/) |
-| **Meta**      | [Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/), [Number of Submatrices That Sum to Target](https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/), [Car Pooling](https://leetcode.com/problems/car-pooling/), [Plates Between Candles](https://leetcode.com/problems/plates-between-candles/)                                                                 |
-| **Microsoft** | [Corporate Flight Bookings](https://leetcode.com/problems/corporate-flight-bookings/), [Matrix Block Sum](https://leetcode.com/problems/matrix-block-sum/), [Minimum Value to Get Positive Step by Step Sum](https://leetcode.com/problems/minimum-value-to-get-positive-step-by-step-sum/), [Check if All the Integers in a Range Are Covered](https://leetcode.com/problems/check-if-all-the-integers-in-a-range-are-covered/)               |
-| **Adobe**     | [Maximum Population Year](https://leetcode.com/problems/maximum-population-year/)                                                                                                                                                                                                                                                                                                                                                              |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Maximum Sum BST in Binary Tree](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/), [Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/), [Delete Node in a BST](https://leetcode.com/problems/delete-node-in-a-bst/), [Insert into a Binary Search Tree](https://leetcode.com/problems/insert-into-a-binary-search-tree/) |
+| **Google**    | [Convert Sorted Array to Binary Search Tree](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/), [Search in a Binary Search Tree](https://leetcode.com/problems/search-in-a-binary-search-tree/), [Maximum Sum BST in Binary Tree](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/), [Insert into a Binary Search Tree](https://leetcode.com/problems/insert-into-a-binary-search-tree/)             |
+| **Microsoft** | [Find Mode in Binary Search Tree](https://leetcode.com/problems/find-mode-in-binary-search-tree/), [Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/), [Delete Node in a BST](https://leetcode.com/problems/delete-node-in-a-bst/), [Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/)         |
+| **Facebook**  | [Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/), [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/), [Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/), [Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)                             |
+| **Bloomberg** | [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/), [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)                                                                                                                                                                                                                                                   |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 7 Easy problems solved
-- [ ] All 9 Medium problems solved
-- [ ] All 4 Hard problems attempted
-- [ ] All 6 conceptual questions answered out loud
-- [ ] I can write the range-sum formula from memory, with correct off-by-one handling
-- [ ] I can explain the difference array as the inverse of a prefix sum
+- [ ] All 4 Easy problems solved
+- [ ] All 10 Medium problems solved
+- [ ] All 2 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 7 conceptual questions answered out loud
+- [ ] I can validate a BST with a range check and explain why the local check fails
+- [ ] I can write LCA for a general tree and for a BST, and say why they differ
+- [ ] I can rebuild a tree from pre-order + in-order without slicing arrays
 
 ---
 
-**← [Lecture 18 · Two Pointers & Sliding Window](../Lecture18/Assignment.md)** &nbsp;·&nbsp; **[Lecture 20 · Monotonic Stack & Queue](../Lecture20/Assignment.md) →**
+**← [Lecture 18 · Trees I — Traversals & Recursion](../Lecture18/Assignment.md)** &nbsp;·&nbsp; **[Lecture 20 · Heaps & Priority Queues](../Lecture20/Assignment.md) →**

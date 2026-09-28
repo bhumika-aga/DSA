@@ -1,10 +1,10 @@
-# 📋 Assignment 8 — Arrays & Strings
+# 🔁 Assignment 5 — Recursion & Backtracking
 
-> **Lecture:** 8 of 38 — Arrays & Strings
-> **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 7 days · **Total Problems:** 35 (10 Easy · 15 Medium · 10 Hard)
-> **Goal:** Master in-place modifications, Kadane's algorithm, prefix sums, and frequency mappings without resorting to
-> O(n²) or heavy HashMaps.
+> **Lecture:** 8 of 45 — Recursion — The Mental Model
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 16 (12 Easy · 4 Medium · 0 Hard)
+> **Goal:** Trust the recursive call, find the base case first, read the cost from the call tree, and remove repeated work with a memo.
+> pruning.
 
 ---
 
@@ -12,416 +12,249 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                | Pattern               | Move                           |
-| ------------------------------------ | --------------------- | ------------------------------ |
-| "sum of a subarray / range"          | Prefix Sum            | `prefix[r+1] - prefix[l]`      |
-| "maximum subarray"                   | Kadane's Algorithm    | extend the run or restart it   |
-| "in place", "O(1) extra space"       | Read / Write Pointers | one pointer reads, one writes  |
-| "anagram", "same letters"            | Frequency Array       | `int[26]` counts               |
-| "palindrome inside a string"         | Expand Around Center  | grow outward from every center |
-| "rotate / reverse part of the array" | Reversal Trick        | reverse whole, then the parts  |
+| Signal in the Problem                        | Pattern                   | Move                                |
+| -------------------------------------------- | ------------------------- | ----------------------------------- |
+| the answer for n uses the answer for n − 1   | Linear recursion          | one call, base case first           |
+| carry a running total or path downward       | Parameterised recursion   | pass the accumulator as an argument |
+| build the answer from what the calls return  | Functional recursion      | combine the returned values         |
+| two or more calls, the same arguments repeat | Tree recursion + memo     | cache on the arguments              |
+| halve the input every call                   | Divide by two             | O(log n) depth                      |
+| solve a smaller copy of the same problem     | Divide & Conquer          | split, recurse, combine             |
+| "all subsets", "all arrangements"            | Backtracking — Lecture 24 | preview only; taught in full later  |
 
 ---
 
-## 🟢 Easy Tier (10 Problems)
+## 🟢 Easy Tier (12 Problems)
 
-_Build the Foundation._
+_Warm-ups. Write the base case first, then trust the call. Every one of these is under ten lines._
 
-### E1 · Range Sum Query - Immutable
+### E1 · Sum of First N Numbers
 
-**🔗 [LC 303 — Range Sum Query - Immutable](https://leetcode.com/problems/range-sum-query-immutable/)** · Easy
-**Pattern:** Prefix Sum | **Companies:** Amazon, Meta, Google
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Precompute `prefix[i + 1] = prefix[i] + nums[i]` in the constructor. Then `sumRange(l, r) = prefix[r + 1] - prefix[l]` in O(1). The extra leading 0 removes every edge case.
-
----
-
-### E2 · Find Pivot Index
-
-**🔗 [LC 724 — Find Pivot Index](https://leetcode.com/problems/find-pivot-index/)** · Easy
-**Pattern:** Prefix Sum · Left/Right Balance | **Companies:** Amazon, Google, Meta
-
-**Hint:** Find the index where the sum of all numbers strictly to the left equals the sum to the right. Tip: `rightSum = totalSum - leftSum - nums[i]`. O(n) time, O(1) space.
+**Task:** Write `sum(n)` recursively. Draw the call stack for `n=4`. Use `return n + sum(n-1)`. State the space complexity (O is NOT 1 here!).
 
 ---
 
-### E3 · Valid Anagram
+### E2 · Factorial & GCD
 
-**🔗 [LC 242 — Valid Anagram](https://leetcode.com/problems/valid-anagram/)** · Easy
-**Pattern:** Frequency Array | **Companies:** Amazon, Meta, Bloomberg
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Return true if `t` is an anagram of `s`. Do NOT use `HashMap`. Use an `int[26]` frequency array. O(n) time, O(1) space.
-
----
-
-### E4 · Replace Elements with Greatest Element on Right Side
-
-**🔗 [LC 1299 — Replace Elements with Greatest Element on Right Side](https://leetcode.com/problems/replace-elements-with-greatest-element-on-right-side/)** · Easy
-**Pattern:** Right-to-Left Scan | **Companies:** Amazon, Google
-
-**Hint:** Walk from the right, carrying `maxRight` (starting at -1). At each index, store `maxRight`, then update it with the old value. One pass, in place.
+**Task:** Implement `factorial(n)` and `gcd(a, b)` recursively. Why is recursion better than loops for Euclid's GCD?
 
 ---
 
-### E5 · First Unique Character in a String
+### E3 · Power Function (O(n))
 
-**🔗 [LC 387 — First Unique Character in a String](https://leetcode.com/problems/first-unique-character-in-a-string/)** · Easy
-**Pattern:** Frequency Array | **Companies:** Amazon, Google, Microsoft
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Return the index of the first non-repeating character in a string. Use a frequency array to count occurrences before a second pass to find the answer. O(n) time.
-
----
-
-### E6 · Maximum Subarray
-
-**🔗 [LC 53 — Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)** · Medium
-**Pattern:** Kadane's Algorithm | **Companies:** Google, Amazon, LinkedIn, Microsoft
-
-**Hint:** Find the contiguous subarray which has the largest sum. Key insight: If `currentMax` becomes negative, reset it. O(n) time, O(1) space.
+**Task:** Implement `pow(x, n)` as `x * pow(x, n-1)`. Then look at Lecture 10 for how to do this in O(log n).
 
 ---
 
-### E7 · Majority Element
+### E4 · Reverse an Array (Two Pointers)
 
-**🔗 [LC 169 — Majority Element](https://leetcode.com/problems/majority-element/)** · Easy
-**Pattern:** Boyer-Moore Voting Algorithm | **Companies:** Amazon, Google, Adobe
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Find the element appearing > n/2 times. Maintain a candidate and count to solve in O(n) time and O(1) space.
-
----
-
-### E8 · Rotate String
-
-**🔗 [LC 796 — Rotate String](https://leetcode.com/problems/rotate-string/)** · Easy
-**Pattern:** String Concatenation Trick | **Companies:** Google, Amazon
-
-**Hint:** Check if string `s` can become `t` after some number of shifts. Hint: Is `t` a substring of `s + s`?
+**Task:** Use recursion to swap `arr[l]` and `arr[r]`, then call `reverse(l+1, r-1)`. Base case: `l >= r`.
 
 ---
 
-### E9 · Check If Two String Arrays are Equivalent
+### E5 · Valid Palindrome II
 
-**🔗 [LC 1662 — Check If Two String Arrays are Equivalent](https://leetcode.com/problems/check-if-two-string-arrays-are-equivalent/)** · Easy
-**Pattern:** Two-Level Pointers | **Companies:** Amazon, Meta
+**🔗 [LC 680 — Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/)** · Easy
+**Pattern:** Recursion — Branch Once | **Companies:** Meta, Amazon, Microsoft
 
-**Hint:** Concatenating is easy. The O(1)-space version keeps two pointers per side (word index, char index) and compares character by character.
-
----
-
-### E10 · Add Strings
-
-**🔗 [LC 415 — Add Strings](https://leetcode.com/problems/add-strings/)** · Easy
-**Pattern:** Digit-by-Digit Addition | **Companies:** Meta, Google, Amazon
-
-**Hint:** Walk both strings from the end with a carry, appending `(a + b + carry) % 10` to a `StringBuilder`, then reverse it. Keep looping while either string has digits left or `carry > 0`.
+**Hint:** Write `isPal(s, l, r)` recursively. At the first mismatch you get exactly one deletion, so return `isPal(l + 1, r) || isPal(l, r - 1)` with no deletions left.
 
 ---
 
-## 🟡 Medium Tier (15 Problems)
+### E6 · Kth Missing Positive Number
 
-_Core Pattern Mastery._
+**🔗 [LC 1539 — Kth Missing Positive Number](https://leetcode.com/problems/kth-missing-positive-number/)** · Easy
+**Pattern:** Recursive Binary Search | **Companies:** Meta, Amazon, Microsoft
 
-### M1 · Number of Ways to Split Array
-
-**🔗 [LC 2270 — Number of Ways to Split Array](https://leetcode.com/problems/number-of-ways-to-split-array/)** · Medium
-**Pattern:** Prefix Sum | **Companies:** Amazon, Google
-
-**Hint:** Total sum once, then a running left sum. Split `i` is valid when `left >= total - left`. Use `long` — the sums overflow `int`.
+**Hint:** The count of missing numbers before index `i` is `arr[i] - (i + 1)`. Binary search — recursively — for the first index where that count is at least `k`; the answer is `lo + k`.
 
 ---
 
-### M2 · Rearrange Array Elements by Sign
+### E7 · Count Digits Recursively
 
-**🔗 [LC 2149 — Rearrange Array Elements by Sign](https://leetcode.com/problems/rearrange-array-elements-by-sign/)** · Medium
-**Pattern:** Two Write Pointers | **Companies:** Amazon, Microsoft
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Allocate the result array, then place positives at even indices and negatives at odd ones with two pointers `pos = 0`, `neg = 1` moving in steps of 2. Relative order is preserved.
-
----
-
-### M3 · Rotate Array
-
-**🔗 [LC 189 — Rotate Array](https://leetcode.com/problems/rotate-array/)** · Medium
-**Pattern:** In-Place Reversals | **Companies:** Amazon, Microsoft, Google
-
-**Hint:** Rotate an array to the right by `k` steps in O(1) extra space using the reversal trick: reverse all → reverse first k → reverse rest.
+**Task:** `1 + countDigits(n/10)` if `n > 0`.
 
 ---
 
-### M4 · Next Permutation
+### E8 · Check if Array is Sorted
 
-**🔗 [LC 31 — Next Permutation](https://leetcode.com/problems/next-permutation/)** · Medium
-**Pattern:** Array Scanning / Math | **Companies:** Google, Amazon, Meta, Microsoft
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Find the next lexicographically greater permutation. Trace backwards to find the first dip, swap, and reverse the tail. O(n) time.
-
----
-
-### M5 · Product of Array Except Self
-
-**🔗 [LC 238 — Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)** · Medium
-**Pattern:** Prefix / Suffix Products | **Companies:** Amazon, Meta, Microsoft
-
-**Hint:** Return an array where `answer[i]` is the product of all elements except `nums[i]`, without using the division operator. O(n) time.
+**Task:** `return (arr[0] <= arr[1]) && isSorted(rest of array)`.
 
 ---
 
-### M6 · Best Time to Buy and Sell Stock
+### E9 · Linear Search (Recursive)
 
-**🔗 [LC 121 — Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)** · Easy
-**Pattern:** Kadane’s Cousin | **Companies:** Amazon, Google, Meta, Microsoft
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** (Wait, this is often Easy, but we'll include it here for continuity). Track `minPrice` to find the maximum possible profit.
-
----
-
-### M7 · Maximum Sum Circular Subarray
-
-**🔗 [LC 918 — Maximum Sum Circular Subarray](https://leetcode.com/problems/maximum-sum-circular-subarray/)** · Medium
-**Pattern:** Advanced Kadane's | **Companies:** Amazon, Google, Meta
-
-**Hint:** Max sub-sum is either `Kadane_Max(nums)` or `Total_Sum - Kadane_Min(nums)`. Be careful when all numbers are negative!
+**Task:** Search index 0, then recurse.
 
 ---
 
-### M8 · Determine if Two Strings Are Close
+### E10 · Fibonacci Number
 
-**🔗 [LC 1657 — Determine if Two Strings Are Close](https://leetcode.com/problems/determine-if-two-strings-are-close/)** · Medium
-**Pattern:** Frequency Arrays | **Companies:** Amazon, Google, Microsoft
+**🔗 [LC 509 — Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)** · Easy
+**Pattern:** Multiple Recursion | **Companies:** Amazon, Google, Adobe
 
-**Hint:** The two operations mean both strings must use the same set of letters, and their sorted frequency lists must match. Compare the presence of each letter, then sort both `int[26]` count arrays and compare.
-
----
-
-### M9 · Rotating the Box
-
-**🔗 [LC 1861 — Rotating the Box](https://leetcode.com/problems/rotating-the-box/)** · Medium
-**Pattern:** Matrix Rotation + Gravity | **Companies:** Amazon, Google
-
-**Hint:** First apply gravity in each row: scan right to left keeping the lowest free slot, moving stones there and resetting at obstacles. Then rotate 90° clockwise: `result[j][m - 1 - i] = box[i][j]`.
+**Hint:** Implement `fib(n) = fib(n-1) + fib(n-2)` and draw the recursion tree for `n = 5`. Count the repeated calls, then add a memo array and count again.
 
 ---
 
-### M10 · Range Sum Query 2D - Immutable
+### E11 · Sum of Digits in Base K
 
-**🔗 [LC 304 — Range Sum Query 2D - Immutable](https://leetcode.com/problems/range-sum-query-2d-immutable/)** · Medium
-**Pattern:** 2D Prefix Sums | **Companies:** Google, Amazon, Meta
+**🔗 [LC 1837 — Sum of Digits in Base K](https://leetcode.com/problems/sum-of-digits-in-base-k/)** · Easy
+**Pattern:** Linear Recursion on Digits | **Companies:** Amazon, Adobe
 
-**Hint:** Precompute a 2D prefix sum to answer any sub-rectangle query in O(1) using the `+ - - +` formula.
-
----
-
-### M11 · Insert Interval
-
-**🔗 [LC 57 — Insert Interval](https://leetcode.com/problems/insert-interval/)** · Medium
-**Pattern:** Array Iteration / Intersections | **Companies:** Google, Amazon, Meta, LinkedIn
-
-**Hint:** Insert an interval into a sorted array of non-overlapping intervals and merge if necessary. O(n) time.
+**Hint:** Recursive rule: `sumBase(n, k) = n % k + sumBase(n / k, k)`, with base case `n == 0`.
 
 ---
 
-### M12 · Reorder Data in Log Files
+### E12 · Binary Tree Paths
 
-**🔗 [LC 937 — Reorder Data in Log Files](https://leetcode.com/problems/reorder-data-in-log-files/)** · Medium
-**Pattern:** Custom String Comparator | **Companies:** Amazon
+**🔗 [LC 257 — Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)** · Easy
+**Pattern:** Tree Traversal | **Companies:** Google, Amazon, Meta
 
-**Hint:** Split each log once into an identifier and content. Letter-logs come first, sorted by content then identifier; digit-logs keep their original order. A stable sort with a comparator does it.
-
----
-
-### M13 · Make Sum Divisible by P
-
-**🔗 [LC 1590 — Make Sum Divisible by P](https://leetcode.com/problems/make-sum-divisible-by-p/)** · Medium
-**Pattern:** Prefix Sum Modulo + Map | **Companies:** Amazon, Google
-
-**Hint:** Let `need = total % p`. Scan prefix sums mod p, storing the last index of each remainder. At index `i`, look up remainder `(cur - need + p) % p` to find the shortest subarray to remove. Don't remove the whole array.
+**Hint:** Return all paths from root to leaf. Pre-order traversal with a path tracker.
 
 ---
 
-### M14 · Majority Element II
+## 🟡 Medium Tier (4 Problems)
 
-**🔗 [LC 229 — Majority Element II](https://leetcode.com/problems/majority-element-ii/)** · Medium
-**Pattern:** Boyer-Moore Voting Extension | **Companies:** Amazon, Google, Meta
+_Recursion that sorts, partitions, simulates, and — in Target Sum — needs a memo to finish in time._
 
-**Hint:** Find all elements that appear more than `⌊ n/3 ⌋` times using two counters. O(n) time, O(1) space.
+### M1 · Sort an Array
 
----
+**🔗 [LC 912 — Sort an Array](https://leetcode.com/problems/sort-an-array/)** · Medium
+**Pattern:** Merge Sort (Divide & Conquer) | **Companies:** Amazon, Microsoft, Google
 
-### M15 · Optimal Partition of String
-
-**🔗 [LC 2405 — Optimal Partition of String](https://leetcode.com/problems/optimal-partition-of-string/)** · Medium
-**Pattern:** Greedy Scan with a Seen Mask | **Companies:** Amazon, Google
-
-**Hint:** Walk the string keeping the letters in the current part (a 26-bit mask or boolean array). When a letter repeats, start a new part and clear the set. Greedy cutting is optimal.
+**Hint:** Recursively sort the left and right halves, then merge with two pointers into a temporary array. Base case: size ≤ 1. Guaranteed O(n log n), which LeetCode requires here.
 
 ---
 
-## 🔴 Hard Tier (10 Problems)
+### M2 · Partition Array According to Given Pivot
 
-_10 Advanced Problems._
+**🔗 [LC 2161 — Partition Array According to Given Pivot](https://leetcode.com/problems/partition-array-according-to-given-pivot/)** · Medium
+**Pattern:** Partition Logic | **Companies:** Amazon, Google
 
-### H1 · Candy
-
-**🔗 [LC 135 — Candy](https://leetcode.com/problems/candy/)** · Hard
-**Pattern:** Two-Pass Prefix / Suffix | **Companies:** Amazon, Google, Microsoft
-
-**Hint:** Left pass: `candy[i] = candy[i-1] + 1` if the rating goes up. Right pass: `candy[i] = max(candy[i], candy[i+1] + 1)` if the rating goes down. Sum the result.
+**Hint:** This is quicksort's partition step, done stably: collect elements `< pivot`, then `== pivot`, then `> pivot`. Then try it in one pass that writes smaller elements from the front and larger ones from the back.
 
 ---
 
-### H2 · Text Justification
+### M3 · Find the Winner of the Circular Game
 
-**🔗 [LC 68 — Text Justification](https://leetcode.com/problems/text-justification/)** · Hard
-**Pattern:** String Simulation | **Companies:** Google, Amazon, Microsoft
+**🔗 [LC 1823 — Find the Winner of the Circular Game](https://leetcode.com/problems/find-the-winner-of-the-circular-game/)** · Medium
+**Pattern:** Recurrence | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Greedily take as many words as fit with single spaces. Spread the extra spaces left-heavy: `extra / gaps` in each gap, with the first `extra % gaps` gaps getting one more. The last line and single-word lines are left-justified.
-
----
-
-### H3 · Max Sum of Rectangle No Larger Than K
-
-**🔗 [LC 363 — Max Sum of Rectangle No Larger Than K](https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/)** · Hard
-**Pattern:** Kadane's on 2D + Sorted Prefix Sums | **Companies:** Google, Amazon
-
-**Hint:** Fix a pair of rows (or columns), collapse the columns between them into a 1D array of sums, and find the best subarray sum ≤ k using a `TreeSet` of prefix sums (`ceiling(prefix - k)`). Unconstrained, this is 2D Kadane's.
+**Hint:** `n` people in a circle, every `k`-th is removed. Return the survivor. (Hint: 0-indexed, `f(1, k) = 0` and `f(n, k) = (f(n-1, k) + k) % n`; LeetCode numbers people from 1, so return `f(n, k) + 1`).
 
 ---
 
-### H4 · Shortest Palindrome
+### M4 · Target Sum
 
-**🔗 [LC 214 — Shortest Palindrome](https://leetcode.com/problems/shortest-palindrome/)** · Hard
-**Pattern:** Rolling Hash / KMP | **Companies:** Google, Amazon, Meta
+**🔗 [LC 494 — Target Sum](https://leetcode.com/problems/target-sum/)** · Medium
+**Pattern:** +/- Choices | **Companies:** Meta, Amazon, Google
 
-**Hint:** The answer is `reverse(suffix) + s`, where the kept prefix is the longest palindromic prefix of `s`. Find it with KMP: build the failure function of `s + "#" + reverse(s)`; its last value is that prefix's length.
-
----
-
-### H5 · Change Minimum Characters to Satisfy One of Three Conditions
-
-**🔗 [LC 1737 — Change Minimum Characters to Satisfy One of Three Conditions](https://leetcode.com/problems/change-minimum-characters-to-satisfy-one-of-three-conditions/)** · Medium
-**Pattern:** Prefix Counts over the Alphabet | **Companies:** Google
-
-**Hint:** Count letters of `a` and `b` in `int[26]`. For conditions 1 and 2, try every split letter `c` from 'b' to 'z': the cost is the letters of `a` that are `>= c` plus the letters of `b` that are `< c` (prefix sums over counts), and the same the other way round. For condition 3, the cost is `len(a) + len(b) - max(countA[x] + countB[x])`.
+**Hint:** Every number gets a `+` or a `-`: recurse `(i + 1, sum ± nums[i])` and count paths that end at `target`. Then memoise on `(i, sum)`. The DP trick (a subset with sum `(total + target) / 2`) comes in Lecture 34.
 
 ---
 
-### H6 · Valid Number
+## 🔴 Hard Tier (0 Problems)
 
-**🔗 [LC 65 — Valid Number](https://leetcode.com/problems/valid-number/)** · Hard
-**Pattern:** Parsing / State Tracking | **Companies:** LinkedIn, Meta, Amazon
-
-**Hint:** Scan once with flags `seenDigit`, `seenDot`, `seenExp`. A sign is only legal at the start or right after `e`. A dot can't come after `e`. After `e` you must see digits again.
-
----
-
-### H7 · Longest Mountain in Array
-
-**🔗 [LC 845 — Longest Mountain in Array](https://leetcode.com/problems/longest-mountain-in-array/)** · Medium
-**Pattern:** Up / Down Run Counting | **Companies:** Google, Amazon
-
-**Hint:** Track `up` and `down` lengths. Reset both at a plateau, or when you start going up again after a descent. A mountain exists when both are > 0, with length `up + down + 1`.
-
----
-
-### H8 · Longest Palindromic Substring
-
-**🔗 [LC 5 — Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)** · Medium
-**Pattern:** Expand Around Center | **Companies:** Amazon, Microsoft, Google
-
-**Hint:** Every palindrome has a center — a character or the gap between two. Expand outward from all `2n - 1` centers while the ends match, and keep the longest. O(n²) time, O(1) space.
-
----
-
-### H9 · String Compression
-
-**🔗 [LC 443 — String Compression](https://leetcode.com/problems/string-compression/)** · Medium
-**Pattern:** Read / Write Pointers | **Companies:** Microsoft, Amazon, Goldman Sachs
-
-**Hint:** `read` scans each run of equal chars; `write` writes the char, then the run length's digits if it's > 1. Everything happens in place, and you return `write`.
-
----
-
-### H10 · Decrease Elements To Make Array Zigzag
-
-**🔗 [LC 1144 — Decrease Elements To Make Array Zigzag](https://leetcode.com/problems/decrease-elements-to-make-array-zigzag/)** · Medium
-**Pattern:** Try Both Parities | **Companies:** Google
-
-**Hint:** Try both shapes: odd indices are valleys, or even indices are valleys. For each valley, the cost is `max(0, nums[i] - min(neighbours) + 1)`. Return the cheaper of the two totals.
-
----
+_No Hard problems here — the hard recursion problems are backtracking, which has its own lecture (24)._
 
 ## 📊 Complexity Analysis Exercises
 
-Determine **Time** and **Space** complexity for each. Answers below.
+Trace the recursion tree and find Time & Space complexity.
 
-```psuedocode
-// Snippet A — Sorting colors
-counts ← [0, 0, 0]
-for x in nums: counts[x] ← counts[x] + 1
-i ← 0
-for c from 0 to 2:
-    repeat counts[c] times:
-        nums[i] ← c
-        i ← i + 1
+```pseudocode
+// Snippet 1
+function recur(n):
+    if n ≤ 1: return
+    for i from 0 to n - 1: print(i)
+    recur(n ÷ 2)
 
-// Snippet B — Matrix operations
-for i from 0 to n - 1:
-    for j from i + 1 to n - 1:
-        swap matrix[i][j], matrix[j][i]
+// Snippet 2
+function solve(n):
+    if n ≤ 0: return
+    solve(n - 1)
+    solve(n - 1)
 
-// Snippet C — String build
-res ← ""                              // immutable string
-for i from 0 to n - 1:
-    res ← res + s[i]                  // creates a new string each time
+// Snippet 3
+// Generating all subsets of an array of size N
 
-// Snippet D — Sliding window
-l ← 0;  sum ← 0
-for r from 0 to n - 1:
-    sum ← sum + nums[r]
-    while sum > k:
-        sum ← sum - nums[l]
-        l ← l + 1
+// Snippet 4
+// Generating all permutations of an array of size N
 
-// Snippet E — Prefix lookup
-map ← empty map;  curr ← 0;  res ← 0
-for x in nums:
-    curr ← curr + x
-    if (curr - k) in map: res ← res + map[curr - k]
-    map[curr] ← (map[curr] if curr in map, else 0) + 1
+// Snippet 5
+function factorial(n):
+    if n = 0: return 1
+    return n × factorial(n - 1)
+
+// Snippet 6
+// Fibonacci with memoisation
+
+// Snippet 7
+function work(n):
+    if n ≤ 1: return
+    for i from 0 to n - 1: work(n - 1)
+
+// Snippet 8
+// Traversing a perfectly balanced binary tree of height H
 ```
 
-**Answers:**
+**Complexity Answers:**
 
-| Snippet | Time  | Space | Key Insight                                                         |
-| :------ | :---- | :---- | :------------------------------------------------------------------ |
-| **A**   | O(N)  | O(1)  | Two passes (counting and filling); fixed size 3 aux array.          |
-| **B**   | O(N²) | O(1)  | Nested loops over n\*n/2 elements.                                  |
-| **C**   | O(N²) | O(N)  | String immutability leads to object copying in every iteration.     |
-| **D**   | O(N)  | O(1)  | Both pointers `l` and `r` traverse each element at most once.       |
-| **E**   | O(N)  | O(N)  | HashMap operations are O(1) avg; O(N) space for unique prefix sums. |
+1. **O(n)** Time (n + n/2 + n/4... = 2n), O(log n) Space (Stack depth).
+2. **O(2ⁿ)** Time, O(n) Space.
+3. **O(2ⁿ \* n)** Time. 2ⁿ subsets, n work per subset.
+4. **O(n! \* n)** Time. n! permutations, n work per result.
+5. **O(n)** Time, O(n) Space.
+6. **O(n)** Time, O(n) Space.
+7. **O(n!)** Time.
+8. **O(2ᴴ)** Time, O(H) Space.
 
 ---
 
 ## 🔍 Self-Assessment — True / False
 
-1. `arr[mid] - 'a'` is a valid way to map lowercase English characters to integers 0–25. → **True**
-2. Kadane's algorithm is only applicable if the array contains at least one positive number. → **False** (It works for
-   all-negative arrays by tracking max directly).
-3. `StringBuilder` is faster than `String` concatenations because it avoids repeated object copies. → **True**
-4. Rolling hash allows us to update the hash of a sliding window in O(1) time. → **True**
-5. A 2D Prefix Sum array requires an additional O(N²) space. → **True**
-6. Finding the majority element using Boyer-Moore requires sorting the array first. → **False** (One pass, O(1) space).
+1. Base case is optional in recursion if the input is always positive. → **False** (leads to infinite recursion).
+2. Recursion always uses more memory than iteration due to stack frames. → **True** (unless Tail Call Optimisation
+   exists).
+3. A recursive call with a smaller argument always terminates. → **False** (only if every path reaches a base case).
+4. Memoisation converts a recursive problem to O(n) space always. → **False** (Depends on state variables).
+5. Tail recursion can be turned into a loop without any extra stack. → **True** (the call is the last thing, so no frame needs to survive it).
+6. Recursion stack limit can be changed in JVM flags. → **True**.
+7. Divide and Conquer and Dynamic Programming mean the same thing. → **False** (DP has overlapping subproblems).
+8. Every recursive solution can be written iteratively. → **True** (Church-Turing thesis).
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. Explain the "baggage reset" intuition in Kadane’s algorithm. When do we decide to start a new subarray?
-2. Compare a mapping using `int[26]` and `HashMap<Character, Integer>`. When is the array strictly better?
-3. Why does swapping a `2` with the `high` index in Sort Colors (DNF) NOT allow us to increment the `mid` pointer
-   immediately?
-4. How do prefix sums convert O(N) range queries into O(1) operations? What is the tradeoff?
-5. Describe the "Reversal Trick" for rotating an array. Why does it work?
+1. **Leap of faith**: In your own words, what are you allowed to assume about the recursive call, and why is that not circular reasoning?
+2. **Stack Overflow**: Why does `int[] a = new int[1000000]` inside a recursive method not cause `StackOverflowError`
+   immediately, while nesting 1 million depth does? (Hint: Stack stores reference, Heap stores array).
+3. **Memoisation vs Tabulation**: Explain Top-Down vs Bottom-Up. Which one is closer to pure recursion?
+4. **Call-tree cost**: Draw the call tree for `fib(5)`. Count the calls, then count them again with a memo. Where does the saving come from?
+5. **Tail Recursion**: What is Tail Call Optimisation (TCO)? Does Java support it natively?
 
 ---
 
@@ -429,27 +262,26 @@ for x in nums:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                           |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Candy](https://leetcode.com/problems/candy/), [Text Justification](https://leetcode.com/problems/text-justification/), [Max Sum of Rectangle No Larger Than K](https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/), [Shortest Palindrome](https://leetcode.com/problems/shortest-palindrome/) |
-| **Google**    | [Candy](https://leetcode.com/problems/candy/), [Text Justification](https://leetcode.com/problems/text-justification/), [Max Sum of Rectangle No Larger Than K](https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/), [Shortest Palindrome](https://leetcode.com/problems/shortest-palindrome/) |
-| **Meta**      | [Shortest Palindrome](https://leetcode.com/problems/shortest-palindrome/), [Valid Number](https://leetcode.com/problems/valid-number/), [Next Permutation](https://leetcode.com/problems/next-permutation/), [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)         |
-| **Microsoft** | [Candy](https://leetcode.com/problems/candy/), [Text Justification](https://leetcode.com/problems/text-justification/), [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/), [String Compression](https://leetcode.com/problems/string-compression/)                   |
-| **LinkedIn**  | [Valid Number](https://leetcode.com/problems/valid-number/), [Insert Interval](https://leetcode.com/problems/insert-interval/), [Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)                                                                                                              |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Partition Array According to Given Pivot](https://leetcode.com/problems/partition-array-according-to-given-pivot/), [Sum of Digits in Base K](https://leetcode.com/problems/sum-of-digits-in-base-k/), [Find the Winner of the Circular Game](https://leetcode.com/problems/find-the-winner-of-the-circular-game/), [Sort an Array](https://leetcode.com/problems/sort-an-array/) |
+| **Google**    | [Partition Array According to Given Pivot](https://leetcode.com/problems/partition-array-according-to-given-pivot/), [Target Sum](https://leetcode.com/problems/target-sum/), [Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/), [Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)                                                           |
+| **Meta**      | [Kth Missing Positive Number](https://leetcode.com/problems/kth-missing-positive-number/), [Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/), [Target Sum](https://leetcode.com/problems/target-sum/), [Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)                                                                               |
+| **Adobe**     | [Sum of Digits in Base K](https://leetcode.com/problems/sum-of-digits-in-base-k/), [Find the Winner of the Circular Game](https://leetcode.com/problems/find-the-winner-of-the-circular-game/), [Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)                                                                                                                |
+| **Microsoft** | [Sort an Array](https://leetcode.com/problems/sort-an-array/), [Kth Missing Positive Number](https://leetcode.com/problems/kth-missing-positive-number/), [Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/)                                                                                                                                                |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 10 Hard problems attempted
+- [ ] All 12 Easy problems solved
+- [ ] All 4 Medium problems solved
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud
-- [ ] I can explain why `StringBuilder` beats `String +=` inside a loop
-- [ ] I can build a prefix-sum array and answer range queries in O(1)
+- [ ] I can draw the recursion tree for a small input before coding
+- [ ] I can add a memo to a recursion and say what the cache key is
 
 ---
 
-**← [Lecture 7 · Mathematics for DSA](../Lecture7/Assignment.md)** &nbsp;·&nbsp; **[Lecture 9 · Sorting Algorithms](../Lecture9/Assignment.md) →**
+**← [Lecture 7 · Java 8+ Modern Features](../Lecture7/Assignment.md)** &nbsp;·&nbsp; **[Lecture 9 · Bit Manipulation](../Lecture9/Assignment.md) →**

@@ -1,237 +1,317 @@
-# ⛰️ Assignment 16 — Heaps & Priority Queues
+# 🗃️ Assignment 13 — HashMap & HashSet
 
-> **Lecture:** 16 of 38 — Heaps & Priority Queues
+> **Lecture:** 16 of 45 — HashMap & HashSet
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 5 days · **Total Problems:** 20 (5 Easy · 10 Medium · 5 Hard)
-> **Goal:** Master the 5 heap patterns — Single Heap, Top-K, Two Heaps, K-way Merge, Greedy Heap.
+> **Estimated Time:** 4 days · **Total Problems:** 25 (7 Easy · 14 Medium · 4 Hard)
+> **Goal:** Master the 5 core HashMap patterns: Frequency Map, Complement Lookup, Prefix Sum + Map, Group-by-Key, and Set Membership. Understand hashing internals, collision resolution, and cache design.
 
 ---
 
 ## 🗺️ Pattern Recognition — Read Before Starting
 
-| Signal Phrase                              | Pattern        | Tool                         |
-| ------------------------------------------ | -------------- | ---------------------------- |
-| "Kth largest/smallest", "running max/min"  | Single Heap    | Min/max-heap of size K       |
-| "top K frequent", "K closest", "K largest" | Top K Elements | Size-K min-heap              |
-| "median", "sliding window median"          | Two Heaps      | maxH (lower) + minH (upper)  |
-| "merge K sorted", "smallest from K lists"  | K-way Merge    | Min-heap with (val, listIdx) |
-| "schedule", "cooldown", "reorganize"       | Greedy Heap    | Max-heap + wait queue        |
+The HashMap is the single most-used data structure in FAANG coding interviews. It transforms O(n) linear scans into O(1) lookups. Understanding **when** to use it and **which pattern** to apply is the difference between a 30-minute solution and a 3-minute one.
+
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
+
+| Signal in the Problem             | Pattern              | Move                                        |
+| --------------------------------- | -------------------- | ------------------------------------------- |
+| "pair sums to target"             | Complement Lookup    | check `target - x` before storing `x`       |
+| "count subarrays with sum k"      | Prefix Sum + HashMap | count earlier prefixes equal to `sum - k`   |
+| "group items that are equivalent" | Canonical Key        | sorted string or count signature as the key |
+| "longest consecutive run"         | HashSet Starts       | only expand from `x` when `x - 1` is absent |
+| "one-to-one mapping"              | Bijection            | two maps, one per direction                 |
+| "frequency of frequencies"        | Nested Counting      | count values, then count the counts         |
 
 ---
 
----
+## 🟢 Easy Tier (7 Problems)
 
-## 🟢 Easy Tier (5 Problems)
+_Build confidence with the core HashMap API and the simplest pattern variants._
 
-### E1 · Kth Largest Element in a Stream
+### E1 · Two Sum
 
-**🔗 [LC 703 — Kth Largest Element in a Stream](https://leetcode.com/problems/kth-largest-element-in-a-stream/)** · Easy
-**Pattern:** Single Min-Heap | **Companies:** Amazon, Google
+**🔗 [LC 1 — Two Sum](https://leetcode.com/problems/two-sum/)** · Easy
+**Pattern:** Complement Lookup | **Companies:** Amazon, Google, Meta, Microsoft
 
-**Hint:** Maintain a min-heap of size k. On each `add(val)`, offer val, poll if size > k. Return `heap.peek()`. Same as Kth Largest in Array but online.
-
----
-
-### E2 · Last Stone Weight
-
-**🔗 [LC 1046 — Last Stone Weight](https://leetcode.com/problems/last-stone-weight/)** · Easy
-**Pattern:** Max-Heap | **Companies:** Amazon
-
-**Hint:** Push all stones into a max-heap. Each round: poll two heaviest, push back `|y - x|` if not equal. Return remaining stone (or 0).
+**Hint:** Map each value to its index. For `nums[i]`, check whether `target - nums[i]` is already in the map before inserting `nums[i]` — that stops an element pairing with itself.
 
 ---
 
-### E3 · Relative Ranks
+### E2 · Roman to Integer
 
-**🔗 [LC 506 — Relative Ranks](https://leetcode.com/problems/relative-ranks/)** · Easy
-**Pattern:** Max-Heap | **Companies:** Google
+**🔗 [LC 13 — Roman to Integer](https://leetcode.com/problems/roman-to-integer/)** · Easy
+**Pattern:** Character Map | **Companies:** Amazon, Microsoft, Adobe
 
-**Hint:** Push `(score, index)` into a max-heap. Poll in order: first gets "Gold Medal", second "Silver Medal", third "Bronze Medal", rest get their rank number.
-
----
-
-### E4 · Take Gifts From the Richest Pile
-
-**🔗 [LC 2558 — Take Gifts From the Richest Pile](https://leetcode.com/problems/take-gifts-from-the-richest-pile/)** · Easy
-**Pattern:** Max-Heap Simulation | **Companies:** Amazon
-
-**Hint:** Put every pile in a max-heap. `k` times: pop the largest, push back `floor(sqrt(x))`. Sum what's left (as `long`). O((n + k) log n).
+**Hint:** Map the symbols to values. A symbol smaller than the one after it is subtracted (as in `IV`). Scanning right to left: add the value if it's `>=` the previous value, otherwise subtract.
 
 ---
 
-### E5 · Sort Characters By Frequency
+### E3 · Check if the Sentence Is Pangram
 
-**🔗 [LC 451 — Sort Characters By Frequency](https://leetcode.com/problems/sort-characters-by-frequency/)** · Medium
-**Pattern:** Max-Heap | **Companies:** Amazon, Google
+**🔗 [LC 1832 — Check if the Sentence Is Pangram](https://leetcode.com/problems/check-if-the-sentence-is-pangram/)** · Easy
+**Pattern:** HashSet / Boolean Array | **Companies:** Amazon, Google
 
-**Hint:** Count frequencies, push into max-heap. Poll in descending frequency order, append `freq` copies of the character to result.
-
----
-
-## 🟡 Medium Tier (10 Problems)
-
-_Core Interview Patterns._
-
-### M1 · Kth Largest Element in an Array
-
-**🔗 [LC 215 — Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)** · Medium
-**Pattern:** Single Min-Heap | **Companies:** Amazon, Google, Facebook, Microsoft
-
-**Hint:** Size-K min-heap. Offer each element; if size > K, poll. Return peek. Alternative: QuickSelect O(n) average.
+**Hint:** Add each character to a `boolean[26]` (or a set) and check all 26 are seen. Early exit once the count reaches 26.
 
 ---
 
-### M2 · Top K Frequent Elements
+### E4 · Contains Duplicate
 
-**🔗 [LC 347 — Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)** · Medium
-**Pattern:** Top K | **Companies:** Amazon, Google, Facebook
+**🔗 [LC 217 — Contains Duplicate](https://leetcode.com/problems/contains-duplicate/)** · Easy
+**Pattern:** Set Membership | **Companies:** Amazon, Google, Apple
 
-**Hint:** HashMap for frequencies + size-K min-heap sorted by frequency. Alternative: bucket sort in O(n).
-
----
-
-### M3 · K Closest Points to Origin
-
-**🔗 [LC 973 — K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)** · Medium
-**Pattern:** Top K | **Companies:** Amazon, Google, Facebook, Uber
-
-**Hint:** Max-heap of size K by squared distance. If new point is closer than farthest in heap, swap. Use squared distance (avoid sqrt). Return heap contents.
+**Hint:** Add elements to a `HashSet`; `add` returns `false` on a duplicate, so return `true` then. O(n) time, O(n) space — compare with the sort-first O(1)-space version.
 
 ---
 
-### M4 · The K Weakest Rows in a Matrix
+### E5 · Ransom Note
 
-**🔗 [LC 1337 — The K Weakest Rows in a Matrix](https://leetcode.com/problems/the-k-weakest-rows-in-a-matrix/)** · Easy
-**Pattern:** K-way Merge / Min-Heap | **Companies:** Amazon, Google
+**🔗 [LC 383 — Ransom Note](https://leetcode.com/problems/ransom-note/)** · Easy
+**Pattern:** Frequency Map | **Companies:** Amazon, Google, Apple
 
-**Hint (Sort K-sorted array):** Elements are at most K positions from their sorted position. Use a min-heap of size K+1. Slide window: offer next element, poll minimum into result.
-
----
-
-### M5 · Find K Pairs with Smallest Sums
-
-**🔗 [LC 373 — Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/)** · Medium
-**Pattern:** K-way Merge | **Companies:** Google, Amazon
-
-**Hint:** Push `(nums1[0]+nums2[j], 0, j)` for all j=0..k-1 into min-heap. Each poll: output pair, push `(nums1[i+1]+nums2[j], i+1, j)` to continue that "row".
+**Hint:** Count the magazine's letters in `int[26]`, then walk the ransom note decrementing counts; if any count goes below zero, return false.
 
 ---
 
-### M6 · Reorganize String
+### E6 · Word Pattern
 
-**🔗 [LC 767 — Reorganize String](https://leetcode.com/problems/reorganize-string/)** · Medium
-**Pattern:** Greedy Heap | **Companies:** Google, Amazon, Facebook
+**🔗 [LC 290 — Word Pattern](https://leetcode.com/problems/word-pattern/)** · Easy
+**Pattern:** Bijective Map | **Companies:** Google, Amazon, Uber
 
-**Hint:** Max-heap by frequency. Each round: poll two most frequent chars, append both, decrement. If only one char left and its count > 1 → impossible (return "").
-
----
-
-### M7 · Task Scheduler
-
-**🔗 [LC 621 — Task Scheduler](https://leetcode.com/problems/task-scheduler/)** · Medium
-**Pattern:** Greedy Heap | **Companies:** Amazon, Facebook, Uber
-
-**Hint:** Max-heap + wait queue `[(remaining, available_at)]`. At each tick: if heap non-empty do the most frequent task. Enqueue to wait with `time + n`. Recheck wait queue each tick.
-
-**Math shortcut:** `max(tasks.length, (maxFreq-1)*(n+1) + countOfMaxFreq)`
+**Hint:** Split `s` into words (lengths must match the pattern's). Keep `char → word` and `word → char` maps and fail on any conflicting mapping in either direction.
 
 ---
 
-### M8 · Super Ugly Number
+### E7 · Isomorphic Strings
 
-**🔗 [LC 313 — Super Ugly Number](https://leetcode.com/problems/super-ugly-number/)** · Medium
-**Pattern:** K-Way Merge with a Heap | **Companies:** Google, Amazon
+**🔗 [LC 205 — Isomorphic Strings](https://leetcode.com/problems/isomorphic-strings/)** · Easy
+**Pattern:** Bijective Map | **Companies:** Google, Amazon, LinkedIn
 
-**Hint:** Same idea as Ugly Number II with k pointers. Push `(primes[j], j, index 0)` into a min-heap; pop the smallest, append it if it's new, and push `primes[j] × ugly[index + 1]`. Skip duplicates when popping.
-
----
-
-### M9 · Maximum Subsequence Score
-
-**🔗 [LC 2542 — Maximum Subsequence Score](https://leetcode.com/problems/maximum-subsequence-score/)** · Medium
-**Pattern:** Greedy + Min-Heap | **Companies:** Google
-
-**Hint:** Sort pairs by nums2 descending. Maintain a min-heap of size k for nums1 values. At each step: track sum of top-k nums1 values. Score = sum \* nums2[i]. Update global max.
+**Hint:** Map `s[i] → t[i]` and `t[i] → s[i]`. If either map already holds a different partner, the strings aren't isomorphic. Arrays of size 256 work as maps.
 
 ---
 
-### M10 · Design Twitter
+## 🟡 Medium Tier (14 Problems)
 
-**🔗 [LC 355 — Design Twitter](https://leetcode.com/problems/design-twitter/)** · Medium
-**Pattern:** K-way Merge | **Companies:** Amazon, Twitter
+_Focus on multi-step HashMap reasoning and patterns within patterns._
 
-**Hint:** Each user has a tweet list. `getNewsFeed` merges the 10 most recent tweets from the user and all followees using a max-heap (by timestamp). Classic K-way merge with K = number of followees + 1.
+### M1 · Group Anagrams
 
----
+**🔗 [LC 49 — Group Anagrams](https://leetcode.com/problems/group-anagrams/)** · Medium
+**Pattern:** Group-by-Key | **Companies:** Amazon, Meta, Uber, Google
 
-## 🔴 Hard Tier (5 Problems)
-
-_FAANG Mastery._
-
-### H1 · Find Median from Data Stream
-
-**🔗 [LC 295 — Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)** · Hard
-**Pattern:** Two Heaps | **Companies:** Amazon, Google, Microsoft, Apple
-
-**Hint:** maxH (lower half) + minH (upper half). Always push to maxH first, then shuttle max-of-lower to minH. Rebalance if minH grows larger. Median at root(s).
-
-**Why Hard?** Maintaining the invariant `maxH.peek() ≤ minH.peek()` after every insert requires careful two-step push. Off-by-one on rebalancing is the classic bug.
+**Hint:** Group by a canonical key: the sorted characters, or a 26-count signature like `"#1#0#2…"`, which avoids the `k log k` sort. `computeIfAbsent(key, x -> new ArrayList<>()).add(s)`.
 
 ---
 
-### H2 · Sliding Window Median
+### M2 · Display Table of Food Orders in a Restaurant
 
-**🔗 [LC 480 — Sliding Window Median](https://leetcode.com/problems/sliding-window-median/)** · Hard
-**Pattern:** Two Heaps + Lazy Deletion | **Companies:** Google, Amazon
+**🔗 [LC 1418 — Display Table of Food Orders in a Restaurant](https://leetcode.com/problems/display-table-of-food-orders-in-a-restaurant/)** · Medium
+**Pattern:** Nested HashMaps | **Companies:** JPMorgan, Amazon
 
-**Hint:** Same Two Heaps as LC 295 but must support removal of the element sliding out of the window. Use lazy deletion: a HashMap tracks "cancelled" elements; skip them when they reach the top of the heap during balance checks.
-
-**Why Hard?** Lazy deletion with rebalancing while keeping `maxH.peek() ≤ minH.peek()` after both insert and delete is tricky.
+**Hint:** Map `table → (food → count)` with a `TreeMap` for tables (numeric order) and a `TreeSet` for food names. Build the header from the food set, then one row per table.
 
 ---
 
-### H3 · Merge k Sorted Lists
+### M3 · Subarray Sum Equals K
 
-**🔗 [LC 23 — Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)** · Hard
-**Pattern:** K-way Merge | **Companies:** Amazon, Google, Microsoft, Facebook
+**🔗 [LC 560 — Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)** · Medium
+**Pattern:** Prefix Sum + Map | **Companies:** Meta, Amazon, Google
 
-**Hint:** Push all K heads. Poll minimum, add to result, push its next. O(N log K).
-
-**Why Hard (conceptually):** The O(N log K) vs naive O(NK) distinction and handling null nodes cleanly is what interviewers focus on. Follow-up: what if K = 10^5?
+**Hint:** Keep a map of prefix sum → how many times it has appeared, starting with `{0: 1}`. At each step add `map.getOrDefault(sum - k, 0)` to the answer, then record the current sum. Negative numbers are why a sliding window fails here.
 
 ---
 
-### H4 · Smallest Range Covering Elements from K Lists
+### M4 · Longest Consecutive Sequence
 
-**🔗 [LC 632 — Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/)** · Hard
-**Pattern:** K-way Merge + Sliding Window | **Companies:** Google, Amazon
+**🔗 [LC 128 — Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)** · Medium
+**Pattern:** Set Membership | **Companies:** Google, Amazon, Meta
 
-**Hint:** Push `(val, listIdx, elemIdx)` for all `list[i][0]` into min-heap. Track current max across all heap elements. Range = `[minHeap.peek(), curMax]`. Slide: poll min, push next from same list. Update range if smaller. Stop when any list is exhausted.
+**Hint:** Put everything in a `HashSet`. Only start counting from `x` when `x - 1` is not in the set (a sequence start), then walk `x + 1, x + 2, …`. Each number is visited a constant number of times: O(n).
 
 ---
 
-### H5 · IPO
+### M5 · 4Sum II
 
-**🔗 [LC 502 — IPO](https://leetcode.com/problems/ipo/)** · Hard
-**Pattern:** Two Heaps (Greedy) | **Companies:** Google, Amazon, Microsoft
+**🔗 [LC 454 — 4Sum II](https://leetcode.com/problems/4sum-ii/)** · Medium
+**Pattern:** Complement Lookup | **Companies:** Amazon, Google
 
-**Hint:** Sort projects by capital required. Min-heap of `(capital, profit)` for available projects. Max-heap of `profit` for projects you can afford. At each of k rounds: unlock all projects with `capital ≤ w` into profit max-heap. Pick the most profitable one, add profit to `w`.
+**Hint:** Count all sums `a + b` from the first two arrays in a map. For every `c + d`, add `map.getOrDefault(-(c + d), 0)`. O(n²) instead of O(n⁴).
 
-**Why Hard?** Combining sorted order, two different heaps, and greedy reasoning in one problem.
+---
+
+### M6 · Contiguous Array
+
+**🔗 [LC 525 — Contiguous Array](https://leetcode.com/problems/contiguous-array/)** · Medium
+**Pattern:** Prefix Sum + Map | **Companies:** Meta, Amazon, Google
+
+**Hint:** Treat 0 as -1; you now need the longest subarray with sum 0. Store the first index at which each prefix sum appears (with `0 → -1`); when a sum repeats at `i`, the candidate length is `i - first[sum]`.
+
+---
+
+### M7 · Repeated DNA Sequences
+
+**🔗 [LC 187 — Repeated DNA Sequences](https://leetcode.com/problems/repeated-dna-sequences/)** · Medium
+**Pattern:** Rolling Hash / Set of Substrings | **Companies:** Amazon, Google, LinkedIn
+
+**Hint:** Slide a length-10 window. Put each substring (or its 20-bit encoding — 2 bits per letter) in `seen`; if it was already there, add it to `result` (also a set, to avoid duplicates).
+
+---
+
+### M8 · Divide Players Into Teams of Equal Skill
+
+**🔗 [LC 2491 — Divide Players Into Teams of Equal Skill](https://leetcode.com/problems/divide-players-into-teams-of-equal-skill/)** · Medium
+**Pattern:** Counting + Complement | **Companies:** Amazon, Google
+
+**Hint:** The pair total must be `2 × sum / n`. Count skills in a map, and for each skill `x` pair it with `target - x`; if the counts don't match, return -1. Chemistry adds up `x × (target - x)`.
+
+---
+
+### M9 · Max Number of K-Sum Pairs
+
+**🔗 [LC 1679 — Max Number of K-Sum Pairs](https://leetcode.com/problems/max-number-of-k-sum-pairs/)** · Medium
+**Pattern:** Complement Counting | **Companies:** Amazon, Google, Meta
+
+**Hint:** For each `x`, if `k - x` has a positive count in the map, form an operation and decrement it; otherwise increment the count of `x`. One pass, O(n).
+
+---
+
+### M10 · Brick Wall
+
+**🔗 [LC 554 — Brick Wall](https://leetcode.com/problems/brick-wall/)** · Medium
+**Pattern:** Frequency Map | **Companies:** Meta, Amazon
+
+**Hint:** Count how many rows have a brick edge at each position (prefix widths, excluding the wall's end). Cutting at the most common edge crosses the fewest bricks: `rows - maxEdgeCount`.
+
+---
+
+### M11 · Number of Pairs of Interchangeable Rectangles
+
+**🔗 [LC 2001 — Number of Pairs of Interchangeable Rectangles](https://leetcode.com/problems/number-of-pairs-of-interchangeable-rectangles/)** · Medium
+**Pattern:** Group-by-Key | **Companies:** Amazon, Google
+
+**Hint:** Two rectangles are interchangeable when `w / h` is equal. Use the reduced fraction `(w / g, h / g)` as the key (not a `double`). A group of size `c` contributes `c × (c - 1) / 2` pairs — or add the running count as you go.
+
+---
+
+### M12 · Max Sum of a Pair With Equal Sum of Digits
+
+**🔗 [LC 2342 — Max Sum of a Pair With Equal Sum of Digits](https://leetcode.com/problems/max-sum-of-a-pair-with-equal-sum-of-digits/)** · Medium
+**Pattern:** Group by Derived Key | **Companies:** Amazon, Google
+
+**Hint:** Key each number by its digit sum. Keep only the largest value seen per key; when a new number shares a key, update the answer with `best[key] + x`, then update `best[key]`.
+
+---
+
+### M13 · Subarray Sums Divisible by K
+
+**🔗 [LC 974 — Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)** · Medium
+**Pattern:** Prefix Sum + Map | **Companies:** Amazon, Google, Meta
+
+**Hint:** Count prefix sums modulo `k`, normalised to be non-negative (`((sum % k) + k) % k`), starting with `{0: 1}`. Two prefixes with equal remainders bound a divisible subarray, so add the current count before incrementing it.
+
+---
+
+### M14 · LRU Cache
+
+**🔗 [LC 146 — LRU Cache](https://leetcode.com/problems/lru-cache/)** · Medium
+**Pattern:** HashMap + Doubly Linked List | **Companies:** Amazon, Microsoft, Meta, Google
+
+**Hint:** A HashMap from key to node, plus a doubly linked list with head and tail sentinels in recency order. `get` moves the node to the front; `put` inserts or updates at the front and evicts `tail.prev` when over capacity. In Java, `LinkedHashMap` in access order with `removeEldestEntry` does the same.
+
+---
+
+## 🔴 Hard Tier (4 Problems)
+
+_Focus on cache design, complex mapping invariants, and advanced grouping._
+
+### H1 · Maximum Equal Frequency
+
+**🔗 [LC 1224 — Maximum Equal Frequency](https://leetcode.com/problems/maximum-equal-frequency/)** · Hard
+**Pattern:** Frequency of Frequencies | **Companies:** Google, Amazon
+
+**Hint:** Maintain `count[x]` and `freqOfCount[c]`. After each prefix, it's valid if: every count is 1; or one value has count 1 and the rest share a max count; or one value has max count `mx` and the rest have `mx - 1`.
+
+---
+
+### H2 · Longest Duplicate Substring
+
+**🔗 [LC 1044 — Longest Duplicate Substring](https://leetcode.com/problems/longest-duplicate-substring/)** · Hard
+**Pattern:** Rolling Hash + Binary Search | **Companies:** Google, Amazon
+
+**Hint:** Binary search the length `L` (if a duplicate of length `L` exists, one of length `L - 1` does too). For each `L`, hash every substring with a rolling hash and check for repeats in a set — verify real matches to guard against collisions.
+
+---
+
+### H3 · All O`one Data Structure
+
+**🔗 [LC 432 — All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/)** · Hard
+**Pattern:** HashMap + Frequency Bucket List | **Companies:** Google, Amazon, Meta
+
+**Hint:** Keep a doubly linked list of buckets in increasing count order, each holding a set of keys, plus `key → bucket`. `inc` and `dec` move a key to the neighbouring bucket (creating or removing buckets as needed). `getMaxKey` and `getMinKey` read the list's ends in O(1).
+
+---
+
+### H4 · Palindrome Pairs
+
+**🔗 [LC 336 — Palindrome Pairs](https://leetcode.com/problems/palindrome-pairs/)** · Hard
+**Pattern:** Hashing Reversed Words | **Companies:** Google, Airbnb, Amazon
+
+**Hint:** Map each reversed word to its index. For every word and split point, if the left part is a palindrome and the reversed right part is in the map (a different index), you've found a pair — and symmetrically for the right part.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — insert n keys into a HashMap
+
+// Snippet 2
+for i from 0 to n - 1:
+    if list.contains(target - a[i]): return true      // list is an ArrayList
+
+// Snippet 3 — same as Snippet 2, but a HashSet instead of a list
+
+// Snippet 4 — count character frequencies of a string of length n
+
+// Snippet 5 — group n words of length k by their sorted letters
+
+// Snippet 6 — insert n keys into a TreeMap
+```
+
+**Complexity Answers:**
+
+1. **O(n)** average — O(1) each, amortised over resizes.
+2. **O(n²)** — contains on a list is O(n).
+3. **O(n)** average — contains on a set is O(1).
+4. **O(n)** time; O(1) space if the alphabet is fixed.
+5. **O(n · k log k)** — sorting each word dominates.
+6. **O(n log n)** — O(log n) per insert.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. HashMap lookups are O(1) in the worst case. → **False** — average O(1); a crowded bucket makes the worst case O(log n) in Java 8+
+2. Two objects that are equal must have the same hashCode. → **True** — otherwise hash-based collections break
+3. Two objects with the same hashCode must be equal. → **False** — different objects can collide
+4. HashMap keeps its keys in insertion order. → **False** — LinkedHashMap does; TreeMap keeps them sorted
+5. An int[] makes a good HashMap key. → **False** — arrays use identity equality; convert to a String or List
+6. A HashSet is a HashMap in disguise. → **True** — Java's HashSet stores its items as keys of an internal HashMap
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. **Build heap:** Why is `buildHeap` O(n) when inserting n elements one-by-one is O(n log n)? Where does the O(n) proof break the intuition?
+Answer these without looking at code:
 
-2. **Top-K counterintuitive:** You want the K _largest_ elements but you use a _min_-heap. Explain why. What happens if you use a max-heap instead?
-
-3. **Two Heaps invariant:** In `addNum`, why do we always push to maxH first (even if the number is larger than minH.peek())? What does the cross-push enforce?
-
-4. **K-way merge complexity:** Merging K lists with N total elements takes O(N log K). Why K in the log and not N? What is the heap size at any point?
-
-5. **Lazy deletion:** In Sliding Window Median, when an element slides out, you can't remove it from the middle of a heap in O(log n) without a custom structure. What does lazy deletion do instead?
+1. **Load Factor**: Java's HashMap doubles capacity when load factor exceeds 0.75. Why 0.75 specifically? What are the tradeoffs of 0.5 vs 0.99?
+2. **hashCode() contract**: If two objects are `equals()`, what must be true of their `hashCode()`? What about the reverse?
+3. **Treeification**: Why does Java 8's HashMap convert a linked list bucket to a Red-Black tree when chain length > 8? What's the worst-case complexity improvement?
+4. **int[] vs HashMap**: For character frequency counting on lowercase alpha strings, why is `int[26]` preferable to `HashMap<Character, Integer>`?
+5. **LinkedHashMap**: Explain how `removeEldestEntry` works. How does access-order mode differ from insertion-order mode?
 
 ---
 
@@ -239,27 +319,27 @@ _FAANG Mastery._
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/) |
-| **Google**    | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/) |
-| **Facebook**  | [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/), [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/), [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)                             |
-| **Microsoft** | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/), [IPO](https://leetcode.com/problems/ipo/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)                                                                 |
-| **Uber**      | [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/)                                                                                                                                                                                                                               |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Display Table of Food Orders in a Restaurant](https://leetcode.com/problems/display-table-of-food-orders-in-a-restaurant/), [Longest Duplicate Substring](https://leetcode.com/problems/longest-duplicate-substring/), [Maximum Equal Frequency](https://leetcode.com/problems/maximum-equal-frequency/), [Palindrome Pairs](https://leetcode.com/problems/palindrome-pairs/)                                                 |
+| **Google**    | [4Sum II](https://leetcode.com/problems/4sum-ii/), [Divide Players Into Teams of Equal Skill](https://leetcode.com/problems/divide-players-into-teams-of-equal-skill/), [Max Sum of a Pair With Equal Sum of Digits](https://leetcode.com/problems/max-sum-of-a-pair-with-equal-sum-of-digits/), [Number of Pairs of Interchangeable Rectangles](https://leetcode.com/problems/number-of-pairs-of-interchangeable-rectangles/) |
+| **Meta**      | [Brick Wall](https://leetcode.com/problems/brick-wall/), [All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/), [Contiguous Array](https://leetcode.com/problems/contiguous-array/), [Group Anagrams](https://leetcode.com/problems/group-anagrams/)                                                                                                                                              |
+| **Microsoft** | [Roman to Integer](https://leetcode.com/problems/roman-to-integer/), [LRU Cache](https://leetcode.com/problems/lru-cache/), [Two Sum](https://leetcode.com/problems/two-sum/)                                                                                                                                                                                                                                                  |
+| **Apple**     | [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/), [Ransom Note](https://leetcode.com/problems/ransom-note/)                                                                                                                                                                                                                                                                                             |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 5 Easy problems solved
-- [ ] All 10 Medium problems solved
+- [ ] All 7 Easy problems solved
+- [ ] All 13 Medium problems solved
 - [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud
-- [ ] Can write the Two Heaps `addNum`/`findMedian` from memory
-- [ ] Can write K-way Merge for linked lists from memory
-- [ ] Can implement a custom PriorityQueue comparator for any object type
-- [ ] Know when to use min-heap vs max-heap for Top-K without hesitation
+- [ ] I can explain load factor, collisions and treeification in Java's HashMap
+- [ ] I can choose between `int[26]` and a HashMap for counting
 
 ---
 
-**← [Lecture 15 · Trees (Binary Trees & BST)](../Lecture15/Assignment.md)** &nbsp;·&nbsp; **[Lecture 17 · Graphs](../Lecture17/Assignment.md) →**
+**← [Lecture 15 · Stacks & Queues](../Lecture15/Assignment.md)** &nbsp;·&nbsp; **[Lecture 17 · Matrix Problems](../Lecture17/Assignment.md) →**

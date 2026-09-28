@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 1 — Java &amp; Programming Fundamentals</title>
+    <title>Lecture 1 &mdash; How Fast Is It? (Complexity Analysis)</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
       rel="stylesheet"
@@ -81,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1386,86 +1391,81 @@
       }
     </style>
   </head>
-
   <body>
-    <!-- ── SIDEBAR ── -->
+    <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Java &amp; Programming Fundamentals</div>
+        <div class="sb-title">Complexity Analysis</div>
         <div class="sb-meta">
-          Lecture 1 of 38 &middot; Phase 1 &mdash; Foundations
+          Lecture 1 of 45 &middot; Phase 1 &mdash; Foundations
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
-        <a class="toc-item" href="#types"
-          ><span class="toc-icon">🧱</span>Data Types</a
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item toc-sub" href="#primitives">Primitive Types</a>
-        <a class="toc-item toc-sub" href="#reference">Reference Types</a>
-        <a class="toc-item toc-sub" href="#casting">Type Casting</a>
-        <a class="toc-item" href="#control"
-          ><span class="toc-icon">🔁</span>Control Flow</a
+        <a class="toc-item toc-sub" href="#pseudo">Reading the Pseudocode</a>
+        <a class="toc-item" href="#counting"
+          ><span class="toc-icon">&#9201;&#65039;</span>Counting Steps</a
         >
-        <a class="toc-item toc-sub" href="#loops">All Loop Types</a>
-        <a class="toc-item toc-sub" href="#conditionals">Conditionals</a>
-        <a class="toc-item" href="#methods"
-          ><span class="toc-icon">🔧</span>Methods & Arrays</a
-        >
-        <a class="toc-item toc-sub" href="#method-anatomy">Method Anatomy</a>
-        <a class="toc-item toc-sub" href="#pass-by-value">Pass-by-value Trap</a>
-        <a class="toc-item toc-sub" href="#arrays-api">Arrays API</a>
-        <a class="toc-item" href="#oop"
-          ><span class="toc-icon">📦</span>OOP Fundamentals</a
-        >
-        <a class="toc-item toc-sub" href="#four-pillars">Four Pillars</a>
-        <a class="toc-item toc-sub" href="#interfaces">Interfaces & Generics</a>
         <a class="toc-item" href="#bigo"
-          ><span class="toc-icon">⏱</span>Big-O Complexity</a
+          ><span class="toc-icon">&#128200;</span>Big-O in Plain Words</a
         >
-        <a class="toc-item toc-sub" href="#rules">4 Simplification Rules</a>
-        <a class="toc-item toc-sub" href="#recognition">Pattern Recognition</a>
-        <a class="toc-item toc-sub" href="#space">Space Complexity</a>
-        <a class="toc-item" href="#collections"
-          ><span class="toc-icon">🗂</span>Java Collections</a
+        <a class="toc-item toc-sub" href="#ladder">The Growth Ladder</a>
+        <a class="toc-item" href="#reading"
+          ><span class="toc-icon">&#128270;</span>Reading Cost From Code</a
         >
-        <a class="toc-item" href="#strings"
-          ><span class="toc-icon">🔤</span>String Essentials</a
+        <a class="toc-item toc-sub" href="#rules">Simplification Rules</a>
+        <a class="toc-item" href="#space"
+          ><span class="toc-icon">&#128190;</span>Space</a
+        >
+        <a class="toc-item" href="#recursion"
+          ><span class="toc-icon">&#127795;</span>Counting Recursive Calls</a
+        >
+        <a class="toc-item" href="#amortised"
+          ><span class="toc-icon">&#128230;</span>Amortised Cost</a
+        >
+        <a class="toc-item" href="#cases"
+          ><span class="toc-icon">&#127922;</span>Best, Average, Worst</a
+        >
+        <a class="toc-item" href="#constraints"
+          ><span class="toc-icon">&#127919;</span>Constraints → Target</a
+        >
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
-          ><span class="toc-icon">💪</span>Practice Problems</a
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
         >
         <a class="toc-item" href="#assignment"
-          ><span class="toc-icon">📝</span>Assignment</a
+          ><span class="toc-icon">&#128221;</span>Assignment</a
         >
-        <div class="sb-div"></div>
         <a class="toc-item" href="#checklist"
-          ><span class="toc-icon">✅</span>Completion Checklist</a
+          ><span class="toc-icon">&#9989;</span>Checklist</a
         >
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../dsa_study_plan.html"
+        <a class="toc-item" href="../index.html"
           >&larr; Course start &middot; the study plan</a
         >
         <a class="toc-item" href="../Lecture2/lecture2_notes.html"
-          >&rarr; Lecture 2 &middot; Java Memory Management</a
+          >&rarr; Lecture 2 &middot; Attacking an Unseen Problem</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
-    <!-- ── MAIN ── -->
+    <!-- MAIN -->
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase1">Phase 1</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 1 &mdash; Java &amp; Programming Fundamentals</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase1">Phase 1</a><span>&rsaquo;</span>
+          <span>Lecture 1 &mdash; Complexity Analysis</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1483,2408 +1483,726 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">⚙️</span>
-          <h1 class="page-title">Java &amp; Programming Fundamentals</h1>
+          <span class="page-emoji">&#128640;</span>
+          <h1 class="page-title">
+            How Fast Is It? &mdash; Complexity Analysis
+          </h1>
           <p class="page-sub">
-            "The alphabet before the poetry — master these cold, they appear
-            everywhere."
+            &ldquo;Not how long it takes &mdash; how the time grows.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 1 of 38</span>
+            <span class="meta-chip accent">&#128218; Lecture 1 of 45</span>
             <span class="meta-chip accent">Phase 1 &mdash; Foundations</span>
-            <span class="meta-chip yellow">&#9201; 5 days</span>
-            <span class="meta-chip green">&#127919; 40 problems</span>
-            <span class="meta-chip">💼 Google · Amazon · Microsoft</span>
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 20 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              Microsoft</span
+            >
+          </div>
+        </div>
+        <!-- /.page-header -->
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Two solutions can give the same answer and still be completely
+            different: one finishes before you blink, the other would still be
+            running next year. The difference is almost never the computer
+            &mdash; it is how the amount of work <em>grows</em> as the input
+            gets bigger. This lecture gives you a vocabulary for that growth,
+            called Big-O, and a handful of rules for reading it straight off a
+            piece of code. Every later lecture assumes you can do this, and
+            every interviewer will ask.
           </div>
         </div>
 
-        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-        <div class="callout blue" style="margin-bottom: 20px">
-          <span class="callout-icon">🌍</span>
+        <div class="callout blue">
+          <span class="callout-icon">&#128214;</span>
           <div class="callout-body">
-            <strong>Why does this topic matter?</strong><br />
-            Java is the dominant language for FAANG backend systems and the
-            de-facto language of coding interviews. Before you can write a
-            single algorithm, you need to know how the computer stores data
-            (types), how it makes decisions (control flow), and how it organizes
-            code (methods and OOP). Every topic in this course — arrays, trees,
-            graphs, dynamic programming — is built on top of these fundamentals.
-            Skipping this is like trying to write poetry without knowing the
-            alphabet.
+            <strong>Unfamiliar word?</strong> Every term used in this course is
+            defined in plain English in the
+            <a href="../glossary.html">Glossary</a>, with a link to the lecture
+            that teaches it.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
+            <li>Read the course&#39;s pseudocode notation fluently</li>
             <li>
-              Understand variables, data types, operators, and control flow
+              Say what O(1), O(log n), O(n), O(n log n), O(n&sup2;) and
+              O(2&#8319;) mean in plain words
             </li>
-            <li>Master loops (for, while, do-while) and when to use each</li>
-            <li>Grasp methods, scope, and the call stack</li>
+            <li>Work out the Big-O of a piece of code from its loops alone</li>
+            <li>Tell time from space, and worst case from amortised</li>
             <li>
-              Learn OOP pillars: Encapsulation, Inheritance, Polymorphism,
-              Abstraction
+              Read a problem&#39;s size limit and name the speed your solution
+              needs
             </li>
-            <li>Introduction to time and space complexity (Big-O notation)</li>
           </ul>
         </div>
 
-        <h3 class="h2" style="margin-top: 0">
-          📖 Before We Start — The Big Picture
-        </h3>
-        <p>
-          Think of a computer program as a recipe.
-          <strong>Variables</strong> are your ingredients,
-          <strong>data types</strong> are the containers (you can't store a
-          liquid in a bag or a powder in a bottle),
-          <strong>control flow</strong> is the list of steps, and
-          <strong>methods</strong> are reusable sub-recipes. The computer
-          follows these instructions one at a time, storing and reading values
-          from memory as it goes.
-        </p>
-        <p>
-          At the hardware level, everything is just 0s and 1s in memory. Java's
-          type system gives those raw bits meaning — a
-          <code>32-bit</code> pattern means a very different thing when
-          interpreted as an <code>int</code> vs a <code>float</code>. This
-          lecture teaches you to pick the right container for the right data,
-          every time.
-        </p>
-
-        <div class="callout green" style="margin-bottom: 32px">
-          <span class="callout-icon">🔗</span>
-          <div class="callout-body">
-            <strong>How it connects:</strong> This is the starting point — no
-            prerequisites. Lecture 2 builds directly on this by explaining
-            <em>where</em> these variables physically live in memory (stack vs
-            heap). Every later lecture assumes you are fluent in these
-            fundamentals.
-          </div>
-        </div>
-
         <hr />
-
-        <!-- ══ SECTION 1: DATA TYPES ════════════════════════════ -->
-        <h2 class="h1" id="types">🧱 Data Types</h2>
-
-        <h3 class="h2" id="primitives">1.1 — Primitive Types (8 total)</h3>
-        <p>
-          Stored directly on the <strong>stack</strong>. Fixed size, no null,
-          ultra-fast access. These are the atoms of Java.
-        </p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Bits</th>
-                <th>Range</th>
-                <th>Default</th>
-                <th>DSA Usage</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>byte</code></td>
-                <td>8</td>
-                <td>−128 → 127</td>
-                <td>0</td>
-                <td>raw byte buffers, rarely in DSA</td>
-              </tr>
-              <tr>
-                <td><code>short</code></td>
-                <td>16</td>
-                <td>−32,768 → 32,767</td>
-                <td>0</td>
-                <td>rarely used</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong><code>int</code> ⭐</strong>
-                </td>
-                <td>32</td>
-                <td>−2.1B → 2.1B</td>
-                <td>0</td>
-                <td>default integer — use this always</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong><code>long</code> ⭐</strong>
-                </td>
-                <td>64</td>
-                <td>±9.2 × 10¹⁸</td>
-                <td>0L</td>
-                <td>large products, timestamps, overflow-prone problems</td>
-              </tr>
-              <tr>
-                <td><code>float</code></td>
-                <td>32</td>
-                <td>~6-7 sig. digits</td>
-                <td>0.0f</td>
-                <td>avoid — precision issues</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong><code>double</code> ⭐</strong>
-                </td>
-                <td>64</td>
-                <td>~15-16 sig. digits</td>
-                <td>0.0</td>
-                <td>default decimal</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong><code>char</code> ⭐</strong>
-                </td>
-                <td>16</td>
-                <td>0 → 65,535 (Unicode)</td>
-                <td>\u0000</td>
-                <td>frequency arrays, char arithmetic</td>
-              </tr>
-              <tr>
-                <td><code>boolean</code></td>
-                <td>1 bit</td>
-                <td>true / false</td>
-                <td>false</td>
-                <td>flags, visited arrays, conditions</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout blue">
-          <span class="callout-icon">💡</span>
-          <div class="callout-body">
-            <strong>DSA Rule of Thumb for type choice:</strong><br />
-            • Default to <code>int</code> for all integers.<br />
-            • Switch to <code>long</code> when result can exceed ~2.1 billion
-            (e.g. n × m with n,m ≈ 10⁵).<br />
-            • <code>char - 'a'</code> gives you an index 0–25 — this is how you
-            build O(1) frequency arrays for lowercase letters.<br />
-            • <code>double</code> for geometry, probabilities, averages.
-          </div>
-        </div>
-
-        <h3 class="h2" id="reference">1.2 — Reference (Non-Primitive) Types</h3>
-        <p>
-          Variables hold a <strong>memory address</strong> (reference) pointing
-          to an object on the <strong>heap</strong>. Can be null. Includes all
-          classes, arrays, interfaces.
-        </p>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// Primitive — value lives IN the variable (stack)</span>
-<span class="kw">int</span> x = 42;           <span class="cm">// x IS 42</span>
-
-<span class="cm">// Reference — variable holds ADDRESS pointing to heap</span>
-<span class="cls">String</span> s = <span class="str">"hello"</span>;  <span class="cm">// s holds address of "hello" object on heap</span>
-<span class="kw">int</span>[] arr = {1,2,3};  <span class="cm">// arr holds address of the array on heap</span>
-
-<span class="cm">// Consequence: == checks identity (same address), not equality!</span>
-<span class="cls">String</span> a = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hi"</span>);
-<span class="cls">String</span> b = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hi"</span>);
-System.out.println(a == b);       <span class="cm">// false  (different addresses!)</span>
-System.out.println(a.equals(b));  <span class="cm">// true   (same content) ← USE THIS</span></pre>
-        </div>
-
-        <h3 class="h2" id="casting">1.3 — Type Casting (Interview Gotchas)</h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Casting Traps</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// Widening (implicit, safe) — smaller → larger</span>
-<span class="kw">int</span> i = 100;
-<span class="kw">long</span> l = i;          <span class="cm">// auto-widens: no data loss</span>
-<span class="kw">double</span> d = i;        <span class="cm">// auto-widens to 100.0</span>
-
-<span class="cm">// Narrowing (explicit, lossy) — larger → smaller</span>
-<span class="kw">double</span> pi = 3.99;
-<span class="kw">int</span> truncated = (<span class="kw">int</span>) pi;   <span class="cm">// → 3  (TRUNCATES, does NOT round!)</span>
-
-<span class="cm">// ⚠️ GOTCHA 1: integer division truncates</span>
-<span class="kw">double</span> wrong   = 5 / 2;      <span class="cm">// → 2.0  (int division first, THEN widened)</span>
-<span class="kw">double</span> correct = 5.0 / 2;    <span class="cm">// → 2.5  (double division)</span>
-<span class="kw">double</span> correct2 = (<span class="kw">double</span>) 5 / 2; <span class="cm">// → 2.5  (cast first)</span>
-
-<span class="cm">// ⚠️ GOTCHA 2: int overflow — use long!</span>
-<span class="kw">int</span> n = 100000;
-<span class="kw">int</span> overflow = n * n;         <span class="cm">// → negative! (wraps around 2.1B limit)</span>
-<span class="kw">long</span> safe = (<span class="kw">long</span>) n * n;    <span class="cm">// → 10000000000L ✓</span>
-
-<span class="cm">// ⭐ char arithmetic — essential for DSA</span>
-<span class="kw">int</span> idx = <span class="str">'e'</span> - <span class="str">'a'</span>;            <span class="cm">// → 4  (freq array index)</span>
-<span class="kw">char</span> c = (<span class="kw">char</span>)(<span class="str">'a'</span> + 3);       <span class="cm">// → 'd'</span>
-<span class="kw">boolean</span> isLower = (ch >= <span class="str">'a'</span> && ch &lt;= <span class="str">'z'</span>); <span class="cm">// char range check</span>
-<span class="kw">char</span> upper = (<span class="kw">char</span>)(ch - 32);   <span class="cm">// lowercase → uppercase</span></pre>
-        </div>
 
         <div class="callout yellow">
-          <span class="callout-icon">⚠️</span>
+          <span class="callout-icon">&#9749;</span>
           <div class="callout-body">
-            <strong
-              >Autoboxing / Unboxing Trap — Common Interview Gotcha!</strong
-            ><br />
-            Java caches <code>Integer</code> values from −128 to 127 (the
-            <em>Integer cache</em>). Outside this range each auto-boxing creates
-            a new heap object.<br /><br />
-            <code>Integer a = 127, b = 127; a == b</code> →
-            <strong>true</strong> (same cached object)<br />
-            <code>Integer c = 128, d = 128; c == d</code> →
-            <strong>false</strong> (two different heap objects!)<br /><br />
-            <strong>Rule:</strong> ALWAYS use <code>.equals()</code> to compare
-            wrapper types — never <code>==</code>.<br />
-            Additional trap: Unboxing a <code>null</code>
-            <code>Integer</code> to <code>int</code> silently throws
-            <code>NullPointerException</code>!
+            <strong>No Java yet &mdash; that is on purpose.</strong> The first
+            three lectures teach you how to <em>think</em> about a problem
+            before you learn the language you will solve it in. Every example
+            here is written in plain pseudocode, and every exercise can be done
+            with a pencil. You write your first Java in Lecture 4; come back to
+            these assignments then and code them.
           </div>
         </div>
-
-        <hr />
-
-        <!-- ══ SECTION 2: CONTROL FLOW ═════════════════════════ -->
-        <h2 class="h1" id="control">🔁 Control Flow</h2>
-
-        <h3 class="h2" id="loops">2.1 — All Loop Types</h3>
-
-        <div class="callout blue">
-          <span class="callout-icon">🎯</span>
-          <div class="callout-body">
-            <strong>Pattern Recognition: Which loop to use?</strong><br />
-            • <code>for</code>: When you know the exact iteration count
-            upfront.<br />
-            • <code>while</code>: When iteration count depends on a condition
-            (unknown upfront). Classic for binary search, two-pointer, digit
-            extraction.<br />
-            • <code>do-while</code>: When the body must execute at least once.
-            Classic for menu loops, digit extraction where n=0 is possible.<br />
-            • <code>for-each</code>: Cleanest for read-only traversal of
-            collections/arrays when you don't need the index.
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · All Loop Types + DSA Usage</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// ── FOR loop — use when count is known ───────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++)          <span class="cm">// forward: i goes 0..n-1</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = n-1; i >= 0; i--)        <span class="cm">// reverse: suffix processing</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i += 2)        <span class="cm">// step 2: even indices</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n-1; i++)         <span class="cm">// n-1 pairs: adj comparison</span>
-
-<span class="cm">// ── WHILE loop — use when count is unknown ───────────────────</span>
-<span class="kw">while</span> (lo &lt;= hi) { ... }              <span class="cm">// binary search template</span>
-<span class="kw">while</span> (n > 0) { digit = n%10; n/=10;} <span class="cm">// digit extraction</span>
-<span class="kw">while</span> (n > 1) { n /= 2; count++; }   <span class="cm">// count divisions → O(log n)</span>
-<span class="kw">while</span> (fast != null && fast.next != null) <span class="cm">// linked list traversal</span>
-
-<span class="cm">// ── DO-WHILE — body runs at least once ───────────────────────</span>
-<span class="kw">do</span> {
-    digit = n % 10;
-    reversed = reversed * 10 + digit;
-    n /= 10;
-} <span class="kw">while</span> (n != 0);                    <span class="cm">// handles n=0 correctly</span>
-
-<span class="cm">// ── FOR-EACH — read-only traversal ───────────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> x : arr) sum += x;           <span class="cm">// array</span>
-<span class="kw">for</span> (<span class="cls">String</span> s : list) process(s);    <span class="cm">// collection</span>
-<span class="kw">for</span> (<span class="cls">Map.Entry</span>&lt;K,V&gt; e : map.entrySet()) <span class="cm">// map iteration</span>
-
-<span class="cm">// ── NESTED LOOPS — know the complexity! ──────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++)          <span class="cm">// ┐ O(n²) — all pairs</span>
-    <span class="kw">for</span> (<span class="kw">int</span> j = i+1; j &lt; n; j++) {}  <span class="cm">// ┘ j starts at i+1: n(n-1)/2 pairs</span>
-
-<span class="cm">// ── BREAK / CONTINUE ─────────────────────────────────────────</span>
-<span class="kw">break</span>;    <span class="cm">// exits the INNERMOST loop only</span>
-<span class="kw">continue</span>; <span class="cm">// skips to NEXT iteration of innermost loop</span>
-<span class="cm">// To break an outer loop: use labeled break</span>
-outer: <span class="kw">for</span> (...) {
-    <span class="kw">for</span> (...) { <span class="kw">if</span> (found) <span class="kw">break</span> outer; } <span class="cm">// exits outer loop!</span>
-}</pre>
-        </div>
-
-        <h3 class="h2" id="conditionals">
-          2.2 — Conditionals &amp; Short-Circuit Evaluation
-        </h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Conditionals</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// Standard if-else</span>
-<span class="kw">if</span> (x > 0) { ... }
-<span class="kw">else if</span> (x == 0) { ... }
-<span class="kw">else</span> { ... }
-
-<span class="cm">// Ternary — for simple single-value selection</span>
-<span class="kw">int</span> max = (a > b) ? a : b;
-<span class="kw">int</span> abs = (x &lt; 0) ? -x : x;     <span class="cm">// ternary absolute value</span>
-
-<span class="cm">// Switch (Java 14+ — enhanced switch expression)</span>
-<span class="kw">int</span> days = <span class="kw">switch</span> (month) {
-    <span class="kw">case</span> 1, 3, 5, 7, 8, 10, 12 -> 31;
-    <span class="kw">case</span> 4, 6, 9, 11 -> 30;
-    <span class="kw">default</span> -> 28;
-};
-
-<span class="cm">// ⭐ Short-circuit evaluation — CRITICAL for null safety!</span>
-<span class="cm">// && stops at first FALSE condition</span>
-<span class="kw">if</span> (node != null && node.val == target) { ... }
-<span class="cm">// if node==null, right side NEVER evaluates → no NullPointerException</span>
-
-<span class="cm">// || stops at first TRUE condition</span>
-<span class="kw">if</span> (arr == null || arr.length == 0) <span class="ret">return</span>;
-<span class="cm">// if arr==null, second check NEVER runs → safe!</span>
-
-<span class="cm">// ⚠️ Integer.MAX_VALUE and MIN_VALUE — essential constants</span>
-<span class="kw">int</span> max = <span class="cls">Integer</span>.MAX_VALUE;  <span class="cm">// 2^31 - 1 = 2,147,483,647</span>
-<span class="kw">int</span> min = <span class="cls">Integer</span>.MIN_VALUE;  <span class="cm">// -2^31  = -2,147,483,648</span>
-<span class="kw">int</span> res = <span class="cls">Math</span>.max(a, b);      <span class="cm">// Math utility methods</span>
-<span class="kw">int</span> abs = <span class="cls">Math</span>.abs(x);
-<span class="kw">double</span> sq = <span class="cls">Math</span>.sqrt(n);</pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 3: METHODS & ARRAYS ═══════════════════════ -->
-        <h2 class="h1" id="methods">🔧 Methods &amp; Arrays</h2>
-
-        <h3 class="h2" id="method-anatomy">3.1 — Method Anatomy</h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Method Anatomy</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">//  access    static   return   name          parameters</span>
-<span class="kw">public static</span>   <span class="kw">int</span>   <span class="fn">binarySearch</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
-    <span class="cm">// body</span>
-    <span class="ret">return</span> -1;  <span class="cm">// must return int (matches return type)</span>
-}
-
-<span class="cm">// void methods — no return value (but can still return early!)</span>
-<span class="kw">public static void</span> <span class="fn">swap</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span> i, <span class="kw">int</span> j) {
-    <span class="kw">int</span> tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
-}
-
-<span class="cm">// Method overloading — same name, different params</span>
-<span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="ret">return</span> a + b; }
-<span class="kw">double</span> <span class="fn">add</span>(<span class="kw">double</span> a, <span class="kw">double</span> b) { <span class="ret">return</span> a + b; } <span class="cm">// different return type too</span>
-
-<span class="cm">// Varargs — variable number of args (used in DSA for flexibility)</span>
-<span class="kw">int</span> <span class="fn">sum</span>(<span class="kw">int</span>... nums) {
-    <span class="kw">int</span> total = 0;
-    <span class="kw">for</span> (<span class="kw">int</span> n : nums) total += n;
-    <span class="ret">return</span> total;
-}
-<span class="cm">// call: sum(1), sum(1,2), sum(1,2,3,4,5) — all valid</span></pre>
-        </div>
-
-        <h3 class="h2" id="pass-by-value">
-          3.2 — Pass-by-Value: The Most Misunderstood Thing in Java
-        </h3>
-
-        <div class="callout red">
-          <span class="callout-icon">⚠️</span>
-          <div class="callout-body">
-            <strong>Java is ALWAYS pass-by-value. No exceptions.</strong><br />
-            The confusion: for objects and arrays, the VALUE being passed is the
-            <em>reference (address)</em>.<br />
-            A copy of the address is passed → mutations through that address
-            persist. But reassigning the reference inside the method doesn't
-            affect the caller.
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Pass-by-Value Illustrated</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// PRIMITIVE: copy of value — original unchanged</span>
-<span class="kw">void</span> <span class="fn">tryChange</span>(<span class="kw">int</span> x) { x = 99; }
-<span class="kw">int</span> a = 5;
-<span class="fn">tryChange</span>(a);
-System.out.println(a);  <span class="cm">// still 5 — x was a COPY</span>
-
-<span class="cm">// ARRAY: copy of reference — mutations visible to caller!</span>
-<span class="kw">void</span> <span class="fn">mutate</span>(<span class="kw">int</span>[] arr) { arr[0] = 99; }
-<span class="kw">int</span>[] arr = {1,2,3};
-<span class="fn">mutate</span>(arr);
-System.out.println(arr[0]);  <span class="cm">// 99 — mutation persisted!</span>
-
-<span class="cm">// REFERENCE REASSIGNMENT: doesn't affect caller</span>
-<span class="kw">void</span> <span class="fn">reassign</span>(<span class="kw">int</span>[] arr) { arr = <span class="kw">new int</span>[]{9,9,9}; }
-<span class="fn">reassign</span>(arr);
-System.out.println(arr[0]);  <span class="cm">// still 99 — local arr was a copy of address</span>
-
-<span class="cm">// ⭐ Consequence: swap(int a, int b) NEVER works
-//   swap(int[] arr, int i, int j) DOES work (mutations on shared array)</span></pre>
-        </div>
-
-        <h3 class="h2" id="arrays-api">3.3 — Arrays: Your #1 DSA Tool</h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Arrays — Complete Reference</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// ── Declaration & Initialization ─────────────────────────────</span>
-<span class="kw">int</span>[] a = <span class="kw">new int</span>[5];          <span class="cm">// [0,0,0,0,0] — auto-initialized to 0</span>
-<span class="kw">boolean</span>[] vis = <span class="kw">new boolean</span>[n]; <span class="cm">// [false,false,...] auto init</span>
-<span class="kw">int</span>[] b = {3, 1, 4, 1, 5};     <span class="cm">// literal init</span>
-<span class="kw">int</span>[][] mat = <span class="kw">new int</span>[3][4];   <span class="cm">// 3 rows, 4 cols — all 0</span>
-<span class="kw">int</span>[][] grid = {{1,2},{3,4}};  <span class="cm">// 2D literal</span>
-
-<span class="cm">// ── Access ────────────────────────────────────────────────────</span>
-a.length                        <span class="cm">// FIELD (no parens!) — O(1)</span>
-mat.length                      <span class="cm">// number of rows</span>
-mat[0].length                   <span class="cm">// number of cols in row 0</span>
-
-<span class="cm">// ── java.util.Arrays methods ──────────────────────────────────</span>
-<span class="cls">Arrays</span>.sort(a);                 <span class="cm">// O(n log n) — dual-pivot quicksort</span>
-<span class="cls">Arrays</span>.sort(a, 0, 5);          <span class="cm">// sort subarray [0,5)</span>
-<span class="cls">Arrays</span>.fill(a, -1);             <span class="cm">// fill all with -1  O(n)</span>
-<span class="cls">Arrays</span>.fill(a, 2, 5, 0);       <span class="cm">// fill range [2,5) with 0</span>
-<span class="cls">Arrays</span>.copyOf(a, a.length);    <span class="cm">// full copy — O(n)</span>
-<span class="cls">Arrays</span>.copyOfRange(a, 1, 4);   <span class="cm">// subarray copy — indices [1,4)</span>
-<span class="cls">Arrays</span>.equals(a, b);           <span class="cm">// element-wise comparison</span>
-<span class="cls">Arrays</span>.binarySearch(a, target); <span class="cm">// O(log n) — array must be sorted!</span>
-<span class="cls">Arrays</span>.toString(a);            <span class="cm">// "[1, 2, 3]" for printing</span>
-
-<span class="cm">// ── Custom sort with Comparator ───────────────────────────────</span>
-<span class="cls">Integer</span>[] arr = {3,1,4,1,5};
-<span class="cls">Arrays</span>.sort(arr, (<span class="kw">a</span>, <span class="kw">b</span>) -> <span class="kw">b</span> - <span class="kw">a</span>); <span class="cm">// descending — note: needs Integer[], not int[]</span>
-<span class="cm">// Sort by absolute value:</span>
-<span class="cls">Arrays</span>.sort(arr, (<span class="kw">a</span>, <span class="kw">b</span>) -> <span class="cls">Math</span>.abs(<span class="kw">a</span>) - <span class="cls">Math</span>.abs(<span class="kw">b</span>));</pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 4: OOP ═══════════════════════════════════ -->
-        <h2 class="h1" id="oop">📦 OOP Fundamentals</h2>
-
-        <h3 class="h2" id="four-pillars">
-          4.1 — The Four Pillars (with DSA relevance)
-        </h3>
-
+        <h2 class="h1" id="pseudo">&#128214; Reading the Pseudocode</h2>
+        <p>
+          Every algorithm in this course is written in the same small notation.
+          It is not a real programming language &mdash; it is a way of writing
+          steps precisely enough that nothing is ambiguous. Ten symbols cover
+          almost all of it.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Pillar</th>
-                <th>What it means</th>
-                <th>DSA example</th>
+                <th>You will see</th>
+                <th>It means</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Encapsulation</strong></td>
-                <td>Bundle data + methods; hide internals</td>
-                <td>LinkedList class with private head, public add/remove</td>
-              </tr>
-              <tr>
-                <td><strong>Abstraction</strong></td>
-                <td>Expose what, hide how</td>
-                <td>PriorityQueue — you call offer/poll, not heapifyUp</td>
-              </tr>
-              <tr>
-                <td><strong>Inheritance</strong></td>
-                <td>Subclass extends superclass, reuses code</td>
-                <td>TreeNode extends Node; DFS/BFS methods inherited</td>
-              </tr>
-              <tr>
-                <td><strong>Polymorphism</strong></td>
-                <td>Same method, different behaviour</td>
+                <td><code>x ← 5</code></td>
                 <td>
-                  Comparator — sort by different keys without changing sort
-                  logic
+                  Put the value 5 into a box called <code>x</code>. (Read the
+                  arrow as &ldquo;becomes&rdquo;.)
+                </td>
+              </tr>
+              <tr>
+                <td><code>a[i]</code></td>
+                <td>
+                  The item at position <code>i</code> in the list
+                  <code>a</code>. Positions start at 0.
+                </td>
+              </tr>
+              <tr>
+                <td><code>length(a)</code></td>
+                <td>How many items the list <code>a</code> holds.</td>
+              </tr>
+              <tr>
+                <td><code>for i from 0 to n - 1:</code></td>
+                <td>
+                  Repeat the indented lines with <code>i</code> = 0, 1, 2,
+                  &hellip; up to and <em>including</em> <code>n − 1</code>.
+                </td>
+              </tr>
+              <tr>
+                <td><code>while x &gt; 1:</code></td>
+                <td>
+                  Keep repeating the indented lines as long as the condition is
+                  true.
+                </td>
+              </tr>
+              <tr>
+                <td><code>if &hellip; : &hellip; else: &hellip;</code></td>
+                <td>Do one thing or the other depending on the condition.</td>
+              </tr>
+              <tr>
+                <td><code>function f(n): &hellip; return r</code></td>
+                <td>
+                  A named, reusable set of steps that takes <code>n</code> in
+                  and hands <code>r</code> back.
+                </td>
+              </tr>
+              <tr>
+                <td><code>÷</code> and <code>mod</code></td>
+                <td>
+                  Whole-number division (7 ÷ 2 = 3) and the remainder left over
+                  (7 mod 2 = 1).
+                </td>
+              </tr>
+              <tr>
+                <td><code>≤ ≥ ≠</code></td>
+                <td>At most, at least, not equal.</td>
+              </tr>
+              <tr>
+                <td><code>// like this</code></td>
+                <td>
+                  A comment: a note for the human reader. The computer ignores
+                  it.
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">
-              ☕ Java · TreeNode (Used in 90% of Tree Problems)
-            </div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// The class you'll write/use constantly in tree problems</span>
-<span class="kw">class</span> <span class="cls">TreeNode</span> {
-    <span class="kw">int</span> val;
-    <span class="cls">TreeNode</span> left, right;
-
-    <span class="cls">TreeNode</span>(<span class="kw">int</span> val) { <span class="kw">this</span>.val = val; }
-    <span class="cls">TreeNode</span>(<span class="kw">int</span> val, <span class="cls">TreeNode</span> left, <span class="cls">TreeNode</span> right) {
-        <span class="kw">this</span>.val = val; <span class="kw">this</span>.left = left; <span class="kw">this</span>.right = right;
-    }
-}
-
-<span class="cm">// ListNode — for linked list problems</span>
-<span class="kw">class</span> <span class="cls">ListNode</span> {
-    <span class="kw">int</span> val;
-    <span class="cls">ListNode</span> next;
-    <span class="cls">ListNode</span>(<span class="kw">int</span> val) { <span class="kw">this</span>.val = val; }
-}</pre>
-        </div>
-
-        <h3 class="h2" id="interfaces">
-          4.2 — Interfaces, Comparators &amp; Generics
-        </h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Comparator Patterns for DSA</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// Custom sorting — appears in interval, scheduling, and K-th problems</span>
-
-<span class="cm">// Sort intervals by start time</span>
-<span class="cls">Arrays</span>.sort(intervals, (<span class="kw">a</span>, <span class="kw">b</span>) -> <span class="kw">a</span>[0] - <span class="kw">b</span>[0]);
-
-<span class="cm">// Sort strings by length</span>
-<span class="cls">Arrays</span>.sort(words, (<span class="kw">a</span>, <span class="kw">b</span>) -> <span class="kw">a</span>.length() - <span class="kw">b</span>.length());
-
-<span class="cm">// Max-heap (reverse natural order) — used constantly!</span>
-<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxHeap = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((<span class="kw">a</span>,<span class="kw">b</span>) -> <span class="kw">b</span>-<span class="kw">a</span>);
-
-<span class="cm">// Min-heap by second element of pair</span>
-<span class="cls">PriorityQueue</span>&lt;<span class="kw">int</span>[]&gt; pq = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;((<span class="kw">a</span>,<span class="kw">b</span>) -> <span class="kw">a</span>[1] - <span class="kw">b</span>[1]);
-
-<span class="cm">// Generics — type-safe collections</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; list = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-<span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; graph = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-<span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; visited = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();</pre>
-        </div>
-
-        <h3 class="h2" id="static-final">
-          4.3 — <code>static</code> &amp; <code>final</code> Keywords
-        </h3>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · static &amp; final</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// static — belongs to the CLASS, shared across all instances</span>
-<span class="kw">class</span> <span class="cls">Counter</span> {
-    <span class="kw">static int</span> count = 0;   <span class="cm">// shared across ALL instances</span>
-    <span class="kw">int</span> id;                  <span class="cm">// unique per instance</span>
-    <span class="cls">Counter</span>() { id = ++count; }
-}
-
-<span class="cm">// static methods can't access instance fields (no 'this')</span>
-<span class="cm">// Why main() is static: JVM calls it without creating an object</span>
-
-<span class="cm">// final — prevents reassignment / inheritance / override</span>
-<span class="kw">final int</span> MAX = 100;        <span class="cm">// constant; convention: ALL_CAPS</span>
-<span class="kw">final</span> <span class="cls">String</span> s = <span class="str">"hi"</span>; s = <span class="str">"bye"</span>;  <span class="cm">// ✗ COMPILE ERROR</span>
-
-<span class="cm">// DSA constants you'll use constantly:</span>
-<span class="kw">static final int</span> INF = <span class="cls">Integer</span>.MAX_VALUE;  <span class="cm">// Dijkstra, DP</span>
-<span class="kw">static final int</span> MOD = 1_000_000_007;       <span class="cm">// modular arithmetic</span></pre>
-        </div>
-
-        <h3 class="h2" id="equals-hashcode">
-          4.4 — The <code>equals()</code> + <code>hashCode()</code> Contract
-        </h3>
-
-        <div class="callout red">
-          <span class="callout-icon">⚠️</span>
-          <div class="callout-body">
-            <strong>The Contract:</strong> If <code>a.equals(b)</code> is
-            <code>true</code>, then
-            <code>a.hashCode() == b.hashCode()</code> MUST also be
-            <code>true</code>.<br />
-            Breaking this contract causes silent bugs in <code>HashMap</code>,
-            <code>HashSet</code>, and every hash-based structure.<br />
-            When using a custom object as a <code>HashMap</code> key, you MUST
-            override <strong>both</strong> methods together.
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Custom HashMap Key</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">class</span> <span class="cls">Point</span> {
-    <span class="kw">int</span> x, y;
-    <span class="cls">Point</span>(<span class="kw">int</span> x, <span class="kw">int</span> y) { <span class="kw">this</span>.x = x; <span class="kw">this</span>.y = y; }
-
-    @Override
-    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="cls">Object</span> o) {
-        <span class="kw">if</span> (!(o <span class="kw">instanceof</span> <span class="cls">Point</span>)) <span class="ret">return false</span>;
-        <span class="cls">Point</span> p = (<span class="cls">Point</span>) o;
-        <span class="ret">return</span> x == p.x &amp;&amp; y == p.y;
-    }
-
-    @Override
-    <span class="kw">public int</span> <span class="fn">hashCode</span>() {
-        <span class="ret">return</span> 31 * x + y;  <span class="cm">// must be consistent with equals()</span>
-    }
-}
-<span class="cm">// Without overriding: map.get(new Point(1,2)) → null even after put!</span>
-<span class="cls">Map</span>&lt;<span class="cls">Point</span>, <span class="cls">String</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-map.put(<span class="kw">new</span> <span class="cls">Point</span>(1,2), <span class="str">"origin"</span>);
-map.get(<span class="kw">new</span> <span class="cls">Point</span>(1,2));  <span class="cm">// → "origin" ✓ (with both overrides)</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 5: BIG-O ═════════════════════════════════ -->
-        <h2 class="h1" id="bigo">⏱ Big-O Complexity Analysis</h2>
-
         <div class="callout blue">
-          <span class="callout-icon">📌</span>
+          <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>What is Big-O?</strong><br />
-            Big-O is an <em>upper bound on the growth rate</em> of an
-            algorithm's resource usage (time or space) as input size n → ∞. It
-            describes <em>how much slower</em> your algorithm gets when you
-            double the input — not the exact running time in milliseconds.
+            <strong>Indentation is meaning.</strong> Lines pushed further right
+            belong to the line above them. That is how you tell what is inside a
+            loop and what comes after it.
           </div>
         </div>
-
-        <h3 class="h2" id="rules">5.1 — The 4 Simplification Rules</h3>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Rule</th>
-                <th>Example</th>
-                <th>Simplifies to</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td><strong>Drop constants</strong></td>
-                <td>O(3n + 500)</td>
-                <td>O(n)</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td><strong>Drop non-dominant terms</strong></td>
-                <td>O(n² + n + log n)</td>
-                <td>O(n²)</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td><strong>Different inputs → different variables</strong></td>
-                <td>Two arrays of size a and b processed sequentially</td>
-                <td>O(a + b), NOT O(n)</td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td><strong>Nested loops on same input → multiply</strong></td>
-                <td>Outer O(n), inner O(n)</td>
-                <td>O(n²)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 class="h2" id="recognition">
-          5.2 — Complexity Recognition by Code Pattern
-        </h3>
-
-        <div class="code-block">
+        <h2 class="h1" id="counting">
+          &#9201;&#65039; Counting Steps, Not Seconds
+        </h2>
+        <p>
+          How long does a program take? Measuring with a stopwatch sounds
+          natural, but it answers the wrong question: a laptop and a phone give
+          different times for the same code, and so does the same laptop on a
+          busy day. What stays the same everywhere is
+          <strong>how many steps</strong> the program takes &mdash; and, more
+          usefully, how that number <em>grows</em> when the input gets bigger.
+        </p>
+        <div class="code-block pseudo">
           <div class="code-header">
-            <div class="code-lang">☕ Java · Read Code → Know Complexity</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Find the Largest Number</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="cm">// ── O(1) — fixed number of operations ────────────────────────</span>
-arr[i];                          <span class="cm">// array access</span>
-map.get(key);                    <span class="cm">// hashmap lookup</span>
-pq.peek();                       <span class="cm">// heap peek</span>
+          <pre><span class="pc-kw">function</span> largest(a):
+    best ← a[0]
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> length(a) - 1:     <span class="pc-cm">// look at every other item once</span>
+        <span class="pc-kw">if</span> a[i] &gt; best:
+            best ← a[i]
+    <span class="pc-kw">return</span> best
 
-<span class="cm">// ── O(log n) — input HALVED each step ────────────────────────</span>
-<span class="kw">while</span> (n > 1) { n /= 2; }      <span class="cm">// log₂n iterations</span>
-<span class="cm">// Binary search, heap operations, balanced BST ops</span>
-
-<span class="cm">// ── O(√n) — loop to square root ──────────────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 2; i*i &lt;= n; i++) <span class="cm">// prime check — √n iterations</span>
-
-<span class="cm">// ── O(n) — single pass ───────────────────────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++) {}  <span class="cm">// n iterations</span>
-<span class="cm">// Two-pointer, sliding window (both pointers move ≤ n times total)</span>
-
-<span class="cm">// ── O(n log n) — sort, or divide + linear merge ──────────────</span>
-<span class="cls">Arrays</span>.sort(arr);               <span class="cm">// O(n log n)</span>
-<span class="cm">// Merge sort: log n levels × O(n) merge = O(n log n)</span>
-
-<span class="cm">// ── O(n²) — nested loops over same input ─────────────────────</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++)
-    <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; n; j++) <span class="cm">// always O(n²) even if j=i+1</span>
-
-<span class="cm">// ── O(2ⁿ) — two recursive calls or all subsets ───────────────</span>
-<span class="cm">// fib(n-1) + fib(n-2), or all 2ⁿ subsets of an array</span>
-
-<span class="cm">// ── O(n!) — all permutations ─────────────────────────────────</span>
-<span class="cm">// Generating all arrangements of n elements</span></pre>
+<span class="pc-cm">// A list of 10 items: about 10 steps. A list of 1,000: about 1,000.</span>
+<span class="pc-cm">// Double the list, double the work. That is the entire idea of growth.</span></pre>
         </div>
-
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Think of it like a party.</strong> One recipe says
+            &ldquo;bake one cake per guest&rdquo;: double the guests and you
+            double the baking. Another says &ldquo;every guest shakes hands with
+            every other guest&rdquo;: double the guests and the handshakes
+            <em>quadruple</em>. Both are fine at a dinner for six. Only one of
+            them survives a wedding for six hundred. Complexity analysis is just
+            the habit of asking which kind of recipe you wrote.
+          </div>
+        </div>
+        <h2 class="h1" id="bigo">&#128200; Big-O in Plain Words</h2>
+        <p>
+          <strong>Big-O</strong> is a short label for the shape of that growth.
+          You say &ldquo;O(n)&rdquo; out loud as &ldquo;order n&rdquo;, and it
+          means: <em>when the input doubles, the work roughly doubles</em>. The
+          letter <code>n</code> is always &ldquo;the size of the input&rdquo;
+          &mdash; how many items are in the list, how many characters are in the
+          string.
+        </p>
+        <h3 class="h2" id="ladder">The Growth Ladder</h3>
+        <p>
+          There are only seven labels you will meet regularly. Learn this table
+          and you can predict whether any solution will finish in time.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Big-O</th>
-                <th>n=10</th>
-                <th>n=100</th>
-                <th>n=1,000</th>
-                <th>n=10,000</th>
-                <th>Verdict</th>
+                <th>Name</th>
+                <th>n = 10</th>
+                <th>n = 1,000</th>
+                <th>n = 1,000,000</th>
+                <th>Typical example</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>O(1)</strong></td>
+                <td>O(1)</td>
+                <td>constant</td>
                 <td>1</td>
                 <td>1</td>
                 <td>1</td>
-                <td>1</td>
-                <td>🟢 Perfect</td>
+                <td>Read <code>a[5]</code></td>
               </tr>
               <tr>
-                <td><strong>O(log n)</strong></td>
-                <td>3</td>
-                <td>7</td>
-                <td>10</td>
-                <td>13</td>
-                <td>🟢 Excellent</td>
-              </tr>
-              <tr>
-                <td><strong>O(√n)</strong></td>
-                <td>3</td>
-                <td>10</td>
-                <td>32</td>
-                <td>100</td>
-                <td>🟢 Good</td>
-              </tr>
-              <tr>
-                <td><strong>O(n)</strong></td>
-                <td>10</td>
-                <td>100</td>
-                <td>1,000</td>
-                <td>10,000</td>
-                <td>🟢 Good</td>
-              </tr>
-              <tr>
-                <td><strong>O(n log n)</strong></td>
-                <td>33</td>
-                <td>664</td>
-                <td>10,000</td>
-                <td>133,000</td>
-                <td>🟡 Acceptable</td>
-              </tr>
-              <tr>
-                <td><strong>O(n²)</strong></td>
-                <td>100</td>
-                <td>10,000</td>
-                <td>1M</td>
-                <td>100M (slow)</td>
-                <td>🔴 Avoid for n&gt;10⁴</td>
-              </tr>
-              <tr>
-                <td><strong>O(2ⁿ)</strong></td>
-                <td>1,024</td>
-                <td>10³⁰ 💀</td>
-                <td>—</td>
-                <td>—</td>
-                <td>🔴 Only for n≤20</td>
-              </tr>
-              <tr>
-                <td><strong>O(n!)</strong></td>
-                <td>3.6M</td>
-                <td>💀</td>
-                <td>—</td>
-                <td>—</td>
-                <td>🔴 Only for n≤10</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 class="h2" id="constraint-guide">
-          5.2.5 — Input Constraints → Expected Complexity
-        </h3>
-
-        <div class="callout purple">
-          <span class="callout-icon">🎯</span>
-          <div class="callout-body">
-            <strong>The #1 Interview Meta-Skill:</strong> Read the constraint
-            <em>before</em> writing code. Problem setters design the limits to
-            hint at the expected algorithm's complexity.
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Input Size (n)</th>
-                <th>Max Complexity</th>
-                <th>Typical Algorithms</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>n ≤ 10</strong></td>
-                <td>O(n!) or O(nⁿ)</td>
-                <td>Permutations, brute-force</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 20</strong></td>
-                <td>O(2ⁿ)</td>
-                <td>Backtracking, bitmask DP</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 500</strong></td>
-                <td>O(n³)</td>
-                <td>3D DP, Floyd-Warshall</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 5,000</strong></td>
-                <td>O(n²)</td>
-                <td>DP tables, O(n²) sorts</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 10⁵</strong></td>
-                <td>O(n log n)</td>
-                <td>Merge sort, heap, segment tree</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 10⁶</strong></td>
-                <td>O(n)</td>
-                <td>Linear scan, two pointers, hashing</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 10⁸</strong></td>
-                <td>O(n) tight constant</td>
-                <td>Optimised linear, bitwise ops</td>
-              </tr>
-              <tr>
-                <td><strong>n ≤ 10¹⁸</strong></td>
                 <td>O(log n)</td>
-                <td>Binary search, fast exponentiation</td>
+                <td>logarithmic</td>
+                <td>3</td>
+                <td>10</td>
+                <td>20</td>
+                <td>Halve the search space each step</td>
+              </tr>
+              <tr>
+                <td>O(n)</td>
+                <td>linear</td>
+                <td>10</td>
+                <td>1,000</td>
+                <td>1,000,000</td>
+                <td>Look at each item once</td>
+              </tr>
+              <tr>
+                <td>O(n log n)</td>
+                <td>n-log-n</td>
+                <td>33</td>
+                <td>10,000</td>
+                <td>20,000,000</td>
+                <td>A good sort</td>
+              </tr>
+              <tr>
+                <td>O(n&sup2;)</td>
+                <td>quadratic</td>
+                <td>100</td>
+                <td>1,000,000</td>
+                <td>10&sup1;&sup2; &mdash; hours</td>
+                <td>Compare every pair</td>
+              </tr>
+              <tr>
+                <td>O(2&#8319;)</td>
+                <td>exponential</td>
+                <td>1,024</td>
+                <td>more than atoms in the universe</td>
+                <td>&mdash;</td>
+                <td>Try every subset</td>
+              </tr>
+              <tr>
+                <td>O(n!)</td>
+                <td>factorial</td>
+                <td>3,628,800</td>
+                <td>&mdash;</td>
+                <td>&mdash;</td>
+                <td>Try every ordering</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <h3 class="h2" id="space">5.3 — Space Complexity</h3>
-
-        <div class="callout orange">
-          <span class="callout-icon">📐</span>
-          <div class="callout-body">
-            <strong>Always report BOTH time and space in interviews.</strong
-            ><br />
-            Then ask: "Can I reduce space to O(1) using in-place
-            manipulation?"<br />
-            Two-pointers, in-place reversal, and bit manipulation are classic
-            O(1) space techniques.
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Space Complexity Examples</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// O(1) space — only fixed number of extra variables</span>
-<span class="kw">int</span> sum = 0;
-<span class="kw">for</span> (<span class="kw">int</span> x : arr) sum += x;   <span class="cm">// one variable, regardless of n</span>
-
-<span class="cm">// O(n) space — proportional to input</span>
-<span class="kw">int</span>[] copy = <span class="cls">Arrays</span>.copyOf(arr, n);   <span class="cm">// n-size extra array</span>
-<span class="cls">Map</span>&lt;?,?&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();      <span class="cm">// up to n entries</span>
-
-<span class="cm">// O(n) space — RECURSION! Each call frame is on the stack</span>
-<span class="kw">int</span> <span class="fn">factorial</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span>(n==0) <span class="ret">return</span> 1;
-    <span class="ret">return</span> n * <span class="fn">factorial</span>(n-1);  <span class="cm">// depth n → O(n) stack space</span>
-}
-
-<span class="cm">// O(log n) space — binary search (recursive) depth = log n</span>
-<span class="cm">// O(n) space  — merge sort call stack depth = log n, but merge arrays = O(n)</span>
-
-<span class="cm">// Auxiliary space = extra space beyond input storage
-// Total space = input + auxiliary</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 6: COLLECTIONS ═══════════════════════════ -->
-        <h2 class="h1" id="collections">🗂 Java Collections Cheat Sheet</h2>
-
-        <p>Memorize this table. Every data structure lecture will use these.</p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Collection</th>
-                <th>Key Operations &amp; Time</th>
-                <th>When to use</th>
-                <th>Important gotchas</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>int[] / array</strong></td>
-                <td>get/set: O(1), length: O(1)</td>
-                <td>Fixed-size, primitives, frequency arrays</td>
-                <td>Fixed size, no built-in methods</td>
-              </tr>
-              <tr>
-                <td><strong>ArrayList&lt;T&gt;</strong></td>
-                <td>get: O(1), add: O(1)*, remove(i): O(n)</td>
-                <td>Dynamic array, ordered, indexed access</td>
-                <td>*amortized; remove by index is O(n)</td>
-              </tr>
-              <tr>
-                <td><strong>LinkedList&lt;T&gt;</strong></td>
-                <td>add/remove ends: O(1), get(i): O(n)</td>
-                <td>Deque operations, frequent inserts at ends</td>
-                <td>Not cache-friendly; prefer ArrayDeque for stack/queue</td>
-              </tr>
-              <tr>
-                <td><strong>HashMap&lt;K,V&gt;</strong></td>
-                <td>get/put/contains: O(1) avg, O(n) worst</td>
-                <td>Frequency count, complement lookup, memoization</td>
-                <td>Unordered; worst case O(n) if hash collisions</td>
-              </tr>
-              <tr>
-                <td><strong>LinkedHashMap&lt;K,V&gt;</strong></td>
-                <td>Same as HashMap</td>
-                <td>LRU Cache (preserves insertion order)</td>
-                <td>Slightly slower than HashMap</td>
-              </tr>
-              <tr>
-                <td><strong>TreeMap&lt;K,V&gt;</strong></td>
-                <td>get/put/floor/ceil: O(log n)</td>
-                <td>Need sorted keys, floor/ceil queries</td>
-                <td>Keys must be Comparable; Red-Black tree internally</td>
-              </tr>
-              <tr>
-                <td><strong>HashSet&lt;T&gt;</strong></td>
-                <td>add/contains/remove: O(1) avg</td>
-                <td>De-dup, O(1) lookup, visited set</td>
-                <td>No ordering; no duplicates</td>
-              </tr>
-              <tr>
-                <td><strong>TreeSet&lt;T&gt;</strong></td>
-                <td>add/contains/floor/ceil: O(log n)</td>
-                <td>Sorted set, range queries</td>
-                <td>Keys must be Comparable</td>
-              </tr>
-              <tr>
-                <td><strong>PriorityQueue&lt;T&gt;</strong></td>
-                <td>offer/poll: O(log n), peek: O(1)</td>
-                <td>Top-K, Dijkstra, median stream</td>
-                <td>Min-heap by default; use (a,b)->b-a for max-heap</td>
-              </tr>
-              <tr>
-                <td><strong>ArrayDeque&lt;T&gt;</strong></td>
-                <td>push/pop/peek (both ends): O(1)</td>
-                <td>Stack, queue, sliding window (deque)</td>
-                <td>Faster than Stack class; preferred in all DSA</td>
-              </tr>
-              <tr>
-                <td><strong>Stack&lt;T&gt;</strong></td>
-                <td>push/pop/peek: O(1)</td>
-                <td>Legacy; use ArrayDeque instead</td>
-                <td>Synchronized (slow); avoid in competitive coding</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout blue">
-          <span class="callout-icon">🌲</span>
-          <div class="callout-body">
-            <strong>TreeMap — Missing from Most Courses:</strong> When you need
-            range or nearest-key queries in O(log n).<br />
-            <code>tm.floorKey(x)</code> — largest key ≤ x &nbsp;|&nbsp;
-            <code>tm.ceilingKey(x)</code> — smallest key ≥ x<br />
-            <code>tm.lowerKey(x)</code> — largest key &lt; x &nbsp;|&nbsp;
-            <code>tm.higherKey(x)</code> — smallest key &gt; x<br />
-            <code>tm.firstKey()</code> / <code>tm.lastKey()</code> — min / max
-            key<br />
-            <code>tm.headMap(x)</code> — submap with all keys &lt; x
-            &nbsp;|&nbsp; <code>tm.tailMap(x)</code> — all keys ≥ x<br />
-            <strong>Use for:</strong> Calendar events, sliding window problems,
-            frequency-range queries.
-          </div>
-        </div>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Collections Quick Reference</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cm">// ── ArrayList ─────────────────────────────────────────────────</span>
-<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; list = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-list.add(5);               <span class="cm">// append</span>
-list.add(0, 5);            <span class="cm">// insert at index 0 — O(n)!</span>
-list.get(i);               <span class="cm">// O(1)</span>
-list.remove(i);            <span class="cm">// by index — O(n); shifts everything</span>
-list.remove(<span class="cls">Integer</span>.valueOf(5)); <span class="cm">// by value — O(n)</span>
-list.size(); list.isEmpty(); list.contains(x);
-<span class="cls">Collections</span>.sort(list);    <span class="cm">// O(n log n)</span>
-<span class="cls">Collections</span>.reverse(list);
-
-<span class="cm">// ── HashMap ───────────────────────────────────────────────────</span>
-<span class="cls">Map</span>&lt;<span class="cls">String</span>,<span class="cls">Integer</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-map.put(<span class="str">"a"</span>, 1);
-map.get(<span class="str">"a"</span>);                        <span class="cm">// returns null if absent</span>
-map.getOrDefault(<span class="str">"a"</span>, 0);           <span class="cm">// ← use this to avoid null checks!</span>
-map.containsKey(<span class="str">"a"</span>); map.containsValue(1);
-map.put(<span class="str">"a"</span>, map.getOrDefault(<span class="str">"a"</span>,0)+1); <span class="cm">// frequency count pattern</span>
-map.putIfAbsent(<span class="str">"a"</span>, <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;()); <span class="cm">// graph adjacency list</span>
-<span class="kw">for</span> (<span class="kw">var</span> e : map.entrySet())          <span class="cm">// iterate all entries</span>
-    System.out.println(e.getKey() + <span class="str">" → "</span> + e.getValue());
-
-<span class="cm">// ── PriorityQueue ─────────────────────────────────────────────</span>
-<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; minPQ = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;();    <span class="cm">// min-heap</span>
-<span class="cls">PriorityQueue</span>&lt;<span class="cls">Integer</span>&gt; maxPQ = <span class="kw">new</span> <span class="cls">PriorityQueue</span>&lt;&gt;(<span class="cls">Collections</span>.reverseOrder());
-minPQ.offer(5);  <span class="cm">// add</span>
-minPQ.peek();    <span class="cm">// view min without removing — O(1)</span>
-minPQ.poll();    <span class="cm">// remove and return min — O(log n)</span>
-
-<span class="cm">// ── ArrayDeque as Stack ──────────────────────────────────────</span>
-<span class="cls">Deque</span>&lt;<span class="cls">Integer</span>&gt; stack = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-stack.push(5);   <span class="cm">// push to front</span>
-stack.pop();     <span class="cm">// remove from front</span>
-stack.peek();    <span class="cm">// view front without removing</span>
-
-<span class="cm">// ── ArrayDeque as Queue ──────────────────────────────────────</span>
-<span class="cls">Deque</span>&lt;<span class="cls">Integer</span>&gt; queue = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-queue.offer(5);  <span class="cm">// enqueue at back</span>
-queue.poll();    <span class="cm">// dequeue from front</span>
-queue.peek();    <span class="cm">// view front</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 7: STRING BASICS ══════════════════════════ -->
-        <h2 class="h1" id="strings">🔤 String Essentials for DSA</h2>
-
-        <p>
-          Java strings are <strong>immutable</strong> — every modification
-          creates a new string. This is the #1 interview trap for beginners.
-        </p>
-
-        <div class="callout red">
-          <span class="callout-icon">🚨</span>
-          <div class="callout-body">
-            <strong>DANGER: String concatenation in a loop is O(n²)!</strong
-            ><br />
-            <code>String s = ""; for(int i=0; i&lt;n; i++) s += "a";</code
-            ><br />
-            Each <code>+=</code> creates a new string and copies everything. Use
-            <code>StringBuilder</code> instead.<br />
-            <code
-              >StringBuilder sb = new StringBuilder(); for(...) sb.append("a");
-              return sb.toString();</code
-            >
-          </div>
-        </div>
-
-        <h3 class="h2" id="string-ops">String Operations You Must Know</h3>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Code</th>
-                <th>Time</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Length</td>
-                <td><code>s.length()</code></td>
-                <td>O(1)</td>
-                <td>Note: () for String, not .length</td>
-              </tr>
-              <tr>
-                <td>Get char</td>
-                <td><code>s.charAt(i)</code></td>
-                <td>O(1)</td>
-                <td>Returns char, not String</td>
-              </tr>
-              <tr>
-                <td>Substring</td>
-                <td><code>s.substring(i, j)</code></td>
-                <td>O(j-i)</td>
-                <td>Creates new string [i, j)</td>
-              </tr>
-              <tr>
-                <td>Compare</td>
-                <td><code>s.equals(t)</code></td>
-                <td>O(n)</td>
-                <td>NEVER use == for strings!</td>
-              </tr>
-              <tr>
-                <td>To char array</td>
-                <td><code>s.toCharArray()</code></td>
-                <td>O(n)</td>
-                <td>Convert to mutable array</td>
-              </tr>
-              <tr>
-                <td>Split</td>
-                <td><code>s.split(" ")</code></td>
-                <td>O(n)</td>
-                <td>Returns String[]</td>
-              </tr>
-              <tr>
-                <td>Trim</td>
-                <td><code>s.trim()</code></td>
-                <td>O(n)</td>
-                <td>Remove leading/trailing spaces</td>
-              </tr>
-              <tr>
-                <td>Contains</td>
-                <td><code>s.contains("ab")</code></td>
-                <td>O(n×m)</td>
-                <td>Naive search</td>
-              </tr>
-              <tr>
-                <td>Index of</td>
-                <td><code>s.indexOf("ab")</code></td>
-                <td>O(n×m)</td>
-                <td>Returns -1 if not found</td>
-              </tr>
-              <tr>
-                <td>To lowercase</td>
-                <td><code>s.toLowerCase()</code></td>
-                <td>O(n)</td>
-                <td>Creates new string</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
         <div class="callout green">
-          <span class="callout-icon">💡</span>
+          <span class="callout-icon">&#128269;</span>
           <div class="callout-body">
-            <strong>StringBuilder Cheat Sheet:</strong><br />
-            <code>StringBuilder sb = new StringBuilder();</code><br />
-            <code>sb.append("hello");</code> — O(1) amortized<br />
-            <code>sb.insert(0, "x");</code> — O(n) — shifts everything<br />
-            <code>sb.reverse();</code> — O(n)<br />
-            <code>sb.toString();</code> — O(n) — get final String<br />
-            <strong>Rule:</strong> If you're building a string character by
-            character, ALWAYS use StringBuilder.
+            <strong>The one number to remember.</strong> A computer does roughly
+            <strong>100 million (10&#8312;) simple steps per second</strong>.
+            Put your step count next to that and you know immediately whether
+            something takes a millisecond, a second, or a lifetime.
           </div>
         </div>
-
-        <h3 class="h2" id="string-patterns">
-          Common String Patterns in Interviews
-        </h3>
-        <ol>
-          <li>
-            <strong>Two Pointers:</strong> Palindrome check, reverse string →
-            <a href="https://leetcode.com/problems/valid-palindrome/">LC 125</a>
-          </li>
-          <li>
-            <strong>Frequency Count:</strong> Anagram check, permutation in
-            string →
-            <a href="https://leetcode.com/problems/valid-anagram/">LC 242</a>
-          </li>
-          <li>
-            <strong>Sliding Window:</strong> Longest substring without repeats →
-            <a
-              href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
-              >LC 3</a
-            >
-          </li>
-          <li>
-            <strong>HashMap:</strong> Group anagrams →
-            <a href="https://leetcode.com/problems/group-anagrams/">LC 49</a>
-          </li>
-          <li>
-            <strong>Stack:</strong> Valid parentheses →
-            <a href="https://leetcode.com/problems/valid-parentheses/">LC 20</a>
-          </li>
-        </ol>
-
-        <hr />
-
-        <!-- ══ SECTION 8: PRACTICE PROBLEMS ═════════════════════ -->
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-
+        <h2 class="h1" id="reading">&#128270; Reading Cost From Code</h2>
         <p>
-          These are solved during the lecture. Think first, attempt on paper,
-          then check solution.
+          You do not need to run anything to find the Big-O. Four rules, applied
+          to the structure of the code, get you there.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rule 1 — Steps One After Another
+              Add</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: print(a[i])      <span class="pc-cm">// n steps</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: print(a[i])      <span class="pc-cm">// n more steps</span>
+
+<span class="pc-cm">// Total: n + n = 2n  →  O(n). Two separate passes are still "linear".</span></pre>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rule 2 — A Loop Inside a Loop
+              Multiplies</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:              <span class="pc-cm">// runs n times for EACH i</span>
+        compare(a[i], a[j])
+
+<span class="pc-cm">// Total: n × n = n²  →  O(n²). This is the handshake recipe.</span></pre>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rule 3 — Halving Gives log n</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">while</span> n &gt; 1:
+    n ← n ÷ 2                           <span class="pc-cm">// 1000 → 500 → 250 → … → 1</span>
+
+<span class="pc-cm">// How many halvings until you reach 1? About log₂(n): 10 for a thousand,</span>
+<span class="pc-cm">// 20 for a million. That is why O(log n) feels almost free.</span></pre>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rule 4 — A Fixed-Size Loop Is
+              Constant</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">for</span> c <span class="pc-kw">from</span> 'a' <span class="pc-kw">to</span> 'z':                  <span class="pc-cm">// always 26 times, whatever n is</span>
+    count[c] ← 0
+
+<span class="pc-cm">// 26 does not grow with the input, so this is O(1).</span></pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>The trap: an inner loop that starts later.</strong>
+            <code>for j from i + 1 to n - 1</code> looks cheaper than a full
+            inner loop &mdash; and it is, by half. But half of n&sup2; is still
+            n&sup2; growth. Rule 5 below explains why the half disappears.
+          </div>
+        </div>
+        <h3 class="h2" id="rules">The Simplification Rules</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rule</th>
+                <th>Example</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Drop constant multipliers</td>
+                <td>3n → O(n)</td>
+                <td>
+                  Doubling n still doubles 3n; the 3 does not change the
+                  <em>shape</em>.
+                </td>
+              </tr>
+              <tr>
+                <td>Keep only the biggest term</td>
+                <td>n&sup2; + n + 100 → O(n&sup2;)</td>
+                <td>
+                  At n = 1,000,000 the n&sup2; term is a million times larger
+                  than n.
+                </td>
+              </tr>
+              <tr>
+                <td>Different inputs keep different letters</td>
+                <td>two lists: O(n + m), not O(n)</td>
+                <td>
+                  If one list is huge and the other tiny, a single letter hides
+                  that.
+                </td>
+              </tr>
+              <tr>
+                <td>Nested loops over different inputs multiply</td>
+                <td>O(n &middot; m)</td>
+                <td>Every row of one against every item of the other.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="space">&#128190; Space: How Much Memory</h2>
+        <p>
+          Time is not the only cost. <strong>Space complexity</strong> counts
+          the extra memory an algorithm needs as the input grows. Interviewers
+          usually mean <em>auxiliary</em> space &mdash; memory beyond the input
+          you were given.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Same Answer, Different Space</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> reverseCopy(a):             <span class="pc-cm">// O(n) extra space</span>
+    b ← new list of length(a)
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 1:
+        b[i] ← a[length(a) - 1 - i]
+    <span class="pc-kw">return</span> b
+
+<span class="pc-kw">function</span> reverseInPlace(a):          <span class="pc-cm">// O(1) extra space</span>
+    left ← 0;  right ← length(a) - 1
+    <span class="pc-kw">while</span> left &lt; right:
+        swap a[left] <span class="pc-kw">and</span> a[right]
+        left ← left + 1;  right ← right - 1</pre>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Recursion uses space too.</strong> Every call that has not
+            finished yet is waiting in memory. A function that calls itself n
+            levels deep uses O(n) space even if it never creates a list. You
+            will see why in Lecture 8.
+          </div>
+        </div>
+        <h2 class="h1" id="recursion">&#127795; Recursion: Count the Calls</h2>
+        <p>
+          When a function calls itself, draw the calls as a tree. The total cost
+          is simply
+          <strong
+            >how many calls there are &times; the work inside each call</strong
+          >. You will learn to write recursion in Lecture 8; for now, only learn
+          to count it.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Shape of the calls</th>
+                <th>Number of calls</th>
+                <th>Cost</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>One call, input shrinks by 1</td>
+                <td>n</td>
+                <td>O(n)</td>
+                <td>Factorial</td>
+              </tr>
+              <tr>
+                <td>One call, input halves</td>
+                <td>log n</td>
+                <td>O(log n)</td>
+                <td>Binary search</td>
+              </tr>
+              <tr>
+                <td>Two calls, input halves, O(n) work to combine</td>
+                <td>log n levels &times; n per level</td>
+                <td>O(n log n)</td>
+                <td>Merge sort</td>
+              </tr>
+              <tr>
+                <td>Two calls, input shrinks by 1</td>
+                <td>about 2&#8319;</td>
+                <td>O(2&#8319;)</td>
+                <td>Naive Fibonacci</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The last row is why some innocent-looking code never finishes: two
+          calls per level doubles the work at every level. Lecture 8 shows how
+          remembering answers you have already computed turns that 2&#8319; back
+          into n.
+        </p>
+        <h2 class="h1" id="amortised">&#128230; Amortised Cost</h2>
+        <p>
+          Some operations are usually cheap and occasionally expensive. A
+          growable list is the classic case: adding an item is instant &mdash;
+          until the list is full, at which point it copies everything into a
+          space twice as big.
+        </p>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Like moving house.</strong> Most years you do not move at
+            all. When you do, it is a huge job. But if you move once every ten
+            years, the effort <em>averaged over the years</em> is small. Because
+            the list doubles each time, the copies add up to at most about 2n
+            work over n additions &mdash; so each addition is
+            <strong>O(1) amortised</strong>, even though a single one can cost
+            O(n).
+          </div>
+        </div>
+        <h2 class="h1" id="cases">&#127922; Best, Average and Worst Case</h2>
+        <p>
+          The same code can be fast or slow depending on the input. Searching a
+          list for a value finds it instantly if it is first (best case), or
+          looks at everything if it is last or missing (worst case).
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Linear search</th>
+                <th>When people mean it</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Best</td>
+                <td>O(1) &mdash; it was first</td>
+                <td>Almost never worth quoting</td>
+              </tr>
+              <tr>
+                <td>Average</td>
+                <td>O(n) &mdash; about half the list</td>
+                <td>When inputs are random</td>
+              </tr>
+              <tr>
+                <td>Worst</td>
+                <td>O(n) &mdash; last or missing</td>
+                <td>
+                  <strong>The default in interviews</strong> unless you are told
+                  otherwise
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="constraints">
+          &#127919; Constraints Tell You the Target
+        </h2>
+        <p>
+          Every interview problem states how big the input can be. Combined with
+          the 10&#8312;-steps-per-second rule, that number tells you which Big-O
+          you need
+          <em>before you have any idea how to solve it</em>. This is the single
+          most useful habit in this lecture.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>If n is at most…</th>
+                <th>You can afford…</th>
+                <th>Which usually means</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>10–11</td>
+                <td>O(n!)</td>
+                <td>Try every ordering</td>
+              </tr>
+              <tr>
+                <td>20–25</td>
+                <td>O(2&#8319;)</td>
+                <td>Try every subset</td>
+              </tr>
+              <tr>
+                <td>100–500</td>
+                <td>O(n&sup3;)</td>
+                <td>Three nested loops</td>
+              </tr>
+              <tr>
+                <td>1,000–5,000</td>
+                <td>O(n&sup2;)</td>
+                <td>Check every pair</td>
+              </tr>
+              <tr>
+                <td>100,000–1,000,000</td>
+                <td>O(n log n) or O(n)</td>
+                <td>Sort once, or a single pass</td>
+              </tr>
+              <tr>
+                <td>1,000,000,000 or more</td>
+                <td>O(log n) or O(1)</td>
+                <td>Halving, or a formula</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>Try it now.</strong> A problem says the list can hold up to
+            100,000 numbers. Checking every pair is 10&sup1;&#8304; steps
+            &mdash; about 100 seconds. So the pair-checking solution is out
+            before you write it, and you already know to look for something n
+            log n or better.
+          </div>
+        </div>
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
+        <p>
+          The mistakes below are mistakes in <em>analysis</em>, not in code.
+          Each one makes you promise a speed your solution does not have.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mistake</th>
+                <th>What it looks like</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Hidden loops inside one line</td>
+                <td>
+                  <code>if x in list</code> inside a loop looks O(1) but scans
+                  the list: O(n&sup2;) overall
+                </td>
+                <td>Ask what every built-in call costs</td>
+              </tr>
+              <tr>
+                <td>Forgetting that sorting costs</td>
+                <td>&ldquo;Sort, then one pass &mdash; O(n)&rdquo;</td>
+                <td>The sort alone is O(n log n)</td>
+              </tr>
+              <tr>
+                <td>Keeping constants</td>
+                <td>&ldquo;O(2n)&rdquo;, &ldquo;O(n/2)&rdquo;</td>
+                <td>Both are O(n)</td>
+              </tr>
+              <tr>
+                <td>Adding nested loops</td>
+                <td>Two nested loops called O(2n)</td>
+                <td>Nested multiplies: O(n&sup2;)</td>
+              </tr>
+              <tr>
+                <td>One letter for two inputs</td>
+                <td>Two lists of different sizes called O(n)</td>
+                <td>Use n and m: O(n + m) or O(n &middot; m)</td>
+              </tr>
+              <tr>
+                <td>Ignoring recursion space</td>
+                <td>A recursive solution called O(1) space</td>
+                <td>Count the depth of the calls</td>
+              </tr>
+              <tr>
+                <td>Confusing amortised with worst case</td>
+                <td>&ldquo;Every append is O(1)&rdquo;</td>
+                <td>O(1) amortised; one append can be O(n)</td>
+              </tr>
+              <tr>
+                <td>Mixing up halving and stepping</td>
+                <td>A loop doing <code>i ← i + 2</code> called O(log n)</td>
+                <td>
+                  Adding a constant is still O(n); only multiplying or dividing
+                  gives log
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Five problems, each teaching a different way to read cost. You do not
+          need to write code yet &mdash; for each one, read the problem, state
+          the obvious solution and its Big-O, then read the solution and
+          compare.
         </p>
 
-        <!-- P1 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 · Brute → Optimize</div>
-              <div class="prob-title">Check if a Number is Prime</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/maximum-prime-difference/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; Related: LC 3115 - Maximum Prime Difference</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-co">Google · Amazon · Adobe</span>
-                <span class="tag tag-pat">O(√n) Optimization</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a positive integer n, return true if it is prime
-                (divisible only by 1 and itself).
-              </p>
-              <div class="iobox">
-                isPrime(2) → true isPrime(17) → true isPrime(15) → false (3 × 5
-                = 15) isPrime(1) → false (1 is NOT prime by definition)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You do not need to test every number below n. How far do the
-                    factors actually go?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    If n has a factor larger than &radic;n, it must also have
-                    one smaller than &radic;n. So loop i from 2 while i&times;i
-                    &le; n.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Factors come in pairs: if a × b = n, then min(a, b) ≤ √n. So we
-                only need to check up to √n.
-              </p>
-              <p>
-                Additional: skip even numbers after checking 2 — halves the
-                iterations.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">☕ Java · 3 Approaches</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="cm">// Approach 1: Brute Force — O(n)</span>
-<span class="kw">boolean</span> <span class="fn">isPrime_brute</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt; 2) <span class="ret">return false</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = 2; i &lt; n; i++)       <span class="cm">// checks all the way to n-1</span>
-        <span class="kw">if</span> (n % i == 0) <span class="ret">return false</span>;
-    <span class="ret">return true</span>;
-}
-
-<span class="cm">// Approach 2: Optimized — O(√n)</span>
-<span class="kw">boolean</span> <span class="fn">isPrime</span>(<span class="kw">int</span> n) {
-    <span class="kw">if</span> (n &lt; 2) <span class="ret">return false</span>;
-    <span class="kw">if</span> (n == 2) <span class="ret">return true</span>;          <span class="cm">// 2 is prime</span>
-    <span class="kw">if</span> (n % 2 == 0) <span class="ret">return false</span>;     <span class="cm">// all evens > 2 are not prime</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = 3; i*i &lt;= n; i += 2) { <span class="cm">// only odd i, stop at √n</span>
-        <span class="kw">if</span> (n % i == 0) <span class="ret">return false</span>;
-    }
-    <span class="ret">return true</span>;
-}
-
-<span class="cm">// Dry run: isPrime(37)
-// n=37, not even. i=3: 9≤37, 37%3≠0 | i=5: 25≤37, 37%5≠0
-// i=7: 49>37 → STOP → return true ✓
-// Only 3 iterations vs 35 in brute force!</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Brute Time</span
-                    ><span class="cx-val red">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Optimal Time</span
-                    ><span class="cx-val green">O(√n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P2 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 · Two Pointers Preview</div>
-              <div class="prob-title">Reverse an Array In-Place</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/reverse-string/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 344 - Reverse String</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-co">Amazon · Microsoft · Apple</span>
-                <span class="tag tag-pat">Two Pointers</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Reverse an array in-place using O(1) extra space. Do not create
-                a new array.
-              </p>
-              <div class="iobox">
-                Input: [1, 2, 3, 4, 5] → Output: [5, 4, 3, 2, 1] Input: [1, 2] →
-                Output: [2, 1]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You do not need a second array. What if two pointers walked
-                    towards each other?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Put one pointer at 0 and one at n-1, swap, then move both
-                    inwards. Stop when they meet.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-
-              <details>
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Full solution
-                </summary>
-                <div class="details-body">
-                  <div class="code-block">
-                    <div class="code-header">
-                      <div class="code-lang">☕ Java</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
-                        Copy
-                      </button>
-                    </div>
-                    <pre><span class="kw">void</span> <span class="fn">reverse</span>(<span class="kw">int</span>[] arr) {
-    <span class="kw">int</span> left = 0, right = arr.length - 1;
-    <span class="kw">while</span> (left &lt; right) {
-        <span class="kw">int</span> tmp  = arr[left];  <span class="cm">// 3-step swap</span>
-        arr[left]  = arr[right];
-        arr[right] = tmp;
-        left++;   right--;     <span class="cm">// converge inward</span>
-    }
-}
-<span class="cm">// Dry run: [1,2,3,4,5]
-// left=0,right=4: swap(1,5) → [5,2,3,4,1]
-// left=1,right=3: swap(2,4) → [5,4,3,2,1]
-// left=2,right=2: left==right → stop ✓
-// n/2 = 2 swaps for n=5. O(n) time, O(1) space.</span></pre>
-                  </div>
-                  <div class="complexity-row">
-                    <div class="cx-badge green">
-                      <span class="cx-label">Time</span
-                      ><span class="cx-val green">O(n)</span>
-                    </div>
-                    <div class="cx-badge green">
-                      <span class="cx-label">Space</span
-                      ><span class="cx-val green">O(1)</span>
-                    </div>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </div>
-        </div>
-
-        <!-- P3: Find Smallest Letter Greater Than Target -->
+        <!-- Problem 01: Count Good Triplets -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 03 &middot; Binary Search Template
+                Problem 01 &middot; Reading Nested Loops
               </div>
-              <div class="prob-title">
-                Find Smallest Letter Greater Than Target
-              </div>
+              <div class="prob-title">Count Good Triplets</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/find-smallest-letter-greater-than-target/"
+                  href="https://leetcode.com/problems/count-good-triplets/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 744 - Find Smallest Letter Greater Than Target</a
+                  >&#128279; LC 1534 - Count Good Triplets</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Upper Bound</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; LinkedIn</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a sorted array of lowercase <code>letters</code> and a
-                character <code>target</code>, return the smallest letter
-                strictly greater than <code>target</code>. If there is none,
-                wrap around and return <code>letters[0]</code>.
-              </p>
-              <div class="iobox">
-                letters = ['c','f','j'], target = 'a' &rarr; 'c' &nbsp;|&nbsp;
-                target = 'c' &rarr; 'f' &nbsp;|&nbsp; target = 'j' &rarr; 'c'
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The array is sorted, so you never need to look at every
-                    letter. Which half can you throw away after one comparison?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Binary search for the <em>first</em> index whose letter is
-                    greater than the target. If that index runs past the end,
-                    wrap to index 0.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the <strong>upper bound</strong> template. Keep a
-                half-open range <code>[lo, hi)</code>. If
-                <code>letters[mid] &gt; target</code>, the answer is at
-                <code>mid</code> or to its left, so <code>hi = mid</code>;
-                otherwise <code>lo = mid + 1</code>. When the loop ends,
-                <code>lo</code> is the first greater letter &mdash; or
-                <code>n</code>, which wraps to 0 with a modulo.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Upper Bound
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">char</span> <span class="fn">nextGreatestLetter</span>(<span class="kw">char</span>[] letters, <span class="kw">char</span> target) {
-    <span class="kw">int</span> lo = <span class="num">0</span>, hi = letters.length;       <span class="cm">// search space [lo, hi)</span>
-    <span class="kw">while</span> (lo &lt; hi) {
-        <span class="kw">int</span> mid = lo + (hi - lo) / <span class="num">2</span>;      <span class="cm">// never overflows</span>
-        <span class="kw">if</span> (letters[mid] &gt; target) hi = mid;
-        <span class="kw">else</span> lo = mid + <span class="num">1</span>;
-    }
-    <span class="ret">return</span> letters[lo % letters.length];   <span class="cm">// lo == n means wrap around</span>
-}
-
-<span class="cm">// Dry run: [&#x27;c&#x27;,&#x27;f&#x27;,&#x27;j&#x27;], target = &#x27;c&#x27;</span>
-<span class="cm">// lo=0 hi=3 -&gt; mid=1 &#x27;f&#x27; &gt; &#x27;c&#x27;  -&gt; hi=1</span>
-<span class="cm">// lo=0 hi=1 -&gt; mid=0 &#x27;c&#x27; &gt; &#x27;c&#x27;? no -&gt; lo=1</span>
-<span class="cm">// lo == hi == 1 -&gt; letters[1] = &#x27;f&#x27;</span>
-</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(log n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P4: How Many Numbers Are Smaller Than the Current Number -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 04 &middot; Brute Force to Counting
-              </div>
-              <div class="prob-title">
-                How Many Numbers Are Smaller Than the Current Number
-              </div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1365 - How Many Numbers Are Smaller Than the Current
-                  Number</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Counting Array</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Microsoft &middot; Bloomberg</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For every <code>nums[i]</code>, count how many other elements
-                are strictly smaller than it. Values are between 0 and 100.
-              </p>
-              <div class="iobox">
-                nums = [8, 1, 2, 2, 3] &rarr; [4, 0, 1, 1, 3]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Two nested loops solve it. Count the comparisons &mdash;
-                    what is that in Big-O?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Values only go up to 100. Count how often each value
-                    appears, turn those counts into running totals, and the
-                    answer for <code>x</code> is the number of values at most
-                    <code>x - 1</code>.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Start with the brute force and name its cost: for each element
-                you scan all the others, so O(n&sup2;). Then use the constraint.
-                A <code>int[101]</code> frequency array plus a prefix sum turns
-                every query into one array read, so the whole problem becomes
-                O(n + 100). This trade &mdash; a little memory for a lot of
-                speed &mdash; is the same idea behind counting sort in Lecture
-                9.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Counting + Prefix
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">smallerNumbersThanCurrent</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span>[] count = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">101</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) count[x]++;              <span class="cm">// how often each value appears</span>
-
-    <span class="kw">for</span> (<span class="kw">int</span> v = <span class="num">1</span>; v &lt;= <span class="num">100</span>; v++)
-        count[v] += count[v - <span class="num">1</span>];               <span class="cm">// now: how many values &lt;= v</span>
-
-    <span class="kw">int</span>[] ans = <span class="kw">new</span> <span class="kw">int</span>[nums.length];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++)
-        ans[i] = nums[i] == <span class="num">0</span> ? <span class="num">0</span> : count[nums[i] - <span class="num">1</span>];
-    <span class="ret">return</span> ans;
-}
-
-<span class="cm">// nums = [8,1,2,2,3] -&gt; counts &lt;=0:0, &lt;=1:1, &lt;=2:3, &lt;=7:4</span>
-<span class="cm">// 8 -&gt; 4, 1 -&gt; 0, 2 -&gt; 1, 2 -&gt; 1, 3 -&gt; 3</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n + 100)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(101)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P5: Max Consecutive Ones -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 05 &middot; Complexity Analysis
-              </div>
-              <div class="prob-title">Max Consecutive Ones</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/max-consecutive-ones/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 485 - Max Consecutive Ones</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Running Count</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a binary array <code>nums</code>, return the maximum
-                number of consecutive <code>1</code>s.
-              </p>
-              <div class="iobox">nums = [1, 1, 0, 1, 1, 1] &rarr; 3</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Trying every start and end is O(n&sup2;). What single fact
-                    about the current position is enough?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Track the length of the run of 1s that ends at the current
-                    index: a 1 extends it, a 0 resets it to zero. Remember the
-                    best length seen.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two variables replace the nested loops. <code>current</code> is
-                the run ending here and <code>best</code> is the answer so far.
-                Each element is read once, so the pass is O(n) with O(1) memory.
-                The same <em>extend-or-reset</em> shape reappears as Kadane's
-                algorithm on sums in Lecture 8.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">&#9749; Java &middot; One Pass</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span> <span class="fn">findMaxConsecutiveOnes</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> current = <span class="num">0</span>, best = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) {
-        <span class="kw">if</span> (x == <span class="num">1</span>) current++;      <span class="cm">// extend the run</span>
-        <span class="kw">else</span> current = <span class="num">0</span>;           <span class="cm">// a zero breaks it</span>
-        best = <span class="cls">Math</span>.<span class="fn">max</span>(best, current);
-    }
-    <span class="ret">return</span> best;
-}
-
-<span class="cm">// [1,1,0,1,1,1] -&gt; current = 1,2,0,1,2,3 -&gt; best = 3</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P6: Number of Good Pairs -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Counting Pairs</div>
-              <div class="prob-title">Number of Good Pairs</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/number-of-good-pairs/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1512 - Number of Good Pairs</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Counting Array</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Microsoft &middot; Adobe</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                A pair <code>(i, j)</code> is <em>good</em> when
-                <code>nums[i] == nums[j]</code> and <code>i &lt; j</code>.
-                Return the number of good pairs. Values are between 1 and 100.
-              </p>
-              <div class="iobox">
-                nums = [1, 2, 3, 1, 1, 3] &rarr; 4 &nbsp; (pairs (0,3), (0,4),
-                (3,4), (2,5))
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Write the double loop first. How many comparisons does it
-                    make for n elements?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    When you reach a value that has already appeared
-                    <code>c</code> times, it makes <code>c</code> new pairs. Add
-                    <code>c</code> to the answer, then increase the count.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The nested loop makes n(n&minus;1)/2 comparisons. Counting does
-                it in one pass: each new occurrence of a value pairs with every
-                earlier occurrence, so add the running count
-                <em>before</em> incrementing it. Same answer, O(n) instead of
-                O(n&sup2;).
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Count Then Pair
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span> <span class="fn">numIdenticalPairs</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span>[] count = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">101</span>];
-    <span class="kw">int</span> pairs = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) {
-        pairs += count[x];   <span class="cm">// x pairs with every earlier copy of itself</span>
-        count[x]++;
-    }
-    <span class="ret">return</span> pairs;
-}
-
-<span class="cm">// [1,2,3,1,1,3]</span>
-<span class="cm">// 1:+0   2:+0   3:+0   1:+1   1:+2   3:+1   -&gt; 4</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(101)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P7: Determine if String Halves Are Alike -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 07 &middot; Character Counting</div>
-              <div class="prob-title">Determine if String Halves Are Alike</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/determine-if-string-halves-are-alike/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1704 - Determine if String Halves Are Alike</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Single Counter</span>
-                <span class="tag tag-co">Amazon &middot; Microsoft</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Split an even-length string <code>s</code> into two halves.
-                Return true when both halves hold the same number of vowels (a,
-                e, i, o, u, upper or lower case).
-              </p>
-              <div class="iobox">
-                s = "book" &rarr; true (1 vowel each) &nbsp;|&nbsp; s =
-                "textbook" &rarr; false (1 vs 2)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You do not care <em>which</em> vowels appear, only how many
-                    are on each side.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    One loop over the index <code>i</code>: add 1 for a vowel in
-                    the first half, subtract 1 for a vowel in the second half.
-                    The halves match when the total is zero.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                A single balance counter replaces two separate counts.
-                <code>"aeiouAEIOU".indexOf(c) &gt;= 0</code> is a readable vowel
-                test and a good reminder that <code>char</code> values work
-                directly with <code>String</code> methods. One pass, no extra
-                arrays.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Balance Counter
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">boolean</span> <span class="fn">halvesAreAlike</span>(<span class="cls">String</span> s) {
-    <span class="cls">String</span> vowels = <span class="str">&quot;aeiouAEIOU&quot;</span>;
-    <span class="kw">int</span> n = s.<span class="fn">length</span>(), balance = <span class="num">0</span>;
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
-        <span class="kw">if</span> (vowels.<span class="fn">indexOf</span>(s.<span class="fn">charAt</span>(i)) &gt;= <span class="num">0</span>) {
-            balance += (i &lt; n / <span class="num">2</span>) ? <span class="num">1</span> : -<span class="num">1</span>;
-        }
-    }
-    <span class="ret">return</span> balance == <span class="num">0</span>;
-}
-
-<span class="cm">// &quot;book&quot;: &#x27;o&#x27; at i=1 -&gt; +1, &#x27;o&#x27; at i=2 -&gt; -1, total 0 -&gt; true</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P8: Running Sum -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 08 · Prefix Sum Introduction</div>
-              <div class="prob-title">Running Sum of 1D Array</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/running-sum-of-1d-array/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1480 - Running Sum</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-co">Amazon · Microsoft</span>
-                <span class="tag tag-pat">Prefix Sum</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given an array <code>nums</code>, return the running sum:
-                <code>runningSum[i] = sum(nums[0]...nums[i])</code>.
-              </p>
-              <div class="iobox">
-                Input: [1, 2, 3, 4] → Output: [1, 3, 6, 10] Input: [3, 1, 2, 10,
-                1] → Output: [3, 4, 6, 16, 17]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Each output entry is the previous output entry plus the
-                    current input.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Accumulate in place: nums[i] += nums[i-1] from i = 1. No
-                    extra array needed.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-
-              <div class="prob-section">
-                <div class="prob-section-label">Why this matters (a lot)</div>
-                <p>
-                  This is your first encounter with the
-                  <mark>prefix sum pattern</mark>. Prefix sums allow you to
-                  compute the sum of ANY subarray in O(1). This technique
-                  appears in:
-                </p>
-                <ul>
-                  <li>
-                    Range sum queries (<a
-                      href="https://leetcode.com/problems/range-sum-query-immutable/"
-                      target="_blank"
-                      >LC 303</a
-                    >)
-                  </li>
-                  <li>
-                    Subarray sum equals K (<a
-                      href="https://leetcode.com/problems/subarray-sum-equals-k/"
-                      target="_blank"
-                      >LC 560</a
-                    >) — uses prefix sum + HashMap
-                  </li>
-                  <li>
-                    Product of array except self (<a
-                      href="https://leetcode.com/problems/product-of-array-except-self/"
-                      target="_blank"
-                      >LC 238</a
-                    >)
-                  </li>
-                  <li>
-                    Many DP problems that optimize with prefix/suffix arrays
-                  </li>
-                </ul>
-              </div>
-              <details>
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Full solution
-                </summary>
-                <div class="details-body">
-                  <div class="code-block">
-                    <div class="code-header">
-                      <div class="code-lang">☕ Java · In-place</div>
-                      <button class="copy-btn" onclick="copyCode(this)">
-                        Copy
-                      </button>
-                    </div>
-                    <pre><span class="kw">int</span>[] <span class="fn">runningSum</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {
-        nums[i] += nums[i - <span class="num">1</span>];  <span class="cm">// accumulate</span>
-    }
-    <span class="ret">return</span> nums;
-}
-
-<span class="cm">// Dry run: [1, 2, 3, 4]
-// i=1: nums[1] = 2 + 1 = 3   → [1, 3, 3, 4]
-// i=2: nums[2] = 3 + 3 = 6   → [1, 3, 6, 4]
-// i=3: nums[3] = 4 + 6 = 10  → [1, 3, 6, 10] ✓</span>
-
-<span class="cm">// 🎯 Bonus: How to get sum of subarray [i..j]?
-// sum(i, j) = prefix[j] - prefix[i-1]
-// Example: sum of nums[1..2] = prefix[2] - prefix[0] = 6 - 1 = 5
-// Verify: nums[1] + nums[2] = 2 + 3 = 5 ✓</span></pre>
-                  </div>
-                  <div class="complexity-row">
-                    <div class="cx-badge green">
-                      <span class="cx-label">Time</span
-                      ><span class="cx-val green">O(n)</span>
-                    </div>
-                    <div class="cx-badge green">
-                      <span class="cx-label">Space</span
-                      ><span class="cx-val green">O(1)</span>
-                    </div>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </div>
-        </div>
-
-        <!-- P9: Count the Digits That Divide a Number -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 09 &middot; Digit Extraction</div>
-              <div class="prob-title">
-                Count the Digits That Divide a Number
-              </div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/count-the-digits-that-divide-a-number/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 2520 - Count the Digits That Divide a Number</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">% 10 and / 10</span>
-                <span class="tag tag-co">Amazon &middot; Adobe</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return how many digits of <code>num</code> divide
-                <code>num</code> evenly. The input has no zero digits.
-              </p>
-              <div class="iobox">
-                num = 121 &rarr; 2 &nbsp; (1 divides 121 twice, 2 does not)
-                &nbsp;|&nbsp; num = 1248 &rarr; 4
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You need each digit in turn, and you still need the original
-                    number to test against.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Copy <code>num</code> into a working variable. While it is
-                    greater than zero, take <code>n % 10</code> as the digit and
-                    then <code>n /= 10</code>. Always test
-                    <code>num % digit</code>, never the shrinking copy.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the digit-extraction loop from the lecture, and it hides
-                the classic bug: if you test <code>n % digit</code> you are
-                testing a number you have already chopped up. Keep the original
-                in its own variable. The loop runs once per digit, so it costs
-                O(log&#8321;&#8320; num).
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Digit Loop
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span> <span class="fn">countDigits</span>(<span class="kw">int</span> num) {
-    <span class="kw">int</span> n = num, count = <span class="num">0</span>;
-    <span class="kw">while</span> (n &gt; <span class="num">0</span>) {
-        <span class="kw">int</span> digit = n % <span class="num">10</span>;              <span class="cm">// read the last digit</span>
-        <span class="kw">if</span> (num % digit == <span class="num">0</span>) count++;   <span class="cm">// test against the ORIGINAL</span>
-        n /= <span class="num">10</span>;                         <span class="cm">// drop it</span>
-    }
-    <span class="ret">return</span> count;
-}
-
-<span class="cm">// num = 121 -&gt; digits 1, 2, 1</span>
-<span class="cm">// 121 % 1 == 0 yes, 121 % 2 == 1 no, 121 % 1 == 0 yes -&gt; 2</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(log num)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P10: Maximum Ascending Subarray Sum -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 10 &middot; Greedy / One-Pass</div>
-              <div class="prob-title">Maximum Ascending Subarray Sum</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/maximum-ascending-subarray-sum/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1800 - Maximum Ascending Subarray Sum</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Extend or Restart</span>
+                <span class="tag tag-pat">Brute force, counted exactly</span>
                 <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >›</span
+              >&rsaquo;</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                An ascending subarray is one where every element is strictly
-                larger than the one before it. Return the largest possible sum
-                of an ascending subarray of <code>nums</code>.
+                Count the triplets <code>i &lt; j &lt; k</code> where every pair
+                of the three values differs by at most given limits
+                <code>a</code>, <code>b</code> and <code>c</code>.
               </p>
               <div class="iobox">
-                nums = [10, 20, 30, 5, 10, 50] &rarr; 65 &nbsp; (from [5, 10,
-                50])
+                arr = [3,0,1,1,9,7], a = 7, b = 2, c = 3 → 4
               </div>
             </div>
             <div class="prob-section">
@@ -3896,8 +2214,9 @@ queue.peek();    <span class="cm">// view front</span></pre>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Where can an ascending run begin? Only where the step from
-                    the previous element was not an increase.
+                    Write the obvious solution: three loops. Now count — how
+                    many times does the innermost line run for a list of length
+                    n?
                   </p>
                 </div>
               </details>
@@ -3908,10 +2227,9 @@ queue.peek();    <span class="cm">// view front</span></pre>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Keep the sum of the run ending here. If
-                    <code>nums[i] &gt; nums[i-1]</code> add to it, otherwise
-                    start again from <code>nums[i]</code>. Track the best sum
-                    you have seen.
+                    Roughly n &times; n &times; n ÷ 6, which is O(n&sup3;). The
+                    problem says n ≤ 100, so that is about 170,000 steps —
+                    perfectly fast. The slow solution is the right one here.
                   </p>
                 </div>
               </details>
@@ -3919,11 +2237,13 @@ queue.peek();    <span class="cm">// view front</span></pre>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                One pass, two variables. Each element either extends the current
-                run or starts a new one, so you never need to look back more
-                than a single step. Recognise the shape: it is the same decision
-                Kadane's algorithm makes, and the same one sliding windows make
-                when they shrink.
+                This is the lecture&rsquo;s most important lesson in disguise:
+                <strong>read the constraint before you optimise</strong>. With n
+                ≤ 100, O(n&sup3;) is roughly a million steps at worst &mdash; a
+                hundredth of a second. A cleverer solution would take longer to
+                write and could hide bugs, for no benefit. Three nested loops
+                multiply (Rule 2), and starting each loop after the previous one
+                only divides by a constant, which Big-O ignores.
               </p>
             </div>
             <details>
@@ -3931,31 +2251,508 @@ queue.peek();    <span class="cm">// view front</span></pre>
                 <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Extend or Restart
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Three Loops, and That Is
+                      Fine</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span> <span class="fn">maxAscendingSum</span>(<span class="kw">int</span>[] nums) {
-    <span class="kw">int</span> sum = nums[<span class="num">0</span>], best = nums[<span class="num">0</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {
-        <span class="kw">if</span> (nums[i] &gt; nums[i - <span class="num">1</span>]) sum += nums[i];   <span class="cm">// extend the run</span>
-        <span class="kw">else</span> sum = nums[i];                          <span class="cm">// restart here</span>
-        best = <span class="cls">Math</span>.<span class="fn">max</span>(best, sum);
-    }
-    <span class="ret">return</span> best;
-}
+                  <pre><span class="pc-kw">function</span> countGoodTriplets(arr, a, b, c):
+    n ← length(arr);  count ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> n - 1:
+            <span class="pc-kw">for</span> k <span class="pc-kw">from</span> j + 1 <span class="pc-kw">to</span> n - 1:          <span class="pc-cm">// innermost line runs ≈ n³ ÷ 6 times</span>
+                <span class="pc-kw">if</span> |arr[i] - arr[j]| ≤ a <span class="pc-kw">and</span> |arr[j] - arr[k]| ≤ b <span class="pc-kw">and</span> |arr[i] - arr[k]| ≤ c:
+                    count ← count + 1
+    <span class="pc-kw">return</span> count
 
-<span class="cm">// [10,20,30,5,10,50] -&gt; sum = 10,30,60,5,15,65 -&gt; best = 65</span></pre>
+<span class="pc-cm">// n ≤ 100  →  at most ~166,000 checks. Done in well under a millisecond.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n&sup3;)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 02: Count of Matches in Tournament -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Simulate, Then Think
+              </div>
+              <div class="prob-title">Count of Matches in Tournament</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/count-of-matches-in-tournament/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1688 - Count of Matches in Tournament</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Simulation → formula</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                In a knockout tournament of <code>n</code> teams, each round
+                pairs teams up and the losers leave (an odd team out advances
+                for free). How many matches are played in total?
+              </p>
+              <div class="iobox">
+                n = 7 → 6 &nbsp;&nbsp;|&nbsp;&nbsp; n = 14 → 13
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Simulate the rounds: each round roughly halves the teams.
+                    How many rounds is that, and what does each round cost?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Now look at the answers: 7 → 6, 14 → 13. Every match knocks
+                    out exactly one team, and all but one team must be knocked
+                    out.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two correct answers with very different costs. The simulation
+                halves the number of teams each round, so it runs about
+                log&#8322; n rounds &mdash; O(log n), already fast. But one
+                sentence of reasoning beats it:
+                <em
+                  >each match eliminates exactly one team, and n &minus; 1 teams
+                  must be eliminated</em
+                >, so the answer is n &minus; 1 in O(1). Whenever a loop
+                produces a suspiciously simple pattern, stop and ask whether
+                there is a reason behind it.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Halving Loop vs One
+                      Line</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> numberOfMatchesSimulated(n):     <span class="pc-cm">// O(log n): teams halve each round</span>
+    matches ← 0
+    <span class="pc-kw">while</span> n &gt; 1:
+        matches ← matches + n ÷ 2
+        n ← (n + 1) ÷ 2                     <span class="pc-cm">// winners, plus the free pass if odd</span>
+    <span class="pc-kw">return</span> matches
+
+<span class="pc-kw">function</span> numberOfMatches(n):              <span class="pc-cm">// O(1)</span>
+    <span class="pc-kw">return</span> n - 1                          <span class="pc-cm">// every match removes exactly one team</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Count Operations to Obtain Zero -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Same Answer, Different Cost
+              </div>
+              <div class="prob-title">Count Operations to Obtain Zero</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/count-operations-to-obtain-zero/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2169 - Count Operations to Obtain Zero</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Repeated subtraction → division</span>
+                <span class="tag tag-co">Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given two numbers, repeatedly subtract the smaller from the
+                larger until one of them is zero. Return how many subtractions
+                that takes.
+              </p>
+              <div class="iobox">
+                num1 = 2, num2 = 3 → 3 &nbsp;&nbsp;(2,3 → 2,1 → 1,1 → 0,1)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Following the rules literally works. What happens with num1
+                    = 1,000,000,000 and num2 = 1?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A billion subtractions of the same number is just one
+                    division. Replace "subtract b from a, over and over" with "a
+                    ÷ b subtractions happen at once, leaving a mod b".
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The literal simulation is O(max(num1, num2)) &mdash; fine for
+                small numbers, a billion steps for large ones. Batching the
+                repeated subtractions into a single division makes each step
+                shrink the numbers dramatically, and the loop becomes the
+                Euclidean algorithm for greatest common divisor, which runs in
+                O(log n). Same output, same idea, a completely different speed.
+                Whenever a loop repeats the same operation many times in a row,
+                ask whether arithmetic can do them all at once.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Batch the
+                      Subtractions</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> countOperations(a, b):          <span class="pc-cm">// O(log n)</span>
+    ops ← 0
+    <span class="pc-kw">while</span> a &gt; 0 <span class="pc-kw">and</span> b &gt; 0:
+        <span class="pc-kw">if</span> a ≥ b:
+            ops ← ops + a ÷ b              <span class="pc-cm">// all those subtractions at once</span>
+            a ← a mod b
+        <span class="pc-kw">else</span>:
+            ops ← ops + b ÷ a
+            b ← b mod a
+    <span class="pc-kw">return</span> ops
+
+<span class="pc-cm">// The one-at-a-time version would loop a ÷ b times per step instead of once.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log(min(a, b)))</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Sum of Absolute Differences in a Sorted Array -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Remove the Repeated Work
+              </div>
+              <div class="prob-title">
+                Sum of Absolute Differences in a Sorted Array
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sum-of-absolute-differences-in-a-sorted-array/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1685 - Sum of Absolute Differences in a Sorted
+                  Array</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >O(n&sup2;) → O(n) with running totals</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For each position <code>i</code> in a sorted array, return the
+                sum of <code>|nums[i] − nums[j]|</code> over every other
+                position <code>j</code>.
+              </p>
+              <div class="iobox">nums = [2, 3, 5] → [4, 3, 5]</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The direct solution compares every pair: O(n&sup2;). With n
+                    up to 100,000, how many steps is that?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    10&sup1;&#8304; — far too many. Because the array is sorted,
+                    every number to the left of i is smaller and every number to
+                    the right is larger. You only need the <em>total</em> of
+                    each side, not each number separately.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the pattern you will use for the rest of the course:
+                find the work that is being <strong>repeated</strong> and do it
+                once. The pair-by-pair version recomputes the same partial sums
+                over and over. Since the array is sorted, the left side
+                contributes <code>nums[i] × (count left) − (sum left)</code> and
+                the right side contributes
+                <code>(sum right) − nums[i] × (count right)</code>. Keep a
+                running total as you walk, and each position costs O(1). The
+                technique has a name &mdash; prefix sums &mdash; and gets its
+                own lecture (26); here, only notice how the constraint forced
+                you to find it.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Running Totals Instead of
+                      Pairs</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> getSumAbsoluteDifferences(nums):
+    n ← length(nums);  total ← sum of nums
+    left ← 0                                  <span class="pc-cm">// sum of everything before i</span>
+    result ← new list of length n
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        right ← total - left - nums[i]        <span class="pc-cm">// sum of everything after i</span>
+        result[i] ← nums[i] × i - left        <span class="pc-cm">// left side: nums[i] is bigger</span>
+                  + right - nums[i] × (n - 1 - i)   <span class="pc-cm">// right side: nums[i] is smaller</span>
+        left ← left + nums[i]
+    <span class="pc-kw">return</span> result</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
                     ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1) extra</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Strictly Palindromic Number -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot; Think Before You Loop
+              </div>
+              <div class="prob-title">Strictly Palindromic Number</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/strictly-palindromic-number/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2396 - Strictly Palindromic Number</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Reasoning → O(1)</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A number <code>n</code> is <em>strictly palindromic</em> if it
+                reads the same forwards and backwards when written in every base
+                from 2 up to n − 2. Decide whether n is.
+              </p>
+              <div class="iobox">
+                n = 9 → false &nbsp;&nbsp;|&nbsp;&nbsp; n = 4 → false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The obvious plan converts n into every base and checks each
+                    one — roughly O(n log n). Before writing it, try base n − 2
+                    by hand for a few values of n.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    For n ≥ 5, n written in base n − 2 is always "12" — which is
+                    not a palindrome. So the answer is always false.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The fastest code is code you do not have to run. Writing n in
+                base n &minus; 2 gives one lot of (n &minus; 2) plus a remainder
+                of 2 &mdash; the digits &ldquo;12&rdquo; &mdash; for every n ≥
+                5, and the small cases fail too. So no number qualifies, and the
+                answer is O(1). Problems like this are rare in interviews, but
+                the habit they teach is not:
+                <strong
+                  >try small cases by hand before you design anything</strong
+                >. Lecture 2 turns that habit into a method.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; The Answer Is a
+                      Constant</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> isStrictlyPalindromic(n):
+    <span class="pc-kw">return</span> false
+
+<span class="pc-cm">// Why: in base (n - 2), n = 1 × (n - 2) + 2, so its digits are "12"</span>
+<span class="pc-cm">// for every n ≥ 5 — never a palindrome. Checking by hand saved all the code.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -3967,130 +2764,109 @@ queue.peek();    <span class="cm">// view front</span></pre>
           </div>
         </div>
 
-        <hr />
-
-        <!-- ══ SECTION 9: ASSIGNMENT LINK ═══════════════════════ -->
+        <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
         <div class="callout orange" style="margin: 14px 0">
-          <span class="callout-icon">📋</span>
+          <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 1 Assignment &mdash; 40 Problems (20 Easy &middot; 10
-              Medium &middot; 10 Hard)</strong
+              >Lecture 1 Assignment &mdash; 20 Problems (15 Easy &middot; 5
+              Medium &middot; 0 Hard)</strong
             ><br />
-            Complete the assignment before moving to Lecture 2. Alongside the
-            problems it has 8 complexity-analysis snippets, true/false checks
-            and conceptual questions.<br /><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 2.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture1/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
-                padding: 6px 16px;
+                padding: 8px 16px;
                 border-radius: 6px;
-                font-size: 13px;
-                font-weight: 600;
                 text-decoration: none;
+                font-weight: 600;
                 display: inline-block;
               "
-              >📄 Open Assignment →</a
+              >&#128196; Open Assignment &rarr;</a
             >
           </div>
         </div>
 
-        <!-- ══ SECTION 10: CHECKLIST ══════════════════════════════ -->
+        <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
         <p>Check each item before advancing to Lecture 2.</p>
-
-        <div
-          style="
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 16px;
-            margin: 14px 0;
-          "
-        >
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can name all 8 primitive types, their sizes, and default values
-              from memory
-            </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can read every line of the pseudocode in this lecture aloud in
+            plain English
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know why <code>5/2 == 2</code> in Java and how to fix it
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can recite the growth ladder in order, with an example for each
+            rung
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I understand pass-by-value: why swap(int a, int b) doesn't work
-              but swap(int[] arr, i, j) does
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can find the Big-O of a loop, two loops in a row, and two loops
+            nested
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know when to use for vs while vs do-while
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain why halving gives log n and adding 2 does not
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can apply all 4 Big-O simplification rules to any code snippet
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can say the difference between O(n) extra space and O(1) extra
+            space
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I recognize O(log n) when I see "divide by 2 each step"
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain amortised O(1) using the growing-list example
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know the time complexity of HashMap.get(), PriorityQueue.poll(),
-              TreeMap.get()
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can turn "n ≤ 100,000" into "I need O(n log n) or better" without
+            thinking
           </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can code Two Sum using HashMap in under 5 minutes
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can explain Kadane's logic (not just code) out loud
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I've read the full Collections table and know which to use when
-            </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I analysed all 20 assignment problems on paper
           </div>
         </div>
 
-        <div class="callout green" style="margin-top: 24px">
-          <span class="callout-icon">🧠</span>
+        <div class="callout green">
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>You're ready for Lecture 2: Java Memory Management</strong
+            <strong
+              >Next up &mdash; Lecture 2: Attacking an Unseen Problem</strong
             ><br />
-            Don't just write code; command memory. Understanding the JVM Stack
-            and Heap is the difference between a senior engineer and a hobbyist.
-            Master this foundation before we move to OOP and complex data
-            structures.
+            You can now tell a fast solution from a slow one. Lecture 2 is about
+            the harder part: getting from a blank page to <em>any</em> solution,
+            then using what you learned here to improve it.
           </div>
         </div>
 
+        <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../dsa_study_plan.html">&larr; Study plan</a>
+          <a href="../index.html"
+            >&larr; Course start &middot; the study plan</a
+          >
           <a class="next" href="../Lecture2/lecture2_notes.html"
-            >Lecture 2 &middot; Java Memory Management &rarr;</a
+            >Lecture 2 &middot; Attacking an Unseen Problem &rarr;</a
           >
         </div>
       </div>

@@ -1,9 +1,9 @@
-# 🎒 Assignment 27 — Dynamic Programming III — Knapsack & Subsets
+# 📉 Assignment 20 — Monotonic Stack & Queue
 
-> **Lecture:** 27 of 38 — Dynamic Programming III — Knapsack & Subsets
-> **Phase:** 4 — Dynamic Programming
-> **Estimated Time:** 6 days · **Total Problems:** 25 (8 Easy · 13 Medium · 4 Hard)
-> **Goal:** See the bag hiding in the wording, then let the loop order decide which knapsack you are solving.
+> **Lecture:** 27 of 45 — Monotonic Stack & Queue
+> **Phase:** 3 — Core Patterns
+> **Estimated Time:** 4 days · **Total Problems:** 29 (5 Easy · 16 Medium · 8 Hard)
+> **Goal:** Write one template for all four variants, then use it for spans, contributions, budgets and sliding windows.
 
 ---
 
@@ -11,251 +11,327 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                  | Pattern            | Move                                 |
-| -------------------------------------- | ------------------ | ------------------------------------ |
-| "each item at most once", exact target | 0/1 Knapsack       | capacity loop **backwards**          |
-| "coins / items may repeat"             | Unbounded Knapsack | capacity loop **forwards**           |
-| "there are k copies of each item"      | Bounded Knapsack   | binary-split the copies, then 0/1    |
-| "split into two equal halves"          | Subset Sum         | target is `total / 2`, boolean table |
-| "how many ways" and order matters      | Permutation Count  | target outside, items inside         |
-| n ≤ 30 but the sums are enormous       | Meet in the Middle | enumerate halves, then search        |
+| Signal in the Problem                         | Pattern                 | Move                                        |
+| --------------------------------------------- | ----------------------- | ------------------------------------------- |
+| "next greater", "days until warmer"           | Next Greater Element    | left → right, pop while `top < current`     |
+| "nearest smaller", "largest rectangle"        | Next / Previous Smaller | same loop, flip the comparison              |
+| "sum over all subarrays"                      | Contribution Technique  | count the spans each element rules          |
+| "lexicographically smallest after removing k" | Stack with a Budget     | pop while worse, while budget remains       |
+| "maximum of every window of size k"           | Monotone Deque          | front is the answer, back is pruned         |
+| "how many elements to my left are smaller"    | **Not** a stack         | that is counting — Fenwick tree, Lecture 37 |
 
 ---
 
-## 🟢 Easy Tier (8 Problems)
+## 🟢 Easy Tier (5 Problems)
 
-_Selection and partition warm-ups: totals, bounds and picking a subset by rule._
+_Stack mechanics first: push, pop, and what the top means._
 
-### E1 · Partition Array Into Three Parts With Equal Sum
+### E1 · Remove Outermost Parentheses
 
-**🔗 [LC 1013 — Partition Array Into Three Parts With Equal Sum](https://leetcode.com/problems/partition-array-into-three-parts-with-equal-sum/)** · Easy
-**Pattern:** Prefix Sums + Partition | **Companies:** Amazon
+**🔗 [LC 1021 — Remove Outermost Parentheses](https://leetcode.com/problems/remove-outermost-parentheses/)** · Easy
+**Pattern:** Plain Stack | **Companies:** Amazon, Adobe
 
-**Hint:** The total must divide by three. Sweep once, cutting whenever the running sum reaches a third — and make sure two cuts happen before the array ends.
-
----
-
-### E2 · Find Subsequence of Length K With the Largest Sum
-
-**🔗 [LC 2099 — Find Subsequence of Length K With the Largest Sum](https://leetcode.com/problems/find-subsequence-of-length-k-with-the-largest-sum/)** · Easy
-**Pattern:** Select by Value, Restore Order | **Companies:** Amazon, Google
-
-**Hint:** Pick the k largest by value, then output them in their original order. Selection with a constraint — the simplest form of "choose a subset".
+**Hint:** Track the depth with a counter (a stack of one number). A `(` at depth 0 and the `)` that closes it are the outermost pair — skip those and keep everything else.
 
 ---
 
-### E3 · Maximum Product Difference Between Two Pairs
+### E2 · Backspace String Compare
 
-**🔗 [LC 1913 — Maximum Product Difference Between Two Pairs](https://leetcode.com/problems/maximum-product-difference-between-two-pairs/)** · Easy
-**Pattern:** Sort and Take the Ends | **Companies:** Amazon
+**🔗 [LC 844 — Backspace String Compare](https://leetcode.com/problems/backspace-string-compare/)** · Easy
+**Pattern:** Stack Simulation | **Companies:** Meta, Amazon, Google
 
-**Hint:** The best pair is the two largest, the worst the two smallest. Sorting makes it obvious; a single pass tracking four values is O(n).
-
----
-
-### E4 · Kids With the Greatest Number of Candies
-
-**🔗 [LC 1431 — Kids With the Greatest Number of Candies](https://leetcode.com/problems/kids-with-the-greatest-number-of-candies/)** · Easy
-**Pattern:** Compare Against the Maximum | **Companies:** Amazon
-
-**Hint:** Find the maximum once, then test each child with `candies[i] + extra >= max`. Precomputing the bound is the habit every knapsack needs.
+**Hint:** Build each string on a stack, popping on `#`. Follow-up: compare from the back with two pointers and a skip counter for O(1) space.
 
 ---
 
-### E5 · Number of Common Factors
+### E3 · Minimum String Length After Removing Substrings
 
-**🔗 [LC 2427 — Number of Common Factors](https://leetcode.com/problems/number-of-common-factors/)** · Easy
-**Pattern:** Bounded Counting | **Companies:** Amazon
+**🔗 [LC 2696 — Minimum String Length After Removing Substrings](https://leetcode.com/problems/minimum-string-length-after-removing-substrings/)** · Easy
+**Pattern:** Stack Matching | **Companies:** Amazon
 
-**Hint:** Count divisors of the smaller number that also divide the larger, or go up to `gcd(a, b)`. A fixed, small search space.
-
----
-
-### E6 · Three Divisors
-
-**🔗 [LC 1952 — Three Divisors](https://leetcode.com/problems/three-divisors/)** · Easy
-**Pattern:** Divisor Counting | **Companies:** Amazon
-
-**Hint:** A number has exactly three divisors only when it is the square of a prime. Test with a loop to `sqrt(n)` — Lecture 7 arithmetic in a Phase 4 wrapper.
+**Hint:** Push characters; when the top and the current character form "AB" or "CD", pop instead of pushing. The stack's final size is the answer.
 
 ---
 
-### E7 · Count Elements With Maximum Frequency
+### E4 · Crawler Log Folder
 
-**🔗 [LC 3005 — Count Elements With Maximum Frequency](https://leetcode.com/problems/count-elements-with-maximum-frequency/)** · Easy
-**Pattern:** Frequency of Frequencies | **Companies:** Amazon
+**🔗 [LC 1598 — Crawler Log Folder](https://leetcode.com/problems/crawler-log-folder/)** · Easy
+**Pattern:** Stack of Depth | **Companies:** Amazon, Microsoft
 
-**Hint:** Count values, find the highest count, then total the values that reach it. Counting first, deciding second.
-
----
-
-### E8 · Minimum Common Value
-
-**🔗 [LC 2540 — Minimum Common Value](https://leetcode.com/problems/minimum-common-value/)** · Easy
-**Pattern:** Two Pointers on Sorted Arrays | **Companies:** Amazon
-
-**Hint:** Both arrays are sorted, so walk them together and advance the smaller side. The merge step you already know from Lecture 9.
+**Hint:** `"../"` pops, `"./"` does nothing, anything else pushes. Only the count matters, so a single integer works as the stack — never let it go below 0.
 
 ---
 
-## 🟡 Medium Tier (13 Problems)
+### E5 · Count Hills and Valleys in an Array
 
-_The three variants, and the word problems that hide them._
+**🔗 [LC 2210 — Count Hills and Valleys in an Array](https://leetcode.com/problems/count-hills-and-valleys-in-an-array/)** · Easy
+**Pattern:** Neighbour Comparison | **Companies:** Amazon
 
-### M1 · Partition Equal Subset Sum
-
-**🔗 [LC 416 — Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)** · Medium
-**Pattern:** 0/1 Knapsack (Feasibility) | **Companies:** Amazon, Google, Meta
-
-**Hint:** Odd total means false. Otherwise ask whether any subset reaches `total / 2`, with a boolean table and a backwards capacity loop.
+**Hint:** Collapse runs of equal values first (or skip them while scanning). Then a position is a hill or valley when it is strictly greater — or strictly smaller — than both surviving neighbours.
 
 ---
 
-### M2 · Coin Change II
+## 🟡 Medium Tier (16 Problems)
 
-**🔗 [LC 518 — Coin Change II](https://leetcode.com/problems/coin-change-ii/)** · Medium
-**Pattern:** Unbounded Knapsack (Count) | **Companies:** Amazon, Google, Meta
+_The four variants, the contribution technique, and the budgeted stack._
 
-**Hint:** `dp[0] = 1`, coins in the outer loop and amounts inner and forward. That nesting is what counts combinations rather than orderings.
+### M1 · Next Greater Node In Linked List
 
----
+**🔗 [LC 1019 — Next Greater Node In Linked List](https://leetcode.com/problems/next-greater-node-in-linked-list/)** · Medium
+**Pattern:** Next Greater Element | **Companies:** Amazon, Google, Microsoft
 
-### M3 · Combination Sum IV
-
-**🔗 [LC 377 — Combination Sum IV](https://leetcode.com/problems/combination-sum-iv/)** · Medium
-**Pattern:** Unbounded (Permutations) | **Companies:** Google, Amazon, Meta
-
-**Hint:** Same arithmetic as Coin Change II with the loops swapped: target outside, numbers inside, because order matters here.
+**Hint:** Copy the list into an array, then run the standard template: a stack of indices, popped when a strictly greater value arrives. Whatever is left keeps the default 0.
 
 ---
 
-### M4 · Last Stone Weight II
+### M2 · 132 Pattern
 
-**🔗 [LC 1049 — Last Stone Weight II](https://leetcode.com/problems/last-stone-weight-ii/)** · Medium
-**Pattern:** 0/1 Knapsack (Minimise Gap) | **Companies:** Amazon, Google
+**🔗 [LC 456 — 132 Pattern](https://leetcode.com/problems/132-pattern/)** · Medium
+**Pattern:** Monotonic Stack + Best Popped | **Companies:** Google, Amazon, Meta
 
-**Hint:** Every smash assigns a sign, so the answer is `total − 2 × bestPile` where the pile is the largest reachable sum at most `total / 2`.
-
----
-
-### M5 · Ones and Zeroes
-
-**🔗 [LC 474 — Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)** · Medium
-**Pattern:** 0/1 Knapsack, 2D Capacity | **Companies:** Google, Amazon
-
-**Hint:** Each string costs zeros and ones. Keep `dp[zeros][ones]` and run both capacity loops backwards.
+**Hint:** Scan from the right with a decreasing stack. Popped values are valid middles, so keep the largest popped value; the pattern exists as soon as an element is smaller than it.
 
 ---
 
-### M6 · Number of Dice Rolls With Target Sum
+### M3 · Sum of Subarray Minimums
 
-**🔗 [LC 1155 — Number of Dice Rolls With Target Sum](https://leetcode.com/problems/number-of-dice-rolls-with-target-sum/)** · Medium
-**Pattern:** Counting Knapsack | **Companies:** Amazon, Google
+**🔗 [LC 907 — Sum of Subarray Minimums](https://leetcode.com/problems/sum-of-subarray-minimums/)** · Medium
+**Pattern:** Contribution Technique | **Companies:** Amazon, Google, Meta
 
-**Hint:** `dp[d][t]` counts ways to reach total `t` with `d` dice. Each die contributes faces 1..k; take the modulus as you go.
-
----
-
-### M7 · Integer Break
-
-**🔗 [LC 343 — Integer Break](https://leetcode.com/problems/integer-break/)** · Medium
-**Pattern:** Unbounded Cutting | **Companies:** Amazon, Google
-
-**Hint:** `dp[i] = max(j × (i − j), j × dp[i − j])` over all cuts `j`. The maths shortcut — cut into 3s — is worth deriving afterwards.
+**Hint:** Find each element's previous smaller and next smaller. It is the minimum of `left × right` subarrays. Use `≥` on one side and `>` on the other so duplicates are not double-counted.
 
 ---
 
-### M8 · Partition to K Equal Sum Subsets
+### M4 · Sum of Subarray Ranges
 
-**🔗 [LC 698 — Partition to K Equal Sum Subsets](https://leetcode.com/problems/partition-to-k-equal-sum-subsets/)** · Medium
-**Pattern:** Bitmask Search, Not Knapsack | **Companies:** Google, Amazon, Meta
+**🔗 [LC 2104 — Sum of Subarray Ranges](https://leetcode.com/problems/sum-of-subarray-ranges/)** · Medium
+**Pattern:** Contribution, Twice | **Companies:** Amazon, Google
 
-**Hint:** Each subset must reach `total / k`. Sort descending and backtrack with pruning, or use a bitmask over used elements — a knapsack table cannot express "k equal groups".
-
----
-
-### M9 · Closest Dessert Cost
-
-**🔗 [LC 1774 — Closest Dessert Cost](https://leetcode.com/problems/closest-dessert-cost/)** · Medium
-**Pattern:** Bounded Knapsack | **Companies:** Amazon
-
-**Hint:** Base flavours are a fixed choice; each topping may be taken 0, 1 or 2 times. Enumerate reachable costs and keep the one closest to target, preferring the smaller on ties.
+**Hint:** The answer is (sum of subarray maximums) − (sum of subarray minimums). Run the span-counting pass twice with the comparisons flipped. O(n) beats the O(n²) double loop.
 
 ---
 
-### M10 · Count Ways To Build Good Strings
+### M5 · Maximum Width Ramp
 
-**🔗 [LC 2466 — Count Ways To Build Good Strings](https://leetcode.com/problems/count-ways-to-build-good-strings/)** · Medium
-**Pattern:** Unbounded Counting | **Companies:** Amazon, Google
+**🔗 [LC 962 — Maximum Width Ramp](https://leetcode.com/problems/maximum-width-ramp/)** · Medium
+**Pattern:** Decreasing Stack + Backward Scan | **Companies:** Amazon, Google
 
-**Hint:** `dp[i] = dp[i − zero] + dp[i − one]`, summed over the allowed lengths. A counting knapsack where the items are two step sizes.
-
----
-
-### M11 · Check if There is a Valid Partition For The Array
-
-**🔗 [LC 2369 — Check if There is a Valid Partition For The Array](https://leetcode.com/problems/check-if-there-is-a-valid-partition-for-the-array/)** · Medium
-**Pattern:** Partition DP | **Companies:** Amazon, Google
-
-**Hint:** `dp[i]` is true when the first `i` elements can be split validly. Check the last two or three elements against the three allowed shapes.
+**Hint:** Build a decreasing stack of candidate left ends from the front. Then walk from the right, popping while `nums[stack.top()] <= nums[j]` and recording `j − stack.pop()`.
 
 ---
 
-### M12 · Partition Array for Maximum Sum
+### M6 · Minimum Cost Tree From Leaf Values
 
-**🔗 [LC 1043 — Partition Array for Maximum Sum](https://leetcode.com/problems/partition-array-for-maximum-sum/)** · Medium
-**Pattern:** Partition into Windows | **Companies:** Amazon, Google
+**🔗 [LC 1130 — Minimum Cost Tree From Leaf Values](https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/)** · Medium
+**Pattern:** Monotonic Stack (Greedy Merge) | **Companies:** Amazon, Google
 
-**Hint:** `dp[i] = max over the last k elements of dp[i − k] + k × (max of that window)`. The inner loop both sizes the window and tracks its maximum.
-
----
-
-### M13 · Filling Bookcase Shelves
-
-**🔗 [LC 1105 — Filling Bookcase Shelves](https://leetcode.com/problems/filling-bookcase-shelves/)** · Medium
-**Pattern:** Sequential Partition | **Companies:** Amazon, Google
-
-**Hint:** Books must stay in order, so `dp[i]` is the cheapest shelving of the first `i` books; extend the last shelf backwards while the width allows, tracking its height.
+**Hint:** The cost of merging two neighbouring leaves is the product of their maxima, so repeatedly remove the smallest value between two larger ones. A decreasing stack does exactly that in one pass.
 
 ---
 
-## 🔴 Hard Tier (4 Problems)
+### M7 · Maximum Subarray Min-Product
 
-_When the table is too big, or the state is not a capacity at all._
+**🔗 [LC 1856 — Maximum Subarray Min-Product](https://leetcode.com/problems/maximum-subarray-min-product/)** · Medium
+**Pattern:** Contribution + Prefix Sums | **Companies:** Amazon, Google
 
-### H1 · Partition Array Into Two Arrays to Minimize Sum Difference
-
-**🔗 [LC 2035 — Partition Array Into Two Arrays to Minimize Sum Difference](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/)** · Hard
-**Pattern:** Meet in the Middle | **Companies:** Google, Amazon
-
-**Hint:** n is up to 30, so a full knapsack is too big. Enumerate subset sums of each half, sort one side, and binary search for the closest complement.
+**Hint:** For each element as the minimum, find its span with a monotonic stack, then get that span's sum from a prefix-sum array (Lecture 26). Track the best product in 64-bit.
 
 ---
 
-### H2 · Tallest Billboard
+### M8 · Remove Duplicate Letters
 
-**🔗 [LC 956 — Tallest Billboard](https://leetcode.com/problems/tallest-billboard/)** · Hard
-**Pattern:** Knapsack Keyed on Difference | **Companies:** Google, Amazon
+**🔗 [LC 316 — Remove Duplicate Letters](https://leetcode.com/problems/remove-duplicate-letters/)** · Medium
+**Pattern:** Lexicographic Stack | **Companies:** Google, Amazon, Meta
 
-**Hint:** State is the gap between the piles; the value stored is the shorter pile. Each rod goes on the taller side, the shorter side, or neither.
-
----
-
-### H3 · Profitable Schemes
-
-**🔗 [LC 879 — Profitable Schemes](https://leetcode.com/problems/profitable-schemes/)** · Hard
-**Pattern:** Two-Capacity Counting | **Companies:** Google, Amazon
-
-**Hint:** `dp[members][profit]` counts schemes, with profit capped at the minimum required. Both loops backwards, modulo 1e9+7.
+**Hint:** Count the remaining occurrences of each letter and keep an in-stack flag. Pop a bigger letter only while it still appears later, and never push a letter twice.
 
 ---
 
-### H4 · Form Largest Integer With Digits That Add up to Target
+### M9 · Find the Most Competitive Subsequence
 
-**🔗 [LC 1449 — Form Largest Integer With Digits That Add up to Target](https://leetcode.com/problems/form-largest-integer-with-digits-that-add-up-to-target/)** · Hard
-**Pattern:** Unbounded Knapsack + Reconstruction | **Companies:** Google, Amazon
+**🔗 [LC 1673 — Find the Most Competitive Subsequence](https://leetcode.com/problems/find-the-most-competitive-subsequence/)** · Medium
+**Pattern:** Stack with a Budget | **Companies:** Amazon, Google, Microsoft
 
-**Hint:** First fill `dp[target]` with the most digits affordable, then build the number greedily from digit 9 down, spending cost while the remaining budget still allows the rest.
+**Hint:** You may drop `n − k` elements. Pop while the top is larger than the current value and the budget allows, then push. Return the first `k` items.
+
+---
+
+### M10 · Shortest Unsorted Continuous Subarray
+
+**🔗 [LC 581 — Shortest Unsorted Continuous Subarray](https://leetcode.com/problems/shortest-unsorted-continuous-subarray/)** · Medium
+**Pattern:** Monotonic Stacks (Both Ends) | **Companies:** Amazon, Google, Meta
+
+**Hint:** An increasing stack from the left finds the leftmost index out of order; a decreasing stack from the right finds the rightmost. Their gap is the answer. (Sorting a copy also works, in O(n log n).)
+
+---
+
+### M11 · Asteroid Collision
+
+**🔗 [LC 735 — Asteroid Collision](https://leetcode.com/problems/asteroid-collision/)** · Medium
+**Pattern:** Stack Simulation | **Companies:** Amazon, Google, Meta
+
+**Hint:** Only a right-moving asteroid followed by a left-moving one collides. Push, and while the top is positive and the current is negative, resolve: pop, destroy, or stop.
+
+---
+
+### M12 · Next Greater Element II
+
+**🔗 [LC 503 — Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)** · Medium
+**Pattern:** Monotonic Stack | **Companies:** Amazon, Google, Meta
+
+**Hint:** Loop over indices `0..2n-1`, using `nums[i % n]`, with a decreasing stack of indices. Pop and assign answers while the current value is larger; only push during the first pass.
+
+---
+
+### M13 · Online Stock Span
+
+**🔗 [LC 901 — Online Stock Span](https://leetcode.com/problems/online-stock-span/)** · Medium
+**Pattern:** Monotonic Decreasing Stack | **Companies:** Amazon, Google, Bloomberg
+
+**Hint:** Keep a stack of `(price, span)`. For a new price, pop every entry with price `<=` it and add its span to the current span (starting at 1), then push. Amortised O(1).
+
+---
+
+### M14 · Remove K Digits
+
+**🔗 [LC 402 — Remove K Digits](https://leetcode.com/problems/remove-k-digits/)** · Medium
+**Pattern:** Greedy + Stack | **Companies:** Google, Amazon, Meta
+
+**Hint:** Build an increasing stack of digits: while `k > 0` and the top is greater than the current digit, pop and decrement `k`. Push the digit. Remove any remaining `k` from the end, strip leading zeros, and return "0" if nothing is left.
+
+---
+
+### M15 · Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
+
+**🔗 [LC 1438 — Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/)** · Medium
+**Pattern:** Two Monotonic Deques | **Companies:** Google, Amazon, Uber
+
+**Hint:** Keep a decreasing deque for the window max and an increasing deque for the window min. Expand right; while `max - min > limit`, move left and pop expired fronts. O(n).
+
+---
+
+### M16 · Jump Game VI
+
+**🔗 [LC 1696 — Jump Game VI](https://leetcode.com/problems/jump-game-vi/)** · Medium
+**Pattern:** Deque DP | **Companies:** Amazon, Google
+
+**Hint:** `dp[i] = nums[i] + max(dp[i-k .. i-1])`. Keep a deque of indices with decreasing `dp` values; pop the front when it's out of the window, read the max from the front, and pop smaller values from the back before pushing `i`.
+
+---
+
+## 🔴 Hard Tier (8 Problems)
+
+_Monotonic structures combined with DP, prefix sums, or a second scan._
+
+### H1 · Number of Visible People in a Queue
+
+**🔗 [LC 1944 — Number of Visible People in a Queue](https://leetcode.com/problems/number-of-visible-people-in-a-queue/)** · Hard
+**Pattern:** Monotonic Stack (Count Pops) | **Companies:** Google, Amazon
+
+**Hint:** Scan from the right with a decreasing stack. Each person sees everyone they pop, plus one more if the stack is not empty afterwards (the first taller person).
+
+---
+
+### H2 · Constrained Subsequence Sum
+
+**🔗 [LC 1425 — Constrained Subsequence Sum](https://leetcode.com/problems/constrained-subsequence-sum/)** · Hard
+**Pattern:** Monotone Deque over DP | **Companies:** Google, Amazon, Meta
+
+**Hint:** `dp[i] = nums[i] + max(0, best dp in the previous k)`. Keep that window maximum in a deque keyed on `dp`, expiring by index. O(n) instead of O(n·k).
+
+---
+
+### H3 · Maximum Score of a Good Subarray
+
+**🔗 [LC 1793 — Maximum Score of a Good Subarray](https://leetcode.com/problems/maximum-score-of-a-good-subarray/)** · Hard
+**Pattern:** Two Pointers or Monotonic Stack | **Companies:** Google, Amazon
+
+**Hint:** Start at `k` and expand greedily to whichever side has the larger neighbour, tracking the running minimum × width. The stack version computes each element's span and keeps the spans that cover `k`.
+
+---
+
+### H4 · Max Value of Equation
+
+**🔗 [LC 1499 — Max Value of Equation](https://leetcode.com/problems/max-value-of-equation/)** · Hard
+**Pattern:** Monotone Deque | **Companies:** Google, Amazon
+
+**Hint:** For `i < j` the expression is `(y_i − x_i) + (x_j + y_j)`. Keep a deque of `y − x` that expires by x-distance, so each `j` reads its best partner in O(1).
+
+---
+
+### H5 · Largest Rectangle in Histogram
+
+**🔗 [LC 84 — Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)** · Hard
+**Pattern:** Monotonic Increasing Stack | **Companies:** Amazon, Google, Meta, Microsoft
+
+**Hint:** Keep an increasing stack of indices. When a shorter bar arrives, pop: the popped bar's height times the width between the new top and `i` is a candidate area. Append a height-0 bar at the end to flush the stack.
+
+---
+
+### H6 · Car Fleet II
+
+**🔗 [LC 1776 — Car Fleet II](https://leetcode.com/problems/car-fleet-ii/)** · Hard
+**Pattern:** Monotonic Stack from the Right | **Companies:** Google
+
+**Hint:** Process cars from right to left with a stack of cars ahead. Pop any car that is at least as fast (you never catch it), or that collides before you would reach it. The top is the car you hit; compute the time from the gap and speed difference.
+
+---
+
+### H7 · Sliding Window Maximum
+
+**🔗 [LC 239 — Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)** · Hard
+**Pattern:** Monotonic Deque | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** Keep a deque of indices with decreasing values. Pop the front if it has left the window, pop smaller values from the back before pushing `i`, and read the front as the window max once `i >= k - 1`.
+
+---
+
+### H8 · Maximal Rectangle
+
+**🔗 [LC 85 — Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)** · Hard
+**Pattern:** Histogram per Row + Monotonic Stack | **Companies:** Google, Amazon, Meta
+
+**Hint:** Turn each row into a histogram: `height[j] = matrix[i][j] == '1' ? height[j] + 1 : 0`. Run Largest Rectangle in Histogram (LC 84) on it and keep the best area over all rows.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — next greater element for every item, with a stack
+
+// Snippet 2 — the same, by scanning right from every item
+
+// Snippet 3 — largest rectangle in a histogram with a stack
+
+// Snippet 4 — sliding window maximum with a monotonic deque
+
+// Snippet 5 — sliding window maximum with a heap
+
+// Snippet 6 — sum of subarray minimums using the contribution technique
+```
+
+**Complexity Answers:**
+
+1. **O(n)** — each index pushed and popped once.
+2. **O(n²)**.
+3. **O(n)**.
+4. **O(n)**.
+5. **O(n log n)**.
+6. **O(n)** — two monotonic passes.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. A monotonic stack solution with a while loop inside a for loop is O(n²). → **False** — each item is pushed once and popped at most once
+2. A monotonic stack usually stores indices, not values. → **True** — indices let you compute distances and widths
+3. A monotonic deque removes items from both ends. → **True** — the front when they leave the window, the back when beaten
+4. A heap is faster than a monotonic deque for sliding window maximum. → **False** — O(n log n) versus O(n)
+5. Next smaller element needs a different algorithm from next greater element. → **False** — flip the comparison
+6. The contribution technique counts how many subarrays each element is the minimum of. → **True**
 
 ---
 
@@ -263,12 +339,12 @@ _When the table is too big, or the state is not a capacity at all._
 
 Answer these out loud, without looking at the notes:
 
-1. **Loop direction:** Why must the 0/1 capacity loop run backwards? Give a two-element input where the forward version is wrong.
-2. **Nesting:** State which nesting counts combinations and which counts permutations, and explain why with {1,2} summing to 3.
-3. **Reduction:** Derive the Target Sum reduction from `P − N = target` and `P + N = total`. When are there no solutions?
-4. **Base cases:** For feasibility, counting, maximising and minimising, what is `dp[0]` in each case?
-5. **Pseudo-polynomial:** O(n · capacity) sounds polynomial. Explain why it is not, in terms of the input size.
-6. **When knapsack fails:** Partition to K Equal Sum Subsets is not a knapsack. What about the question breaks the table?
+1. **Amortised cost:** The template has a loop inside a loop. Explain why it still runs in O(n).
+2. **Indices vs values:** Why does the stack hold indices? Give a problem that cannot be solved if it holds values.
+3. **Direction:** You want the previous greater element but may only loop left to right. How do you get it?
+4. **Duplicates:** In the contribution technique, what exactly goes wrong if both sides use `>`? Give a small input.
+5. **The budget:** In Remove Duplicate Letters, what stops the stack from popping a letter it will need? What plays the same role in Remove K Digits?
+6. **Deque vs heap:** Both can give a window maximum. State the cost of each and the condition that makes the deque valid.
 
 ---
 
@@ -276,23 +352,27 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon** | [Partition Array Into Two Arrays to Minimize Sum Difference](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/), [Tallest Billboard](https://leetcode.com/problems/tallest-billboard/), [Profitable Schemes](https://leetcode.com/problems/profitable-schemes/), [Form Largest Integer With Digits That Add up to Target](https://leetcode.com/problems/form-largest-integer-with-digits-that-add-up-to-target/) |
-| **Google** | [Partition Array Into Two Arrays to Minimize Sum Difference](https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/), [Tallest Billboard](https://leetcode.com/problems/tallest-billboard/), [Profitable Schemes](https://leetcode.com/problems/profitable-schemes/), [Form Largest Integer With Digits That Add up to Target](https://leetcode.com/problems/form-largest-integer-with-digits-that-add-up-to-target/) |
-| **Meta**   | [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/), [Coin Change II](https://leetcode.com/problems/coin-change-ii/), [Combination Sum IV](https://leetcode.com/problems/combination-sum-iv/), [Partition to K Equal Sum Subsets](https://leetcode.com/problems/partition-to-k-equal-sum-subsets/)                                                                                                                   |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Count Hills and Valleys in an Array](https://leetcode.com/problems/count-hills-and-valleys-in-an-array/), [Minimum String Length After Removing Substrings](https://leetcode.com/problems/minimum-string-length-after-removing-substrings/), [Remove Outermost Parentheses](https://leetcode.com/problems/remove-outermost-parentheses/), [Max Value of Equation](https://leetcode.com/problems/max-value-of-equation/) |
+| **Google**    | [Car Fleet II](https://leetcode.com/problems/car-fleet-ii/), [Maximum Score of a Good Subarray](https://leetcode.com/problems/maximum-score-of-a-good-subarray/), [Number of Visible People in a Queue](https://leetcode.com/problems/number-of-visible-people-in-a-queue/), [Jump Game VI](https://leetcode.com/problems/jump-game-vi/)                                                                                 |
+| **Meta**      | [Constrained Subsequence Sum](https://leetcode.com/problems/constrained-subsequence-sum/), [Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/), [132 Pattern](https://leetcode.com/problems/132-pattern/), [Asteroid Collision](https://leetcode.com/problems/asteroid-collision/)                                                                                                                     |
+| **Microsoft** | [Crawler Log Folder](https://leetcode.com/problems/crawler-log-folder/), [Find the Most Competitive Subsequence](https://leetcode.com/problems/find-the-most-competitive-subsequence/), [Next Greater Node In Linked List](https://leetcode.com/problems/next-greater-node-in-linked-list/), [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)                             |
+| **Uber**      | [Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/), [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)                                                                                                                                                 |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 8 Easy problems solved
-- [ ] All 13 Medium problems solved
-- [ ] All 4 Hard problems attempted
+- [ ] All 5 Easy problems solved
+- [ ] All 16 Medium problems solved
+- [ ] All 8 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
 - [ ] All 6 conceptual questions answered out loud
-- [ ] I can name the items, capacity and objective of a disguised problem in under a minute
-- [ ] I can write all three knapsack variants with the correct loop order from memory
+- [ ] I can write the four variants by changing only the loop direction and the comparison
+- [ ] I can derive `left × right` for the contribution technique without looking it up
 
 ---
 
-**← [Lecture 26 · Dynamic Programming II — Grids & Strings](../Lecture26/Assignment.md)** &nbsp;·&nbsp; **[Lecture 28 · Dynamic Programming IV — Interval, Tree, Bitmask & Digit](../Lecture28/Assignment.md) →**
+**← [Lecture 26 · Prefix Sums & Difference Arrays](../Lecture26/Assignment.md)** &nbsp;·&nbsp; **[Lecture 28 · Intervals & Sweep Line](../Lecture28/Assignment.md) →**

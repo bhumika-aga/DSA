@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 19 &mdash; Prefix Sums &amp; Difference Arrays</title>
+    <title>Lecture 19 &mdash; Trees II (BST, LCA &amp; Construction)</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Master binary trees and BSTs: DFS traversals, BFS level-order, height recursion, diameter, BST property, and LCA — with full dry runs and Java code."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -86,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1391,45 +1391,37 @@
       }
     </style>
   </head>
+
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Prefix Sums &amp; Difference Arrays</div>
+        <div class="sb-title">Trees II &mdash; BST &amp; LCA</div>
         <div class="sb-meta">
-          Lecture 19 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 19 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
         <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127757;</span>Introduction</a
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#build"
-          ><span class="toc-icon">&#129521;</span>Building a Prefix Sum</a
+        <a class="toc-item" href="#p5"
+          ><span class="toc-icon">&#127381;</span>The BST Property</a
         >
-        <a class="toc-item" href="#query"
-          ><span class="toc-icon">&#9889;</span>O(1) Range Queries</a
+        <a class="toc-item" href="#p6"
+          ><span class="toc-icon">&#129517;</span>Lowest Common Ancestor</a
         >
-        <a class="toc-item" href="#hashmap"
-          ><span class="toc-icon">&#128273;</span>Prefix + HashMap</a
+        <a class="toc-item" href="#morris"
+          ><span class="toc-icon">&#129525;</span>Morris Traversal</a
         >
-        <a class="toc-item toc-sub" href="#hm-k">Sum Equals K</a>
-        <a class="toc-item toc-sub" href="#hm-mod">Divisible by K</a>
-        <a class="toc-item" href="#diff"
-          ><span class="toc-icon">&#128203;</span>Difference Arrays</a
-        >
-        <a class="toc-item toc-sub" href="#diff-2d">2D Difference</a>
-        <a class="toc-item" href="#twod"
-          ><span class="toc-icon">&#129518;</span>2D Prefix Sums</a
-        >
-        <a class="toc-item" href="#xor"
-          ><span class="toc-icon">&#10006;&#65039;</span>Prefix XOR &amp;
-          Friends</a
+        <a class="toc-item" href="#construct"
+          ><span class="toc-icon">&#127959;&#65039;</span>Build from
+          Traversals</a
         >
         <a class="toc-item" href="#pitfalls"
-          ><span class="toc-icon">&#9201;</span>Complexity &amp; Bugs</a
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
           ><span class="toc-icon">&#128170;</span>Practice Problems</a
@@ -1444,14 +1436,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture18/lecture18_notes.html"
-          >&larr; Lecture 18 &middot; Two Pointers &amp; Sliding Window</a
+          >&larr; Lecture 18 &middot; Trees I</a
         >
         <a class="toc-item" href="../Lecture20/lecture20_notes.html"
-          >&rarr; Lecture 20 &middot; Monotonic Stack &amp; Queue</a
+          >&rarr; Lecture 20 &middot; Heaps &amp; Priority Queues</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1459,10 +1450,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 19 &mdash; Prefix Sums &amp; Difference Arrays</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 19 &mdash; Trees II &mdash; BST &amp; LCA</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1480,37 +1470,42 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129534;</span>
-          <h1 class="page-title">Prefix Sums &amp; Difference Arrays</h1>
+          <span class="page-emoji">&#127794;</span>
+          <h1 class="page-title">
+            Trees II &mdash; BST, LCA &amp; Construction
+          </h1>
           <p class="page-sub">
-            &ldquo;Pay once, answer forever. Precompute the totals and every
-            range question becomes one subtraction.&rdquo;
+            &ldquo;An ordering rule turns a tree you can walk into a tree you
+            can search.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 19 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip accent">&#128218; Lecture 19 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
             <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 20 problems</span>
+            <span class="meta-chip green">&#127919; 16 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
             >
           </div>
         </div>
+        <!-- /.page-header -->
 
         <!-- WHY THIS MATTERS -->
-        <div class="callout blue" id="intro">
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 18 ended on a warning: the moment negative numbers appear, a
-            sliding window stops working, because adding an element can make an
-            invalid window valid again. Prefix sums have no such rule. They
-            answer &ldquo;what is the total between i and j?&rdquo; in constant
-            time for any numbers at all, and their mirror image &mdash; the
-            difference array &mdash; applies a range update in constant time
-            too. Between them they turn a whole family of O(n&sup2;) and
-            O(n&middot;q) solutions into O(n).
+            Lecture 18 taught you to walk a tree. This one adds the two things
+            that make trees genuinely useful in interviews: an
+            <em>ordering rule</em> that turns a tree into something you can
+            search in O(height), and the ability to reason about
+            <em>two nodes at once</em> rather than one. Think of a BST like a
+            well-organised filing cabinet &mdash; every drawer you skip is half
+            the cabinet you never open &mdash; and an LCA question like finding
+            the most recent shared ancestor on a family tree.
           </div>
         </div>
 
@@ -1518,1139 +1513,668 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Build a prefix-sum array and answer any range-sum query in O(1)
+              State the BST property exactly, and why a range check beats a
+              local one
             </li>
-            <li>
-              Combine prefix sums with a HashMap to count subarrays matching a
-              target
-            </li>
-            <li>
-              Apply many range updates in O(1) each using a difference array
-            </li>
-            <li>
-              Extend both ideas to 2D grids with inclusion&ndash;exclusion
-            </li>
-            <li>
-              Recognise prefix-XOR as the same trick, and say which operations
-              can never be prefixed
-            </li>
+            <li>Use an in-order walk to get sorted order out of a BST</li>
+            <li>Find the lowest common ancestor of two nodes in one pass</li>
+            <li>Walk a tree in O(1) extra space with Morris traversal</li>
+            <li>Rebuild a tree from two of its traversals</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="build">&#129521; Building a Prefix Sum</h2>
-        <p>
-          A prefix sum answers one question in advance:
-          <strong>how much is there before this point?</strong> Store that for
-          every index and you never add the same element twice again.
-        </p>
+        <hr />
 
+        <h2 class="h1" id="p5">&#127381; The BST Property</h2>
+        <p>
+          For <em>every</em> node in a BST, all values in its left subtree are
+          strictly less, and all values in its right subtree are strictly
+          greater.
+        </p>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build (the n+1 convention)</span
+              >&#128208; Pseudocode &middot; BST Operations</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-cm">// prefix[i] = sum of the first i elements = nums[0] + ... + nums[i-1]</span>
-<span class="pc-cm">// The extra leading 0 is what removes every edge case later.</span>
-prefix ← array of length n + 1
-prefix[0] ← 0
+          <pre><span class="pc-cm">// The BST rule: everything in the left subtree &lt; node &lt; everything in the right</span>
+<span class="pc-kw">function</span> search(node, val):
+    <span class="pc-kw">while</span> node ≠ null:
+        <span class="pc-kw">if</span> val = node.val: <span class="pc-kw">return</span> node          <span class="pc-cm">// found</span>
+        <span class="pc-kw">if</span> val &lt; node.val: node ← node.left
+        <span class="pc-kw">else</span>: node ← node.right
+    <span class="pc-kw">return</span> null
 
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    prefix[i + 1] ← prefix[i] + nums[i]
-
-<span class="pc-cm">// nums   = [ 3,  1,  4,  1,  5]
-// prefix = [0, 3,  4,  8,  9, 14]
-//           ^ nothing taken yet</span></pre>
+<span class="pc-cm">// Insert:   same walk as search until null, place the new node there</span>
+<span class="pc-cm">// Validate: pass (min, max) bounds down; every node needs min &lt; val &lt; max</span>
+<span class="pc-cm">// Inorder:  always produces a sorted sequence ← the key BST insight</span></pre>
         </div>
-
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>The off-by-one discipline.</strong> Decide once and never
-            waver: <code>prefix</code> has <code>n + 1</code> slots, and
-            <code>prefix[i]</code> excludes <code>nums[i]</code>. The
-            alternative (same length as <code>nums</code>, including the current
-            element) forces an <code>if (l == 0)</code> check into every single
-            query. One extra slot buys you a body of code with no special cases.
+            <strong>Classic Mistake &mdash; Wrong BST validation:</strong>
+            Checking only
+            <code>node.left.val &lt; node.val &lt; node.right.val</code> at each
+            node is <strong>wrong</strong>. You must pass a valid range
+            <code>[min, max]</code> down the tree. Going left narrows the max;
+            going right narrows the min. Start the bounds at &plusmn;&infin; (in
+            Java, use <code>Long</code> bounds) so a node holding the smallest
+            or largest possible integer isn't wrongly rejected.
           </div>
         </div>
-
-        <h2 class="h1" id="query">&#9889; O(1) Range Queries</h2>
-        <p>
-          Everything before <code>r + 1</code>, minus everything before
-          <code>l</code>, leaves exactly the window <code>[l, r]</code>. That is
-          the whole idea.
-        </p>
-
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Range Sum in O(1)</span
+              >&#128208; Pseudocode &middot; Validate BST + Kth Smallest</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> rangeSum(l, r):            <span class="pc-cm">// inclusive on both ends</span>
-    <span class="pc-kw">return</span> prefix[r + 1] - prefix[l]
+          <pre><span class="pc-cm">// Validate BST — range propagation:</span>
+<span class="pc-kw">function</span> isValidBST(root):
+    <span class="pc-kw">return</span> check(root, -∞, +∞)
 
-<span class="pc-cm">// nums   = [ 3,  1,  4,  1,  5]
-// prefix = [0, 3,  4,  8,  9, 14]
-// sum(1..3) = prefix[4] - prefix[1] = 9 - 3 = 6   (1 + 4 + 1) ✓
-// sum(0..4) = prefix[5] - prefix[0] = 14 - 0 = 14 ✓</span></pre>
+<span class="pc-kw">function</span> check(n, lo, hi):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)
+    <span class="pc-cm">// going left narrows the max; going right narrows the min</span>
+
+<span class="pc-cm">// Kth Smallest — inorder = sorted, count as you go:</span>
+k ← the requested rank;  result ← none
+<span class="pc-kw">function</span> kth(n):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> result is set: <span class="pc-kw">return</span>
+    kth(n.left)
+    k ← k - 1
+    <span class="pc-kw">if</span> k = 0:
+        result ← n.val
+        <span class="pc-kw">return</span>
+    kth(n.right)</pre>
         </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Approach</th>
-              <th>Build</th>
-              <th>One query</th>
-              <th>q queries</th>
-              <th>Update an element</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Loop over the range each time</td>
-              <td>&mdash;</td>
-              <td>O(n)</td>
-              <td>O(n &middot; q)</td>
-              <td>O(1)</td>
-            </tr>
-            <tr>
-              <td><strong>Prefix sum array</strong></td>
-              <td>O(n)</td>
-              <td><strong>O(1)</strong></td>
-              <td>O(n + q)</td>
-              <td>O(n) &mdash; rebuild the tail</td>
-            </tr>
-            <tr>
-              <td>Fenwick / Segment tree (Lecture 30)</td>
-              <td>O(n)</td>
-              <td>O(log n)</td>
-              <td>O(q log n)</td>
-              <td>O(log n)</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong>When a prefix sum is the wrong tool.</strong> It assumes the
-            array never changes. One update invalidates every prefix after it,
-            so a problem with interleaved updates and queries wants a Fenwick
-            tree or a segment tree instead &mdash; that is exactly the gap
-            Lecture 30 fills.
-          </div>
-        </div>
-
-        <h2 class="h1" id="hashmap">&#128273; Prefix + HashMap</h2>
-        <p>
-          The second use of a prefix sum is not about queries at all. If two
-          prefixes are
-          <strong>equal</strong>, the elements between them sum to zero; if they
-          differ by <code>k</code>, the elements between them sum to
-          <code>k</code>. So instead of storing prefixes in an array, store how
-          often each prefix <em>value</em> has been seen &mdash; in a HashMap.
-        </p>
-
-        <h3 class="h2" id="hm-k">Counting Subarrays That Sum to K</h3>
+        <h3 class="h3">BST Insert &amp; Delete</h3>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Subarray Sum Equals K</span
+              >&#128208; Pseudocode &middot; BST Insert (LC 701) + Delete (LC
+              450)</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> countSubarrays(nums, k):
-    seen ← {0: 1}              <span class="pc-cm">// the empty prefix has sum 0, once</span>
-    sum ← 0;  count ← 0
+          <pre><span class="pc-cm">// INSERT: navigate like search until a null spot, place the node there</span>
+<span class="pc-kw">function</span> insertIntoBST(root, val):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> TreeNode(val)
+    <span class="pc-kw">if</span> val &lt; root.val: root.left ← insertIntoBST(root.left, val)
+    <span class="pc-kw">else</span>: root.right ← insertIntoBST(root.right, val)
+    <span class="pc-kw">return</span> root                  <span class="pc-cm">// return root so the parent's pointer stays valid</span>
 
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        sum ← sum + x
-        <span class="pc-kw">if</span> (sum - k) <span class="pc-kw">in</span> seen:
-            count ← count + seen[sum - k]    <span class="pc-cm">// every earlier prefix that closes a window</span>
-        seen[sum] ← (seen[sum] <span class="pc-kw">if</span> sum <span class="pc-kw">in</span> seen, <span class="pc-kw">else</span> 0) + 1
-    <span class="pc-kw">return</span> count
+<span class="pc-cm">// DELETE: 3 cases</span>
+<span class="pc-cm">// Case 1: leaf node    → return null</span>
+<span class="pc-cm">// Case 2: one child    → return that child</span>
+<span class="pc-cm">// Case 3: two children → copy the inorder successor up, delete the successor below</span>
+<span class="pc-kw">function</span> deleteNode(root, key):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> null
+    <span class="pc-kw">if</span> key &lt; root.val: root.left ← deleteNode(root.left, key)
+    <span class="pc-kw">else if</span> key &gt; root.val: root.right ← deleteNode(root.right, key)
+    <span class="pc-kw">else</span>:
+        <span class="pc-kw">if</span> root.left = null: <span class="pc-kw">return</span> root.right       <span class="pc-cm">// Cases 1 and 2</span>
+        <span class="pc-kw">if</span> root.right = null: <span class="pc-kw">return</span> root.left
+        succ ← root.right
+        <span class="pc-kw">while</span> succ.left ≠ null: succ ← succ.left      <span class="pc-cm">// leftmost = successor</span>
+        root.val ← succ.val                           <span class="pc-cm">// copy value up</span>
+        root.right ← deleteNode(root.right, succ.val) <span class="pc-cm">// delete the old successor</span>
+    <span class="pc-kw">return</span> root
 
-<span class="pc-cm">// nums = [1, 2, 3], k = 3
-// x=1: sum=1, need -2 → no.  seen = {0:1, 1:1}
-// x=2: sum=3, need  0 → yes (×1) → count = 1.  seen = {0:1, 1:1, 3:1}
-// x=3: sum=6, need  3 → yes (×1) → count = 2.  ✓ [1,2] and [3]</span></pre>
+<span class="pc-cm">// Time O(h): O(log n) for a balanced BST, O(n) worst case (skewed)</span></pre>
         </div>
+        <hr />
 
+        <!-- P6: LCA -->
+        <h2 class="h1" id="p6">&#127760; Lowest Common Ancestor (LCA)</h2>
+        <p>
+          The LCA of two nodes p and q is the deepest node that is an ancestor
+          of both. It is the first node where they &ldquo;split&rdquo; in the
+          tree.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; LCA Binary Tree (LC 236) + BST (LC
+              235)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Binary Tree — works for any tree:</span>
+<span class="pc-kw">function</span> lca(n, p, q):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
+    l ← lca(n.left, p, q)
+    r ← lca(n.right, p, q)
+    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n     <span class="pc-cm">// split here → this IS the LCA</span>
+    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
+    <span class="pc-kw">return</span> r                               <span class="pc-cm">// whichever side found something</span>
+
+<span class="pc-cm">// BST — exploit the ordering (simpler):</span>
+<span class="pc-kw">function</span> lcaBST(n, p, q):
+    <span class="pc-kw">if</span> p.val &lt; n.val <span class="pc-kw">and</span> q.val &lt; n.val: <span class="pc-kw">return</span> lcaBST(n.left, p, q)
+    <span class="pc-kw">if</span> p.val &gt; n.val <span class="pc-kw">and</span> q.val &gt; n.val: <span class="pc-kw">return</span> lcaBST(n.right, p, q)
+    <span class="pc-kw">return</span> n                               <span class="pc-cm">// split point → LCA</span></pre>
+        </div>
         <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
+          <span class="callout-icon">&#128204;</span>
           <div class="callout-body">
-            <strong>Why seed the map with <code>{0: 1}</code>?</strong> Without
-            it, a subarray that starts at index 0 is never counted &mdash;
-            because closing it needs a prefix of 0 that was never recorded. The
-            seed says &ldquo;before I read anything, I had a running total of
-            zero, and that happened once.&rdquo;
+            <strong
+              >Dry Run &mdash; LCA(root=3, p=5, q=1) on [3,5,1,6,2,0,8]:</strong
+            >
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">         <span class="hl">3</span>
+        / \
+      <span class="nd">5</span>     <span class="nd">1</span>
+     / \   / \
+   <span class="nd">6</span>   <span class="nd">2</span> <span class="nd">0</span>   <span class="nd">8</span>
+
+lca(<span class="hl">3</span>, p=5, q=1):
+  left  = lca(<span class="nd">5</span>, p=5, q=1) &rarr; node==p &rarr; return <span class="nd">5</span>  &#9668; found p
+  right = lca(<span class="nd">1</span>, p=5, q=1) &rarr; node==q &rarr; return <span class="nd">1</span>  &#9668; found q
+  both non-null &rarr; split point &rarr; return <span class="hl">3</span> &#10003;
+
+Key: once both sides return non-null, the current node IS the LCA.</div>
           </div>
         </div>
 
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Count, then record.</strong> Look up <code>sum - k</code>
-            <em>before</em> you insert the current prefix. Do it the other way
-            round and, when <code>k = 0</code>, every element cheerfully pairs
-            with itself.
-          </div>
-        </div>
+        <hr />
 
-        <h3 class="h2" id="hm-mod">Divisible by K, and Longest Zero-Sum</h3>
-        <p>
-          Two variations reuse the same skeleton with a different key and a
-          different stored value:
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Question</th>
-              <th>Map key</th>
-              <th>Map value</th>
-              <th>Why</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>How many subarrays sum to k?</td>
-              <td>prefix sum</td>
-              <td>count</td>
-              <td>every earlier match is one more subarray</td>
-            </tr>
-            <tr>
-              <td>How many are divisible by k?</td>
-              <td>prefix mod k</td>
-              <td>count</td>
-              <td>equal remainders cancel</td>
-            </tr>
-            <tr>
-              <td>Longest subarray summing to k?</td>
-              <td>prefix sum</td>
-              <td><strong>first</strong> index</td>
-              <td>earliest match gives the longest span</td>
-            </tr>
-            <tr>
-              <td>Longest with equal 0s and 1s?</td>
-              <td>prefix with 0 read as &minus;1</td>
-              <td>first index</td>
-              <td>balance returning to a value means equal counts</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Negative remainders.</strong> In most languages
-            <code>-7 mod 3</code> is <code>-1</code>, not <code>2</code>.
-            Normalise with <code>((sum mod k) + k) mod k</code> or the two
-            halves of the same remainder never meet.
-          </div>
-        </div>
-
-        <h2 class="h1" id="diff">
-          &#128203; Difference Arrays &mdash; The Mirror Image
+        <!-- MORRIS -->
+        <h2 class="h1" id="morris">
+          &#129525; Morris Traversal &mdash; O(1) Space
         </h2>
         <p>
-          A prefix sum turns <em>many reads</em> into one subtraction. A
-          difference array turns <em>many writes</em> into two. Use it when the
-          problem says &ldquo;add <code>v</code> to every element from
-          <code>l</code> to <code>r</code>&rdquo;, many times over, and only
-          asks for the final array.
+          Every traversal so far has cost O(h) memory &mdash; the call stack, or
+          an explicit stack. Morris traversal gets in-order out of a tree in
+          <strong>O(1)</strong> extra space by borrowing the null right pointers
+          of leaf nodes as temporary threads back up the tree, then putting them
+          back. Every node is visited at most twice, so it is still O(n) time.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Range Update in O(1)</span
+              >&#128208; Pseudocode &middot; Morris In-order Traversal</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>diff ← array of length n + 1, all 0
+          <pre><span class="pc-cm">// In-order traversal with NO recursion and NO stack.</span>
+<span class="pc-cm">// Idea: temporarily point each predecessor's right pointer back</span>
+<span class="pc-cm">// at its successor, so you can climb back up without a stack.</span>
+cur <span class="pc-kw">&larr;</span> root
 
-<span class="pc-kw">function</span> update(l, r, v):        <span class="pc-cm">// add v to every index in [l, r]</span>
-    diff[l] ← diff[l] + v            <span class="pc-cm">// switch the change on</span>
-    diff[r + 1] ← diff[r + 1] - v    <span class="pc-cm">// switch it off again</span>
+<span class="pc-kw">while</span> cur &ne; null:
+    <span class="pc-kw">if</span> cur.left = null:
+        visit(cur)
+        cur <span class="pc-kw">&larr;</span> cur.right
+    <span class="pc-kw">else</span>:
+        <span class="pc-cm">// find the rightmost node of the left subtree</span>
+        pred <span class="pc-kw">&larr;</span> cur.left
+        <span class="pc-kw">while</span> pred.right &ne; null <span class="pc-kw">and</span> pred.right &ne; cur:
+            pred <span class="pc-kw">&larr;</span> pred.right
 
-<span class="pc-kw">function</span> build():                 <span class="pc-cm">// run once, at the very end</span>
-    running ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        running ← running + diff[i]
-        result[i] ← running
-    <span class="pc-kw">return</span> result
-
-<span class="pc-cm">// update(1, 3, +5) on n = 5
-// diff   = [0, +5, 0, 0, -5, 0]
-// build  = [0,  5, 5, 5,  0]      ← the +5 lives exactly on [1, 3] ✓</span></pre>
+        <span class="pc-kw">if</span> pred.right = null:
+            pred.right <span class="pc-kw">&larr;</span> cur      <span class="pc-cm">// 1st visit: thread it, go left</span>
+            cur <span class="pc-kw">&larr;</span> cur.left
+        <span class="pc-kw">else</span>:
+            pred.right <span class="pc-kw">&larr;</span> null     <span class="pc-cm">// 2nd visit: unthread, restore tree</span>
+            visit(cur)
+            cur <span class="pc-kw">&larr;</span> cur.right</pre>
         </div>
 
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(n) &mdash; each edge walked at most twice</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>They are inverses.</strong> Prefix-summing a difference
-            array gives back the original updates, and taking the differences of
-            a prefix-sum array gives back the original elements. That is why the
-            <code>r + 1</code> slot exists: it is the same extra cell as the
-            leading <code>0</code>, seen from the other side.
+            <strong>It mutates the tree while it runs</strong><br />Between the
+            threading and the unthreading, the tree is temporarily
+            <em>not</em> a tree &mdash; it has cycles. The algorithm always
+            restores it, but never run it concurrently with anything else
+            reading the tree, and never on a structure you must not modify.
           </div>
         </div>
 
-        <p>
-          The pattern hides in problems that never mention arrays. &ldquo;Each
-          booking adds seats to flights <code>l</code> through
-          <code>r</code>&rdquo;, &ldquo;each passenger occupies the car from
-          stop <code>l</code> to stop <code>r</code>&rdquo;, &ldquo;each person
-          is alive from birth to death&rdquo; &mdash; all the same two writes
-          and one sweep.
-        </p>
+        <hr />
 
-        <h3 class="h2" id="diff-2d">2D Difference Arrays</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Rectangle Update in O(1)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Add v to every cell in the rectangle (r1, c1) .. (r2, c2).</span>
-<span class="pc-kw">function</span> update(r1, c1, r2, c2, v):
-    diff[r1][c1]         ← diff[r1][c1] + v
-    diff[r1][c2 + 1]     ← diff[r1][c2 + 1] - v
-    diff[r2 + 1][c1]     ← diff[r2 + 1][c1] - v
-    diff[r2 + 1][c2 + 1] ← diff[r2 + 1][c2 + 1] + v   <span class="pc-cm">// added back: it was removed twice</span>
-
-<span class="pc-cm">// Then prefix-sum the whole grid once (rows, then columns).</span></pre>
-        </div>
-
-        <h2 class="h1" id="twod">&#129518; 2D Prefix Sums</h2>
-        <p>
-          The same idea in two dimensions is called an
-          <em>integral image</em>: <code>P[r][c]</code> is the sum of the whole
-          rectangle from the top-left corner down to <code>(r-1, c-1)</code>.
-          Any sub-rectangle is then four lookups.
-        </p>
-
-        <div class="ascii-tree">
-          A | B ----+---- C | D &nbsp;&nbsp; want D = whole &minus; (A+B)
-          &minus; (A+C) + A &nbsp;&nbsp; the corner A is subtracted twice, so
-          add it back once
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build and Query a 2D Prefix</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// P has one extra row and one extra column of zeros.</span>
-<span class="pc-kw">for</span> r <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-        P[r][c] ← grid[r-1][c-1] + P[r-1][c] + P[r][c-1] - P[r-1][c-1]
-
-<span class="pc-kw">function</span> regionSum(r1, c1, r2, c2):        <span class="pc-cm">// inclusive corners</span>
-    <span class="pc-kw">return</span> P[r2+1][c2+1] - P[r1][c2+1] - P[r2+1][c1] + P[r1][c1]
-
-<span class="pc-cm">// grid = [[1, 2],        P = [[0, 0, 0],
-//         [3, 4]]             [0, 1, 3],
-//                             [0, 4, 10]]
-// regionSum(1,0, 1,1) = P[2][2] - P[1][2] - P[2][0] + P[1][0]
-//                     = 10 - 3 - 0 + 0 = 7   (3 + 4) ✓</span></pre>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Inclusion&ndash;exclusion, in one sentence.</strong> Take
-            the big rectangle, remove the strip above and the strip to the left,
-            then add back the corner you just removed twice. The build formula
-            is the same four terms rearranged.
-          </div>
-        </div>
-
-        <h2 class="h1" id="xor">&#10006;&#65039; Prefix XOR &amp; Friends</h2>
-        <p>
-          Prefix sums work because addition has an inverse: subtraction. Any
-          operation with an inverse can be prefixed the same way.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Operation</th>
-              <th>Undo with</th>
-              <th>Range formula</th>
-              <th>Safe?</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Sum (+)</td>
-              <td>&minus;</td>
-              <td><code>P[r+1] - P[l]</code></td>
-              <td>&#9989; always</td>
-            </tr>
-            <tr>
-              <td>XOR (^)</td>
-              <td>XOR itself</td>
-              <td><code>P[r+1] ^ P[l]</code></td>
-              <td>&#9989; always</td>
-            </tr>
-            <tr>
-              <td>Product (&times;)</td>
-              <td>&divide;</td>
-              <td><code>P[r+1] / P[l]</code></td>
-              <td>&#9888;&#65039; breaks on a zero</td>
-            </tr>
-            <tr>
-              <td>Min / Max</td>
-              <td><em>nothing</em></td>
-              <td>&mdash;</td>
-              <td>&#10060; use a sparse table or segment tree</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Prefix XOR</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// x XOR x = 0, so XOR is its own inverse — no subtraction needed.</span>
-px ← array of length n + 1;  px[0] ← 0
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    px[i + 1] ← px[i] XOR nums[i]
-
-<span class="pc-kw">function</span> rangeXor(l, r):
-    <span class="pc-kw">return</span> px[r + 1] XOR px[l]
-
-<span class="pc-cm">// A pair of equal prefix-XORs means the range between them XORs to 0 —
-// the same "equal prefixes cancel" idea, one operator over.</span></pre>
-        </div>
-
-        <h2 class="h1" id="pitfalls">
-          &#9201; Complexity &amp; The Classic Bugs
+        <!-- CONSTRUCTION -->
+        <h2 class="h1" id="construct">
+          &#127959;&#65039; Building a Tree from its Traversals
         </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Technique</th>
-              <th>Preprocess</th>
-              <th>Per query / update</th>
-              <th>Extra space</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1D prefix sum</td>
-              <td>O(n)</td>
-              <td>O(1) query</td>
-              <td>O(n)</td>
-            </tr>
-            <tr>
-              <td>Prefix + HashMap</td>
-              <td>&mdash;</td>
-              <td>O(1) average per element</td>
-              <td>O(n)</td>
-            </tr>
-            <tr>
-              <td>Difference array</td>
-              <td>&mdash;</td>
-              <td>O(1) update, O(n) once to build</td>
-              <td>O(n)</td>
-            </tr>
-            <tr>
-              <td>2D prefix sum</td>
-              <td>O(m &middot; n)</td>
-              <td>O(1) region query</td>
-              <td>O(m &middot; n)</td>
-            </tr>
-          </tbody>
-        </table>
+        <p>
+          One traversal is never enough to rebuild a tree &mdash; but two are,
+          as long as one of them is <strong>in-order</strong>. Preorder (or
+          postorder) tells you which node is the root; in-order tells you where
+          that root splits the remaining nodes into a left group and a right
+          group. Recurse on the two groups.
+        </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Bug</th>
-              <th>Symptom</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Forgetting the seed <code>{0: 1}</code></td>
-              <td>Subarrays starting at index 0 are missed</td>
-              <td>Insert the empty prefix before the loop</td>
-            </tr>
-            <tr>
-              <td>Recording before counting</td>
-              <td>Elements pair with themselves when k = 0</td>
-              <td>Look up <code>sum - k</code> first, then store</td>
-            </tr>
-            <tr>
-              <td>Off-by-one in the query</td>
-              <td>One element too many or too few</td>
-              <td>
-                <code>P[r+1] - P[l]</code>, always, with the extra leading slot
-              </td>
-            </tr>
-            <tr>
-              <td>Difference array too short</td>
-              <td>Crash when <code>r</code> is the last index</td>
-              <td>
-                Allocate <code>n + 1</code> slots for the &ldquo;off&rdquo; mark
-              </td>
-            </tr>
-            <tr>
-              <td>Negative remainders</td>
-              <td>Divisible-by-k counts come out low</td>
-              <td><code>((sum mod k) + k) mod k</code></td>
-            </tr>
-            <tr>
-              <td>Overflow</td>
-              <td>Sums wrap to negative numbers</td>
-              <td>Accumulate in 64-bit (<code>long</code>)</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Build from Preorder + Inorder</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// preorder tells you WHICH node is the root.</span>
+<span class="pc-cm">// inorder tells you WHERE that root splits left from right.</span>
+position <span class="pc-kw">&larr;</span> map from value &rarr; index in inorder
+p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">// cursor into preorder</span>
 
-        <div class="callout green">
+<span class="pc-kw">function</span> build(lo, hi):        <span class="pc-cm">// inorder range [lo, hi]</span>
+    <span class="pc-kw">if</span> lo > hi: <span class="pc-kw">return</span> null
+
+    node <span class="pc-kw">&larr;</span> Node(preorder[p])
+    p <span class="pc-kw">&larr;</span> p + 1
+    mid <span class="pc-kw">&larr;</span> position[node.value]
+
+    node.left  <span class="pc-kw">&larr;</span> build(lo, mid - 1)   <span class="pc-cm">// must come first: p is shared</span>
+    node.right <span class="pc-kw">&larr;</span> build(mid + 1, hi)
+    <span class="pc-kw">return</span> node
+
+<span class="pc-kw">return</span> build(0, length(inorder) - 1)</pre>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(n) &mdash; the map removes the linear scan</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(n)</span>
+          </div>
+        </div>
+
+        <div class="callout purple">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> &ldquo;Range
-            sum&rdquo;, &ldquo;how many subarrays&rdquo;, &ldquo;many updates,
-            one final read&rdquo;, or a sliding window that breaks because the
-            numbers can be negative. Any of those four, and a prefix or
-            difference array is the first thing to try.
+            <strong>The three variants</strong><br /><strong
+              >Preorder + inorder</strong
+            >
+            (LC 105) &mdash; take roots from the front.
+            <strong>Postorder + inorder</strong> (LC 106) &mdash; take roots
+            from the <em>back</em> and build <em>right</em> before left.
+            <strong>Preorder + postorder</strong> (LC 889) &mdash; only works
+            when every node has 0 or 2 children, and the answer is not unique.
           </div>
         </div>
 
+        <hr />
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
+        <p>
+          The costs worth quoting in an interview first, then the mistakes that
+          most often break code that looks correct. Every row in the second
+          table is a bug someone has shipped.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Cost</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BST search, insert, delete</td>
+                <td>O(h)</td>
+                <td>O(log n) balanced, O(n) skewed</td>
+              </tr>
+              <tr>
+                <td>Validate a BST</td>
+                <td>O(n)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>LCA in any binary tree</td>
+                <td>O(n)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>LCA in a BST</td>
+                <td>O(h)</td>
+                <td>Walk down, no recursion into both sides</td>
+              </tr>
+              <tr>
+                <td>Build from pre-order + in-order</td>
+                <td>O(n) with an index map</td>
+                <td>O(n&sup2;) without</td>
+              </tr>
+              <tr>
+                <td>Morris traversal</td>
+                <td>O(n) time, O(1) space</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Validating by comparing each node only with its parent</td>
+                <td>A deeper node breaks the rule unnoticed</td>
+                <td>Pass (min, max) bounds down</td>
+              </tr>
+              <tr>
+                <td>Using <code>int</code> bounds</td>
+                <td>Fails on nodes holding the extreme values</td>
+                <td>
+                  Use <code>long</code> or <code>null</code> for &ldquo;no
+                  bound&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Deleting a node with two children</td>
+                <td>Part of the tree disappears</td>
+                <td>
+                  Replace it with its in-order successor, then delete that
+                </td>
+              </tr>
+              <tr>
+                <td>Undefined handling of duplicates</td>
+                <td>Inconsistent searches</td>
+                <td>Decide: equal values go left, or are not allowed</td>
+              </tr>
+              <tr>
+                <td>Searching the in-order array for each root</td>
+                <td>O(n&sup2;) build</td>
+                <td>Precompute a value &rarr; index map</td>
+              </tr>
+              <tr>
+                <td>
+                  Building the right subtree before the left from pre-order
+                </td>
+                <td>The wrong tree</td>
+                <td>Build left first &mdash; pre-order lists it first</td>
+              </tr>
+              <tr>
+                <td>Not removing Morris threads</td>
+                <td>The tree is left modified</td>
+                <td>Remove the thread on the second visit</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <!-- PRACTICE -->
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems, one per idea in this lecture. Try each before opening a
-          hint &mdash; the goal is to name the shape, not to recall the code.
+          Four problems: two on the ordering property, one on two-node
+          reasoning, and one that rebuilds a tree from nothing but its
+          traversals.
         </p>
 
-        <!-- Problem 01: Find the Middle Index in Array -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Build &amp; Query</div>
-              <div class="prob-title">Find the Middle Index in Array</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/find-the-middle-index-in-array/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1991 - Find the Middle Index in Array</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Prefix Sum</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the leftmost index where the sum of everything strictly
-                to its left equals the sum of everything strictly to its right.
-                Return &minus;1 if no such index exists.
-              </p>
-              <div class="iobox">
-                nums = [2, 3, -1, 8, 4] → 3 &nbsp;(2+3-1 = 4 =
-                4)&nbsp;&nbsp;|&nbsp;&nbsp; nums = [1, -1, 4] → 2
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You know the total of the whole array before you start
-                    walking it. What else do you need?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep a running <code>left</code>. The right side is
-                    <code>total - left - nums[i]</code> &mdash; the pivot itself
-                    belongs to neither side.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                One pass over a running total replaces the inner loop. Compare
-                <em>before</em> adding <code>nums[i]</code> to
-                <code>left</code>, because the pivot is excluded from both
-                sides. Negative numbers are no problem here: a prefix sum never
-                assumes the values grow.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Total Minus Left</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> findMiddleIndex(nums):
-    total ← sum(nums)
-    left ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        right ← total - left - nums[i]      <span class="pc-cm">// pivot excluded from both sides</span>
-        <span class="pc-kw">if</span> left = right: <span class="pc-kw">return</span> i
-        left ← left + nums[i]
-    <span class="pc-kw">return</span> -1
-
-<span class="pc-cm">// [2,3,-1,8,4]: total = 16
-// i=0 left=0  right=14   i=1 left=2 right=11
-// i=2 left=5  right=12   i=3 left=4 right=4  ← answer 3 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 02: Binary Subarrays With Sum -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Prefix + HashMap</div>
-              <div class="prob-title">Binary Subarrays With Sum</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/binary-subarrays-with-sum/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 930 - Binary Subarrays With Sum</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Prefix + HashMap</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a binary array <code>nums</code> and an integer
-                <code>goal</code>, return how many non-empty subarrays sum to
-                exactly <code>goal</code>.
-              </p>
-              <div class="iobox">nums = [1, 0, 1, 0, 1], goal = 2 → 4</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Two prefixes that differ by <code>goal</code> bound a
-                    subarray that sums to <code>goal</code>.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Walk the array keeping a running sum and a map of how often
-                    each earlier prefix appeared. Add
-                    <code>map[sum - goal]</code> at each step. Seed the map with
-                    <code>{0: 1}</code>.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The array is binary, so a sliding window is tempting &mdash; but
-                <code>goal</code> can be 0, and that breaks the &ldquo;shrink
-                while too big&rdquo; rule. The prefix-map version does not care:
-                it counts every earlier prefix that closes a valid window, in
-                one pass. (The at-most trick from Lecture 18 also works:
-                <code>atMost(goal) &minus; atMost(goal&minus;1)</code>.)
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Count, Then Record</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> numSubarraysWithSum(nums, goal):
-    seen ← {0: 1}
-    sum ← 0;  count ← 0
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        sum ← sum + x
-        <span class="pc-kw">if</span> (sum - goal) <span class="pc-kw">in</span> seen:
-            count ← count + seen[sum - goal]     <span class="pc-cm">// look up BEFORE storing</span>
-        seen[sum] ← (seen[sum] <span class="pc-kw">if</span> sum <span class="pc-kw">in</span> seen, <span class="pc-kw">else</span> 0) + 1
-    <span class="pc-kw">return</span> count
-
-<span class="pc-cm">// [1,0,1,0,1], goal = 2
-// prefixes: 1, 1, 2, 2, 3 — matches at sum=2 (×1), sum=2 (×1), sum=3 (×2)
-// count = 4 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 03: Corporate Flight Bookings -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Difference Array</div>
-              <div class="prob-title">Corporate Flight Bookings</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/corporate-flight-bookings/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1109 - Corporate Flight Bookings</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Difference Array</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                There are <code>n</code> flights. Each booking
-                <code>[first, last, seats]</code> reserves <code>seats</code> on
-                every flight from <code>first</code> to
-                <code>last</code> inclusive. Return the total seats booked on
-                each flight.
-              </p>
-              <div class="iobox">
-                bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5 → [10, 55, 45,
-                25, 25]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Applying each booking flight by flight is O(bookings &times;
-                    n). Can one booking cost O(1)?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Record only where each booking <em>starts</em> and where it
-                    <em>stops</em>: <code>+seats</code> at <code>first</code>,
-                    <code>-seats</code> just after <code>last</code>. One prefix
-                    sum at the end turns the marks into the answer.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the difference array with the labels changed. Each
-                booking writes two cells regardless of how many flights it
-                spans, and a single sweep expands the marks. Watch the indexing:
-                flights are 1-based in the statement, so either shift by one or
-                allocate <code>n + 2</code> cells &mdash; the &ldquo;off&rdquo;
-                mark for the last flight must have somewhere to live.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Writes, One Sweep</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> corpFlightBookings(bookings, n):
-    diff ← array of length n + 1, all 0        <span class="pc-cm">// 0-based flights</span>
-
-    <span class="pc-kw">for</span> (first, last, seats) <span class="pc-kw">in</span> bookings:
-        diff[first - 1] ← diff[first - 1] + seats
-        <span class="pc-kw">if</span> last &lt; n: diff[last] ← diff[last] - seats
-
-    answer ← array of length n
-    running ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        running ← running + diff[i]
-        answer[i] ← running
-    <span class="pc-kw">return</span> answer
-
-<span class="pc-cm">// diff after all three bookings: [10, 45, -10, 0, 0]
-// sweep: 10, 55, 45, 25, 25 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n + bookings)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 04: Matrix Block Sum -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; 2D Prefix</div>
-              <div class="prob-title">Matrix Block Sum</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/matrix-block-sum/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1314 - Matrix Block Sum</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">2D Prefix Sum</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return a matrix <code>answer</code> where
-                <code>answer[i][j]</code> is the sum of all cells within
-                <code>k</code> rows and <code>k</code> columns of
-                <code>(i, j)</code>, clipped to the grid.
-              </p>
-              <div class="iobox">
-                mat = [[1,2,3],[4,5,6],[7,8,9]], k = 1 →
-                [[12,21,16],[27,45,33],[24,39,28]]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Every answer cell is the sum of a rectangle. How many
-                    lookups should one rectangle cost?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Build a 2D prefix sum once, then clamp the rectangle corners
-                    to the grid: rows <code>max(0, i-k)</code> to
-                    <code>min(m-1, i+k)</code>, and the same for columns.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Without preprocessing this is O(m&middot;n&middot;k&sup2;). With
-                one integral image it is O(m&middot;n) total, because each
-                answer cell costs four lookups. The only fiddly part is
-                clamping: write the corner arithmetic once, in a helper, and the
-                edges stop being a special case.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Integral Image +
-                      Clamp</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> matrixBlockSum(mat, k):
-    m ← rows(mat);  n ← cols(mat)
-    P ← (m+1) × (n+1) matrix of zeros
-    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m:
-        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
-            P[r][c] ← mat[r-1][c-1] + P[r-1][c] + P[r][c-1] - P[r-1][c-1]
-
-    answer ← m × n matrix
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-            r1 ← max(0, i - k);  c1 ← max(0, j - k)
-            r2 ← min(m - 1, i + k);  c2 ← min(n - 1, j + k)
-            answer[i][j] ← P[r2+1][c2+1] - P[r1][c2+1] - P[r2+1][c1] + P[r1][c1]
-    <span class="pc-kw">return</span> answer</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(m &middot; n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(m &middot; n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 05: XOR Queries of a Subarray -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Prefix XOR</div>
-              <div class="prob-title">XOR Queries of a Subarray</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/xor-queries-of-a-subarray/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1310 - XOR Queries of a Subarray</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Prefix XOR</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For each query <code>[l, r]</code>, return the XOR of
-                <code>arr[l] ^ arr[l+1] ^ ... ^ arr[r]</code>.
-              </p>
-              <div class="iobox">
-                arr = [1, 3, 4, 8], queries = [[0,1],[1,2],[0,3],[3,3]] → [2, 7,
-                14, 8]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Answering each query directly is O(n) per query. Which
-                    property of XOR makes a prefix array work?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    <code>x ^ x = 0</code>, so XOR undoes itself:
-                    <code>rangeXor(l, r) = px[r+1] ^ px[l]</code>, with no
-                    subtraction anywhere.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Everything you know about prefix sums transfers, with
-                <code>+</code> and <code>&minus;</code> both replaced by
-                <code>^</code>. Build <code>px</code> with the same leading zero
-                &mdash; XOR with 0 leaves a value unchanged, which is exactly
-                the role the empty prefix plays for sums.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix XOR</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> xorQueries(arr, queries):
-    n ← length(arr)
-    px ← array of length n + 1;  px[0] ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        px[i + 1] ← px[i] XOR arr[i]
-
-    out ← empty list
-    <span class="pc-kw">for</span> (l, r) <span class="pc-kw">in</span> queries:
-        append px[r + 1] XOR px[l] <span class="pc-kw">to</span> out
-    <span class="pc-kw">return</span> out
-
-<span class="pc-cm">// arr = [1,3,4,8] → px = [0, 1, 2, 6, 14]
-// query [1,2] = px[3] XOR px[1] = 6 XOR 1 = 7 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n + q)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 06: Shortest Subarray with Sum at Least K -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 06 &middot; Prefix + Monotonic Deque
+                Problem 01 &middot;
+                <a
+                  href="https://leetcode.com/problems/validate-binary-search-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 98</a
+                >
+              </div>
+              <div class="prob-title">Validate Binary Search Tree</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 5: BST Property</span>
+                <span class="tag tag-co"
+                  >Amazon · Microsoft · Bloomberg · Meta</span
+                >
+                <span class="tag tag-lc">LC 98</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>Determine if a binary tree is a valid BST.</p>
+              <div class="iobox">
+                Input: [5,1,4,null,null,3,6] Output: false (root is 5 but right
+                child is 4 which is less)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Checking only node vs its two children is the classic wrong
+                    answer.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Every node must fall inside an inherited (min, max) range:
+                    recurse left with max = node.val and right with min =
+                    node.val. Use long bounds for Integer.MIN/MAX values.
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Pattern 5. Pass a valid range <code>[lo, hi]</code> down. Going
+                left tightens the upper bound; going right tightens the lower
+                bound. Use <code>Long</code> to avoid
+                <code>Integer.MIN/MAX_VALUE</code> edge cases.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 98</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> isValidBST(root):
+    <span class="pc-kw">return</span> check(root, -∞, +∞)
+
+<span class="pc-kw">function</span> check(n, lo, hi):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(h)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- P5 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 236</a
+                >
               </div>
               <div class="prob-title">
-                Shortest Subarray with Sum at Least K
+                Lowest Common Ancestor of a Binary Tree
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 6: LCA</span>
+                <span class="tag tag-co"
+                  >Amazon · Google · Meta · Microsoft</span
+                >
+                <span class="tag tag-lc">LC 236</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the lowest common ancestor of two nodes p and q in a binary
+                tree.
+              </p>
+              <div class="iobox">
+                Input: root=[3,5,1,6,2,0,8], p=5, q=1 Output: 3
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    If both targets are in different subtrees, the current node
+                    is the answer.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Recurse both sides. If both return non-null, this node is
+                    the LCA; otherwise pass up whichever side is non-null. In a
+                    BST you can do better &mdash; walk down until the values
+                    straddle the node.
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Pattern 6. Return node when null/p/q. If both left and right are
+                non-null &rarr; split here &rarr; current node IS the LCA. Else
+                bubble up the non-null side.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 236</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> lca(n, p, q):
+    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
+    l ← lca(n.left, p, q)
+    r ← lca(n.right, p, q)
+    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n
+    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
+    <span class="pc-kw">return</span> r</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(h)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ASSIGNMENT -->
+        <!-- Problem 03: Construct Binary Tree from Preorder and Inorder Traversal -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Rebuild</div>
+              <div class="prob-title">
+                Construct Binary Tree from Preorder and Inorder Traversal
               </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/"
+                  href="https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 862 - Shortest Subarray with Sum at Least K</a
+                  >&#128279; LC 105 - Construct Binary Tree from Preorder and
+                  Inorder Traversal</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Prefix + Deque</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Build from Traversals</span>
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
@@ -2664,13 +2188,12 @@ px ← array of length n + 1;  px[0] ← 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Return the length of the shortest non-empty subarray with a sum
-                of at least <code>k</code>. The array may contain negative
-                numbers. Return &minus;1 if none exists.
+                Given the pre-order and in-order traversals of a binary tree
+                with unique values, rebuild the tree.
               </p>
               <div class="iobox">
-                nums = [2, -1, 2], k = 3 → 3 &nbsp;&nbsp;|&nbsp;&nbsp; nums =
-                [84, -37, 32, 40, 95], k = 167 → 3
+                preorder = [3,9,20,15,7], inorder = [9,3,15,20,7] → the tree
+                rooted at 3
               </div>
             </div>
             <div class="prob-section">
@@ -2682,8 +2205,9 @@ px ← array of length n + 1;  px[0] ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    A sliding window fails here. Why? And what does the problem
-                    look like once you write it in prefix sums?
+                    Pre-order starts with the root. Where does that same value
+                    sit in the in-order list, and what does its position tell
+                    you?
                   </p>
                 </div>
               </details>
@@ -2694,11 +2218,9 @@ px ← array of length n + 1;  px[0] ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    You need the shortest <code>j - i</code> with
-                    <code>P[j] - P[i] &ge; k</code>. Keep candidate
-                    <code>i</code>s in a deque with <em>increasing</em> prefix
-                    values; pop from the front when a window qualifies, and from
-                    the back when a new prefix is no larger.
+                    Everything left of it in the in-order list is the left
+                    subtree, everything right is the right subtree. Recurse on
+                    those two slices.
                   </p>
                 </div>
               </details>
@@ -2706,15 +2228,13 @@ px ← array of length n + 1;  px[0] ← 0
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Negatives break windows because growing the window can lower the
-                sum, so shrinking is no longer safe. In prefix form the question
-                becomes a search over earlier prefixes. Two rules keep the deque
-                honest: a front entry that already satisfies
-                <code>P[j] - P[front] &ge; k</code> can be answered and
-                discarded (no later <code>j</code> gives a shorter window), and
-                a back entry with <code>P[back] &ge; P[j]</code> is useless
-                (<code>j</code> is both later and smaller). Each index enters
-                and leaves once: O(n).
+                Two facts do all the work: pre-order hands you the root first,
+                and in-order splits the remaining values into the two subtrees
+                once you know where the root is. Scanning the in-order array for
+                the root each time costs O(n) and makes the whole thing
+                O(n&sup2;); a value&rarr;index map fixes that. Keep a moving
+                pointer into the pre-order array rather than slicing it, or the
+                copying costs more than the algorithm.
               </p>
             </div>
             <details>
@@ -2725,29 +2245,31 @@ px ← array of length n + 1;  px[0] ← 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Monotonic Deque over
-                      Prefixes</span
+                      >&#128208; Pseudocode &middot; Root From Pre-order, Split
+                      With In-order</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> shortestSubarray(nums, k):
-    n ← length(nums)
-    P ← array of length n + 1;  P[0] ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: P[i + 1] ← P[i] + nums[i]      <span class="pc-cm">// use 64-bit</span>
+                  <pre><span class="pc-kw">function</span> buildTree(preorder, inorder):
+    pos ← map from value → index in inorder     <span class="pc-cm">// O(1) lookups</span>
+    i ← 0                                        <span class="pc-cm">// cursor into preorder</span>
 
-    dq ← empty deque of indices        <span class="pc-cm">// prefix values increase front → back</span>
-    best ← +infinity
+    <span class="pc-kw">function</span> build(lo, hi):                  <span class="pc-cm">// inorder range [lo, hi]</span>
+        <span class="pc-kw">if</span> lo &gt; hi: <span class="pc-kw">return</span> null
 
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n:
-        <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> P[j] - P[dq.front()] ≥ k:
-            best ← min(best, j - dq.popFront())     <span class="pc-cm">// answered — never needed again</span>
-        <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> P[dq.back()] ≥ P[j]:
-            dq.popBack()                            <span class="pc-cm">// j is later AND smaller</span>
-        dq.pushBack(j)
+        rootVal ← preorder[i];  i ← i + 1
+        node ← new TreeNode(rootVal)
+        mid ← pos[rootVal]                       <span class="pc-cm">// where the root splits it</span>
 
-    <span class="pc-kw">if</span> best = +infinity: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> best</pre>
+        node.left  ← build(lo, mid - 1)          <span class="pc-cm">// MUST be built first</span>
+        node.right ← build(mid + 1, hi)
+        <span class="pc-kw">return</span> node
+
+    <span class="pc-kw">return</span> build(0, length(inorder) - 1)
+
+<span class="pc-cm">// The left call must run before the right one: pre-order lists the entire
+// left subtree before the right, so the cursor has to consume it first.</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2763,6 +2285,125 @@ px ← array of length n + 1;  px[0] ← 0
             </details>
           </div>
         </div>
+        <!-- Problem 04: Kth Smallest Element in a BST -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Ordering</div>
+              <div class="prob-title">Kth Smallest Element in a BST</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 230 - Kth Smallest Element in a BST</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">BST Property</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return the <code>k</code>-th smallest value in a binary search
+                tree.
+              </p>
+              <div class="iobox">root = [3,1,4,null,2], k = 1 → 1</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    What order does an in-order walk visit a BST in? You do not
+                    need to sort anything.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    In-order gives sorted order, so the k-th node visited is the
+                    answer. Count as you go and stop the moment you reach k.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the BST property doing all the work: in-order on a BST
+                <em>is</em> the sorted sequence, so the problem reduces to
+                &ldquo;stop at the k-th step&rdquo;. Collecting everything into
+                a list and indexing works but reads the whole tree; counting
+                during the walk and returning early is the answer they want. The
+                classic follow-up &mdash; &ldquo;what if the tree is modified
+                often?&rdquo; &mdash; wants each node to store its subtree size,
+                which turns the query into O(height).
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; In-order, Stop at k</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> kthSmallest(root, k):
+    stack ← empty;  node ← root
+
+    <span class="pc-kw">while</span> node ≠ null <span class="pc-kw">or</span> stack is not empty:
+        <span class="pc-kw">while</span> node ≠ null:                 <span class="pc-cm">// go as far left as possible</span>
+            stack.push(node)
+            node ← node.left
+
+        node ← stack.pop()                    <span class="pc-cm">// smallest unvisited</span>
+        k ← k - 1
+        <span class="pc-kw">if</span> k = 0: <span class="pc-kw">return</span> node.val       <span class="pc-cm">// stop early</span>
+
+        node ← node.right
+
+<span class="pc-cm">// Follow-up: store subtree sizes in each node and the query becomes
+// O(height) — descend left or right by comparing k with leftSize + 1.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(height + k)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(height)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
 
         <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
@@ -2770,11 +2411,11 @@ px ← array of length n + 1;  px[0] ← 0
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 19 Assignment &mdash; 20 Problems (7 Easy &middot; 9
-              Medium &middot; 4 Hard)</strong
+              >Lecture 19 Assignment &mdash; 16 Problems (4 Easy &middot; 10
+              Medium &middot; 2 Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by the
-            shape it needs. Complete it before moving to Lecture 20.<br /><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 20.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture19/Assignment.md"
               style="
@@ -2797,87 +2438,82 @@ px ← array of length n + 1;  px[0] ← 0
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can build a prefix-sum array with the n+1 convention without
-            thinking about it
+            I can state the BST property for a whole subtree, not just a parent
+            and child
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the range-sum formula and say why the extra leading zero
-            exists
+            I can explain why comparing only with the parent fails to validate a
+            BST
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why the prefix map is seeded with 0 &rarr; 1, and why
-            I look up before storing
+            I can write an in-order walk that stops early at the k-th node
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can choose between storing a count and storing a first index, and
-            say what each one answers
+            I can write LCA for a general binary tree and for a BST, and say why
+            they differ
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can apply a range update in O(1) with a difference array and
-            rebuild the result in one sweep
+            I can explain how Morris traversal reaches O(1) space and what it
+            costs
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the 2D region-sum formula and explain the
-            inclusion&ndash;exclusion corner
+            I can rebuild a tree from pre-order + in-order and say why
+            post-order + in-order also works
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I know which operations can be prefixed (sum, XOR) and which cannot
-            (min, max)
+            I can say why pre-order + post-order is NOT enough
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I completed all 20 assignment problems and can name the pattern for
-            each
-          </div>
+          <div class="cb-text">I completed all 16 assignment problems</div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
             <strong
-              >You're ready for Lecture 20: Monotonic Stack &amp; Queue</strong
+              >Next up &mdash; Lecture 20: Heaps &amp; Priority Queues</strong
             ><br />
-            The hard problem above needed a deque of candidate prefixes, kept in
-            increasing order, with useless entries thrown away. That structure
-            is the subject of the next lecture &mdash; and once it is named, a
-            whole family of &ldquo;next greater&rdquo; and &ldquo;window
-            extreme&rdquo; problems collapses into it.
+            A BST keeps <em>everything</em> in order, which is more than most
+            problems need. A heap keeps only the single most extreme element to
+            hand, and that weaker promise buys much cheaper inserts &mdash; the
+            right trade whenever the question is &ldquo;top k&rdquo; rather than
+            &ldquo;sorted&rdquo;.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture18/lecture18_notes.html"
-            >&larr; Lecture 18 &middot; Two Pointers &amp; Sliding Window</a
+            >&larr; Lecture 18 &middot; Trees I</a
           >
           <a class="next" href="../Lecture20/lecture20_notes.html"
-            >Lecture 20 &middot; Monotonic Stack &amp; Queue &rarr;</a
+            >Lecture 20 &middot; Heaps &amp; Priority Queues &rarr;</a
           >
         </div>
       </div>
-      <!-- /content -->
+      <!-- #content -->
     </div>
-    <!-- /main -->
+    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

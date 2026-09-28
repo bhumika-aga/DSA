@@ -1,350 +1,348 @@
-# 🧮 Assignment 14 — Matrix Problems
+# 🗂️ Assignment 11 — Linked Lists
 
-> **Lecture:** 14 of 38 — Matrix Problems
+> **Lecture:** 14 of 45 — Linked Lists
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 4 days · **Total Problems:** 24 (5 Easy · 14 Medium · 5 Hard)
-> **Goal:** Master the 4 matrix patterns (Boundary Traversal, In-Place State Machine, Grid DFS/BFS, 2D Binary Search) and apply them to the most frequently asked FAANG matrix problems.
+> **Estimated Time:** 6 days · **Total Problems:** 28 (9 Easy · 16 Medium · 3 Hard)
+> **Goal:** Master pointer rerouting, Fast & Slow pointer paradigms, and complex cache design invariants (LRU/LFU).
 
 ---
 
 ## 🗺️ Pattern Recognition — Read Before Starting
 
-Before writing any code, identify which of the 4 patterns applies. Do this **within 30 seconds** of reading the problem:
+Linked Lists are the foundational bridge between linear data structures (Arrays) and hierarchical ones (Trees). Mastering them requires a mental shift from "index-based access" to **"reference-based navigation"**.
 
-| Signal Phrase in Problem                           | Pattern to Apply       | Core Algorithm       |
-| -------------------------------------------------- | ---------------------- | -------------------- |
-| "spiral order", "layer by layer", "peel"           | Boundary / Spiral Walk | 4-pointer shrink     |
-| "in place", "O(1) space" + state changes           | In-Place State Machine | Sentinel encoding    |
-| "connected cells", "island", "flood fill", "reach" | Grid DFS               | Recursive flood fill |
-| "shortest distance", "nearest", "minimum time"     | Grid BFS               | Multi-source BFS     |
-| "sorted rows and columns", "search in matrix"      | 2D Binary Search       | Corner walk O(m+n)   |
+Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
----
-
----
-
-## 🟢 Easy Tier (5 Problems)
-
-_Goal: Get comfortable with grid indexing, bounds checking, and recognising the basic patterns._
-
-### E1 · Flood Fill
-
-**🔗 [LC 733 — Flood Fill](https://leetcode.com/problems/flood-fill/)** · Easy
-**Pattern:** Grid DFS | **Companies:** Amazon, Adobe
-
-**Problem:** Given a 2D image, a starting cell `(sr, sc)`, and a new colour, flood-fill the connected region starting from `(sr, sc)` with the new colour.
-
-**Hint:** This is the simplest grid DFS. From the start cell, recursively spread to all 4-directional neighbours that have the **same original colour**. Mark them with the new colour as you go. Watch out for the edge case where `image[sr][sc] == color` already — return early to avoid infinite recursion.
-
-**Why Easy?** Single-source DFS, no counting, no special state encoding. Pure flood fill skeleton.
+| Signal in the Problem             | Pattern                      | Move                                        |
+| --------------------------------- | ---------------------------- | ------------------------------------------- |
+| "middle", "cycle", "nth from end" | Fast & Slow Pointers         | one moves 2 steps, one moves 1              |
+| "reverse" (all or part)           | In-place Reversal            | `prev`, `curr`, `next` — three pointers     |
+| "head might change"               | Dummy Head                   | start from a sentinel node                  |
+| "merge / sort lists"              | Merge Two Lists              | splice nodes, don't copy values             |
+| "random pointer", "deep copy"     | Interweaving                 | insert copies between originals, then split |
+| "O(1) get and put"                | HashMap + Doubly Linked List | map to nodes, move nodes on access          |
 
 ---
 
-### E2 · Island Perimeter
+## 🟢 Easy Tier (9 Problems)
 
-**🔗 [LC 463 — Island Perimeter](https://leetcode.com/problems/island-perimeter/)** · Easy
-**Pattern:** Grid Counting | **Companies:** Goldman Sachs, Microsoft
+_Focus on traversing, basic manipulation, and the "Tortoise and Hare" strategy._
 
-**Problem:** Given a grid with exactly one island (no lakes), return the perimeter of the island.
+### E1 · Reverse Linked List
 
-**Hint:** For every land cell (`grid[r][c] == 1`), start with 4 sides. Subtract 1 for each neighbour that is also land (shared edge = not a perimeter edge). No DFS needed — just a nested loop and neighbour check.
+**🔗 [LC 206 — Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)** · Easy
+**Pattern:** Reversal | **Companies:** Amazon, Microsoft, Meta, Apple
 
-**Formula:** `perimeter += 4 - (number of land neighbours)`
-
-**Why Easy?** No recursion, no state tracking. Pure arithmetic.
+**Hint:** Iteratively keep `prev = null`, `curr = head`: save `next`, point `curr.next` at `prev`, then advance both. Recursively: reverse the rest, then set `head.next.next = head` and `head.next = null`.
 
 ---
 
-### E3 · Matrix Diagonal Sum
+### E2 · Middle of the Linked List
 
-**🔗 [LC 1572 — Matrix Diagonal Sum](https://leetcode.com/problems/matrix-diagonal-sum/)** · Easy
-**Pattern:** Index Arithmetic | **Companies:** Microsoft
+**🔗 [LC 876 — Middle of the Linked List](https://leetcode.com/problems/middle-of-the-linked-list/)** · Easy
+**Pattern:** Fast & Slow | **Companies:** Amazon, Google, Microsoft
 
-**Problem:** Given a square matrix, return the sum of all elements on the primary diagonal plus the secondary diagonal, counting the centre cell once if n is odd.
-
-**Hint:** Primary diagonal: `matrix[i][i]`. Secondary diagonal: `matrix[i][n-1-i]`. If `n` is odd, subtract `matrix[n/2][n/2]` once to avoid double-counting the centre.
-
-**Why Easy?** O(n) solution using a single loop and index arithmetic.
+**Hint:** Fast moves two steps, slow moves one. When fast reaches the end, slow is at the middle — for even length, at the second middle node, which is what LeetCode wants.
 
 ---
 
-### E4 · Transpose Matrix
+### E3 · Linked List Cycle
 
-**🔗 [LC 867 — Transpose Matrix](https://leetcode.com/problems/transpose-matrix/)** · Easy
-**Pattern:** Index Swap | **Companies:** Amazon, Microsoft
+**🔗 [LC 141 — Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)** · Easy
+**Pattern:** Floyd's Detection | **Companies:** Amazon, Microsoft, Meta, Bloomberg
 
-**Hint:** The result has size `n × m`: `result[j][i] = matrix[i][j]`. For a square matrix, try it in place by swapping across the diagonal only for `j > i`.
-
----
-
-### E5 · Count Negative Numbers in a Sorted Matrix
-
-**🔗 [LC 1351 — Count Negative Numbers in a Sorted Matrix](https://leetcode.com/problems/count-negative-numbers-in-a-sorted-matrix/)** · Easy
-**Pattern:** Corner Walk | **Companies:** Google
-
-**Problem:** Given a matrix sorted descending in each row and column, count negatives efficiently.
-
-**Hint:** Start at the **bottom-left corner**. If current cell is negative, all cells to its right in this row are also negative → add `n - c` to count and go up (`r--`). If non-negative, move right (`c++`). This is the corner walk from the bottom-left, giving O(m+n).
-
-**Why Easy?** Classic corner walk applied to counting instead of searching.
+**Hint:** Floyd's algorithm: slow moves one step, fast moves two. If there's a cycle, fast eventually lands on slow; if fast hits `null`, there's none. O(1) space.
 
 ---
 
-## 🟡 Medium Tier (14 Problems)
+### E4 · Merge Two Sorted Lists
 
-_Each problem requires identifying and correctly applying one of the 4 core patterns. These are the most commonly asked matrix problems at FAANG companies._
+**🔗 [LC 21 — Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)** · Easy
+**Pattern:** Dummy Head | **Companies:** Amazon, Apple, Microsoft
 
-### M1 · Spiral Matrix
-
-**🔗 [LC 54 — Spiral Matrix](https://leetcode.com/problems/spiral-matrix/)** · Medium
-**Pattern:** Boundary Walk | **Companies:** Amazon, Google, Microsoft, Facebook
-
-**Problem:** Return all elements of an m×n matrix in spiral order.
-
-**Hint:** Maintain 4 pointers: `top`, `bottom`, `left`, `right`. Each round: traverse top row (left→right), right column (top→bottom), bottom row (right→left, **guard**: `if top <= bottom`), left column (bottom→top, **guard**: `if left <= right`). Shrink bounds after each traversal.
-
-**Common mistake:** Forgetting the two guards causes double-counting in non-square matrices.
+**Hint:** Start from a dummy node and a `tail` pointer. Repeatedly attach the smaller head and advance that list. At the end attach whichever list is left.
 
 ---
 
-### M2 · Rotate Image
+### E5 · Remove Linked List Elements
 
-**🔗 [LC 48 — Rotate Image](https://leetcode.com/problems/rotate-image/)** · Medium
-**Pattern:** In-Place Transformation | **Companies:** Amazon, Microsoft, Apple
+**🔗 [LC 203 — Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/)** · Easy
+**Pattern:** Dummy Head | **Companies:** Amazon, Google, Adobe
 
-**Problem:** Rotate an n×n matrix 90° clockwise in place using O(1) extra space.
-
-**Hint:** Two-step trick: (1) **Transpose** — swap `matrix[i][j]` with `matrix[j][i]` for all `j > i`. (2) **Reverse each row** — standard two-pointer reversal. This works because rotating 90° CW maps `(r, c)` → `(c, n-1-r)`. Transpose gives `(c, r)`, reversing each row turns `r` into `n-1-r`.
-
-**Follow-up variants:** Counter-clockwise = Transpose + reverse each **column**. 180° = reverse all rows + reverse each row.
+**Hint:** Put a dummy before `head` so deleting the first node isn't special. With `curr` at the dummy: if `curr.next.val == val`, unlink it (don't advance); otherwise advance.
 
 ---
 
-### M3 · Set Matrix Zeroes
+### E6 · Palindrome Linked List
 
-**🔗 [LC 73 — Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/)** · Medium
-**Pattern:** In-Place State Machine | **Companies:** Amazon, Microsoft, Goldman Sachs
+**🔗 [LC 234 — Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)** · Easy
+**Pattern:** Composition | **Companies:** Amazon, Meta, Microsoft
 
-**Problem:** If any cell is 0, set its entire row and column to 0. Do it in place with O(1) extra space.
-
-**Hint:** Use the **first row and first column as sentinel arrays**. Two boolean flags (`row0`, `col0`) remember if those sentinels originally contained zeros. 4-pass algorithm: check sentinels → mark inner cells → zero out inner cells from sentinels → zero out sentinels if flagged.
-
-**Common mistake:** Not handling row 0 / col 0 separately. If you zero them out first, you corrupt your own sentinel data.
+**Hint:** Find the middle with fast and slow pointers, reverse the second half, and compare the two halves node by node. Restore the list afterwards if the caller needs it intact.
 
 ---
 
-### M4 · Number of Islands
+### E7 · Intersection of Two Linked Lists
 
-**🔗 [LC 200 — Number of Islands](https://leetcode.com/problems/number-of-islands/)** · Medium
-**Pattern:** Grid DFS (Flood Fill) | **Companies:** Amazon, Google, Meta, Bloomberg
+**🔗 [LC 160 — Intersection of Two Linked Lists](https://leetcode.com/problems/intersection-of-two-linked-lists/)** · Easy
+**Pattern:** Two Pointers (Switch Heads) | **Companies:** Amazon, Microsoft, Meta, Bloomberg
 
-**Problem:** Count connected groups of adjacent '1' cells in a grid of '1' (land) and '0' (water).
-
-**Hint:** Scan every cell. When you find an unvisited '1', increment count and DFS to sink the entire island (mark all connected '1's as '2'). After DFS, that island will never be counted again.
-
-**Interview follow-up:** "What if the grid is enormous?" → convert to iterative BFS to avoid stack overflow.
+**Hint:** Walk pointers `a` and `b`; when one reaches the end, jump it to the other list's head. Both travel `lenA + lenB`, so they meet at the intersection — or both reach `null` together.
 
 ---
 
-### M5 · 01 Matrix
+### E8 · Remove Duplicates from Sorted List
 
-**🔗 [LC 542 — 01 Matrix](https://leetcode.com/problems/01-matrix/)** · Medium
-**Pattern:** Multi-Source BFS | **Companies:** Google, Amazon, Uber
+**🔗 [LC 83 — Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)** · Easy
+**Pattern:** Pointer Skipping | **Companies:** Amazon, Microsoft, Adobe
 
-**Problem:** Return a matrix where each cell contains its distance to the nearest 0.
-
-**Hint:** Wrong approach: BFS from every 1-cell = O((m\*n)²). Right approach: **seed queue with ALL 0-cells** and BFS outward. Each 1-cell gets its distance from the first 0-source that reaches it (guaranteed nearest). Use `dist = -1` as the "unvisited" sentinel.
+**Hint:** The list is sorted, so duplicates are adjacent. While `curr.next` has the same value, skip it (`curr.next = curr.next.next`); otherwise advance `curr`.
 
 ---
 
-### M6 · Rotting Oranges
+### E9 · Convert Binary Number in a Linked List to Integer
 
-**🔗 [LC 994 — Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)** · Medium
-**Pattern:** Multi-Source BFS with Time Tracking | **Companies:** Amazon, Google, Uber
+**🔗 [LC 1290 — Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/)** · Easy
+**Pattern:** Traversal + Accumulation | **Companies:** Amazon, Adobe
 
-**Problem:** Rotten oranges (2) spread to fresh (1) neighbours every minute. Return minimum minutes to rot all, or -1 if impossible.
-
-**Hint:** Same multi-source BFS as M5, but track **BFS levels as minutes**. Count fresh oranges before BFS. After BFS, if `fresh > 0` → unreachable cells exist → return -1. Process queue level by level (use `int size = q.size()` before each round).
+**Hint:** Horner's method: start at 0 and for each node do `value = value * 2 + node.val` (or `(value << 1) | node.val`).
 
 ---
 
-### M7 · Search a 2D Matrix II
+## 🟡 Medium Tier (16 Problems)
 
-**🔗 [LC 240 — Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)** · Medium
-**Pattern:** Corner Walk O(m+n) | **Companies:** Google, Microsoft
+_Focus on multi-step logic and complex pointer state management._
 
-**Problem:** Matrix has sorted rows (left→right) and sorted columns (top→bottom) independently. Search for target.
+### M1 · Delete Node in a Linked List
 
-**Hint:** Start at **top-right corner**. If `curr == target` → found. If `curr > target` → go left (eliminate column). If `curr < target` → go down (eliminate row). Each step eliminates one row or column → at most m+n steps.
+**🔗 [LC 237 — Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/)** · Medium
+**Pattern:** Value Override | **Companies:** Amazon, Apple, Microsoft
 
-**Key insight:** Top-right is the unique corner where left = smaller (let us go left if too big) and down = larger (let us go down if too small). No other corner has this property.
-
----
-
-### M8 · Spiral Matrix II
-
-**🔗 [LC 59 — Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)** · Medium
-**Pattern:** Boundary Walk (fill) | **Companies:** Amazon
-
-**Problem:** Given n, construct an n×n matrix filled with numbers 1 to n² in spiral order.
-
-**Hint:** Same 4-pointer logic as LC 54, but instead of reading cells you write into them. Use a counter that increments from 1 to n². Same two guards apply.
+**Hint:** You don't have access to the previous node, so copy the next node's value into this node, then skip the next node: `node.val = node.next.val; node.next = node.next.next`.
 
 ---
 
-### M9 · Max Area of Island
+### M2 · Remove Nth Node From End of List
 
-**🔗 [LC 695 — Max Area of Island](https://leetcode.com/problems/max-area-of-island/)** · Medium
-**Pattern:** Grid DFS with size tracking | **Companies:** Amazon, Google, DoorDash
+**🔗 [LC 19 — Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)** · Medium
+**Pattern:** Gap Pointers | **Companies:** Amazon, Meta, Google, Microsoft
 
-**Problem:** Find the maximum area (cell count) of any island in the grid.
+**Hint:** Dummy head, then move `fast` `n + 1` steps ahead of `slow`. Advance both until `fast` is null — `slow` now sits just before the node to delete. One pass.
 
-**Hint:** Same DFS flood fill as Number of Islands, but the DFS returns the **size** of the island it sinks. Track the maximum across all islands.
+---
 
-```psuedocode
-function dfs(r, c):
-    if (r, c) is out of bounds or grid[r][c] ≠ '1': return 0
-    mark (r, c) visited
-    return 1 + dfs(r-1, c) + dfs(r+1, c) + dfs(r, c-1) + dfs(r, c+1)
+### M3 · Linked List Cycle II
+
+**🔗 [LC 142 — Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)** · Medium
+**Pattern:** Floyd's | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** After slow and fast meet inside the cycle, reset one pointer to `head` and move both one step at a time. They meet at the cycle's entry, because the distance from the head equals the distance from the meeting point (mod cycle length).
+
+---
+
+### M4 · Reorder List
+
+**🔗 [LC 143 — Reorder List](https://leetcode.com/problems/reorder-list/)** · Medium
+**Pattern:** Middle + Reverse + Merge | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Three steps: find the middle, reverse the second half, then weave the halves together, alternating one node from each. Cut the first half's tail to avoid a cycle.
+
+---
+
+### M5 · Odd Even Linked List
+
+**🔗 [LC 328 — Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/)** · Medium
+**Pattern:** Multi-Pointer | **Companies:** Amazon, Microsoft, Bloomberg
+
+**Hint:** Keep `odd = head`, `even = head.next`, and remember `evenHead`. Repeatedly link `odd.next = even.next` and `even.next = odd.next`, advancing each. Finally attach `evenHead` after the last odd node.
+
+---
+
+### M6 · Add Two Numbers
+
+**🔗 [LC 2 — Add Two Numbers](https://leetcode.com/problems/add-two-numbers/)** · Medium
+**Pattern:** Carry Propagation | **Companies:** Amazon, Microsoft, Meta, Adobe
+
+**Hint:** The digits are stored in reverse, so add from the heads with a carry: `sum = a + b + carry`, create a node with `sum % 10`, and set `carry = sum / 10`. Loop while either list or `carry` remains.
+
+---
+
+### M7 · Add Two Numbers II
+
+**🔗 [LC 445 — Add Two Numbers II](https://leetcode.com/problems/add-two-numbers-ii/)** · Medium
+**Pattern:** Reverse or Stack + Carry | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** The digits are stored most-significant first. Push both lists onto stacks (or reverse them), then add from the top with a carry, inserting each new node at the front of the result.
+
+---
+
+### M8 · Copy List with Random Pointer
+
+**🔗 [LC 138 — Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)** · Medium
+**Pattern:** Interweaving | **Companies:** Amazon, Meta, Microsoft, Bloomberg
+
+**Hint:** Three passes: insert a copy after each original node (`A → A' → B → B'`), set `copy.random = orig.random.next`, then separate the two lists. O(1) extra space. (A `HashMap<orig, copy>` version is simpler.)
+
+---
+
+### M9 · Sort List
+
+**🔗 [LC 148 — Sort List](https://leetcode.com/problems/sort-list/)** · Medium
+**Pattern:** Divide & Conquer | **Companies:** Amazon, Google, Meta, Microsoft
+
+**Hint:** Merge sort on a list: split at the middle with slow and fast pointers (cut `prev.next = null`), sort each half recursively, and merge two sorted lists. O(n log n) time, O(log n) stack.
+
+---
+
+### M10 · Rotate List
+
+**🔗 [LC 61 — Rotate List](https://leetcode.com/problems/rotate-list/)** · Medium
+**Pattern:** Close into a Ring, Then Cut | **Companies:** Amazon, Microsoft, Bloomberg
+
+**Hint:** Find the length `L` and the tail, then reduce `k %= L`. Connect the tail to the head to form a ring, walk `L - k - 1` steps to the new tail, and cut there.
+
+---
+
+### M11 · Swapping Nodes in a Linked List
+
+**🔗 [LC 1721 — Swapping Nodes in a Linked List](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/)** · Medium
+**Pattern:** Gap Pointers | **Companies:** Amazon, Google
+
+**Hint:** Move `fast` `k - 1` steps to find the k-th node from the start, then move `slow` from the head and `fast` to the end together — `slow` lands on the k-th node from the end. Swap their values.
+
+---
+
+### M12 · Split Linked List in Parts
+
+**🔗 [LC 725 — Split Linked List in Parts](https://leetcode.com/problems/split-linked-list-in-parts/)** · Medium
+**Pattern:** Length + Split | **Companies:** Amazon, Google
+
+**Hint:** Count the length `L`. Each part gets `L / k` nodes, and the first `L % k` parts get one extra. Walk and cut each part, filling `null` for any empty parts.
+
+---
+
+### M13 · Flatten a Multilevel Doubly Linked List
+
+**🔗 [LC 430 — Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/)** · Medium
+**Pattern:** DFS on Child Pointers | **Companies:** Amazon, Meta, Bloomberg
+
+**Hint:** DFS: whenever a node has a child, flatten the child, splice it between the node and its `next` (fixing both `prev` pointers), and set `child = null`. Keep track of the flattened child's tail so the splice is O(1).
+
+---
+
+### M14 · Partition List
+
+**🔗 [LC 86 — Partition List](https://leetcode.com/problems/partition-list/)** · Medium
+**Pattern:** Two-Queue | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Use two dummy lists: `less` for nodes `< x` and `greater` for the rest, appending in order. Join `less` to `greater.next` and terminate `greater`'s tail with `null`.
+
+---
+
+### M15 · Reverse Linked List II
+
+**🔗 [LC 92 — Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)** · Medium
+**Pattern:** In-place Reversal (Sub-list) | **Companies:** Amazon, Meta, Microsoft
+
+**Hint:** Walk to the node before position `left`. Then do head insertion `right - left` times: take the node after the current segment start and move it to the front of the segment. One pass, O(1) space.
+
+---
+
+### M16 · Design Front Middle Back Queue
+
+**🔗 [LC 1670 — Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/)** · Medium
+**Pattern:** Doubly Linked List Design | **Companies:** Amazon, Google
+
+**Hint:** Use a doubly linked list with sentinels plus a pointer to the middle node (or two deques kept balanced so `left.size()` is `right.size()` or one less). After every push or pop, rebalance the middle.
+
+---
+
+## 🔴 Hard Tier (3 Problems)
+
+_Focus on cache design invariants and k-sized re-grouping._
+
+### H1 · Reverse Nodes in k-Group
+
+**🔗 [LC 25 — Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)** · Hard
+**Pattern:** Reversal | **Companies:** Amazon, Meta, Microsoft, Google
+
+**Hint:** Check that `k` nodes remain; if not, leave them as they are. Reverse exactly `k` nodes, connect the previous group's tail to the new head, and move on (iterative, O(1) space) — or recurse on the rest first.
+
+---
+
+### H2 · Design Skiplist
+
+**🔗 [LC 1206 — Design Skiplist](https://leetcode.com/problems/design-skiplist/)** · Hard
+**Pattern:** Linked Levels (Skiplist) | **Companies:** Google, Amazon
+
+**Hint:** Each node has `next[]` pointers, one per level. To search, start at the top level and move right while the next value is smaller, then drop a level. Insert with a random height (coin flips), recording the predecessor at each level.
+
+---
+
+### H3 · LFU Cache
+
+**🔗 [LC 460 — LFU Cache](https://leetcode.com/problems/lfu-cache/)** · Hard
+**Pattern:** Freq Maps | **Companies:** Google, Amazon, Uber
+
+**Hint:** Keep `key → node`, `freq → doubly linked list of nodes` and `minFreq`. On access, move the node from its frequency list to the next one (updating `minFreq` if its old list empties). To evict, remove the tail of the `minFreq` list. Everything is O(1).
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1
+cur ← head
+while cur ≠ null:
+    cur ← cur.next
+
+// Snippet 2 — get the i-th node for every i
+for i from 0 to n - 1:
+    node ← getNode(head, i)
+
+// Snippet 3 — reverse iteratively
+prev ← null;  cur ← head
+while cur ≠ null:
+    nxt ← cur.next;  cur.next ← prev
+    prev ← cur;  cur ← nxt
+
+// Snippet 4 — reverse recursively (what does it cost in SPACE?)
+
+// Snippet 5 — slow and fast pointers to find the middle
+
+// Snippet 6 — merge two sorted lists of lengths n and m
 ```
 
----
+**Complexity Answers:**
 
-### M10 · Pacific Atlantic Water Flow
-
-**🔗 [LC 417 — Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)** · Medium
-**Pattern:** Reverse Multi-Source BFS/DFS | **Companies:** Google, Amazon
-
-**Problem:** Water flows from higher-or-equal to lower cells. Find all cells that can drain to both Pacific (top/left edges) and Atlantic (bottom/right edges).
-
-**Hint:** Reverse the flow. BFS/DFS from Pacific borders **going uphill** (visit only cells ≥ current height). Do the same from Atlantic borders. Cells reachable from **both** are the answer.
-
-**Common mistake:** Flowing downhill from every cell = O((m\*n)²). Always reverse direction and BFS from boundaries.
+1. **O(n)** time, O(1) space.
+2. **O(n²)** — each getNode walks from the head.
+3. **O(n)** time, **O(1)** space.
+4. **O(n)** time and **O(n)** stack space — one frame per node.
+5. **O(n)** time, O(1) space — fast covers the list once.
+6. **O(n + m)** time, O(1) extra space.
 
 ---
 
-### M11 · Game of Life
+## 🔍 Self-Assessment — True / False
 
-**🔗 [LC 289 — Game of Life](https://leetcode.com/problems/game-of-life/)** · Medium
-**Pattern:** In-Place State Machine | **Companies:** Amazon, LinkedIn, Snapchat
-
-**Problem:** Apply Conway's Game of Life rules to a binary grid in place. Cells live or die based on neighbour counts.
-
-**Hint:** Encode intermediate states: use `2` for "was alive, now dead" and `-1` for "was dead, now alive". Apply rules using original values (treat 2 as 1 and -1 as 0 when counting neighbours). Second pass: convert 2→0 and -1→1.
-
-**8-directional movement:** Use `int[][] dirs = { {-1,-1}, {-1,0}, {-1,1}, {0,-1}, {0,1}, {1,-1}, {1,0}, {1,1} };`
-
----
-
-### M12 · Surrounded Regions
-
-**🔗 [LC 130 — Surrounded Regions](https://leetcode.com/problems/surrounded-regions/)** · Medium
-**Pattern:** Grid DFS from boundary | **Companies:** Amazon, Microsoft
-
-**Problem:** Capture all 'O' regions not connected to any border. Replace captured 'O's with 'X'.
-
-**Hint:** Reverse thinking: any 'O' connected to the border **cannot** be captured. DFS from all border 'O' cells and mark them as safe (e.g., 'S'). Then flip all remaining 'O' → 'X' and all 'S' → 'O'.
-
----
-
-### M13 · Number of Closed Islands
-
-**🔗 [LC 1254 — Number of Closed Islands](https://leetcode.com/problems/number-of-closed-islands/)** · Medium
-**Pattern:** Grid DFS with Border Elimination | **Companies:** Google, Amazon
-
-**Hint:** First flood-fill every land cell connected to the border (those islands can't be closed). Then count the remaining land components with DFS.
-
----
-
-### M14 · As Far from Land as Possible
-
-**🔗 [LC 1162 — As Far from Land as Possible](https://leetcode.com/problems/as-far-from-land-as-possible/)** · Medium
-**Pattern:** Multi-Source BFS | **Companies:** Amazon, Google
-
-**Hint:** Enqueue every land cell at distance 0 and BFS outward over water. The last water cell reached has the maximum distance. If there is no land or no water, return -1.
-
----
-
-## 🔴 Hard Tier (5 Problems)
-
-_Combines multiple patterns or requires advanced BFS state management. These appear in on-site rounds at Google, Meta, and Amazon._
-
-### H1 · Shortest Path in Binary Matrix
-
-**🔗 [LC 1091 — Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)** · Medium
-**Pattern:** BFS Shortest Path (8-directional) | **Companies:** Google, Amazon
-
-**Problem:** Find the shortest clear path from top-left to bottom-right in a binary matrix (0=clear, 1=blocked). Movement is 8-directional.
-
-**Hint:** BFS from `(0,0)` if it is 0. Expand to all 8 neighbours. Track path length via BFS levels. Return -1 if no path. Remember to check if `(0,0)` or `(n-1,n-1)` is blocked first.
-
-**Why Hard?** 8-directional movement (expand `dirs` to include diagonals), careful start/end checks.
-
----
-
-### H2 · Map of Highest Peak
-
-**🔗 [LC 1765 — Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/)** · Medium
-**Pattern:** Multi-Source BFS | **Companies:** Google, Amazon
-
-**Hint:** Every water cell is height 0 — enqueue them all at once. BFS outward: each unvisited land neighbour gets `height = current + 1`. Adjacent heights then differ by at most 1, and the maximum height is as large as possible.
-
----
-
-### H3 · Minimum Path Sum
-
-**🔗 [LC 64 — Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)** · Medium
-**Pattern:** Grid DP (preview of Lecture 26) | **Companies:** Google, Amazon, Adobe
-
-**Problem:** Given a grid of non-negative integers, find the minimum sum path from top-left to bottom-right (can only move right or down).
-
-**Hint:** Classic DP. `dp[r][c] = grid[r][c] + min(dp[r-1][c], dp[r][c-1])`. Handle first row (can only come from left) and first column (can only come from above) separately. Can be done in-place on the grid.
-
-**Why Hard?** It's your first grid DP problem. The recurrence must be set up correctly before coding.
-
----
-
-### H4 · Trapping Rain Water II
-
-**🔗 [LC 407 — Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/)** · Hard
-**Pattern:** Min-Heap (Priority Queue) + BFS from boundary | **Companies:** Google, Amazon
-
-**Problem:** Given an m×n height map, compute how much water it can trap after raining.
-
-**Hint:** The 2D extension of the classic 1D trapping rain water. Use a **min-heap seeded with all boundary cells**. BFS inward: each internal cell can hold `max(0, min_border_height - cell_height)` units. Use the min-heap to always process the lowest boundary cell first.
-
-**Why Hard?** Combines PriorityQueue, BFS traversal, and non-trivial water accumulation logic.
-
----
-
-### H5 · Cut Off Trees for Golf Event
-
-**🔗 [LC 675 — Cut Off Trees for Golf Event](https://leetcode.com/problems/cut-off-trees-for-golf-event/)** · Hard
-**Pattern:** Sort + Repeated BFS | **Companies:** Google, Amazon, Uber
-
-**Problem:** Cut every tree in a forest in order of increasing height, starting from (0, 0). Return the total number of steps, or −1 if some tree is unreachable.
-
-**Hint:** The order is forced — sort the trees by height. Then the problem is just a sequence of shortest-path queries, so run a BFS from each tree to the next and add the distances. The only real trap is forgetting that a 0 cell is a wall while a 1 cell is walkable ground.
-
-**Why Hard?** Combines sorting, repeated BFS with correct start/end handling, and an unreachability check that has to return −1 for the whole answer.
+1. Accessing the k-th node of a linked list is O(1). → **False** — you must walk k steps: O(k)
+2. Inserting at the head of a singly linked list is O(1). → **True** — point the new node at the old head
+3. Floyd's fast-and-slow pointers detect a cycle using O(1) extra space. → **True** — only two pointers
+4. A dummy head node is only needed when the list is empty. → **False** — it removes the special case whenever the real head might change
+5. Reversing a list recursively uses O(1) extra space. → **False** — the call stack holds n frames
+6. Deleting a node you have a reference to is always O(1) in a singly linked list. → **False** — you need its predecessor, unless you copy the next node's value into it
 
 ---
 
 ## 🧠 Conceptual Check
 
-These are the kind of questions interviewers ask verbally after you solve the coding problem:
-
-1. **Bounds checking:** Write the standard `if (r < 0 || r >= m || c < 0 || c >= n)` guard from memory. Why must this be the **first** check in every DFS function — not the second or third?
-
-2. **DFS vs BFS on grids:** For what specific class of problems must you use BFS instead of DFS? What property does BFS guarantee that DFS cannot?
-
-3. **Multi-source BFS:** Why is seeding ALL source cells simultaneously O(m*n) total, while doing one BFS per source would be O((m*n)²)?
-
-4. **In-place tricks:** In Set Matrix Zeroes, why do we need two separate boolean flags for `row0` and `col0` instead of just checking `matrix[0][0]`?
-
-5. **Corner walk:** In LC 240, why does starting from the **top-right** corner work but the **top-left** or **bottom-right** does not? Give a one-sentence answer.
-
-6. **Game of Life:** What does the sentinel value `2` represent and why is it necessary to use a sentinel instead of just writing `0` immediately?
+1. **Space Trade-off**: Why is iterative reversal preferred over recursive in production?
+2. **Infinite Loops**: What safety check prevents a cycle in a merged list?
+3. **Dummy Head**: When is using a sentinel node actually detrimental?
+4. **Complexity Check**: Why is random access O(n) for a linked list but O(1) for an array?
 
 ---
 
@@ -352,25 +350,27 @@ These are the kind of questions interviewers ask verbally after you solve the co
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                           |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
-| **Google**    | [Shortest Path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/), [Map of Highest Peak](https://leetcode.com/problems/map-of-highest-peak/), [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/) |
-| **Microsoft** | [Spiral Matrix](https://leetcode.com/problems/spiral-matrix/), [Rotate Image](https://leetcode.com/problems/rotate-image/), [Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/), [Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)                                                 |
-| **Uber**      | [Cut Off Trees for Golf Event](https://leetcode.com/problems/cut-off-trees-for-golf-event/), [01 Matrix](https://leetcode.com/problems/01-matrix/), [Rotting Oranges](https://leetcode.com/problems/rotting-oranges/)                                                                                                            |
-| **Adobe**     | [Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/), [Flood Fill](https://leetcode.com/problems/flood-fill/)                                                                                                                                                                                                     |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/), [Design Skiplist](https://leetcode.com/problems/design-skiplist/), [LFU Cache](https://leetcode.com/problems/lfu-cache/)                       |
+| **Microsoft** | [Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/), [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/), [Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/), [Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)                 |
+| **Meta**      | [Add Two Numbers](https://leetcode.com/problems/add-two-numbers/), [Add Two Numbers II](https://leetcode.com/problems/add-two-numbers-ii/), [Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/), [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)                                             |
+| **Google**    | [Split Linked List in Parts](https://leetcode.com/problems/split-linked-list-in-parts/), [Swapping Nodes in a Linked List](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/), [Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/) |
+| **Bloomberg** | [Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/), [Rotate List](https://leetcode.com/problems/rotate-list/), [Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/), [Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)                               |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 5 Easy problems solved
-- [ ] All 14 Medium problems solved
+- [ ] All 10 Easy problems solved
+- [ ] All 13 Medium problems solved
 - [ ] All 5 Hard problems attempted
-- [ ] All 6 conceptual questions answered out loud
-- [ ] Can write the 4-direction `dirs` array and `inBounds` check from memory
-- [ ] Can identify the correct pattern within 30 seconds for any matrix problem
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 4 conceptual questions answered out loud
+- [ ] I can reverse a list iteratively and recursively without drawing it
+- [ ] I can find a cycle's entry point and explain why Floyd's algorithm works
 
 ---
 
-**← [Lecture 13 · HashMap & HashSet](../Lecture13/Assignment.md)** &nbsp;·&nbsp; **[Lecture 15 · Trees (Binary Trees & BST)](../Lecture15/Assignment.md) →**
+**← [Lecture 13 · Searching Algorithms](../Lecture13/Assignment.md)** &nbsp;·&nbsp; **[Lecture 15 · Stacks & Queues](../Lecture15/Assignment.md) →**

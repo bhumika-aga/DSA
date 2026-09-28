@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 30 &mdash; Segment &amp; Fenwick Trees</title>
+    <title>Lecture 30 &mdash; Divide &amp; Conquer</title>
     <meta
       name="description"
       content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
@@ -86,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1396,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Segment &amp; Fenwick Trees</div>
+        <div class="sb-title">Divide &amp; Conquer</div>
         <div class="sb-meta">
-          Lecture 30 of 38 &middot; Phase 5 &mdash; Advanced Structures
+          Lecture 30 of 45 &middot; Phase 3 &mdash; Core Patterns
         </div>
       </div>
       <div class="sb-scroll">
@@ -1406,27 +1406,24 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127757;</span>Introduction</a
         >
-        <a class="toc-item" href="#why"
-          ><span class="toc-icon">&#9878;&#65039;</span>Why Prefix Sums Break</a
+        <a class="toc-item" href="#shape"
+          ><span class="toc-icon">&#9986;</span>Divide, Conquer, Combine</a
         >
-        <a class="toc-item" href="#segtree"
-          ><span class="toc-icon">&#127795;</span>The Segment Tree</a
+        <a class="toc-item" href="#master"
+          ><span class="toc-icon">&#128207;</span>The Master Theorem</a
         >
-        <a class="toc-item toc-sub" href="#s-build">Build</a>
-        <a class="toc-item toc-sub" href="#s-query">Query &amp; Update</a>
-        <a class="toc-item" href="#lazy"
-          ><span class="toc-icon">&#128164;</span>Lazy Propagation</a
+        <a class="toc-item toc-sub" href="#mt-cases">The Three Cases</a>
+        <a class="toc-item" href="#quickselect"
+          ><span class="toc-icon">&#127919;</span>QuickSelect</a
         >
-        <a class="toc-item" href="#bit"
-          ><span class="toc-icon">&#128290;</span>Fenwick Tree (BIT)</a
+        <a class="toc-item" href="#counting"
+          ><span class="toc-icon">&#128290;</span>Counting in the Merge</a
         >
-        <a class="toc-item toc-sub" href="#b-count">Counting With a BIT</a>
-        <a class="toc-item" href="#variants"
-          ><span class="toc-icon">&#129513;</span>Variants You Will Meet</a
+        <a class="toc-item" href="#space"
+          ><span class="toc-icon">&#129513;</span>Splitting the Problem</a
         >
-        <a class="toc-item" href="#choose"
-          ><span class="toc-icon">&#128269;</span>Choosing a Structure</a
-        >
+        <a class="toc-item toc-sub" href="#sp-expr">Every Operator a Split</a>
+        <a class="toc-item toc-sub" href="#sp-build">Building by Halves</a>
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
@@ -1443,14 +1440,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture29/lecture29_notes.html"
-          >&larr; Lecture 29 &middot; Tries</a
+          >&larr; Lecture 29 &middot; Greedy Algorithms</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&rarr; Lecture 31 &middot; coming soon</a
+        <a class="toc-item" href="../Lecture31/lecture31_notes.html"
+          >&rarr; Lecture 31 &middot; Union-Find (Disjoint Set Union)</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1458,10 +1454,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase5">Phase 5</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 30 &mdash; Segment &amp; Fenwick Trees</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase3">Phase 3</a><span>&rsaquo;</span>
+          <span>Lecture 30 &mdash; Divide &amp; Conquer</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1479,20 +1474,20 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128246;</span>
-          <h1 class="page-title">Segment Trees &amp; Fenwick Trees</h1>
+          <span class="page-emoji">&#128269;</span>
+          <h1 class="page-title">Divide &amp; Conquer</h1>
           <p class="page-sub">
-            &ldquo;Prefix sums are fast until someone changes one number.&rdquo;
+            &ldquo;Cut the problem in half, solve both halves, and spend all
+            your cleverness on putting them back together.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 30 of 38</span>
-            <span class="meta-chip accent"
-              >Phase 5 &mdash; Advanced Structures</span
-            >
-            <span class="meta-chip yellow">&#9201; 6 days</span>
-            <span class="meta-chip green">&#127919; 22 problems</span>
+            <span class="meta-chip accent">&#128218; Lecture 30 of 45</span>
+            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 18 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Microsoft</span
+              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              Microsoft</span
             >
           </div>
         </div>
@@ -1502,602 +1497,521 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Every structure so far has been good at one thing. A prefix-sum
-            array answers range queries instantly but has to be rebuilt after
-            any change; a plain array updates instantly but has to be scanned
-            for every query. Segment trees and Fenwick trees refuse that
-            trade-off: both operations become O(log n). They are also the point
-            where interviews stop asking you to recall a structure and start
-            asking you to <em>design</em> one, which is why they appear in
-            senior loops far more often than their LeetCode frequency suggests.
+            Merge sort, quick sort and binary search were all divide and conquer
+            &mdash; you just were not asked to say so. This lecture gives the
+            technique its own name and, more usefully, its own arithmetic: the
+            Master Theorem, which reads the running time straight off the
+            recursion. Then it covers the two places the technique earns its
+            keep &mdash; selecting without sorting, and counting pairs during a
+            merge.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Say exactly when a prefix-sum array stops being the answer</li>
-            <li>Build a segment tree and write query and point update</li>
-            <li>Add lazy propagation for range updates</li>
             <li>
-              Write a Fenwick tree from memory and explain the low-bit trick
+              Write any divide-and-conquer solution as divide, conquer, combine
             </li>
-            <li>Use a BIT over values to count, not just to sum</li>
+            <li>
+              Apply the Master Theorem to
+              <code>T(n) = a&middot;T(n/b) + f(n)</code> and get the answer in
+              seconds
+            </li>
+            <li>
+              Use QuickSelect for O(n) average selection, and say why it is not
+              O(n log n)
+            </li>
+            <li>Count pairs during a merge without adding to the complexity</li>
+            <li>
+              Split a problem space that is not an array &mdash; expressions,
+              constructions, character positions
+            </li>
           </ul>
         </div>
 
-        <h2 class="h1" id="why">&#9878;&#65039; Why Prefix Sums Break</h2>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: A company counting its
+              staff.</strong
+            >
+            The chief executive does not count every employee. They ask each
+            division head, who asks each department manager, who counts their
+            own team. Each person answers for their part, and the answers are
+            added up on the way back. Divide and conquer is exactly that: split,
+            let each part answer, combine.
+          </div>
+        </div>
+
+        <h2 class="h1" id="shape">&#9986; Divide, Conquer, Combine</h2>
         <p>
-          Consider <code>q</code> operations on an array of
-          <code>n</code> numbers, mixing &ldquo;sum of
-          <code>[l, r]</code>&rdquo; with &ldquo;set <code>a[i]</code> to
-          <code>v</code>&rdquo;. Two obvious designs each fail on one half of
-          the workload.
+          Three steps, always in the same order. The interesting one is the
+          third: if combining is cheap the algorithm is fast, and if combining
+          is expensive you may as well not have split.
         </p>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Design</th>
-                <th>Query</th>
-                <th>Update</th>
-                <th>Total for n = q = 10&#8309;</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Plain array, scan the range</td>
-                <td>O(n)</td>
-                <td>O(1)</td>
-                <td>10&#185;&#8304; &mdash; far too slow</td>
-              </tr>
-              <tr>
-                <td>Prefix-sum array</td>
-                <td>O(1)</td>
-                <td>O(n) rebuild</td>
-                <td>10&#185;&#8304; &mdash; equally hopeless</td>
-              </tr>
-              <tr>
-                <td>Square-root blocks</td>
-                <td>O(&radic;n)</td>
-                <td>O(1)</td>
-                <td>~3 &times; 10&#8312; &mdash; borderline</td>
-              </tr>
-              <tr>
-                <td>Segment tree / Fenwick tree</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>~4 &times; 10&#8311; &mdash; comfortable</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> solve(problem):
+    <span class="pc-kw">if</span> problem is small enough:
+        <span class="pc-kw">return</span> answer directly          <span class="pc-cm">// base case — never forget it</span>
+
+    left, right ← split(problem)         <span class="pc-cm">// DIVIDE</span>
+    a ← solve(left)                      <span class="pc-cm">// CONQUER</span>
+    b ← solve(right)
+    <span class="pc-kw">return</span> combine(a, b)                <span class="pc-cm">// COMBINE — where the real work lives</span>
+
+<span class="pc-cm">// Merge sort: split at the middle, combine = merge two sorted halves.
+// Binary search: split at the middle, one side is thrown away, combine = nothing.</span></pre>
         </div>
 
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>The idea behind all three fixes is the same:</strong> store
-            the answer for <em>blocks</em> of the array instead of for every
-            prefix. A prefix sum uses one block per prefix, so a change touches
-            almost all of them. Square-root decomposition uses &radic;n blocks;
-            a segment tree uses a hierarchy of halves, so a change touches only
-            the log n blocks on one root-to-leaf path. Lecture 31 comes back to
-            the &radic;n version, which is easier to write under pressure and
-            often fast enough.
+            <strong>Divide and conquer vs dynamic programming.</strong> Both
+            split a problem into smaller ones. The difference is overlap: the
+            halves of a merge sort share nothing, so each is solved once. The
+            subproblems of Fibonacci overlap heavily, so solving each one afresh
+            is exponential &mdash; that is where memoisation, and Phase 4, come
+            in.
           </div>
         </div>
 
-        <h2 class="h1" id="segtree">&#127795; The Segment Tree</h2>
+        <h2 class="h1" id="master">&#128207; The Master Theorem</h2>
         <p>
-          Node 1 covers the whole array. Its children cover the two halves,
-          theirs cover the quarters, and the leaves are single elements. Each
-          node stores the answer for its own range, so a query assembles its
-          answer from at most 2&nbsp;log&nbsp;n nodes, and an update repairs one
-          path.
+          Almost every divide-and-conquer recursion has the same shape:
+          <code>a</code> subproblems, each of size <code>n / b</code>, plus
+          <code>f(n)</code> work to split and combine.
         </p>
 
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang">&#128208; Pseudocode &middot; Layout</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Array of size 4n, no pointers. For node i covering [lo, hi]:
-//     left child  = 2i,     covering [lo, mid]
-//     right child = 2i + 1, covering [mid + 1, hi]
-//     mid = lo + (hi - lo) ÷ 2
-//
-// a = [2, 5, 1, 4]
-//
-//              [0..3] = 12
-//             /            //        [0..1] = 7      [2..3] = 5
-//        /      \         /      //      2         5       1        4
-//
-// Why 4n and not 2n? Because the tree is only perfect when n is a power of
-// two; 4n is the safe bound for every n, and it costs nothing to allocate.</span></pre>
+        <div class="ascii-tree">
+          T(n) = a &middot; T(n / b) + f(n) &nbsp;&nbsp;&nbsp; a = how many
+          subproblems &nbsp;|&nbsp; b = how much smaller each one is
+          &nbsp;|&nbsp; f(n) = divide + combine
         </div>
 
-        <h3 class="h2" id="s-build">Build</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build in O(n)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> build(node, lo, hi):
-    <span class="pc-kw">if</span> lo = hi:
-        tree[node] ← a[lo]                  <span class="pc-cm">// a leaf is its element</span>
-        <span class="pc-kw">return</span>
-
-    mid ← lo + (hi - lo) ÷ 2
-    build(2·node,     lo,      mid)
-    build(2·node + 1, mid + 1, hi)
-    tree[node] ← tree[2·node] + tree[2·node + 1]   <span class="pc-cm">// pull up</span>
-
-<span class="pc-cm">// Every node is written exactly once → O(n), not O(n log n).
-// Replace + with min, max, gcd or OR and nothing else changes: the operation
-// only has to be associative.</span></pre>
-        </div>
-
-        <h3 class="h2" id="s-query">Query &amp; Update</h3>
         <p>
-          The query is a three-way decision at every node: my range is outside
-          yours (contribute nothing), my range is inside yours (return my stored
-          answer), or we overlap partially (ask both children).
+          Compare <code>f(n)</code> against
+          <code>n<sup>log<sub>b</sub>a</sup></code> &mdash; the total work done
+          by the leaves. Whichever side dominates decides the answer.
         </p>
 
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Range Query, Point Update</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> query(node, lo, hi, l, r):        <span class="pc-cm">// sum of [l, r]</span>
-    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span> 0        <span class="pc-cm">// 1. no overlap</span>
-    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r: <span class="pc-kw">return</span> tree[node]   <span class="pc-cm">// 2. fully inside</span>
+        <h3 class="h2" id="mt-cases">The Three Cases</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>When</th>
+              <th>Result</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Leaves win</td>
+              <td>
+                <code>f(n)</code> grows slower than
+                <code>n<sup>log<sub>b</sub>a</sup></code>
+              </td>
+              <td><code>&Theta;(n<sup>log<sub>b</sub>a</sup>)</code></td>
+              <td>naive matrix multiply: 8 halves, O(n&sup2;) combine</td>
+            </tr>
+            <tr>
+              <td>Tie</td>
+              <td>they grow at the same rate</td>
+              <td>
+                <code>&Theta;(n<sup>log<sub>b</sub>a</sup> log n)</code>
+              </td>
+              <td>merge sort: 2 halves, O(n) merge &rarr; O(n log n)</td>
+            </tr>
+            <tr>
+              <td>Root wins</td>
+              <td><code>f(n)</code> grows faster</td>
+              <td><code>&Theta;(f(n))</code></td>
+              <td>2 halves, O(n&sup2;) combine &rarr; O(n&sup2;)</td>
+            </tr>
+          </tbody>
+        </table>
 
-    mid ← lo + (hi - lo) ÷ 2                 <span class="pc-cm">// 3. partial → split</span>
-    <span class="pc-kw">return</span> query(2·node,     lo,      mid, l, r)
-         + query(2·node + 1, mid + 1, hi,  l, r)
-
-<span class="pc-kw">function</span> update(node, lo, hi, i, value):
-    <span class="pc-kw">if</span> lo = hi:
-        tree[node] ← value
-        <span class="pc-kw">return</span>
-
-    mid ← lo + (hi - lo) ÷ 2
-    <span class="pc-kw">if</span> i ≤ mid: update(2·node,     lo,      mid, i, value)
-    <span class="pc-kw">else</span>:       update(2·node + 1, mid + 1, hi,  i, value)
-    tree[node] ← tree[2·node] + tree[2·node + 1]   <span class="pc-cm">// repair on the way up</span>
-
-<span class="pc-cm">// Dry run on a = [2, 5, 1, 4], query(l=1, r=2):
-//   [0..3] partial → split
-//     [0..1] partial → left [0..0] no overlap = 0, right [1..1] inside = 5
-//     [2..3] partial → left [2..2] inside = 1, right [3..3] no overlap = 0
-//   total = 6 ✓  (visited 7 of 7 nodes here because n is tiny; for large n
-//   the &quot;fully inside&quot; case cuts the recursion after ~2 log n nodes)</span></pre>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Recurrence</th>
+              <th>a, b, f(n)</th>
+              <th>Answer</th>
+              <th>Where you have seen it</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>T(n) = 2T(n/2) + O(n)</code></td>
+              <td>2, 2, n</td>
+              <td>O(n log n)</td>
+              <td>Merge sort, count inversions</td>
+            </tr>
+            <tr>
+              <td><code>T(n) = T(n/2) + O(1)</code></td>
+              <td>1, 2, 1</td>
+              <td>O(log n)</td>
+              <td>Binary search, fast power</td>
+            </tr>
+            <tr>
+              <td><code>T(n) = 2T(n/2) + O(1)</code></td>
+              <td>2, 2, 1</td>
+              <td>O(n)</td>
+              <td>Tree traversal, tree height</td>
+            </tr>
+            <tr>
+              <td><code>T(n) = T(n/2) + O(n)</code></td>
+              <td>1, 2, n</td>
+              <td>O(n)</td>
+              <td>QuickSelect (average case)</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>The identity element matters.</strong> The no-overlap branch
-            must return something that cannot affect the answer: 0 for sums,
-            <code>+infinity</code> for minimums, <code>-infinity</code> for
-            maximums, 0 for gcd. Returning 0 from a minimum query is the single
-            most common segment-tree bug.
+            <strong>Read the fourth row carefully.</strong>
+            <code>T(n) = T(n/2) + O(n)</code> is <em>linear</em>, not O(n log
+            n), because the work halves every level: n + n/2 + n/4 + &hellip;
+            &lt; 2n. Recursing into <strong>one</strong> half instead of both is
+            what makes QuickSelect beat sorting.
           </div>
         </div>
 
-        <h2 class="h1" id="lazy">&#128164; Lazy Propagation</h2>
+        <h2 class="h1" id="quickselect">
+          &#127919; QuickSelect &mdash; Selection Without Sorting
+        </h2>
         <p>
-          &ldquo;Add 3 to every element of <code>[l, r]</code>&rdquo; would
-          touch O(n) leaves if you did it honestly. Lazy propagation is the
-          refusal to do it honestly: mark the node that covers the range with a
-          debt, and pay the debt only when someone descends through it.
+          You need the k-th smallest element. Sorting gives it in O(n log n),
+          but sorting answers a much harder question than the one asked.
+          QuickSelect partitions around a pivot and then recurses into
+          <strong>only the side that can contain the answer</strong>.
         </p>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Range Add, Range Sum</span
+              >&#128208; Pseudocode &middot; QuickSelect</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> push(node, lo, hi):               <span class="pc-cm">// pay the debt one level down</span>
-    <span class="pc-kw">if</span> lazy[node] = 0: <span class="pc-kw">return</span>
-    mid ← lo + (hi - lo) ÷ 2
-    apply(2·node,     lo,      mid, lazy[node])
-    apply(2·node + 1, mid + 1, hi,  lazy[node])
-    lazy[node] ← 0
+          <pre><span class="pc-kw">function</span> quickSelect(nums, k):        <span class="pc-cm">// k is a 0-based index into the sorted order</span>
+    lo ← 0;  hi ← length(nums) - 1
 
-<span class="pc-kw">function</span> apply(node, lo, hi, add):
-    tree[node] ← tree[node] + add × (hi - lo + 1)   <span class="pc-cm">// whole range</span>
-    lazy[node] ← lazy[node] + add                   <span class="pc-cm">// owe it to the children</span>
+    <span class="pc-kw">while</span> lo &lt; hi:
+        p ← partition(nums, lo, hi)      <span class="pc-cm">// random pivot: everything &lt; it on the left</span>
+        <span class="pc-kw">if</span> p = k: <span class="pc-kw">return</span> nums[p]
+        <span class="pc-kw">if</span> p &lt; k: lo ← p + 1            <span class="pc-cm">// the answer is to the right</span>
+        <span class="pc-kw">else</span>: hi ← p - 1                 <span class="pc-cm">// the answer is to the left</span>
+    <span class="pc-kw">return</span> nums[lo]
 
-<span class="pc-kw">function</span> rangeAdd(node, lo, hi, l, r, add):
-    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span>
-    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r:
-        apply(node, lo, hi, add)             <span class="pc-cm">// stop here — this is the trick</span>
-        <span class="pc-kw">return</span>
+<span class="pc-kw">function</span> partition(nums, lo, hi):      <span class="pc-cm">// Lomuto, with a random pivot</span>
+    swap nums[random index in lo..hi], nums[hi]
+    pivot ← nums[hi];  store ← lo
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> lo <span class="pc-kw">to</span> hi - 1:
+        <span class="pc-kw">if</span> nums[i] &lt; pivot:
+            swap nums[i], nums[store];  store ← store + 1
+    swap nums[store], nums[hi]
+    <span class="pc-kw">return</span> store</pre>
+        </div>
 
-    push(node, lo, hi)
-    mid ← lo + (hi - lo) ÷ 2
-    rangeAdd(2·node,     lo,      mid, l, r, add)
-    rangeAdd(2·node + 1, mid + 1, hi,  l, r, add)
-    tree[node] ← tree[2·node] + tree[2·node + 1]
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Average</th>
+              <th>Worst</th>
+              <th>Space</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Sort, then index</td>
+              <td>O(n log n)</td>
+              <td>O(n log n)</td>
+              <td>O(log n)</td>
+            </tr>
+            <tr>
+              <td>Size-k heap</td>
+              <td>O(n log k)</td>
+              <td>O(n log k)</td>
+              <td>O(k)</td>
+            </tr>
+            <tr>
+              <td><strong>QuickSelect</strong></td>
+              <td><strong>O(n)</strong></td>
+              <td>O(n&sup2;)</td>
+              <td>O(1) iterative</td>
+            </tr>
+          </tbody>
+        </table>
 
-<span class="pc-kw">function</span> query(node, lo, hi, l, r):
-    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span> 0
-    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r: <span class="pc-kw">return</span> tree[node]
-    push(node, lo, hi)                       <span class="pc-cm">// never read a stale child</span>
-    mid ← lo + (hi - lo) ÷ 2
-    <span class="pc-kw">return</span> query(2·node, lo, mid, l, r) + query(2·node + 1, mid + 1, hi, l, r)</pre>
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
+          <div class="callout-body">
+            <strong>Always randomise the pivot.</strong> With a fixed pivot, a
+            sorted or adversarial input makes every partition remove one element
+            &mdash; n + (n&minus;1) + &hellip; = O(n&sup2;). A random pivot
+            makes that case vanishingly unlikely; the median-of-medians pivot
+            guarantees O(n) worst case but is slower in practice and is a theory
+            answer, not an interview one.
+          </div>
+        </div>
+
+        <h2 class="h1" id="counting">&#128290; Counting in the Merge</h2>
+        <p>
+          The second big use. While merging two sorted halves you know something
+          you will never know again: every element still in the left half is
+          <em>before</em> every element in the right half, and both halves are
+          sorted. Pairs can be counted in bulk, for free.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Count Inversions</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// An inversion is a pair i &lt; j with nums[i] &gt; nums[j].</span>
+<span class="pc-kw">function</span> sortAndCount(nums, lo, hi):
+    <span class="pc-kw">if</span> hi - lo ≤ 1: <span class="pc-kw">return</span> 0
+    mid ← (lo + hi) ÷ 2
+    count ← sortAndCount(nums, lo, mid) + sortAndCount(nums, mid, hi)
+
+    <span class="pc-cm">// count across the halves BEFORE merging destroys the split</span>
+    j ← mid
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> lo <span class="pc-kw">to</span> mid - 1:
+        <span class="pc-kw">while</span> j &lt; hi <span class="pc-kw">and</span> nums[j] &lt; nums[i]: j ← j + 1
+        count ← count + (j - mid)        <span class="pc-cm">// this many right elements are smaller</span>
+
+    merge the two halves in place
+    <span class="pc-kw">return</span> count
+
+<span class="pc-cm">// The counting pointer only moves forward, so the extra work is O(n)
+// per level — the total stays O(n log n).</span></pre>
         </div>
 
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>Two rules keep lazy propagation correct.</strong> First,
-            <code>tree[node]</code> is always already correct for its own range
-            &mdash; the lazy value is what the <em>children</em> have not been
-            told. Second, <code>push</code> before you descend, in every
-            operation, including queries. Almost every lazy bug is a missing
-            push.
+            <strong>One pattern, many questions.</strong> Count of Smaller
+            Numbers After Self, Reverse Pairs, Count of Range Sum and Number of
+            Pairs Satisfying an Inequality are all this loop with a different
+            comparison. Rewrite the condition so it compares one element of the
+            left half with one of the right, and the rest of the code does not
+            change.
           </div>
         </div>
+
+        <h2 class="h1" id="space">
+          &#129513; Splitting Something That Is Not an Array
+        </h2>
+        <p>
+          The technique is not about arrays; it is about
+          <em>choosing a split point</em>. The interesting problems are the ones
+          where you have to invent it.
+        </p>
+
+        <h3 class="h2" id="sp-expr">Every Operator Is a Split</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Different Ways to Add
+              Parentheses</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> ways(expr):
+    <span class="pc-kw">if</span> expr is a plain number: <span class="pc-kw">return</span> [value of expr]
+
+    results ← empty list
+    <span class="pc-kw">for</span> each position i where expr[i] is an operator:
+        left ← ways(expr[0 .. i-1])        <span class="pc-cm">// everything before the operator</span>
+        right ← ways(expr[i+1 .. end])     <span class="pc-cm">// everything after it</span>
+        <span class="pc-kw">for</span> a <span class="pc-kw">in</span> left:
+            <span class="pc-kw">for</span> b <span class="pc-kw">in</span> right:
+                results.append(apply expr[i] to a and b)
+    <span class="pc-kw">return</span> results
+
+<span class="pc-cm">// "2*3-4*5": splitting at each of the three operators gives every
+// possible parenthesisation. Memoise on the substring to avoid re-solving.</span></pre>
+        </div>
+
+        <h3 class="h2" id="sp-build">Building by Halves</h3>
+        <p>
+          Construction problems run the template backwards: instead of splitting
+          an answer, you split the <em>input</em> and let the recursion build
+          the structure.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Problem</th>
+              <th>The split</th>
+              <th>The combine</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Maximum Binary Tree</td>
+              <td>at the largest value</td>
+              <td>make it the root of the two halves</td>
+            </tr>
+            <tr>
+              <td>Balance a BST</td>
+              <td>at the middle of the sorted values</td>
+              <td>middle becomes the root</td>
+            </tr>
+            <tr>
+              <td>Construct Quad Tree</td>
+              <td>into four equal squares</td>
+              <td>merge four identical leaves into one</td>
+            </tr>
+            <tr>
+              <td>Longest Substring with K Repeats</td>
+              <td>at every character that is too rare</td>
+              <td>take the best answer among the pieces</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>Assignment is not addition.</strong> For &ldquo;set the
-            whole range to <code>v</code>&rdquo;, the pending value must be
-            stored as &ldquo;assign v&rdquo; with a separate &ldquo;is
-            pending&rdquo; flag, because a later assignment overwrites an
-            earlier one instead of stacking with it. Mixing add and assign in
-            one tree means deciding how the two compose &mdash; say that out
-            loud before you write it.
+            <strong>The split must always shrink the problem.</strong> If a
+            recursive call can receive the same input it was given &mdash; an
+            empty range, or a split that puts everything on one side &mdash; the
+            recursion never ends. Check the base case and the strict decrease
+            before you run anything.
           </div>
         </div>
 
-        <h2 class="h1" id="bit">&#128290; Fenwick Tree (BIT)</h2>
-        <p>
-          A Fenwick tree does less than a segment tree &mdash; prefix aggregates
-          only, and the operation must be invertible if you want arbitrary
-          ranges &mdash; but it is twenty lines, uses <code>n</code>
-          integers instead of 4n, and is noticeably faster in practice. When the
-          problem is prefix sums with point updates, this is the answer.
-        </p>
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; The Classic Bugs
+        </h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Recurrence</th>
+              <th>Time</th>
+              <th>Space</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Merge sort / count inversions</td>
+              <td><code>2T(n/2) + O(n)</code></td>
+              <td>O(n log n)</td>
+              <td>O(n)</td>
+            </tr>
+            <tr>
+              <td>QuickSelect (random pivot)</td>
+              <td><code>T(n/2) + O(n)</code> expected</td>
+              <td>O(n) average, O(n&sup2;) worst</td>
+              <td>O(1)</td>
+            </tr>
+            <tr>
+              <td>Binary search / fast power</td>
+              <td><code>T(n/2) + O(1)</code></td>
+              <td>O(log n)</td>
+              <td>O(1)</td>
+            </tr>
+            <tr>
+              <td>Split at every operator</td>
+              <td>Catalan-many results</td>
+              <td>exponential without memoisation</td>
+              <td>O(n&sup2;) memo</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Whole Structure</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// bit[i] stores the sum of the lowbit(i) elements ending at index i.
-// lowbit(i) = i AND (-i) — the lowest set bit of i.
-//   lowbit(6) = lowbit(0b110) = 2  → bit[6] covers a[5] + a[6]
-//   lowbit(8) = lowbit(0b1000) = 8 → bit[8] covers a[1..8]
-// Indices are 1-based. This is not optional: index 0 has no low bit.</span>
-
-<span class="pc-kw">function</span> update(i, delta):               <span class="pc-cm">// add delta to a[i]</span>
-    <span class="pc-kw">while</span> i ≤ n:
-        bit[i] ← bit[i] + delta
-        i ← i + (i AND -i)                <span class="pc-cm">// next range that covers i</span>
-
-<span class="pc-kw">function</span> prefix(i):                      <span class="pc-cm">// sum of a[1..i]</span>
-    total ← 0
-    <span class="pc-kw">while</span> i &gt; 0:
-        total ← total + bit[i]
-        i ← i - (i AND -i)                <span class="pc-cm">// strip the low bit</span>
-    <span class="pc-kw">return</span> total
-
-<span class="pc-kw">function</span> rangeSum(l, r):
-    <span class="pc-kw">return</span> prefix(r) - prefix(l - 1)  <span class="pc-cm">// needs an invertible op</span>
-
-<span class="pc-cm">// Both loops strip or add one bit per step, so both are O(log n).
-// Building by calling update n times is O(n log n); the O(n) build adds each
-// bit[i] into bit[i + lowbit(i)] in one pass, which is worth knowing.</span></pre>
-        </div>
-
-        <h3 class="h2" id="b-count">Counting With a BIT</h3>
-        <p>
-          The move that turns a BIT into an interview weapon is indexing it by
-          <em>value</em> rather than by position. <code>bit[v]</code> then means
-          &ldquo;how many values &le; v have I seen so far&rdquo;, and questions
-          about order become prefix sums.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Count Smaller Elements to the
-              Right</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> countSmallerAfter(a):
-    ranks ← compress(a)                   <span class="pc-cm">// sorted distinct values → 1..m</span>
-    bit ← empty Fenwick tree of size m
-    answer ← array of zeros
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:   <span class="pc-cm">// right to left</span>
-        r ← ranks[a[i]]
-        answer[i] ← prefix(r - 1)         <span class="pc-cm">// already seen, strictly smaller</span>
-        update(r, 1)                      <span class="pc-cm">// now a[i] has been seen</span>
-
-    <span class="pc-kw">return</span> answer
-
-<span class="pc-cm">// Coordinate compression is what makes this work when values are huge or
-// negative: only the ORDER of the values matters, never their magnitude.</span></pre>
-        </div>
-
-        <div class="callout blue">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Recognise the family.</strong> Counting inversions, counting
-            smaller elements to the right, reverse pairs, counting good triplets
-            &mdash; all of them are &ldquo;sweep in one direction, ask how many
-            earlier values fall in a range&rdquo;. You solved several of these
-            with merge sort in Lecture 9; the BIT version is usually shorter and
-            extends to weights and to more than two conditions.
-          </div>
-        </div>
-
-        <h2 class="h1" id="variants">&#129513; Variants You Will Meet</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Variant</th>
-                <th>What changes</th>
-                <th>Use it for</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Min / max segment tree</td>
-                <td>Combine with min or max; identity is &plusmn;infinity</td>
-                <td>Range extremes, DP transitions over a value window</td>
-              </tr>
-              <tr>
-                <td>Segment tree over values</td>
-                <td>Index by compressed value, not position</td>
-                <td>&ldquo;Best DP answer among values &lt; x&rdquo;</td>
-              </tr>
-              <tr>
-                <td>Dynamic (sparse) segment tree</td>
-                <td>Create nodes on demand instead of allocating 4n</td>
-                <td>Coordinates up to 10&#8313; with few queries</td>
-              </tr>
-              <tr>
-                <td>Coordinate compression + static tree</td>
-                <td>Map the endpoints that actually occur to 1..m</td>
-                <td>The same situation, when all queries are known up front</td>
-              </tr>
-              <tr>
-                <td>Difference array + one prefix pass</td>
-                <td>No tree at all</td>
-                <td>Range updates, then a single query phase at the end</td>
-              </tr>
-              <tr>
-                <td>Merge-sort tree</td>
-                <td>Each node stores its range sorted</td>
-                <td>&ldquo;How many values in [l, r] are &le; k&rdquo;</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Check the difference array first.</strong> If every update
-            arrives before every query, you do not need a tree at all: record
-            <code>+v</code> at <code>l</code> and <code>-v</code> at
-            <code>r + 1</code>, then take one prefix pass at the end. That is
-            O(n + q) and five lines. Reach for a tree only when updates and
-            queries are interleaved.
-          </div>
-        </div>
-
-        <h2 class="h1" id="choose">&#128269; Choosing a Structure</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>The workload</th>
-                <th>Structure</th>
-                <th>Why</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Range query, no updates</td>
-                <td>Prefix sums (or a sparse table for min/max)</td>
-                <td>O(1) per query, nothing to maintain</td>
-              </tr>
-              <tr>
-                <td>All updates first, then all queries</td>
-                <td>Difference array</td>
-                <td>O(n + q) with no structure at all</td>
-              </tr>
-              <tr>
-                <td>Point update + prefix sum</td>
-                <td>Fenwick tree</td>
-                <td>Shortest correct answer, smallest constant</td>
-              </tr>
-              <tr>
-                <td>Point update + range min / max / gcd</td>
-                <td>Segment tree</td>
-                <td>A BIT cannot invert min or max</td>
-              </tr>
-              <tr>
-                <td>Range update + range query</td>
-                <td>Segment tree with lazy propagation</td>
-                <td>Deferred work keeps both at O(log n)</td>
-              </tr>
-              <tr>
-                <td>Huge coordinates, few operations</td>
-                <td>Dynamic tree, or compress then build</td>
-                <td>Allocate only what is touched</td>
-              </tr>
-              <tr>
-                <td>Counting by value while sweeping</td>
-                <td>BIT over compressed values</td>
-                <td>Order questions become prefix sums</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h2 class="h1" id="pitfalls">&#9888;&#65039; Complexity &amp; Bugs</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Segment tree</th>
-                <th>Fenwick tree</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Build</td>
-                <td>O(n)</td>
-                <td>O(n)</td>
-                <td>
-                  Both have an O(n) build; the naive BIT build is O(n log n)
-                </td>
-              </tr>
-              <tr>
-                <td>Point update</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>One root-to-leaf path, or one chain of low bits</td>
-              </tr>
-              <tr>
-                <td>Range query</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>BIT needs an invertible operation</td>
-              </tr>
-              <tr>
-                <td>Range update</td>
-                <td>O(log n) with lazy</td>
-                <td>O(log n) with two BITs</td>
-                <td>The two-BIT trick handles range add + range sum</td>
-              </tr>
-              <tr>
-                <td>Memory</td>
-                <td>4n</td>
-                <td>n + 1</td>
-                <td>Plus 4n more for the lazy array</td>
-              </tr>
-              <tr>
-                <td>Lines of code</td>
-                <td>~40</td>
-                <td>~12</td>
-                <td>Under interview pressure this matters</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Bug</th>
-                <th>Symptom</th>
-                <th>Fix</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Tree array sized 2n</td>
-                <td>Index out of bounds for non-power-of-two n</td>
-                <td>Allocate 4n</td>
-              </tr>
-              <tr>
-                <td>Returning 0 for a min query with no overlap</td>
-                <td>Every minimum comes back as 0</td>
-                <td>Return the identity: <code>+infinity</code></td>
-              </tr>
-              <tr>
-                <td>Forgetting to pull up after an update</td>
-                <td>Leaf is right, ancestors are stale</td>
-                <td>Recombine children on the way back up</td>
-              </tr>
-              <tr>
-                <td>Missing <code>push</code> in the query</td>
-                <td>Range updates seem to vanish</td>
-                <td>Push before descending, in every operation</td>
-              </tr>
-              <tr>
-                <td>0-based Fenwick indices</td>
-                <td>Infinite loop or silently wrong sums</td>
-                <td><code>lowbit(0) = 0</code> &mdash; index from 1</td>
-              </tr>
-              <tr>
-                <td>Compressing values but querying with raw ones</td>
-                <td>Out of range, or counts far too small</td>
-                <td>Map every read and write through the same rank table</td>
-              </tr>
-              <tr>
-                <td>Overflow on sums</td>
-                <td>Wrong answers only on large inputs</td>
-                <td>Use 64-bit accumulators for sums of n &times; 10&#8313;</td>
-              </tr>
-              <tr>
-                <td>Rebuilding the tree per query</td>
-                <td>Correct but times out</td>
-                <td>Build once outside the loop</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Bug</th>
+              <th>Symptom</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A split that does not shrink</td>
+              <td>Stack overflow on a two-element input</td>
+              <td>Check that both sides are strictly smaller</td>
+            </tr>
+            <tr>
+              <td>Counting after merging</td>
+              <td>Inversion counts far too low</td>
+              <td>Count while the halves are still separate</td>
+            </tr>
+            <tr>
+              <td>Fixed pivot in QuickSelect</td>
+              <td>Times out on sorted input</td>
+              <td>Pick the pivot at random</td>
+            </tr>
+            <tr>
+              <td>Recursing into both sides of a partition</td>
+              <td>O(n log n) where O(n) was expected</td>
+              <td>Only the side containing k matters</td>
+            </tr>
+            <tr>
+              <td>Mid computed as <code>(lo + hi) / 2</code></td>
+              <td>Overflow on very large bounds</td>
+              <td><code>lo + (hi - lo) / 2</code></td>
+            </tr>
+            <tr>
+              <td>No memo on overlapping splits</td>
+              <td>Exponential blow-up on long expressions</td>
+              <td>Cache by the substring or index range</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="callout green">
-          <span class="callout-icon">&#128269;</span>
+          <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> Two numbers
-            together give it away: an array of 10&#8309; and a query count of
-            10&#8309;, with updates mixed into the queries. If the updates all
-            come first, say &ldquo;difference array&rdquo;; if there are no
-            updates, say &ldquo;prefix sums&rdquo;; only when they interleave do
-            you reach for a tree &mdash; and then say which one and why, because
-            choosing the Fenwick tree when it suffices is itself the signal they
-            are looking for.
+            <strong>How to spot it in an interview.</strong> The answer for the
+            whole can be built from the answers for two halves, and the halves
+            do not depend on each other. Or the question asks for one order
+            statistic rather than the whole order. Or it counts pairs
+            <code>(i, j)</code> with <code>i &lt; j</code> and a comparison
+            &mdash; that is a merge sort with a counting line.
           </div>
         </div>
 
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems: the canonical structure, two uses of a Fenwick tree, one
-          that needs no tree at all, and two that combine a tree with
-          compression or laziness.
+          Six problems, easiest first. For each one, name the split point before
+          you write a line &mdash; that is the only decision that matters.
         </p>
 
-        <!-- Problem 01: Range Sum Query - Mutable -->
+        <!-- Problem 01: Subtree of Another Tree -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; The Canonical One</div>
-              <div class="prob-title">Range Sum Query - Mutable</div>
+              <div class="prob-num">Problem 01 &middot; Tree Recursion</div>
+              <div class="prob-title">Subtree of Another Tree</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/range-sum-query-mutable/"
+                  href="https://leetcode.com/problems/subtree-of-another-tree/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 307 - Range Sum Query - Mutable</a
+                  >&#128279; LC 572 - Subtree of Another Tree</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Segment Tree / Fenwick Tree</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Divide on the Root</span>
                 <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Microsoft</span
+                  >Amazon &middot; Google &middot; Meta</span
                 >
               </div>
             </div>
@@ -2109,12 +2023,13 @@
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Support <code>update(index, value)</code> and
-                <code>sumRange(left, right)</code> on an integer array.
+                Return true if <code>subRoot</code> appears as a subtree of
+                <code>root</code>: some node of <code>root</code>, with all of
+                its descendants, equals <code>subRoot</code>.
               </p>
               <div class="iobox">
-                nums = [1, 3, 5]; sumRange(0, 2) → 9; update(1, 2); sumRange(0,
-                2) → 8
+                root = [3,4,5,1,2], subRoot = [4,1,2] → true
+                &nbsp;&nbsp;|&nbsp;&nbsp; subRoot = [4,1,3] → false
               </div>
             </div>
             <div class="prob-section">
@@ -2126,8 +2041,9 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    A prefix-sum array answers the query in O(1) but costs O(n)
-                    per update. What does that cost over 10⁴ mixed operations?
+                    Two different questions hide here: &ldquo;are these two
+                    trees identical?&rdquo; and &ldquo;does this tree contain
+                    that one?&rdquo;
                   </p>
                 </div>
               </details>
@@ -2138,9 +2054,9 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    Both operations need to be logarithmic. A Fenwick tree is
-                    the shortest structure that does it — store deltas, not
-                    values, when updating.
+                    Write <code>isSame(a, b)</code> first. Then the answer is:
+                    this node matches, or the left subtree contains it, or the
+                    right one does.
                   </p>
                 </div>
               </details>
@@ -2148,15 +2064,13 @@
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Write it both ways and know when to offer each. The Fenwick
-                version is twelve lines and is what you should produce first:
-                <code>update</code> takes the <em>delta</em>
-                <code>value − old[i]</code>, so you must keep the original array
-                alongside the tree. The segment tree version is longer but
-                generalises to minimum, maximum and gcd, which a Fenwick tree
-                cannot do &mdash; say that explicitly, because the follow-up
-                question is almost always &ldquo;now make it range
-                minimum&rdquo;.
+                The clean version is two small recursions rather than one clever
+                one. <code>isSame</code> divides on the root and requires both
+                halves to agree; <code>isSubtree</code> divides on the root and
+                requires <em>either</em> half to succeed. Cost is O(n&middot;m)
+                in the worst case, because each of the n nodes may start a
+                comparison &mdash; acceptable here, and the reason the
+                serialise-and-search trick exists.
               </p>
             </div>
             <details>
@@ -2167,41 +2081,395 @@
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Fenwick Tree, Storing
-                      Deltas</span
+                      >&#128208; Pseudocode &middot; Two Recursions</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> NumArray(nums):
-    n ← length(nums)
-    a ← copy of nums                      <span class="pc-cm">// needed to compute deltas</span>
-    bit ← array of n + 1 zeros
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: add(i + 1, nums[i])
+                  <pre><span class="pc-kw">function</span> isSubtree(root, subRoot):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> isSame(root, subRoot): <span class="pc-kw">return</span> true
+    <span class="pc-kw">return</span> isSubtree(root.left, subRoot) <span class="pc-kw">or</span> isSubtree(root.right, subRoot)
 
-<span class="pc-kw">function</span> add(i, delta):
-    <span class="pc-kw">while</span> i ≤ n:
-        bit[i] ← bit[i] + delta
-        i ← i + (i AND -i)
-
-<span class="pc-kw">function</span> prefix(i):
-    s ← 0
-    <span class="pc-kw">while</span> i &gt; 0:
-        s ← s + bit[i]
-        i ← i - (i AND -i)
-    <span class="pc-kw">return</span> s
-
-<span class="pc-kw">function</span> update(index, value):
-    add(index + 1, value - a[index])      <span class="pc-cm">// the delta, not the value</span>
-    a[index] ← value
-
-<span class="pc-kw">function</span> sumRange(left, right):
-    <span class="pc-kw">return</span> prefix(right + 1) - prefix(left)</pre>
+<span class="pc-kw">function</span> isSame(a, b):
+    <span class="pc-kw">if</span> a = null <span class="pc-kw">and</span> b = null: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> a = null <span class="pc-kw">or</span> b = null: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> a.val ≠ b.val: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> isSame(a.left, b.left) <span class="pc-kw">and</span> isSame(a.right, b.right)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(log n) per op</span>
+                    ><span class="cx-val green">O(n × m)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(h)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Different Ways to Add Parentheses -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Split at Every Operator
+              </div>
+              <div class="prob-title">Different Ways to Add Parentheses</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/different-ways-to-add-parentheses/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 241 - Different Ways to Add Parentheses</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Split the Expression</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an expression of numbers and the operators <code>+</code>,
+                <code>-</code> and <code>*</code>, return every possible result
+                from different ways of grouping it.
+              </p>
+              <div class="iobox">
+                expression = "2*3-4*5" → [-34, -14, -10, -10, 10]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Parenthesising means choosing which operator is applied
+                    <em>last</em>. What does that choice do to the string?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Each operator splits the expression into a left part and a
+                    right part. Solve both recursively, then combine every left
+                    result with every right result using that operator.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The split point is the operator applied last, so trying each
+                operator in turn enumerates every grouping exactly once. A
+                number with no operators is the base case. Results multiply, so
+                memoise on the substring (or on the index range) &mdash; without
+                it the same sub-expression is recomputed a Catalan number of
+                times.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Recurse on Both Sides</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> diffWaysToCompute(expr):
+    <span class="pc-kw">if</span> expr contains no operator: <span class="pc-kw">return</span> [number(expr)]
+    <span class="pc-kw">if</span> expr <span class="pc-kw">in</span> memo: <span class="pc-kw">return</span> memo[expr]
+
+    results ← empty list
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(expr) - 1:
+        <span class="pc-kw">if</span> expr[i] is an operator:
+            left ← diffWaysToCompute(expr[0 .. i-1])
+            right ← diffWaysToCompute(expr[i+1 .. end])
+            <span class="pc-kw">for</span> a <span class="pc-kw">in</span> left:
+                <span class="pc-kw">for</span> b <span class="pc-kw">in</span> right:
+                    results.append(apply expr[i] <span class="pc-kw">to</span> a, b)
+
+    memo[expr] ← results
+    <span class="pc-kw">return</span> results</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(Catalan(n))</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n²) memo</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Longest Substring with At Least K Repeating Characters -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Split on a Bad Character
+              </div>
+              <div class="prob-title">
+                Longest Substring with At Least K Repeating Characters
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 395 - Longest Substring with At Least K
+                  Repeating Characters</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Divide on the Impossible</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return the length of the longest substring in which every
+                character appears at least <code>k</code> times.
+              </p>
+              <div class="iobox">
+                s = "aaabb", k = 3 → 3 &nbsp;("aaa")&nbsp;&nbsp;|&nbsp;&nbsp; s
+                = "ababbc", k = 2 → 5 &nbsp;("ababb")
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A sliding window struggles here. Instead, look for a
+                    character that appears fewer than k times in the whole
+                    string.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    That character can never be inside the answer, so it splits
+                    the string. Solve each piece between the bad characters and
+                    take the best.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The insight is negative: find something the answer cannot
+                contain, and use it as the split point. Counting the whole
+                string costs O(n); each recursive call works on strictly shorter
+                pieces. If no character is rare, the whole string is valid and
+                the recursion ends. Depth is bounded by the alphabet size,
+                giving O(26&middot;n).
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Split at Rare
+                      Characters</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> longestSubstring(s, k):
+    <span class="pc-kw">if</span> length(s) &lt; k: <span class="pc-kw">return</span> 0
+    count ← frequency of each character in s
+
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> count:
+        <span class="pc-kw">if</span> count[c] &gt; 0 <span class="pc-kw">and</span> count[c] &lt; k:       <span class="pc-cm">// c can never be in the answer</span>
+            best ← 0
+            <span class="pc-kw">for</span> piece <span class="pc-kw">in</span> split s on c:
+                best ← max(best, longestSubstring(piece, k))
+            <span class="pc-kw">return</span> best
+
+    <span class="pc-kw">return</span> length(s)                             <span class="pc-cm">// every character is frequent enough</span>
+
+<span class="pc-cm">// "ababbc", k=2: 'c' appears once → split into "ababb" → all counts ≥ 2 → 5 ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(26 × n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(26 × depth)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Beautiful Array -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Build by Halves</div>
+              <div class="prob-title">Beautiful Array</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/beautiful-array/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 932 - Beautiful Array</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Construct by Parity</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return any permutation of <code>1..n</code> such that for every
+                <code>i &lt; k &lt; j</code>,
+                <code>nums[k] * 2 ≠ nums[i] + nums[j]</code>.
+              </p>
+              <div class="iobox">
+                n = 5 → [1, 5, 3, 2, 4] &nbsp;(one valid answer of several)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The forbidden condition needs
+                    <code>nums[i] + nums[j]</code> to be even. When is that
+                    impossible?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Put every odd number before every even number: an odd plus
+                    an even is odd, so no middle element can break it. Then
+                    recursively build the odd half and the even half.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The trick is a transformation. If <code>A</code> is beautiful,
+                so are <code>2A - 1</code> (all odd) and <code>2A</code> (all
+                even), and concatenating them keeps the property because cross
+                pairs sum to an odd number. So build the array for
+                <code>⌈n/2⌉</code>, map it to odds, build for
+                <code>⌊n/2⌋</code>, map it to evens, and join. Each level halves
+                the size: O(n log n).
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Odds, Then Evens</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> beautifulArray(n):
+    <span class="pc-kw">if</span> n = 1: <span class="pc-kw">return</span> [1]
+
+    odds ← beautifulArray((n + 1) ÷ 2)     <span class="pc-cm">// will become 1, 3, 5, ...</span>
+    evens ← beautifulArray(n ÷ 2)          <span class="pc-cm">// will become 2, 4, 6, ...</span>
+
+    out ← empty list
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> odds: out.append(2 × x - 1)
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> evens: out.append(2 × x)
+    <span class="pc-kw">return</span> out
+
+<span class="pc-cm">// An odd + an even is odd, so 2 × middle can never equal it —
+// only pairs inside a half can break the rule, and those are beautiful already.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2213,24 +2481,26 @@
           </div>
         </div>
 
-        <!-- Problem 02: Count Number of Teams -->
+        <!-- Problem 05: Number of Pairs Satisfying Inequality -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; BIT Over Values</div>
-              <div class="prob-title">Count Number of Teams</div>
+              <div class="prob-num">Problem 05 &middot; Count in the Merge</div>
+              <div class="prob-title">
+                Number of Pairs Satisfying Inequality
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/count-number-of-teams/"
+                  href="https://leetcode.com/problems/number-of-pairs-satisfying-inequality/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 1395 - Count Number of Teams</a
+                  >&#128279; LC 2426 - Number of Pairs Satisfying Inequality</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Fenwick Tree (counting)</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Merge Sort Counting</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2241,10 +2511,12 @@
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Count the triples <code>i &lt; j &lt; k</code> whose ratings are
-                strictly increasing or strictly decreasing.
+                Count pairs <code>i &lt; j</code> with
+                <code>nums1[i] - nums1[j] ≤ nums2[i] - nums2[j] + diff</code>.
               </p>
-              <div class="iobox">rating = [2, 5, 3, 4, 1] → 3</div>
+              <div class="iobox">
+                nums1 = [3,2,5], nums2 = [2,2,1], diff = 1 → 3
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2255,9 +2527,8 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    n ≤ 1000, so O(n²) passes — but solve it as if n were 10⁵.
-                    Fix the middle soldier: what do you need to know about each
-                    side?
+                    Move everything about <code>i</code> to one side and
+                    everything about <code>j</code> to the other.
                   </p>
                 </div>
               </details>
@@ -2268,9 +2539,10 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    For each j: how many smaller ratings lie to its left, and
-                    how many larger lie to its right. Sweep with a BIT indexed
-                    by rating.
+                    With <code>d[i] = nums1[i] - nums2[i]</code> the condition
+                    is <code>d[i] ≤ d[j] + diff</code>. Now count pairs
+                    <code>i &lt; j</code> with that relation &mdash; a merge
+                    sort with a counting line.
                   </p>
                 </div>
               </details>
@@ -2278,14 +2550,12 @@
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The cubic loop is the intended solution here, and the quadratic
-                one fixes the middle element. The reason to write the BIT
-                version anyway is that it is the same code as counting
-                inversions: sweep left to right maintaining a Fenwick tree over
-                compressed ratings, and each position asks two prefix queries.
-                Every &ldquo;count pairs or triples in order&rdquo; problem
-                &mdash; inversions, reverse pairs, good triplets &mdash; is this
-                pattern with a different multiplier.
+                The algebra turns two arrays into one. Then it is the
+                inversion-counting pattern: during the merge, both halves are
+                sorted, so for each left element a single forward pointer finds
+                how many right elements satisfy the inequality, and the count is
+                added in bulk. The pointer never rewinds, so the counting is
+                O(n) per level and the total stays O(n log n).
               </p>
             </div>
             <details>
@@ -2296,32 +2566,26 @@
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Fix the Middle, Count Both
-                      Sides</span
+                      >&#128208; Pseudocode &middot; Transform, Then Count</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> numTeams(rating):
-    m ← number of distinct ratings
-    left  ← Fenwick tree of size m        <span class="pc-cm">// seen so far</span>
-    right ← Fenwick tree of size m        <span class="pc-cm">// everything, then removed</span>
-    <span class="pc-kw">for</span> r <span class="pc-kw">in</span> rating: right.add(rank(r), 1)
+                  <pre><span class="pc-kw">function</span> numberOfPairs(nums1, nums2, diff):
+    d ← array where d[i] = nums1[i] - nums2[i]
+    <span class="pc-kw">return</span> sortAndCount(d, 0, length(d), diff)
 
-    total ← 0
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        r ← rank(rating[j])
-        right.add(r, -1)                  <span class="pc-cm">// j is no longer &quot;to the right&quot;</span>
+<span class="pc-kw">function</span> sortAndCount(d, lo, hi, diff):
+    <span class="pc-kw">if</span> hi - lo ≤ 1: <span class="pc-kw">return</span> 0
+    mid ← lo + (hi - lo) ÷ 2
+    total ← sortAndCount(d, lo, mid, diff) + sortAndCount(d, mid, hi, diff)
 
-        lessLeft   ← left.prefix(r - 1)
-        moreLeft   ← j - left.prefix(r)
-        lessRight  ← right.prefix(r - 1)
-        moreRight  ← (n - 1 - j) - right.prefix(r)
+    j ← mid
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> lo <span class="pc-kw">to</span> mid - 1:
+        <span class="pc-kw">while</span> j &lt; hi <span class="pc-kw">and</span> d[j] + diff &lt; d[i]: j ← j + 1
+        total ← total + (hi - j)          <span class="pc-cm">// all remaining right elements qualify</span>
 
-        total ← total + lessLeft × moreRight     <span class="pc-cm">// increasing</span>
-                      + moreLeft × lessRight     <span class="pc-cm">// decreasing</span>
-
-        left.add(r, 1)
+    merge d[lo..mid) <span class="pc-kw">and</span> d[mid..hi) in place
     <span class="pc-kw">return</span> total</pre>
                 </div>
                 <div class="complexity-row">
@@ -2339,150 +2603,28 @@
           </div>
         </div>
 
-        <!-- Problem 03: Range Frequency Queries -->
+        <!-- Problem 06: Number of Ways to Reorder Array to Get Same BST -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 03 &middot; Query Without a Tree
+                Problem 06 &middot; Divide + Combinatorics
               </div>
-              <div class="prob-title">Range Frequency Queries</div>
+              <div class="prob-title">
+                Number of Ways to Reorder Array to Get Same BST
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/range-frequency-queries/"
+                  href="https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 2080 - Range Frequency Queries</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Bucketed Indices + Binary Search</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Answer many queries of the form &ldquo;how many times does
-                <code>value</code> occur in
-                <code>arr[left..right]</code>?&rdquo;
-              </p>
-              <div class="iobox">
-                arr = [12, 33, 4, 56, 22, 2, 34, 33, 22, 12, 34, 56], query(1,
-                2, 33) → 1
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The array never changes. Does that remove the need for a
-                    tree?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Store, for each value, the sorted list of positions where it
-                    occurs. A query is then two binary searches inside one list.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This problem is here as a corrective. It looks like a
-                range-query problem, so people reach for a segment tree &mdash;
-                but nothing is ever updated, so the right answer is a map from
-                value to its sorted index list, and a pair of binary searches.
-                Knowing when <em>not</em> to build a tree is half of what this
-                lecture is for. If the array did change, this becomes a
-                merge-sort tree or a BIT per value, and the cost of that jump is
-                worth stating.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Positions Per Value +
-                      Binary Search</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> RangeFreqQuery(arr):
-    positions ← map from value → list of indices
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        positions[arr[i]].append(i)       <span class="pc-cm">// already sorted</span>
-
-<span class="pc-kw">function</span> query(left, right, value):
-    <span class="pc-kw">if</span> value <span class="pc-kw">not</span> <span class="pc-kw">in</span> positions: <span class="pc-kw">return</span> 0
-    list ← positions[value]
-    lo ← first index in list ≥ left       <span class="pc-cm">// lower bound</span>
-    hi ← first index in list &gt; right      <span class="pc-cm">// upper bound</span>
-    <span class="pc-kw">return</span> hi - lo
-
-<span class="pc-cm">// No updates → no tree. If updates existed, this becomes a BIT per value
-// or a merge-sort tree, at a real cost in memory and code.</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green"
-                      >O(n) build, O(log n) per query</span
-                    >
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 04: Longest Increasing Subsequence II -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Tree Over Values</div>
-              <div class="prob-title">Longest Increasing Subsequence II</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/longest-increasing-subsequence-ii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2407 - Longest Increasing Subsequence II</a
+                  >&#128279; LC 1569 - Number of Ways to Reorder Array to Get
+                  Same BST</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Segment Tree (max) over values</span>
+                <span class="tag tag-pat">Split by the Root</span>
                 <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
@@ -2494,11 +2636,13 @@
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Find the longest strictly increasing subsequence in which
-                consecutive elements differ by at most <code>k</code>.
+                Given a permutation of distinct values, count how many other
+                orderings build the same binary search tree. Answer modulo
+                10<sup>9</sup>+7.
               </p>
               <div class="iobox">
-                nums = [4, 2, 1, 4, 3, 4, 5, 8, 15], k = 3 → 5
+                nums = [2,1,3] → 1 &nbsp;&nbsp;|&nbsp;&nbsp; nums = [3,4,5,1,2]
+                → 5
               </div>
             </div>
             <div class="prob-section">
@@ -2510,9 +2654,8 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    The O(n²) DP asks, for each i, the best dp[j] among earlier
-                    valid j. What kind of query is that over the
-                    <em>values</em>?
+                    The first value is always the root. What decides which side
+                    of the tree each later value goes to?
                   </p>
                 </div>
               </details>
@@ -2523,9 +2666,10 @@
                 </summary>
                 <div class="details-body">
                   <p>
-                    dp[v] = best length ending at value v. Then dp[nums[i]] = 1
-                    + max of dp over the value window [nums[i] − k, nums[i] − 1]
-                    — a range maximum query.
+                    Split the rest into values smaller and larger than the root.
+                    Any interleaving of the two sequences builds the same tree,
+                    so multiply by the number of interleavings:
+                    <code>C(left + right, left)</code>.
                   </p>
                 </div>
               </details>
@@ -2533,14 +2677,14 @@
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                This is the lecture&rsquo;s main lesson applied to dynamic
-                programming: when a DP transition is &ldquo;the best of all
-                previous states in a range&rdquo;, a segment tree turns O(n) per
-                step into O(log n). Index the tree by value, not by position, so
-                the constraint &ldquo;differs by at most k&rdquo; becomes a
-                contiguous range. Point update, range maximum, no lazy
-                propagation &mdash; and a Fenwick tree cannot replace it here,
-                because maximum is not invertible.
+                Divide and conquer plus one counting fact. Within each side the
+                relative order must be preserved, but the two sides can be
+                shuffled together freely &mdash; that is a binomial coefficient.
+                The answer is
+                <code>C(l + r, l) &times; ways(left) &times; ways(right)</code>,
+                minus one at the very end because the original ordering is not a
+                <em>re</em>ordering. Precompute Pascal&rsquo;s triangle for the
+                coefficients, and keep everything modulo 10<sup>9</sup>+7.
               </p>
             </div>
             <details>
@@ -2551,294 +2695,33 @@
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Range Max Over the Value
-                      Axis</span
+                      >&#128208; Pseudocode &middot; Interleavings × Both
+                      Sides</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> lengthOfLIS(nums, k):
-    V ← max(nums)
-    tree ← segment tree over values 1..V, combine = max, identity = 0
-    best ← 0
+                  <pre><span class="pc-kw">function</span> numOfWays(nums):
+    C ← Pascal&#39;s triangle up to length(nums)      <span class="pc-cm">// binomial coefficients mod 1e9+7</span>
+    <span class="pc-kw">return</span> (ways(nums) - 1) mod 1000000007
 
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        lo ← max(1, x - k)
-        hi ← x - 1                        <span class="pc-cm">// strictly increasing</span>
+<span class="pc-kw">function</span> ways(seq):
+    <span class="pc-kw">if</span> length(seq) ≤ 2: <span class="pc-kw">return</span> 1
+    root ← seq[0]
+    left ← values of seq[1..] smaller than root      <span class="pc-cm">// order preserved</span>
+    right ← values of seq[1..] larger than root
 
-        prev ← 0
-        <span class="pc-kw">if</span> lo ≤ hi: prev ← tree.queryMax(lo, hi)
-
-        length ← prev + 1
-        tree.update(x, length)            <span class="pc-cm">// point update, keep the max</span>
-        best ← max(best, length)
-
-    <span class="pc-kw">return</span> best
-
-<span class="pc-cm">// The DP is unchanged — only the &quot;best previous state&quot; lookup got faster.</span></pre>
+    interleavings ← C[length(left) + length(right)][length(left)]
+    <span class="pc-kw">return</span> interleavings × ways(left) × ways(right) mod 1000000007</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log V)</span>
+                    ><span class="cx-val green">O(n²)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 05: My Calendar III -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Dynamic + Lazy</div>
-              <div class="prob-title">My Calendar III</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/my-calendar-iii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 732 - My Calendar III</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Lazy Segment Tree / Sweep</span>
-                <span class="tag tag-co">Google &middot; Amazon</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                After each booked interval <code>[start, end)</code>, return the
-                maximum number of bookings that overlap at any single point.
-              </p>
-              <div class="iobox">
-                book(10, 20) → 1, book(50, 60) → 1, book(10, 40) → 2, book(5,
-                15) → 3
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A booking adds 1 to every point in a range, and the answer
-                    is the maximum over all points. Which two operations is
-                    that?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Range add and global maximum — exactly lazy propagation. The
-                    coordinates go up to 10⁹, so either create nodes on demand
-                    or compress.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two solutions, and both are worth knowing. The sweep-line one is
-                shorter: a sorted map with <code>+1</code> at each start and
-                <code>−1</code> at each end, then a running total over the keys
-                &mdash; O(n) per call, which passes here. The segment tree one
-                is the scalable answer: range add with lazy propagation over a
-                dynamic tree keyed by coordinate, giving O(log C) per booking.
-                Offer the sweep, then say how you would make it logarithmic;
-                that sequence is what interviewers are grading.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Range Add, Global Max</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-cm">// Sweep version — short, O(n) per call, enough for the constraints</span>
-<span class="pc-kw">function</span> book(start, end):
-    delta[start] ← delta[start] + 1
-    delta[end]   ← delta[end] - 1
-
-    active ← 0;  best ← 0
-    <span class="pc-kw">for</span> key <span class="pc-kw">in</span> sorted keys of delta:
-        active ← active + delta[key]
-        best ← max(best, active)
-    <span class="pc-kw">return</span> best
-
-<span class="pc-cm">// Segment tree version — O(log C), the one that scales</span>
-<span class="pc-kw">function</span> book(start, end):
-    rangeAdd(root, 0, 10⁹, start, end - 1, +1)   <span class="pc-cm">// end is exclusive</span>
-    <span class="pc-kw">return</span> tree[root]                            <span class="pc-cm">// root holds the maximum</span>
-
-<span class="pc-cm">// Nodes are created only when a range is first touched, so the tree holds
-// O(n log C) nodes instead of pre-allocating 4 × 10⁹.</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(log C) per booking</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n log C)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 06: Falling Squares -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Compress First</div>
-              <div class="prob-title">Falling Squares</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/falling-squares/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 699 - Falling Squares</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat"
-                  >Coordinate Compression + Lazy Assign</span
-                >
-                <span class="tag tag-co">Google &middot; Amazon</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Squares drop one at a time onto a number line and rest on
-                whatever is below them. After each drop, return the height of
-                the tallest stack so far.
-              </p>
-              <div class="iobox">
-                positions = [[1,2],[2,3],[6,1]] → [2, 5, 5]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A square landing on [l, r) sits at 1 + the maximum current
-                    height in that interval. What two operations does that need?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Range maximum query, then range assign of the new height.
-                    Coordinates reach 10⁸, but there are at most 2n distinct
-                    endpoints — compress them.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Every square is one query and one update on the same interval:
-                read the maximum height under it, then set the whole interval to
-                that plus its side length. The assignment is a <em>set</em>, not
-                an add, so the lazy value needs a pending-assign flag rather
-                than an accumulator. Compression is the other half: only the
-                interval endpoints that actually occur can ever matter, so map
-                the at most 2n of them to a small index range and build a static
-                tree over that.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Query Max, Then
-                      Assign</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> fallingSquares(positions):
-    xs ← sorted distinct of all l and (l + side) values   <span class="pc-cm">// compress</span>
-    tree ← lazy segment tree over 0..len(xs) - 1, op = max, lazy = assign
-    best ← 0;  result ← empty list
-
-    <span class="pc-kw">for</span> (left, side) <span class="pc-kw">in</span> positions:
-        l ← index of left <span class="pc-kw">in</span> xs
-        r ← index of (left + side) <span class="pc-kw">in</span> xs - 1        <span class="pc-cm">// half-open</span>
-
-        base ← tree.queryMax(l, r)
-        top  ← base + side
-        tree.assign(l, r, top)                        <span class="pc-cm">// range set, not add</span>
-
-        best ← max(best, top)
-        result.add(best)
-
-    <span class="pc-kw">return</span> result
-
-<span class="pc-cm">// Touching squares must not stack: using a half-open range is what keeps
-// [1,2] and [2,3] independent.</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(n²)</span>
                   </div>
                 </div>
               </div>
@@ -2852,12 +2735,11 @@
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 30 Assignment &mdash; 22 Problems (3 Easy &middot; 12
-              Medium &middot; 7 Hard)</strong
+              >Lecture 30 Assignment &mdash; 18 Problems (4 Easy &middot; 10
+              Medium &middot; 4 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged, grouped by the
-            structure it needs &mdash; including the ones that need none.
-            Complete it before moving to Lecture 31.<br /><br />
+            kind of split it needs. Complete it before moving to Lecture 31.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture30/Assignment.md"
               style="
@@ -2880,77 +2762,74 @@
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why a prefix-sum array fails once updates appear
+            I can write any solution here as divide, conquer, combine
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write build, query and point update for a segment tree from
-            memory
+            I can apply the Master Theorem to a recurrence without looking it up
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I know the identity element for sum, min, max and gcd queries
+            I can explain why T(n) = T(n/2) + O(n) is linear, not O(n log n)
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can add lazy propagation and say where every push belongs
+            I can write QuickSelect and say why the pivot must be random
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write a Fenwick tree in twelve lines and explain
-            <code>i AND -i</code>
+            I can count pairs during a merge without changing the complexity
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can index a BIT by value and count inversions with it
+            I can find the split point in a problem that has no array in it
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can recognise when a difference array or plain prefix sums are
-            enough
+            I know when overlapping subproblems mean I should memoise instead
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I completed all 22 assignment problems and can justify the structure
-            I chose for each
+            I completed all 18 assignment problems and can name the split for
+            each
           </div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#127881;</span>
+          <span class="callout-icon">&#128640;</span>
           <div class="callout-body">
             <strong
-              >Next up &mdash; Lecture 31: Square Root Decomposition &amp;
-              Mo&#39;s Algorithm</strong
+              >You're ready for Lecture 31: Union-Find (Disjoint Set
+              Union)</strong
             ><br />
-            The &radic;n bridge mentioned at the start of this lecture gets its
-            own treatment: a structure that is worse asymptotically, much easier
-            to write, and &mdash; with Mo&#39;s algorithm for offline queries
-            &mdash; able to answer questions no segment tree can.
+            This lecture kept splitting things apart. The last lecture of the
+            phase does the opposite: it starts with everything separate and
+            merges, answering &ldquo;are these two in the same group?&rdquo; in
+            almost constant time.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture29/lecture29_notes.html"
-            >&larr; Lecture 29 &middot; Tries</a
+            >&larr; Lecture 29 &middot; Greedy Algorithms</a
           >
-          <a class="next" href="../dsa_study_plan.html"
-            >Lecture 31 &middot; coming soon &rarr;</a
+          <a class="next" href="../Lecture31/lecture31_notes.html"
+            >Lecture 31 &middot; Union-Find (Disjoint Set Union) &rarr;</a
           >
         </div>
       </div>

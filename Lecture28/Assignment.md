@@ -1,9 +1,9 @@
-# 🎛️ Assignment 28 — Dynamic Programming IV — Interval, Tree, Bitmask & Digit
+# 📐 Assignment 21 — Intervals & Sweep Line
 
-> **Lecture:** 28 of 38 — Dynamic Programming IV — Interval, Tree, Bitmask & Digit
-> **Phase:** 4 — Dynamic Programming
-> **Estimated Time:** 7 days · **Total Problems:** 25 (5 Easy · 12 Medium · 8 Hard)
-> **Goal:** Recognise the four advanced DP state shapes from the constraints alone, and write each template without looking it up.
+> **Lecture:** 28 of 45 — Intervals & Sweep Line
+> **Phase:** 3 — Core Patterns
+> **Estimated Time:** 4 days · **Total Problems:** 18 (5 Easy · 10 Medium · 3 Hard)
+> **Goal:** Decide what to sort by, or stop sorting intervals altogether and sweep their start and end events instead.
 
 ---
 
@@ -11,253 +11,228 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                                                     | Pattern                  | Move                                                               |
-| ------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------ |
-| Answer depends on a contiguous range, and splitting it changes the pieces | Interval DP              | dp`[i][j]`, loop over length, pivot k inside                       |
-| Removing an element merges its neighbours                                 | Interval DP, think LAST  | The last one removed still has the original boundaries             |
-| Two players alternate, both play optimally                                | Interval DP on advantage | dp`[i][j]` = my score − yours; flip the sign at the recursive call |
-| Question asked about every subtree                                        | Tree DP                  | Post-order walk, return a tuple, combine at the parent             |
-| Question asked about every node as a root                                 | Rerooting                | Pass 1 down for sizes, pass 2 up to patch in O(1)                  |
-| n ≤ 20 and the answer needs a set of used items                           | Bitmask DP               | dp[mask], position = popcount(mask)                                |
-| Shortest walk that must cover everything                                  | Bitmask BFS              | State = (node, visitedMask)                                        |
-| Count numbers in [A, B] with a digit property                             | Digit DP                 | count(pos, tight, started, state), answer = f(B) − f(A−1)          |
+| Signal in the Problem                 | Pattern                | Move                                  |
+| ------------------------------------- | ---------------------- | ------------------------------------- |
+| "merge", "combine overlapping"        | Sort by Start          | extend with `max(end, iv.end)`        |
+| "how many can I keep / attend"        | Greedy by End          | earliest finish leaves the most room  |
+| "minimum rooms", "maximum at once"    | Event Sweep            | `+1` on start, `-1` on end, then sort |
+| "add v to a range", small coordinates | Difference Array       | Lecture 26, indexed by position       |
+| "skyline", "area covered once"        | Sweep + Active Set     | multiset or heap of what is open      |
+| huge or sparse coordinates            | Coordinate Compression | rank the endpoints, then sweep        |
 
 ---
 
 ## 🟢 Easy Tier (5 Problems)
 
-_Tree DP with the smallest possible state, plus a bitmask warm-up. The point is the shape of the recursion: walk post-order, return something, combine it at the parent._
+_Build intervals, test overlap, and count what covers a point._
 
-### E1 · Binary Tree Tilt
+### E1 · Summary Ranges
 
-**🔗 [LC 563 — Binary Tree Tilt](https://leetcode.com/problems/binary-tree-tilt/)** · Easy
-**Pattern:** Tree DP (post-order tuple) | **Companies:** Amazon · Microsoft
+**🔗 [LC 228 — Summary Ranges](https://leetcode.com/problems/summary-ranges/)** · Easy
+**Pattern:** Interval Building | **Companies:** Amazon, Google, Meta
 
-**Hint:** Return the subtree sum from the walk and accumulate the tilt on the way up — one pass, no repeated sums.
-
----
-
-### E2 · Sum of Root To Leaf Binary Numbers
-
-**🔗 [LC 1022 — Sum of Root To Leaf Binary Numbers](https://leetcode.com/problems/sum-of-root-to-leaf-binary-numbers/)** · Easy
-**Pattern:** Tree DP (path state) | **Companies:** Amazon · Meta
-
-**Hint:** Carry the number built so far down the recursion; add it at the leaves only.
+**Hint:** Walk the sorted array keeping the start of the current run. Close the run when `nums[i] + 1 != nums[i+1]`, and format as `a` or `a->b`.
 
 ---
 
-### E3 · Univalued Binary Tree
+### E2 · Determine if Two Events Have Conflict
 
-**🔗 [LC 965 — Univalued Binary Tree](https://leetcode.com/problems/univalued-binary-tree/)** · Easy
-**Pattern:** Tree DP (boolean fold) | **Companies:** Amazon
+**🔗 [LC 2446 — Determine if Two Events Have Conflict](https://leetcode.com/problems/determine-if-two-events-have-conflict/)** · Easy
+**Pattern:** Overlap Test | **Companies:** Amazon
 
-**Hint:** Compare every node with the root value and AND the two children’s answers.
-
----
-
-### E4 · Binary Watch
-
-**🔗 [LC 401 — Binary Watch](https://leetcode.com/problems/binary-watch/)** · Easy
-**Pattern:** Bitmask enumeration | **Companies:** Amazon · Google
-
-**Hint:** There are only 1024 times; enumerate masks and keep those whose popcount matches.
+**Hint:** Two half-open events clash unless one finishes before the other starts: `startA < endB and startB < endA`. Times are `"HH:MM"` strings, so compare them directly or convert to minutes.
 
 ---
 
-### E5 · Second Minimum Node In a Binary Tree
+### E3 · Number of Students Doing Homework at a Given Time
 
-**🔗 [LC 671 — Second Minimum Node In a Binary Tree](https://leetcode.com/problems/second-minimum-node-in-a-binary-tree/)** · Easy
-**Pattern:** Tree DP (two bests) | **Companies:** Amazon · Google
+**🔗 [LC 1450 — Number of Students Doing Homework at a Given Time](https://leetcode.com/problems/number-of-students-doing-homework-at-a-given-time/)** · Easy
+**Pattern:** Count Covering Intervals | **Companies:** Amazon, Adobe
 
-**Hint:** Track the smallest and the second smallest as you walk — the second value is the answer.
-
----
-
-## 🟡 Medium Tier (12 Problems)
-
-_The working core of the lecture — interval DP, game DP on an advantage, and your first real bitmask states. Read the constraints before you plan; they name the technique._
-
-### M1 · Guess Number Higher or Lower II
-
-**🔗 [LC 375 — Guess Number Higher or Lower II](https://leetcode.com/problems/guess-number-higher-or-lower-ii/)** · Medium
-**Pattern:** Interval DP (game) | **Companies:** Google · Amazon
-
-**Hint:** dp`[i][j]` = min over k of k + max(dp`[i][k-1]`, dp`[k+1][j]`) — you pay for the worse branch.
+**Hint:** Each student is the interval `[startTime[i], endTime[i]]`. Count how many contain `queryTime` — a single pass, since the intervals are given, not built.
 
 ---
 
-### M2 · Stone Game
+### E4 · Teemo Attacking
 
-**🔗 [LC 877 — Stone Game](https://leetcode.com/problems/stone-game/)** · Medium
-**Pattern:** Interval DP (game, advantage) | **Companies:** Amazon · Meta
+**🔗 [LC 495 — Teemo Attacking](https://leetcode.com/problems/teemo-attacking/)** · Easy
+**Pattern:** Overlapping Ranges | **Companies:** Amazon, Google
 
-**Hint:** dp`[i][j]` is the current player’s lead; take from either end and subtract the opponent’s lead.
-
----
-
-### M3 · Stone Game VII
-
-**🔗 [LC 1690 — Stone Game VII](https://leetcode.com/problems/stone-game-vii/)** · Medium
-**Pattern:** Interval DP (game, advantage) | **Companies:** Google · Amazon
-
-**Hint:** Same recurrence as Stone Game VII with the cost of the removed stone folded in.
+**Hint:** Each attack covers `[t, t + duration)`. Add the full duration, unless the next attack starts sooner — then add only the gap. One pass over the sorted times.
 
 ---
 
-### M4 · Predict the Winner
+### E5 · Range Addition II
 
-**🔗 [LC 486 — Predict the Winner](https://leetcode.com/problems/predict-the-winner/)** · Medium
-**Pattern:** Interval DP (game, advantage) | **Companies:** Amazon · Google · Adobe
+**🔗 [LC 598 — Range Addition II](https://leetcode.com/problems/range-addition-ii/)** · Easy
+**Pattern:** Range Intersection | **Companies:** Amazon
 
-**Hint:** Identical to Stone Game — return whether the lead from the full range is ≥ 0.
-
----
-
-### M5 · Minimum Score Triangulation of Polygon
-
-**🔗 [LC 1039 — Minimum Score Triangulation of Polygon](https://leetcode.com/problems/minimum-score-triangulation-of-polygon/)** · Medium
-**Pattern:** Interval DP (triangulation) | **Companies:** Amazon · Google
-
-**Hint:** Fix the edge (i, j) and pick the third vertex k — the same pivot loop as Burst Balloons.
+**Hint:** Every operation covers a rectangle anchored at the origin, so the most-incremented cells are the intersection of them all: the product of the minimum width and the minimum height.
 
 ---
 
-### M6 · Longest ZigZag Path in a Binary Tree
+## 🟡 Medium Tier (10 Problems)
 
-**🔗 [LC 1372 — Longest ZigZag Path in a Binary Tree](https://leetcode.com/problems/longest-zigzag-path-in-a-binary-tree/)** · Medium
-**Pattern:** Tree DP (direction state) | **Companies:** Amazon · Google
+_The two sort orders, the greedy proof, and the first real sweeps._
 
-**Hint:** Each node returns two lengths: the best zigzag continuing left, and continuing right.
+### M1 · Non-overlapping Intervals
 
----
+**🔗 [LC 435 — Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)** · Medium
+**Pattern:** Greedy by End Time | **Companies:** Amazon, Google, Meta
 
-### M7 · Binary Tree Coloring Game
-
-**🔗 [LC 1145 — Binary Tree Coloring Game](https://leetcode.com/problems/binary-tree-coloring-game/)** · Medium
-**Pattern:** Tree DP (three regions) | **Companies:** Amazon · Meta
-
-**Hint:** Find x’s node, then compare its left size, right size, and the rest against n ÷ 2.
+**Hint:** Sort by end and keep an interval whenever its start is at least the last kept end. The answer is the total minus the number kept.
 
 ---
 
-### M8 · Beautiful Arrangement
+### M2 · Minimum Number of Arrows to Burst Balloons
 
-**🔗 [LC 526 — Beautiful Arrangement](https://leetcode.com/problems/beautiful-arrangement/)** · Medium
-**Pattern:** Bitmask DP | **Companies:** Google · Amazon
+**🔗 [LC 452 — Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/)** · Medium
+**Pattern:** Greedy by End Time | **Companies:** Amazon, Google, Meta
 
-**Hint:** The used set is the whole state; the position is popcount(mask) + 1.
-
----
-
-### M9 · Maximum Product of the Length of Two Palindromic Subsequences
-
-**🔗 [LC 2002 — Maximum Product of the Length of Two Palindromic Subsequences](https://leetcode.com/problems/maximum-product-of-the-length-of-two-palindromic-subsequences/)** · Medium
-**Pattern:** Bitmask enumeration | **Companies:** Amazon · Google
-
-**Hint:** Enumerate all 2ⁿ splits, keep the palindromic halves, and multiply the lengths.
+**Hint:** Same loop as non-overlapping intervals, but touching balloons burst together, so the test is `start > lastEnd`. Sort by end and count the arrows.
 
 ---
 
-### M10 · Can I Win
+### M3 · Partition Labels
 
-**🔗 [LC 464 — Can I Win](https://leetcode.com/problems/can-i-win/)** · Medium
-**Pattern:** Bitmask DP (game) | **Companies:** Amazon · Google · Bloomberg
+**🔗 [LC 763 — Partition Labels](https://leetcode.com/problems/partition-labels/)** · Medium
+**Pattern:** Intervals from Last Occurrence | **Companies:** Amazon, Google, Meta
 
-**Hint:** Memoise on the mask of used numbers; you win if some unused move loses for the opponent.
-
----
-
-### M11 · Rotated Digits
-
-**🔗 [LC 788 — Rotated Digits](https://leetcode.com/problems/rotated-digits/)** · Medium
-**Pattern:** Digit DP (or precompute) | **Companies:** Google
-
-**Hint:** Per digit: 0/1/8 are neutral, 2/5/6/9 make it different, 3/4/7 kill the number.
+**Hint:** Record each letter's last index, then sweep: extend the current part to the furthest last-occurrence seen, and cut when the index reaches it.
 
 ---
 
-### M12 · Count Numbers with Unique Digits
+### M4 · Remove Covered Intervals
 
-**🔗 [LC 357 — Count Numbers with Unique Digits](https://leetcode.com/problems/count-numbers-with-unique-digits/)** · Medium
-**Pattern:** Digit DP (counting) | **Companies:** Google · Amazon
+**🔗 [LC 1288 — Remove Covered Intervals](https://leetcode.com/problems/remove-covered-intervals/)** · Medium
+**Pattern:** Sort with a Tie-Break | **Companies:** Amazon, Google
 
-**Hint:** Count numbers with no repeated digit by position: 9 × 9 × 8 × … — or run the skeleton.
-
----
-
-## 🔴 Hard Tier (8 Problems)
-
-_Interval DP where the split is subtle, rerooting, bitmask search, and digit DP. These are the versions interviewers actually ask when they want to see you choose a state._
-
-### H1 · Burst Balloons
-
-**🔗 [LC 312 — Burst Balloons](https://leetcode.com/problems/burst-balloons/)** · Hard
-**Pattern:** Interval DP (think last) | **Companies:** Google · Amazon · Meta
-
-**Hint:** Pad with 1s and choose which balloon bursts last; its neighbours are then the boundaries.
+**Hint:** Sort by start ascending and end descending, then keep a running `maxEnd`. An interval is covered exactly when its end is at most `maxEnd`.
 
 ---
 
-### H2 · Minimum Cost to Merge Stones
+### M5 · My Calendar II
 
-**🔗 [LC 1000 — Minimum Cost to Merge Stones](https://leetcode.com/problems/minimum-cost-to-merge-stones/)** · Hard
-**Pattern:** Interval DP (k-way merge) | **Companies:** Google · Amazon
+**🔗 [LC 731 — My Calendar II](https://leetcode.com/problems/my-calendar-ii/)** · Medium
+**Pattern:** Two Booking Layers | **Companies:** Google, Amazon
 
-**Hint:** Split so the left part collapses to a multiple of (k − 1) piles; merge only when the length allows it.
-
----
-
-### H3 · Strange Printer
-
-**🔗 [LC 664 — Strange Printer](https://leetcode.com/problems/strange-printer/)** · Hard
-**Pattern:** Interval DP (strange printer) | **Companies:** Google · Amazon
-
-**Hint:** If s[i] = s[k], printing them together is free: dp`[i][j]` = dp`[i+1][j]` patched by matching characters.
+**Hint:** Keep the booked intervals and the already-double-booked intervals in two lists. A new booking is rejected if it overlaps the doubles; otherwise add its overlaps with the singles to the doubles.
 
 ---
 
-### H4 · Minimum Cost to Cut a Stick
+### M6 · Video Stitching
 
-**🔗 [LC 1547 — Minimum Cost to Cut a Stick](https://leetcode.com/problems/minimum-cost-to-cut-a-stick/)** · Hard
-**Pattern:** Interval DP (coordinates) | **Companies:** Google · Amazon
+**🔗 [LC 1024 — Video Stitching](https://leetcode.com/problems/video-stitching/)** · Medium
+**Pattern:** Greedy Reach | **Companies:** Amazon, Google
 
-**Hint:** Add 0 and n as sentinels, sort, and pay (cuts[j] − cuts[i]) at every split.
-
----
-
-### H5 · Palindrome Partitioning II
-
-**🔗 [LC 132 — Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)** · Hard
-**Pattern:** Interval DP + linear DP | **Companies:** Google · Amazon
-
-**Hint:** Precompute the palindrome table with the length loop, then do a one-dimensional cut DP over it.
+**Hint:** Sort by start. Scan forward tracking the furthest reach from clips that begin at or before the current end; when the current end is reached, take a clip and increment the count. It is Jump Game on intervals.
 
 ---
 
-### H6 · Sum of Distances in Tree
+### M7 · Maximum Length of Pair Chain
 
-**🔗 [LC 834 — Sum of Distances in Tree](https://leetcode.com/problems/sum-of-distances-in-tree/)** · Hard
-**Pattern:** Tree DP (rerooting) | **Companies:** Google · Amazon · Meta
+**🔗 [LC 646 — Maximum Length of Pair Chain](https://leetcode.com/problems/maximum-length-of-pair-chain/)** · Medium
+**Pattern:** Greedy by End Time | **Companies:** Amazon, Google
 
-**Hint:** Two passes: sizes and inward sums down, then answer[v] = answer[u] − size[v] + (n − size[v]).
-
----
-
-### H7 · Shortest Path Visiting All Nodes
-
-**🔗 [LC 847 — Shortest Path Visiting All Nodes](https://leetcode.com/problems/shortest-path-visiting-all-nodes/)** · Hard
-**Pattern:** Bitmask BFS ((node, mask)) | **Companies:** Google · Amazon · Meta
-
-**Hint:** Visited belongs in the state: BFS over (node, mask), starting from every node at once.
+**Hint:** The same chain rule as non-overlapping intervals: sort by the second value and extend the chain whenever the next pair starts strictly after the last kept end.
 
 ---
 
-### H8 · Non-negative Integers without Consecutive Ones
+### M8 · Maximum Number of Events That Can Be Attended
 
-**🔗 [LC 600 — Non-negative Integers without Consecutive Ones](https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/)** · Hard
-**Pattern:** Digit DP (binary) | **Companies:** Google · Amazon
+**🔗 [LC 1353 — Maximum Number of Events That Can Be Attended](https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/)** · Medium
+**Pattern:** Day Sweep + Min-Heap | **Companies:** Amazon, Google, Microsoft
 
-**Hint:** Walk the bits from the top with a tight flag and the previous bit; memoise only the loose states.
+**Hint:** Advance day by day. Push every event that has started into a min-heap keyed on end day, discard expired tops, and attend the event that ends soonest.
+
+---
+
+### M9 · Two Best Non-Overlapping Events
+
+**🔗 [LC 2054 — Two Best Non-Overlapping Events](https://leetcode.com/problems/two-best-non-overlapping-events/)** · Medium
+**Pattern:** Sort + Suffix Maximum | **Companies:** Amazon, Google
+
+**Hint:** Sort by start and precompute the best value among events starting at or after each index. For each event, binary search the first non-overlapping event and add that suffix maximum.
+
+---
+
+### M10 · Exclusive Time of Functions
+
+**🔗 [LC 636 — Exclusive Time of Functions](https://leetcode.com/problems/exclusive-time-of-functions/)** · Medium
+**Pattern:** Stack of Active Calls | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** A stack holds the currently running function ids. On every log entry, add the elapsed time to whatever is on top, then push (start) or pop (end). Remember that an end timestamp is inclusive.
+
+---
+
+## 🔴 Hard Tier (3 Problems)
+
+_Sweeps that carry a structure: a multiset, a merge, or a DP table._
+
+### H1 · The Skyline Problem
+
+**🔗 [LC 218 — The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/)** · Hard
+**Pattern:** Event Sweep + Multiset | **Companies:** Google, Amazon, Meta
+
+**Hint:** Turn each building into a start and an end event, sort with starts before ends and taller first, and keep the open heights in a multiset. Emit a point whenever the maximum changes.
+
+---
+
+### H2 · Rectangle Area II
+
+**🔗 [LC 850 — Rectangle Area II](https://leetcode.com/problems/rectangle-area-ii/)** · Hard
+**Pattern:** Sweep + Coordinate Compression | **Companies:** Google, Amazon
+
+**Hint:** Sweep the distinct x-coordinates. Within a strip, the covered height is fixed: merge the y-intervals of the rectangles spanning it and multiply by the strip width.
+
+---
+
+### H3 · Maximum Profit in Job Scheduling
+
+**🔗 [LC 1235 — Maximum Profit in Job Scheduling](https://leetcode.com/problems/maximum-profit-in-job-scheduling/)** · Hard
+**Pattern:** Sort + DP + Binary Search | **Companies:** Google, Amazon, Meta
+
+**Hint:** Sort jobs by end time. `dp[i] = max(dp[i-1], profit[i] + dp[j])`, where `j` is the last job ending at or before this job's start — found by binary search.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — merge overlapping intervals (sort first)
+
+// Snippet 2 — check if a new interval overlaps each of n others
+
+// Snippet 3 — minimum meeting rooms with a sweep of 2n events
+
+// Snippet 4 — minimum meeting rooms with a min-heap of end times
+
+// Snippet 5 — insert one interval into a sorted, non-overlapping list
+
+// Snippet 6 — maximum non-overlapping intervals (sort by end, greedy)
+```
+
+**Complexity Answers:**
+
+1. **O(n log n)**.
+2. **O(n)**.
+3. **O(n log n)** — sorting the events.
+4. **O(n log n)**.
+5. **O(n)**.
+6. **O(n log n)**.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. Two intervals [a, b] and [c, d] overlap exactly when a ≤ d and c ≤ b. → **True** — for closed intervals
+2. Merging intervals works without sorting them first. → **False** — sort by start first
+3. For the most non-overlapping intervals, sort by end time. → **True** — finishing earliest leaves the most room
+4. A sweep line processes events in time order. → **True**
+5. At equal times, the order of start and end events never matters. → **False** — it decides whether touching intervals count as overlapping
+6. Meeting rooms can be solved with a heap of end times. → **True**
 
 ---
 
@@ -265,15 +240,12 @@ _Interval DP where the split is subtle, rerooting, bitmask search, and digit DP.
 
 Answer these out loud, without looking at the notes:
 
-1. **Length loop:** Why must the interval template loop over length rather than over i and j directly? What breaks otherwise?
-2. **Think last:** Burst Balloons picks the balloon that bursts last. What exactly goes wrong if you pick the first one instead?
-3. **Advantage:** What does dp`[i][j]` mean in a game DP, and why is one number enough for two players?
-4. **Two values:** In a tree DP, why does a node often return two numbers instead of just its best answer?
-5. **Rerooting:** Derive `answer[v] = answer[u] − size[v] + (n − size[v])` from scratch, in words.
-6. **The n ≤ 20 wall:** Why does bitmask DP stop being viable somewhere around n = 20? Do the arithmetic.
-7. **Free position:** In Beautiful Arrangement the position is never stored in the state. Why is that safe?
-8. **Tight states:** Why does digit DP memoise only the states where `tight` is false?
-9. **Two bounds:** How do you count values in [A, B] when your function only counts from 0, and what is the edge case?
+1. **Endpoints:** Write the overlap test for half-open intervals, then for closed ones. Which does a meeting-room problem use?
+2. **Sort choice:** Give a concrete input where sorting by start gives the wrong answer to "keep the most non-overlapping intervals".
+3. **The max:** Why must merging use `max(end, iv.end)`? Give an input that exposes the bug.
+4. **Tie-break:** At the same timestamp, when should an end event be processed before a start event, and what is the symptom of getting it backwards?
+5. **Sweep vs difference array:** Both count concurrency. State the input that makes each one the wrong choice.
+6. **Skyline removal:** Why can a plain binary heap not be used directly, and what are the two standard fixes?
 
 ---
 
@@ -281,30 +253,27 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company                    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Google · Amazon**        | [Minimum Cost to Merge Stones](https://leetcode.com/problems/minimum-cost-to-merge-stones/), [Strange Printer](https://leetcode.com/problems/strange-printer/), [Minimum Cost to Cut a Stick](https://leetcode.com/problems/minimum-cost-to-cut-a-stick/), [Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)                                                                                                       |
-| **Amazon · Google**        | [Minimum Score Triangulation of Polygon](https://leetcode.com/problems/minimum-score-triangulation-of-polygon/), [Longest ZigZag Path in a Binary Tree](https://leetcode.com/problems/longest-zigzag-path-in-a-binary-tree/), [Maximum Product of the Length of Two Palindromic Subsequences](https://leetcode.com/problems/maximum-product-of-the-length-of-two-palindromic-subsequences/), [Binary Watch](https://leetcode.com/problems/binary-watch/) |
-| **Amazon · Meta**          | [Stone Game](https://leetcode.com/problems/stone-game/), [Binary Tree Coloring Game](https://leetcode.com/problems/binary-tree-coloring-game/), [Sum of Root To Leaf Binary Numbers](https://leetcode.com/problems/sum-of-root-to-leaf-binary-numbers/)                                                                                                                                                                                                  |
-| **Google · Amazon · Meta** | [Burst Balloons](https://leetcode.com/problems/burst-balloons/), [Sum of Distances in Tree](https://leetcode.com/problems/sum-of-distances-in-tree/), [Shortest Path Visiting All Nodes](https://leetcode.com/problems/shortest-path-visiting-all-nodes/)                                                                                                                                                                                                |
-| **Amazon**                 | [Univalued Binary Tree](https://leetcode.com/problems/univalued-binary-tree/)                                                                                                                                                                                                                                                                                                                                                                            |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Determine if Two Events Have Conflict](https://leetcode.com/problems/determine-if-two-events-have-conflict/), [Range Addition II](https://leetcode.com/problems/range-addition-ii/), [Rectangle Area II](https://leetcode.com/problems/rectangle-area-ii/), [Maximum Length of Pair Chain](https://leetcode.com/problems/maximum-length-of-pair-chain/)                                           |
+| **Google**    | [My Calendar II](https://leetcode.com/problems/my-calendar-ii/), [Remove Covered Intervals](https://leetcode.com/problems/remove-covered-intervals/), [Two Best Non-Overlapping Events](https://leetcode.com/problems/two-best-non-overlapping-events/), [Video Stitching](https://leetcode.com/problems/video-stitching/)                                                                         |
+| **Meta**      | [Maximum Profit in Job Scheduling](https://leetcode.com/problems/maximum-profit-in-job-scheduling/), [The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/), [Exclusive Time of Functions](https://leetcode.com/problems/exclusive-time-of-functions/), [Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/) |
+| **Microsoft** | [Maximum Number of Events That Can Be Attended](https://leetcode.com/problems/maximum-number-of-events-that-can-be-attended/), [Exclusive Time of Functions](https://leetcode.com/problems/exclusive-time-of-functions/)                                                                                                                                                                           |
+| **Adobe**     | [Number of Students Doing Homework at a Given Time](https://leetcode.com/problems/number-of-students-doing-homework-at-a-given-time/)                                                                                                                                                                                                                                                              |
 
 ---
 
 ## ✅ Completion Checklist
 
 - [ ] All 5 Easy problems solved
-- [ ] All 12 Medium problems solved
-- [ ] All 8 Hard problems attempted
-- [ ] All 9 conceptual questions answered out loud
-- [ ] I can write the interval template from memory, including the length loop
-- [ ] I can explain the think-last reversal and when it is unnecessary
-- [ ] I can write a game DP as an advantage with the sign flip
-- [ ] I can reroot a tree DP and derive the patch formula
-- [ ] I know the bitmask operations, including submask enumeration
-- [ ] I can write the digit DP skeleton with tight and started flags
-- [ ] I can read a constraint like n ≤ 15 and name the intended technique
+- [ ] All 10 Medium problems solved
+- [ ] All 3 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 6 conceptual questions answered out loud
+- [ ] I can convert any interval problem into events and sweep them
+- [ ] I can say which of sort-by-start, sort-by-end and event-sweep a new problem needs
 
 ---
 
-**← [Lecture 27 · Dynamic Programming III — Knapsack & Subsets](../Lecture27/Assignment.md)** &nbsp;·&nbsp; **[Lecture 29 · Tries (Prefix Trees)](../Lecture29/Assignment.md) →**
+**← [Lecture 27 · Monotonic Stack & Queue](../Lecture27/Assignment.md)** &nbsp;·&nbsp; **[Lecture 29 · Greedy Algorithms](../Lecture29/Assignment.md) →**

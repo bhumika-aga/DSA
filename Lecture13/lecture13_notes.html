@@ -3,17 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 13 — HashMap &amp; HashSet</title>
-    <meta
-      name="description"
-      content="Master HashMap and HashSet for FAANG interviews: hashing internals, collision resolution, frequency maps, complement lookup, prefix sum with map, and LRU Cache design."
-    />
+    <title>Lecture 13 — Searching Algorithms</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
       rel="stylesheet"
     />
-
     <style>
       *,
       *::before,
@@ -87,7 +82,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1394,65 +1389,68 @@
   </head>
 
   <body>
-    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">HashMap &amp; HashSet</div>
+        <div class="sb-title">Searching Algorithms</div>
         <div class="sb-meta">
-          Lecture 13 of 38 &middot; Phase 2 &mdash; Core Data Structures
+          Lecture 13 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
-        <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#128218;</span>Why HashMaps Win</a
+        <a href="#overview" class="toc-item active">
+          <span class="toc-icon">🌐</span> Search Overview
+        </a>
+        <a href="#deep-dive" class="toc-item">
+          <span class="toc-icon">🔬</span> Algorithms Deep Dive
+        </a>
+        <a href="#variations" class="toc-item">
+          <span class="toc-icon">🔄</span> Search Variations
+        </a>
+        <a href="#exp-sqrt" class="toc-item"
+          ><span class="toc-icon">&#128640;</span>Exponential &amp; Sqrt</a
         >
-        <a class="toc-item" href="#internals"
-          ><span class="toc-icon">&#9881;</span>How Hashing Works</a
+        <a href="#complexity" class="toc-item">
+          <span class="toc-icon">⏱️</span> Complexity Analysis
+        </a>
+        <a href="#matrix" class="toc-item">
+          <span class="toc-icon">🗺️</span> 2D Matrix Search
+        </a>
+
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Classic Bugs</a
         >
-        <a class="toc-item toc-sub" href="#collision">Collision Resolution</a>
-        <a class="toc-item toc-sub" href="#resize">Load Factor &amp; Resize</a>
-        <a class="toc-item" href="#patterns"
-          ><span class="toc-icon">&#127919;</span>The 5 Core Patterns</a
-        >
-        <a class="toc-item toc-sub" href="#freq-map">Frequency Map</a>
-        <a class="toc-item toc-sub" href="#complement">Complement Lookup</a>
-        <a class="toc-item toc-sub" href="#prefix-map">Prefix Sum + Map</a>
-        <a class="toc-item toc-sub" href="#group-key">Group-by-Key</a>
-        <a class="toc-item toc-sub" href="#set-membership">Set Membership</a>
-        <a class="toc-item" href="#practice"
-          ><span class="toc-icon">&#128170;</span>Practice Problems</a
-        >
-        <a class="toc-item" href="#assignment"
-          ><span class="toc-icon">&#128221;</span>Assignment</a
-        >
-        <a class="toc-item" href="#checklist"
-          ><span class="toc-icon">&#9989;</span>Checklist</a
-        >
+        <a href="#practice" class="toc-item">
+          <span class="toc-icon">💪</span> Problem Set
+        </a>
+        <a href="#assignment" class="toc-item">
+          <span class="toc-icon">📝</span> Assignment
+        </a>
+        <div class="sb-div"></div>
+        <a href="#checklist" class="toc-item">
+          <span class="toc-icon">✅</span> Completion Checklist
+        </a>
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture12/lecture12_notes.html"
-          >&larr; Lecture 12 &middot; Stacks &amp; Queues</a
+          >&larr; Lecture 12 &middot; Sorting Algorithms</a
         >
         <a class="toc-item" href="../Lecture14/lecture14_notes.html"
-          >&rarr; Lecture 14 &middot; Matrix Problems</a
+          >&rarr; Lecture 14 &middot; Linked Lists</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
-    <!-- ══ MAIN ════════════════════════════════════════════════ -->
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase2">Phase 2</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 13 &mdash; HashMap &amp; HashSet</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 13 &mdash; Searching Algorithms</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1468,40 +1466,37 @@
       </div>
 
       <div id="content">
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-          <span class="page-emoji">&#128218;</span>
-          <h1 class="page-title">HashMap &amp; HashSet — Deep Dive</h1>
+        <header class="page-header">
+          <span class="page-emoji">🔍</span>
+          <h1 class="page-title">Searching Algorithms</h1>
           <p class="page-sub">
-            "The HashMap is not a trick — it is the most powerful O(1) tool in
-            your interview toolkit."
+            "From exhaustive scanning to logarithmic bounds. Searching is the
+            art of eliminating the irrelevant."
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 13 of 38</span>
+            <span class="meta-chip accent">&#128218; Lecture 13 of 45</span>
             <span class="meta-chip accent"
               >Phase 2 &mdash; Core Data Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 25 problems</span>
-            <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Facebook &middot;
-              Microsoft</span
-            >
+            <span class="meta-chip yellow">&#9201; 5 days</span>
+            <span class="meta-chip green">&#127919; 28 problems</span>
+            <span class="meta-chip">💼 Google · Uber · Facebook</span>
           </div>
-        </div>
+        </header>
 
-        <!-- WHY THIS MATTERS -->
+        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
         <div class="callout blue" style="margin-bottom: 20px">
-          <span class="callout-icon">&#128161;</span>
+          <span class="callout-icon">🌍</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            The HashMap is the single most frequently used data structure in
-            coding interviews. It powers Two Sum, Group Anagrams, Top K Frequent
-            elements, counting, caching, and dozens of other patterns. You will
-            use a HashMap in more than
-            <strong>60% of all medium-difficulty LeetCode problems</strong>.
-            Understanding <em>why</em> it's O(1) — and when it degrades to O(n)
-            — is what separates good candidates from great ones.
+            Searching is how every large system finds things fast. Google
+            indexes billions of pages and returns results in milliseconds
+            because of binary search principles at every layer. Binary Search
+            turns an O(N) problem into O(log N) — for N = 1 billion, that's the
+            difference between 1 billion operations and just 30. Beyond simple
+            element search, "Binary Search on Answer Space" is one of the most
+            powerful interview tricks — it converts problems that look
+            impossible into clean O(N log N) solutions.
           </div>
         </div>
 
@@ -1509,1331 +1504,1443 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Understand hashing, hash functions, and collision resolution
-              internals
+              Understand the limits of O(N) Linear Search against O(log N)
+              Binary Search scaling.
             </li>
             <li>
-              Use frequency maps for counting, grouping, and top-K problems
+              Implement Binary Search perfectly &mdash; get boundaries right
+              every single time.
             </li>
-            <li>Apply complement lookup for pair-sum patterns in O(1)</li>
             <li>
-              Know when to use TreeMap (sorted), LinkedHashMap (ordered), vs
-              HashMap (fastest)
+              Recognise disguised binary search problems that aren't initially
+              obvious.
+            </li>
+            <li>
+              Apply "binary search on answer space" for monotonic optimisation
+              scenarios.
+            </li>
+            <li>
+              Search in rotated arrays, 2D matrices, and infinite data streams.
             </li>
           </ul>
         </div>
 
+        <h3 class="h2" style="margin-top: 0">
+          📖 Before We Start — The Big Picture
+        </h3>
+        <p>
+          Searching is the problem of finding a target element in a dataset. The
+          strategy depends entirely on what you know about the data:
+        </p>
+        <ul>
+          <li>
+            <strong>Unsorted data?</strong> You have no choice but Linear Search
+            — O(N). No trick can help without first sorting.
+          </li>
+          <li>
+            <strong>Sorted data?</strong> Binary Search reduces the problem by
+            half with every comparison — O(log N). This is the cornerstone of
+            this lecture.
+          </li>
+          <li>
+            <strong>Sorted 2D matrix?</strong> You can flatten it to 1D or use
+            Staircase search.
+          </li>
+          <li>
+            <strong>Answer-space search?</strong> You don't search for a value
+            in an array — you binary search for the optimal answer to a
+            minimization/maximization problem.
+          </li>
+        </ul>
+        <p>
+          The key insight of <strong>Binary Search</strong> is the
+          <em>invariant</em>: at every step, you maintain the guarantee that the
+          target — if it exists — lies within <code>[lo, hi]</code>. By checking
+          the midpoint, you eliminate half the remaining candidates. You only
+          need 30 checks to find any element in a 1-billion element array.
+        </p>
+
         <div class="callout green" style="margin-bottom: 32px">
-          <span class="callout-icon">&#128279;</span>
+          <span class="callout-icon">🔗</span>
           <div class="callout-body">
-            <strong>How it connects:</strong> Lecture 2 introduced HashMaps as
-            Java Collections. Lecture 8 used frequency arrays (int[26]) as an
-            O(1) alternative for character maps. This lecture formalises the
-            internals — hashing, collision resolution, load factor — and teaches
-            the 5 interview patterns that appear repeatedly across Google,
-            Amazon, Meta and Microsoft problems.
+            <strong>How it connects:</strong> Lecture 12 (Sorting) is the
+            prerequisite — Binary Search requires sorted data. Lecture 8
+            (Recursion) shows the elegant recursive formulation of Binary
+            Search. Binary Search on answer space appears in later lectures on
+            Graphs (finding minimum cost) and Dynamic Programming.
           </div>
         </div>
 
         <hr />
 
-        <!-- ══ SECTION 1: WHY HASHMAPS ═══════════════════════ -->
-        <h2 class="h1" id="intro">
-          &#128218; Why HashMaps Beat Every Other Structure
+        <!-- EXPONENTIAL SEARCH & INTEGER SQRT -->
+        <h2 class="h1" id="exp-sqrt">
+          &#128640; Exponential Search &amp; Integer Square Root
         </h2>
         <p>
-          Before HashMaps, solving "Does this element exist?" required O(n)
-          linear scan or O(log n) binary search in a sorted structure. HashMaps
-          provide <mark>O(1) average-case lookup, insert, and delete</mark> — an
-          extraordinary advantage.
+          Two variants that come up constantly and that plain binary search does
+          not cover: searching a sequence whose length you don't know, and
+          searching a range of <em>answers</em> rather than a range of indices.
         </p>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Array</th>
-                <th>Sorted Array</th>
-                <th>BST</th>
-                <th>HashMap</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Search</td>
-                <td>O(n)</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td><strong>O(1) avg</strong></td>
-              </tr>
-              <tr>
-                <td>Insert</td>
-                <td>O(1) amortised</td>
-                <td>O(n)</td>
-                <td>O(log n)</td>
-                <td><strong>O(1) avg</strong></td>
-              </tr>
-              <tr>
-                <td>Delete</td>
-                <td>O(n)</td>
-                <td>O(n)</td>
-                <td>O(log n)</td>
-                <td><strong>O(1) avg</strong></td>
-              </tr>
-              <tr>
-                <td>Ordered?</td>
-                <td>No</td>
-                <td>Yes</td>
-                <td>Yes</td>
-                <td><strong>No (use TreeMap)</strong></td>
-              </tr>
-            </tbody>
-          </table>
+        <h3 class="h3" id="exp-search">Exponential (Galloping) Search</h3>
+        <p>
+          Double a bound until you overshoot the target, then binary search the
+          last doubling window. Because the window is found in O(log&nbsp;i)
+          steps where i is the target's index, this beats plain binary search
+          when the answer sits near the front &mdash; and it is the only option
+          for an unbounded or infinite stream.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Exponential Search</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Use when the array has no known end (a stream), or when the</span>
+<span class="pc-cm">// target is expected near the front. Find a bound, then binary search it.</span>
+<span class="pc-kw">if</span> arr[0] = target: <span class="pc-kw">return</span> 0
+
+bound <span class="pc-kw">&larr;</span> 1
+<span class="pc-kw">while</span> bound &lt; length(arr) <span class="pc-kw">and</span> arr[bound] &lt; target:
+    bound <span class="pc-kw">&larr;</span> bound &times; 2      <span class="pc-cm">// 1, 2, 4, 8, 16 …</span>
+
+<span class="pc-cm">// target now lies in (bound/2, min(bound, n-1)]</span>
+<span class="pc-kw">return</span> binarySearch(arr, bound &divide; 2, min(bound, length(arr) - 1), target)</pre>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(log i) &mdash; i is the target index</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
+        </div>
+
+        <h3 class="h3" id="int-sqrt">Integer Square Root</h3>
+        <p>
+          <code>Math.sqrt</code> is banned in this question for a reason: it is
+          the cleanest small example of
+          <strong>binary search on the answer space</strong>. The predicate
+          <em>&ldquo;is mid&times;mid &le; n?&rdquo;</em> is monotonic &mdash;
+          true, true, true, then false forever &mdash; so you can binary search
+          the boundary.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Integer Square Root</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Largest integer r with r*r &lt;= n. A binary search on the ANSWER,</span>
+<span class="pc-cm">// not on an array — the classic 'search space' shape.</span>
+<span class="pc-kw">if</span> n &lt; 2: <span class="pc-kw">return</span> n
+lo <span class="pc-kw">&larr;</span> 1
+hi <span class="pc-kw">&larr;</span> n &divide; 2      <span class="pc-cm">// sqrt(n) never exceeds n/2 for n >= 4</span>
+ans <span class="pc-kw">&larr;</span> 1
+
+<span class="pc-kw">while</span> lo &le; hi:
+    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
+    <span class="pc-kw">if</span> mid &times; mid &le; n:
+        ans <span class="pc-kw">&larr;</span> mid       <span class="pc-cm">// feasible — record it and reach higher</span>
+        lo  <span class="pc-kw">&larr;</span> mid + 1
+    <span class="pc-kw">else</span>:
+        hi <span class="pc-kw">&larr;</span> mid - 1    <span class="pc-cm">// too big</span>
+
+<span class="pc-kw">return</span> ans</pre>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(log n)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
         </div>
 
         <div class="callout yellow">
-          <span class="callout-icon">&#9888;</span>
+          <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong>When NOT to use HashMap:</strong> If you need sorted order →
-            use <code>TreeMap</code> (O(log n)). If keys are small integers →
-            use an <code>int[]</code> frequency array (faster in practice).
-            HashMaps have high constant factors due to hashing overhead.
+            <strong>The overflow trap</strong><br /><code>mid * mid</code>
+            overflows a 32-bit int long before mid reaches
+            &radic;(2<sup>31</sup>). Use <code>long</code>, or compare
+            <code>mid &le; n / mid</code> instead of multiplying at all.
           </div>
         </div>
 
         <hr />
 
-        <!-- ══ SECTION 2: HOW HASHING WORKS ═══════════════════ -->
-        <h2 class="h1" id="internals">
-          &#9881; How Hashing Works — The Internals
-        </h2>
-        <p>
-          A HashMap stores entries in an internal
-          <strong>array of buckets</strong>. To find where a key belongs:
-        </p>
-        <ol style="margin: 8px 0 8px 24px; line-height: 2">
-          <li>Compute <code>hash = key.hashCode()</code></li>
-          <li>
-            Map to bucket index: <code>index = hash &amp; (capacity - 1)</code>
-          </li>
-          <li>Store the (key, value) pair in that bucket</li>
-        </ol>
+        <!-- ══ 1. OVERVIEW ═══════════════════════════════════════ -->
+        <section id="overview" class="section">
+          <h2 class="h1">🌐 Search Overview</h2>
+          <p>
+            The goal of searching algorithms is simply to locate a target
+            element in a dataset. Optimisation comes from leveraging the
+            properties of the dataset:
+          </p>
+          <ul>
+            <li>
+              <strong>Linear Search:</strong> The universal fallback. Scans one
+              by one. Required when data is unsorted.
+            </li>
+            <li>
+              <strong>Binary Search:</strong> The divide-and-conquer king.
+              Slices domains in half, but requires sorted data.
+            </li>
+            <li>
+              <strong>Ternary Search:</strong> Divides space into thirds.
+              Specialized for finding peaks/valleys in unimodal functions.
+            </li>
+            <li>
+              <strong>Interpolation Search:</strong> Guesses the location based
+              on values. Incredible speed, but requires uniformly distributed
+              data.
+            </li>
+          </ul>
+        </section>
 
-        <div class="ascii-tree">
-          HashMap internals (capacity = 8, default): Key hashCode() index = hash
-          &amp; 7 Bucket ────────────────────────────────────────────── "cat"
-          98532 <span class="hl">4</span> bucket[<span class="hl">4</span>] →
-          ("cat", value) "dog" 99557 <span class="hl">5</span> bucket[<span
-            class="hl"
-            >5</span
-          >] → ("dog", value) "art" 96478 <span class="hl">6</span> bucket[<span
-            class="hl"
-            >6</span
-          >] → ("art", value) "rat" 113608
-          <span class="nd">0</span> bucket[<span class="nd">0</span>] → ("rat",
-          value) ← collision risk
-        </div>
+        <!-- ══ 2. ALGORITHMS DEEP DIVE ═══════════════════════════ -->
+        <section id="deep-dive" class="section">
+          <h2 class="h1">🔬 Algorithms Deep Dive</h2>
 
-        <h3 class="h2" id="collision">
-          Collision Resolution — Separate Chaining vs Open Addressing
-        </h3>
-        <p>
-          When two keys hash to the same bucket, we have a
-          <strong>collision</strong>. Java's HashMap uses
-          <mark>Separate Chaining</mark> — each bucket holds a linked list (or a
-          red-black tree when the chain length &gt; 8).
-        </p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Strategy</th>
-                <th>How It Works</th>
-                <th>Java Uses?</th>
-                <th>Worst Case</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Separate Chaining</strong></td>
-                <td>Each bucket = list/tree of entries</td>
-                <td>✅ Yes (HashMap)</td>
-                <td>O(n) — all into one bucket</td>
-              </tr>
-              <tr>
-                <td><strong>Open Addressing</strong></td>
-                <td>Linear/quadratic probing for next empty slot</td>
-                <td>No</td>
-                <td>O(n) with bad hash</td>
-              </tr>
-              <tr>
-                <td><strong>Robin Hood</strong></td>
-                <td>Steal from "rich" entries, give to "poor"</td>
-                <td>No</td>
-                <td>O(log n) expected</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout purple">
-          <span class="callout-icon">&#128301;</span>
-          <div class="callout-body">
-            <strong>Java HashMap's tree upgrade (Java 8+):</strong> When a
-            bucket's chain length exceeds <code>TREEIFY_THRESHOLD = 8</code>,
-            the linked list is converted to a red-black tree. This makes
-            worst-case per-bucket lookup O(log n) instead of O(n). This is the
-            "HashMap treeification" interview question at Google.
+          <h3 class="h2">Linear Search</h3>
+          <p>
+            While mathematically <code>O(n)</code> is slow, it is paradoxically
+            the <em>fastest</em> search for tiny arrays (<code>n &lt; 100</code
+            >) due to CPU contiguous memory caching avoiding pointer jumping
+            overhead.
+          </p>
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Recursion Trap:</strong> Writing Linear
+              Search recursively occupies <code>O(n)</code> Space due to the
+              Call Stack. Always write Linear Search iteratively in Java!
+            </p>
           </div>
-        </div>
 
-        <h3 class="h2" id="resize">Load Factor &amp; Resizing</h3>
-        <p>
-          Java's HashMap has a default <strong>load factor of 0.75</strong>.
-          When <code>size / capacity &gt; 0.75</code>, the map
-          <strong>doubles capacity and rehashes all entries</strong> — an O(n)
-          operation. This is why HashMap insertions are O(1) <em>amortised</em>,
-          not O(1) worst-case.
-        </p>
-
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">&#9749; Java &middot; Key HashMap API</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Integer</span>&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-
-<span class="cm">// Core operations — all O(1) average</span>
-map.put(<span class="str">"apple"</span>, 3);                    <span class="cm">// insert / update</span>
-map.get(<span class="str">"apple"</span>);                        <span class="cm">// → 3</span>
-map.getOrDefault(<span class="str">"banana"</span>, 0);           <span class="cm">// → 0 (safe default)</span>
-map.containsKey(<span class="str">"apple"</span>);               <span class="cm">// → true</span>
-map.remove(<span class="str">"apple"</span>);                    <span class="cm">// delete key</span>
-
-<span class="cm">// Frequency counting idiom (interview staple)</span>
-map.put(<span class="str">"apple"</span>, map.getOrDefault(<span class="str">"apple"</span>, 0) + 1);
-<span class="cm">// OR: Java 8+</span>
-map.merge(<span class="str">"apple"</span>, 1, <span class="cls">Integer</span>::sum);
-
-<span class="cm">// Iterating</span>
-<span class="kw">for</span> (<span class="cls">Map</span>.<span class="cls">Entry</span>&lt;<span class="cls">String</span>, <span class="cls">Integer</span>&gt; e : map.entrySet())
-    System.out.println(e.getKey() + <span class="str">" → "</span> + e.getValue());
-
-<span class="cm">// HashSet — same internals, no values</span>
-<span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; seen = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
-seen.add(5);
-seen.contains(5);   <span class="cm">// O(1)</span>
-seen.remove(5);</pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 3: THE 5 PATTERNS ═══════════════════════ -->
-        <h2 class="h1" id="patterns">
-          &#127919; The 5 Core HashMap Interview Patterns
-        </h2>
-        <p>
-          Every HashMap problem you will encounter in FAANG interviews is a
-          variation of one of these five patterns. Learn to recognise the
-          pattern first — the code will follow naturally.
-        </p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Pattern</th>
-                <th>Trigger phrase</th>
-                <th>Canonical Problem</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td><strong>Frequency Map</strong></td>
-                <td>"count occurrences", "most frequent"</td>
-                <td>
-                  <a
-                    href="https://leetcode.com/problems/top-k-frequent-elements/"
-                    target="_blank"
-                    >Top K Frequent (LC 347)</a
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td><strong>Complement Lookup</strong></td>
-                <td>"find two that add to target"</td>
-                <td>
-                  <a
-                    href="https://leetcode.com/problems/two-sum/"
-                    target="_blank"
-                    >Two Sum (LC 1)</a
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td><strong>Prefix Sum + Map</strong></td>
-                <td>"subarray sum equals K"</td>
-                <td>
-                  <a
-                    href="https://leetcode.com/problems/subarray-sum-equals-k/"
-                    target="_blank"
-                    >Subarray Sum = K (LC 560)</a
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td><strong>Group-by-Key</strong></td>
-                <td>"group", "anagram", "same signature"</td>
-                <td>
-                  <a
-                    href="https://leetcode.com/problems/group-anagrams/"
-                    target="_blank"
-                    >Group Anagrams (LC 49)</a
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td><strong>Set Membership</strong></td>
-                <td>"duplicate", "seen before", "longest sequence"</td>
-                <td>
-                  <a
-                    href="https://leetcode.com/problems/longest-consecutive-sequence/"
-                    target="_blank"
-                    >Longest Consecutive (LC 128)</a
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pattern deep-dives -->
-        <h3 class="h2" id="freq-map">Pattern 1: Frequency Map</h3>
-        <p>
-          Count how many times each element appears. The result is a
-          <code>Map&lt;T, Integer&gt;</code> where value = count.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Frequency Map template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Count how often each number appears</span>
-freq ← empty map
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-    freq[x] ← (freq[x] <span class="pc-kw">if</span> x <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1</pre>
-        </div>
-
-        <h3 class="h2" id="complement">Pattern 2: Complement Lookup</h3>
-        <p>
-          For "find two elements summing to target": as you scan, store what
-          you've seen. For each new element, check if its
-          <mark>complement = target - element</mark> is already stored.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Complement Lookup</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// One pass. Ask 'have I already seen the number that completes me?'</span>
-<span class="pc-cm">// before storing the current one — otherwise an element pairs with itself.</span>
-seen <span class="pc-kw">&larr;</span> empty map from value &rarr; index
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    need <span class="pc-kw">&larr;</span> target - a[i]
-    <span class="pc-kw">if</span> need <span class="pc-kw">in</span> seen:
-        <span class="pc-kw">return</span> (seen[need], i)
-    seen[a[i]] <span class="pc-kw">&larr;</span> i        <span class="pc-cm">// store AFTER the lookup</span>
-
-<span class="pc-kw">return</span> none</pre>
-        </div>
-
-        <h3 class="h2" id="prefix-map">Pattern 3: Prefix Sum + Map</h3>
-        <p>
-          For "subarray sum equals K": maintain a running prefix sum. At each
-          index, check if <code>prefixSum - K</code> has been seen before — that
-          gap is a valid subarray.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Prefix Sum + Map</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Count subarrays summing to k, in one pass.</span>
-<span class="pc-cm">// sum(i..j) = prefix[j] - prefix[i-1], so we look for prefix - k.</span>
-count <span class="pc-kw">&larr;</span> 0
-running <span class="pc-kw">&larr;</span> 0
-seen <span class="pc-kw">&larr;</span> map with { 0 &rarr; 1 }   <span class="pc-cm">// the empty prefix — do not forget this</span>
-
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-    running <span class="pc-kw">&larr;</span> running + x
-    <span class="pc-kw">if</span> (running - k) <span class="pc-kw">in</span> seen:
-        count <span class="pc-kw">&larr;</span> count + seen[running - k]
-    seen[running] <span class="pc-kw">&larr;</span> seen.get(running, 0) + 1
-
-<span class="pc-kw">return</span> count</pre>
-        </div>
-
-        <h3 class="h2" id="group-key">Pattern 4: Group-by-Key</h3>
-        <p>
-          Transform each element into a <mark>canonical key</mark> (sorted
-          string, character frequency array, etc.) and group elements sharing
-          the same key.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Group-by-Key template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>groups ← empty map                  <span class="pc-cm">// key → list of strings</span>
-<span class="pc-kw">for</span> s <span class="pc-kw">in</span> strs:
-    key ← sort the characters of s   <span class="pc-cm">// sorted = canonical form</span>
-    <span class="pc-kw">if</span> key <span class="pc-kw">not</span> <span class="pc-kw">in</span> groups: groups[key] ← empty list
-    append s <span class="pc-kw">to</span> groups[key]</pre>
-        </div>
-
-        <h3 class="h2" id="set-membership">Pattern 5: Set Membership</h3>
-        <p>
-          Add all elements to a HashSet first. Then traverse, using the set for
-          O(1) existence checks. Classic trick for "longest consecutive
-          sequence": only start counting from sequence beginnings (nums where
-          <code>num - 1</code> is NOT in the set).
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Set Membership template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>set ← all values of nums
-longest ← 0
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> set:
-    <span class="pc-kw">if</span> (x - 1) <span class="pc-kw">not</span> <span class="pc-kw">in</span> set:           <span class="pc-cm">// x is a sequence start</span>
-        len ← 1
-        <span class="pc-kw">while</span> (x + len) <span class="pc-kw">in</span> set: len ← len + 1
-        longest ← max(longest, len)</pre>
-        </div>
-
-        <hr />
-
-        <!-- ══ SECTION 4: PRACTICE PROBLEMS ═══════════════════ -->
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-        <p>
-          Work through in order. Click a card to expand. Try solving before
-          revealing the solution.
-        </p>
-
-        <!-- P01: Two Sum -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Complement Lookup</div>
-              <div class="prob-title">Two Sum</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/two-sum/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1 — Easy</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-co"
-                  >Google · Amazon · Meta · Microsoft</span
-                >
-                <span class="tag tag-pat">Complement Lookup</span>
-              </div>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Linear Search (Iterative vs
+                Recursive)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given an array and a target, return indices of the two numbers
-                that add to target. Exactly one solution exists.
-              </p>
-              <div class="iobox">
-                Input: nums=[2,7,11,15], target=9 → Output: [0,1] Input:
-                nums=[3,2,4], target=6 → Output: [1,2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The brute force is two nested loops. What makes 'have I seen
-                    the partner?' instant?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    One pass with a value &rarr; index map. Look up target - x
-                    before inserting x.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                <strong>Brute force:</strong> Check all pairs → O(n²). Too
-                slow.<br />
-                <strong>Key insight:</strong> For each element x, the complement
-                we need is <code>target - x</code>. If we store every element
-                we've seen so far in a HashMap (value → index), we can check if
-                the complement already exists in O(1).<br />
-                <strong>Critical detail:</strong> Put into map
-                <em>after</em> checking — prevents using the same element twice.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; One-Pass HashMap</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> twoSum(nums, target):
-    seen ← empty map                       <span class="pc-cm">// value → index</span>
+            <pre><span class="pc-cm">// Iterative: space O(1)</span>
+<span class="pc-kw">function</span> linearSearch(nums, target):
     <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        complement ← target - nums[i]
-        <span class="pc-kw">if</span> complement <span class="pc-kw">in</span> seen:
-            <span class="pc-kw">return</span> [seen[complement], i]
-        seen[nums[i]] ← i                  <span class="pc-cm">// add AFTER checking</span>
-    <span class="pc-kw">return</span> []
+        <span class="pc-kw">if</span> nums[i] = target: <span class="pc-kw">return</span> i
+    <span class="pc-kw">return</span> NOT_FOUND
 
-<span class="pc-cm">// Dry run: nums=[2,7,11,15], target=9</span>
-<span class="pc-cm">// i=0: complement=7, seen={} → miss → seen={2:0}</span>
-<span class="pc-cm">// i=1: complement=2, seen={2:0} → HIT → return [0,1] ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+<span class="pc-cm">// Recursive: space O(n) — one call-stack frame per element</span>
+<span class="pc-kw">function</span> recursiveLinear(nums, target, index):
+    <span class="pc-kw">if</span> index ≥ length(nums): <span class="pc-kw">return</span> NOT_FOUND
+    <span class="pc-kw">if</span> nums[index] = target: <span class="pc-kw">return</span> index
+    <span class="pc-kw">return</span> recursiveLinear(nums, target, index + 1)</pre>
           </div>
-        </div>
 
-        <!-- P02: Roman to Integer -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Character Map</div>
-              <div class="prob-title">Roman to Integer</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/roman-to-integer/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 13 — Easy</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-co">Amazon · Microsoft · Adobe</span>
-                <span class="tag tag-pat">Character Map</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+          <h3 class="h2">Binary Search</h3>
+          <p>
+            Systematically eliminates halves. Heavily vulnerable to infinite
+            loops if boundaries (`low`, `high`) overlap incorrectly.
+          </p>
+          <div class="callout orange">
+            <p>
+              <strong>Caveat - The Overflow Bug:</strong> Calculating
+              <code>mid = (low + high) / 2</code> overflows the 32-bit integer
+              limit if boundaries are massive. <strong>Always use:</strong>
+              <code>mid = low + (high - low) / 2</code>.
+            </p>
           </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Convert a Roman numeral string to an integer. Roman symbols:
-                I=1, V=5, X=10, L=50, C=100, D=500, M=1000. Subtraction rule: if
-                a smaller value precedes a larger one, subtract it (e.g. IV=4,
-                IX=9).
-              </p>
-              <div class="iobox">
-                Input: "III" → 3 Input: "LVIII" → 58 (L=50, V=5, III=3) Input:
-                "MCMXCIV" → 1994 (M=1000, CM=900, XC=90, IV=4)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Almost every symbol adds. Only six subtract, and there is a
-                    rule for when.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Map each numeral to its value; scan left to right and
-                    subtract when a symbol is followed by a larger one,
-                    otherwise add.
-                  </p>
-                </div>
-              </details>
-            </div>
 
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Build a HashMap from Roman characters to integer values. Scan
-                right to left — if current value is less than the next value to
-                the right, subtract it; otherwise add it.
-              </p>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Classic Binary Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; HashMap + Right-to-Left
-                      Scan</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> romanToInt(s):
-    val ← {I:1, V:5, X:10, L:50, C:100, D:500, M:1000}
-    result ← 0;  prev ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> length(s) - 1 <span class="pc-kw">down to</span> 0:
-        curr ← val[s[i]]
-        <span class="pc-kw">if</span> curr &lt; prev: result ← result - curr     <span class="pc-cm">// smaller before larger → subtract</span>
-        <span class="pc-kw">else</span>: result ← result + curr
-        prev ← curr
-    <span class="pc-kw">return</span> result
-
-<span class="pc-cm">// Dry run: "MCMXCIV" (right to left)</span>
-<span class="pc-cm">// i=6: V=5,   prev=0   → 5 ≥ 0     → add 5.    result=5,   prev=5</span>
-<span class="pc-cm">// i=5: I=1,   prev=5   → 1 &lt; 5     → sub 1.    result=4,   prev=1</span>
-<span class="pc-cm">// i=4: C=100, prev=1   → 100 ≥ 1   → add 100.  result=104, prev=100</span>
-<span class="pc-cm">// i=3: X=10,  prev=100 → 10 &lt; 100  → sub 10.   result=94,  prev=10</span>
-<span class="pc-cm">// i=2: M=1000 ... → result=1994 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+            <pre><span class="pc-kw">function</span> binarySearch(nums, target):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo ≤ hi:                   <span class="pc-cm">// '≤' so a one-element range is still checked</span>
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
+        <span class="pc-kw">if</span> nums[mid] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                  hi ← mid - 1
+    <span class="pc-kw">return</span> NOT_FOUND</pre>
           </div>
-        </div>
 
-        <!-- P03: Group Anagrams -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Group-by-Key</div>
-              <div class="prob-title">Group Anagrams</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/group-anagrams/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 49 — Medium</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Google · Amazon · Uber · Meta</span>
-                <span class="tag tag-pat">Group-by-Key</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+          <h3 class="h2">Interpolation Search</h3>
+          <p>
+            Instead of blindly checking the middle, it estimates position:
+            <code
+              >pos = lo + ((target - arr[lo]) * (hi - lo) / (arr[hi] -
+              arr[lo]))</code
+            >.
+          </p>
+          <div class="callout green">
+            <p>
+              <strong>Good to Know:</strong> Outperforms Binary Search by
+              reaching <code>O(log log n)</code>, <em>but only</em> if data is
+              linearly uniform (e.g., 10, 20, 30...). If clumped heavily, it
+              crashes to <code>O(n)</code>.
+            </p>
           </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given a list of strings, group the anagrams together. An anagram
-                is a word formed by rearranging another word's letters.
-              </p>
-              <div class="iobox">
-                Input: ["eat","tea","tan","ate","nat","bat"] Output:
-                [["bat"],["nat","tan"],["ate","eat","tea"]]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>Anagrams must produce an identical key.</p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sorted characters as the key gives O(n k log k); a 26-slot
-                    count array stringified gives O(n k).
-                  </p>
-                </div>
-              </details>
-            </div>
 
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                <strong>Key insight:</strong> All anagrams of a word share the
-                same <mark>sorted character sequence</mark>. "eat", "tea", "ate"
-                all sort to "aet". Use the sorted string as the HashMap key, and
-                group original words under it.
-              </p>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Interpolation Search</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sort Key Grouping</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> groupAnagrams(strs):
-    map ← empty map                     <span class="pc-cm">// sorted key → list of words</span>
-    <span class="pc-kw">for</span> s <span class="pc-kw">in</span> strs:
-        key ← sort the characters of s  <span class="pc-cm">// canonical form</span>
-        <span class="pc-kw">if</span> key <span class="pc-kw">not</span> <span class="pc-kw">in</span> map: map[key] ← empty list
-        append s <span class="pc-kw">to</span> map[key]
-    <span class="pc-kw">return</span> all values of map
+            <pre><span class="pc-cm">// Guess the position from the VALUE, like opening a dictionary near 'M' for "mango".</span>
+<span class="pc-kw">while</span> lo ≤ hi <span class="pc-kw">and</span> arr[lo] ≤ target ≤ arr[hi]:
+    <span class="pc-kw">if</span> arr[hi] = arr[lo]:                        <span class="pc-cm">// flat range — avoid dividing by zero</span>
+        <span class="pc-kw">if</span> arr[lo] = target: <span class="pc-kw">return</span> lo
+        <span class="pc-kw">return</span> NOT_FOUND
 
-<span class="pc-cm">// Dry run: ["eat","tea","tan"]</span>
-<span class="pc-cm">// "eat" → sort → "aet" → map={"aet":["eat"]}</span>
-<span class="pc-cm">// "tea" → sort → "aet" → map={"aet":["eat","tea"]}</span>
-<span class="pc-cm">// "tan" → sort → "ant" → map={"aet":[...], "ant":["tan"]}</span>
-<span class="pc-cm">// Return [[eat,tea],[tan]] ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge yellow">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val yellow">O(n · k log k)</span>
-                  </div>
-                  <div class="cx-badge yellow">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val yellow">O(n · k)</span>
-                  </div>
-                </div>
-                <div class="callout teal" style="margin-top: 10px">
-                  <span class="callout-icon">&#128161;</span>
-                  <div class="callout-body">
-                    <strong>O(n · k) alternative:</strong> Instead of sorting
-                    each string, build a frequency-count key: a fixed 26-element
-                    int array like <code>[1,0,0,...,1]</code>. Sorting is O(k
-                    log k); frequency key is O(k). Both work — mention the
-                    tradeoff in interviews.
-                  </div>
-                </div>
-              </div>
-            </details>
+    <span class="pc-cm">// multiply BEFORE dividing: dividing first truncates to 0 and the probe collapses to lo</span>
+    pos ← lo + (target - arr[lo]) × (hi - lo) ÷ (arr[hi] - arr[lo])
+
+    <span class="pc-kw">if</span> arr[pos] = target: <span class="pc-kw">return</span> pos
+    <span class="pc-kw">if</span> arr[pos] &lt; target: lo ← pos + 1
+    <span class="pc-kw">else</span>:                 hi ← pos - 1
+<span class="pc-kw">return</span> NOT_FOUND
+<span class="pc-cm">// O(log log n) on uniformly spread values; degrades to O(n) on skewed data.</span></pre>
           </div>
-        </div>
 
-        <!-- P04: Count Nice Pairs in an Array -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 04 &middot; Frequency Map on a Key
-              </div>
-              <div class="prob-title">Count Nice Pairs in an Array</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/count-nice-pairs-in-an-array/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1814 - Count Nice Pairs in an Array</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Rearrange, Then Count Pairs</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+          <h3 class="h2">Ternary Search</h3>
+          <p>
+            Calculates <code>mid1</code> and <code>mid2</code> to eliminate a
+            third of the array per pass. It is mathematically slower than Binary
+            Search (`2 * log_3(N) > log_2(N)`), so it is
+            <strong>never</strong> used for exact targeting natively.
+          </p>
+          <div class="callout purple">
+            <p>
+              <strong>Primary Use Case:</strong> Finding the maximum/minimum
+              point in a continuous <em>Unimodal</em> function (a curve that
+              goes strictly up, then strictly down).
+            </p>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Let <code>rev(x)</code> be <code>x</code> with its digits
-                reversed. Count pairs <code>(i, j)</code> with
-                <code>i &lt; j</code> and
-                <code>nums[i] + rev(nums[j]) == nums[j] + rev(nums[i])</code>.
-                Return the count modulo 10&#8313;+7.
-              </p>
-              <div class="iobox">
-                nums = [42, 11, 1, 97] &rarr; 2 &nbsp; (pairs (0,3) and (1,2))
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Move everything about <code>i</code> to one side of the
-                    equation and everything about <code>j</code> to the other.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The condition becomes
-                    <code>nums[i] - rev(nums[i]) == nums[j] - rev(nums[j])</code
-                    >. Count how often each value of that difference appears.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The algebra is the whole problem: once each element is reduced
-                to the single key <code>x - rev(x)</code>, the question is
-                &ldquo;how many equal pairs?&rdquo; &mdash; the classic
-                complement-counting pass. Add the running count of the key
-                <em>before</em> storing the current element, and take the
-                modulus as you go.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Key = x - rev(x)</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countNicePairs(nums):
-    MOD ← 1000000007
-    seen ← empty map                    <span class="pc-cm">// key -&gt; how many times seen</span>
-    count ← 0
 
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        key ← x - reverseDigits(x)
-        <span class="pc-kw">if</span> key <span class="pc-kw">in</span> seen:
-            count ← (count + seen[key]) mod MOD    <span class="pc-cm">// pairs with every earlier match</span>
-        seen[key] ← (seen[key] <span class="pc-kw">if</span> key <span class="pc-kw">in</span> seen, <span class="pc-kw">else</span> 0) + 1
-    <span class="pc-kw">return</span> count
-
-<span class="pc-kw">function</span> reverseDigits(x):
-    r ← 0
-    <span class="pc-kw">while</span> x &gt; 0:
-        r ← r × 10 + x mod 10
-        x ← x ÷ 10
-    <span class="pc-kw">return</span> r</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n × digits)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Ternary Search (Peak
+                Finding)</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// Find the maximum of a function that rises then falls (unimodal)</span>
+<span class="pc-kw">while</span> hi - lo &gt; 2:
+    mid1 ← lo + (hi - lo) ÷ 3
+    mid2 ← hi - (hi - lo) ÷ 3
+    <span class="pc-kw">if</span> f(mid1) &lt; f(mid2): lo ← mid1      <span class="pc-cm">// the peak is right of mid1</span>
+    <span class="pc-kw">else</span>:                 hi ← mid2      <span class="pc-cm">// the peak is left of mid2</span>
+<span class="pc-cm">// then check the last ≤ 3 points directly</span></pre>
           </div>
-        </div>
+        </section>
 
-        <!-- P05: Subarray Sum Equals K -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Prefix Sum + Map</div>
-              <div class="prob-title">Subarray Sum Equals K</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/subarray-sum-equals-k/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 560 — Medium</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Google · Amazon · Meta</span>
-                <span class="tag tag-pat">Prefix Sum + Map</span>
-              </div>
+        <!-- ══ 2.1 ALGORITHM VARIATIONS ══════════════════════════ -->
+        <section id="variations" class="section">
+          <h2 class="h1">🔄 Algorithm Variations</h2>
+
+          <h3 class="h2">Upper / Lower Bounds (Duplicates)</h3>
+          <p>
+            If finding the <strong>first</strong> occurrence of a duplicate,
+            when `nums[mid] == target`, don't stop! Keep searching left:
+            <code>ans = mid; high = mid - 1;</code> to capture the earliest
+            index boundary.
+          </p>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; First / Last Occurrence</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <pre><span class="pc-cm">// Don't return on the first match — record it and keep shrinking</span>
+<span class="pc-cm">// towards the side you want.</span>
+lo <span class="pc-kw">&larr;</span> 0; hi <span class="pc-kw">&larr;</span> length(a) - 1; ans <span class="pc-kw">&larr;</span> -1
+
+<span class="pc-kw">while</span> lo &le; hi:
+    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
+    <span class="pc-kw">if</span> a[mid] = target:
+        ans <span class="pc-kw">&larr;</span> mid
+        hi <span class="pc-kw">&larr;</span> mid - 1        <span class="pc-cm">// FIRST occurrence: keep looking left</span>
+        <span class="pc-cm">// lo &lt;- mid + 1     // LAST occurrence: keep looking right</span>
+    <span class="pc-kw">else if</span> a[mid] &lt; target: lo <span class="pc-kw">&larr;</span> mid + 1
+    <span class="pc-kw">else</span>:                    hi <span class="pc-kw">&larr;</span> mid - 1
+
+<span class="pc-kw">return</span> ans</pre>
           </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given an integer array and k, return the number of contiguous
-                subarrays that sum to k. Array may contain negative numbers.
-              </p>
-              <div class="iobox">
-                Input: nums=[1,1,1], k=2 → 2 (subarrays [1,1] at indices 0-1 and
-                1-2) Input: nums=[1,2,3], k=3 → 2 ([1,2] and [3])
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Negative numbers break sliding windows. Prefix sums do not
-                    care.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Track the running sum in a map. At each step add the count
-                    of previously seen prefixes equal to running - k. Seed with
-                    {0: 1} for subarrays that start at index 0.
-                  </p>
-                </div>
-              </details>
-            </div>
 
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                If <code>prefix[j] - prefix[i] = k</code>, then subarray
-                <code>[i+1..j]</code> sums to k. Rearranging:
-                <code>prefix[i] = prefix[j] - k</code>.<br />
-                As we scan, for each new prefix sum, we ask:
-                <mark>how many times has (prefixSum - k) appeared before?</mark>
-                Each such occurrence is a valid subarray ending here.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix Sum HashMap</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> subarraySum(nums, k):
-    prefixCount ← {0: 1}                 <span class="pc-cm">// the empty prefix has sum 0, seen once</span>
-    sum ← 0;  count ← 0
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        sum ← sum + x
-        <span class="pc-kw">if</span> (sum - k) <span class="pc-kw">in</span> prefixCount:
-            count ← count + prefixCount[sum - k]
-        prefixCount[sum] ← (prefixCount[sum] <span class="pc-kw">if</span> sum <span class="pc-kw">in</span> prefixCount, <span class="pc-kw">else</span> 0) + 1
-    <span class="pc-kw">return</span> count
+          <h3 class="h2">Search in Rotated Sorted Array</h3>
+          <p>
+            If an array is shifted (`[4, 5, 6, 7, 0, 1, 2]`), you test which
+            half is strictly monotonic. If `nums[lo] <= nums[mid]`, the left
+            side is perfectly sorted, and you can evaluate containment safely.
+          </p>
 
-<span class="pc-cm">// Dry run: nums=[1,1,1], k=2</span>
-<span class="pc-cm">// Start: map={0:1}, sum=0, count=0</span>
-<span class="pc-cm">// x=1: sum=1, need 1-2=-1 → not in map → count=0 → map={0:1,1:1}</span>
-<span class="pc-cm">// x=1: sum=2, need 2-2=0  → map has 1  → count=1 → map={0:1,1:1,2:1}</span>
-<span class="pc-cm">// x=1: sum=3, need 3-2=1  → map has 1  → count=2 → map={...,3:1}</span>
-<span class="pc-cm">// Return 2 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-                <div class="callout orange" style="margin-top: 10px">
-                  <span class="callout-icon">&#9888;</span>
-                  <div class="callout-body">
-                    <strong>Why not sliding window?</strong> Sliding window only
-                    works for non-negative arrays. Since this problem allows
-                    negative numbers, prefix sum + HashMap is the correct O(n)
-                    approach. Never use a two-pointer here.
-                  </div>
-                </div>
-              </div>
-            </details>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Sorted Half Validation</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                     <span class="pc-cm">// left half is sorted</span>
+    <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             lo ← mid + 1   <span class="pc-cm">// so it must be on the right</span>
+<span class="pc-kw">else</span>:                                        <span class="pc-cm">// right half is sorted</span>
+    <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1   <span class="pc-cm">// target is inside it</span>
+    <span class="pc-kw">else</span>:                             hi ← mid - 1   <span class="pc-cm">// so it must be on the left</span></pre>
           </div>
-        </div>
 
-        <!-- P06: Longest Consecutive Sequence -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Set Membership</div>
-              <div class="prob-title">Longest Consecutive Sequence</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/longest-consecutive-sequence/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 128 — Medium</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co">Google · Amazon · Meta</span>
-                <span class="tag tag-pat">Set Membership</span>
-              </div>
+          <h3 class="h2">Binary Search on Answer Space</h3>
+          <p>
+            Searching for an abstract minimum/maximum configuration instead of
+            an array index.
+          </p>
+          <ol>
+            <li>
+              <strong>Domain:</strong> Establish `lo` = absolute min answer,
+              `hi` = absolute max.
+            </li>
+            <li>
+              <strong>isValid(mid):</strong> Write a secondary
+              <code>O(n)</code> function to test if `mid` properly satisfies all
+              constraints.
+            </li>
+            <li>
+              <strong>Optimise:</strong> If `isValid(mid)` is logically valid,
+              try optimising further by lowering requirements: `hi = mid`.
+              Otherwise, `lo = mid + 1`.
+            </li>
+          </ol>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Binary Search on the Answer</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <pre><span class="pc-cm">// Use when you can't search the input, but you CAN ask</span>
+<span class="pc-cm">// 'is candidate answer x feasible?' — and that answer is</span>
+<span class="pc-cm">// monotonic: false, false, ..., false, true, true, ..., true.</span>
+lo <span class="pc-kw">&larr;</span> smallest conceivable answer
+hi <span class="pc-kw">&larr;</span> largest conceivable answer
+ans <span class="pc-kw">&larr;</span> hi
+
+<span class="pc-kw">while</span> lo &le; hi:
+    mid <span class="pc-kw">&larr;</span> lo + (hi - lo) &divide; 2
+    <span class="pc-kw">if</span> feasible(mid):
+        ans <span class="pc-kw">&larr;</span> mid            <span class="pc-cm">// works — try to do better</span>
+        hi  <span class="pc-kw">&larr;</span> mid - 1
+    <span class="pc-kw">else</span>:
+        lo <span class="pc-kw">&larr;</span> mid + 1         <span class="pc-cm">// too tight — relax</span>
+
+<span class="pc-kw">return</span> ans
+
+<span class="pc-cm">// Koko eating bananas: feasible(speed) = hours needed &lt;= H</span>
+<span class="pc-cm">// Ship packages in D days: feasible(cap)  = days needed &lt;= D</span>
+
+<span class="pc-cm">// Equivalent form without `ans`: shrink the range until lo = hi.</span>
+<span class="pc-cm">// Here lo always points at the smallest answer not yet ruled out.</span>
+<span class="pc-kw">while</span> lo &lt; hi:
+    mid ← lo + (hi - lo) ÷ 2
+    <span class="pc-kw">if</span> feasible(mid): hi ← mid         <span class="pc-cm">// mid works — keep it in range</span>
+    <span class="pc-kw">else</span>:             lo ← mid + 1     <span class="pc-cm">// mid fails — discard it</span>
+<span class="pc-kw">return</span> lo</pre>
           </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given an unsorted array, return the length of the longest
-                consecutive elements sequence. Must run in O(n).
-              </p>
-              <div class="iobox">
-                Input: [100,4,200,1,3,2] → 4 (sequence: [1,2,3,4]) Input:
-                [0,3,7,2,5,8,4,6,0,1] → 9 ([0,1,2,3,4,5,6,7,8])
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>Sorting is O(n log n). The interview wants O(n).</p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    HashSet of everything, then only start counting a run at x
-                    when x-1 is absent &mdash; so each run is traversed exactly
-                    once.
-                  </p>
-                </div>
-              </details>
-            </div>
+        </section>
 
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                <strong>Key insight:</strong> Add all numbers to a HashSet. Only
-                start building a sequence from a "sequence start" — a number
-                where <code>num - 1</code> is NOT in the set. From there, count
-                upwards. This ensures each number is visited at most twice →
-                O(n).
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; HashSet O(n)</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> longestConsecutive(nums):
-    set ← all values of nums
-    longest ← 0
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> set:
-        <span class="pc-kw">if</span> (x - 1) <span class="pc-kw">not</span> <span class="pc-kw">in</span> set:              <span class="pc-cm">// x is a sequence start</span>
-            len ← 1
-            <span class="pc-kw">while</span> (x + len) <span class="pc-kw">in</span> set: len ← len + 1
-            longest ← max(longest, len)
-    <span class="pc-kw">return</span> longest
+        <!-- ══ 3. COMPLEXITY ANALYSIS ════════════════════════════ -->
+        <section id="complexity" class="section">
+          <h2 class="h1">⏱️ Complexity Analysis</h2>
+          <p>
+            A global snapshot verifying Time bounds and internal memory Space
+            usage natively.
+          </p>
 
-<span class="pc-cm">// [100,4,200,1,3,2] → set={100,4,200,1,3,2}</span>
-<span class="pc-cm">// x=100: 99 in set? No → start. 101? No → len=1</span>
-<span class="pc-cm">// x=4:   3 in set? Yes → NOT a start → skip</span>
-<span class="pc-cm">// x=1:   0 in set? No → start. 2? Yes, 3? Yes, 4? Yes, 5? No → len=4</span>
-<span class="pc-cm">// longest = 4 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Condition</th>
+                  <th>Time (Worst)</th>
+                  <th>Time (Best)</th>
+                  <th>Space</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Linear Search</td>
+                  <td>Unsorted</td>
+                  <td><code>O(n)</code></td>
+                  <td><code>O(1)</code></td>
+                  <td><code>O(1)</code></td>
+                </tr>
+                <tr>
+                  <td>Binary Search</td>
+                  <td>Sorted</td>
+                  <td><code>O(log&#8322; n)</code></td>
+                  <td><code>O(1)</code></td>
+                  <td><code>O(1)</code></td>
+                </tr>
+                <tr>
+                  <td>Ternary Search</td>
+                  <td>Sorted / Unimodal</td>
+                  <td><code>O(log&#8323; n)</code></td>
+                  <td><code>O(1)</code></td>
+                  <td><code>O(1)</code></td>
+                </tr>
+                <tr>
+                  <td>Interpolation</td>
+                  <td>Sorted, Uniform</td>
+                  <td><code>O(n)</code></td>
+                  <td><code>O(log log n)</code></td>
+                  <td><code>O(1)</code></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
+        </section>
 
-        <!-- P07: LRU Cache -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 07 &middot; Design</div>
-              <div class="prob-title">LRU Cache</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/lru-cache/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 146 — Medium</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-co"
-                  >Amazon · Microsoft · Meta · Google</span
-                >
-                <span class="tag tag-pat">HashMap + DLL</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <!-- ══ 4. MATRIX & 2D ARRAYS ═════════════════════════════ -->
+        <section id="matrix" class="section">
+          <h2 class="h1">🗺️ 2D Matrix Traversals</h2>
+
+          <h3 class="h2">Perfectly Flattened Binary Search</h3>
+          <p>
+            If a matrix `M x C` is strictly sorted universally (the end of Row 1
+            is less than the start of Row 2), treat it like a 1D array of length
+            `M * C`.
+          </p>
+          <div class="callout green">
+            <p>
+              <strong>The Indexing Math:</strong><br />
+              Row Index = <code>mid / C</code><br />
+              Col Index = <code>mid % C</code>
+            </p>
           </div>
-          <div class="prob-body">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Design a data structure that implements an LRU (Least Recently
-                Used) cache with capacity constraint. Both <code>get</code> and
-                <code>put</code> must run in O(1).
-              </p>
-              <div class="iobox">
-                LRUCache(2) // capacity = 2 put(1, 1) // cache: {1=1} put(2, 2)
-                // cache: {1=1, 2=2} get(1) // returns 1, cache: {2=2, 1=1} (1
-                moves to front) put(3, 3) // evicts key 2 (LRU), cache: {1=1,
-                3=3} get(2) // returns -1 (not found)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    O(1) lookup and O(1) reordering need two different
-                    structures cooperating.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    HashMap for lookup plus a doubly linked list for recency;
-                    the map stores node references so unlinking is O(1).
-                    Sentinel head and tail kill all null checks.
-                  </p>
-                </div>
-              </details>
-            </div>
 
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                O(1) get requires a HashMap. O(1) ordering (move to front,
-                remove last) requires a <mark>Doubly Linked List</mark>.
-                Together: HashMap (key → DLL node) + DLL (ordered from
-                most-recent to least-recent).<br /><br />
-                Java shortcut: <code>LinkedHashMap</code> with access-order mode
-                does this automatically — great to mention in interviews, but
-                implement from scratch if asked.
-              </p>
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; 1D to 2D Mapping</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
             </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; LinkedHashMap (O(1) solution)
+            <pre>rows ← number of rows;  cols ← number of columns
+lo ← 0;  hi ← rows × cols - 1          <span class="pc-cm">// treat the matrix as one sorted array</span>
+<span class="pc-kw">while</span> lo ≤ hi:
+    mid ← lo + (hi - lo) ÷ 2
+    val ← matrix[mid ÷ cols][mid mod cols]
+    <span class="pc-kw">if</span> val = target: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> val &lt; target: lo ← mid + 1
+    <span class="pc-kw">else</span>:            hi ← mid - 1
+<span class="pc-kw">return</span> false</pre>
+          </div>
+
+          <h3 class="h2">Staircase / Saddleback Search</h3>
+          <p>
+            If the array is <em>only</em> sorted horizontally per row and
+            vertically per col (meaning Row 2 can start with a smaller number
+            than the end of Row 1), you cannot flatten it. You start exclusively
+            at the <strong>Top-Right</strong> coordinate, shrinking the domain
+            leftwards or downwards in <code>O(m + n)</code> combinations.
+          </p>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Top-Right Staircase</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre>row ← 0;  col ← last column index
+<span class="pc-kw">while</span> row &lt; number of rows <span class="pc-kw">and</span> col ≥ 0:
+    <span class="pc-kw">if</span> matrix[row][col] = target: <span class="pc-kw">return</span> true
+    <span class="pc-kw">if</span> matrix[row][col] &gt; target: col ← col - 1   <span class="pc-cm">// everything below is bigger → drop this column</span>
+    <span class="pc-kw">else</span>:                         row ← row + 1   <span class="pc-cm">// everything left is smaller → drop this row</span>
+<span class="pc-kw">return</span> false</pre>
+          </div>
+        </section>
+
+        <!-- PRACTICE PROBLEMS -->
+        <section class="section">
+          <h2 class="h1" id="pitfalls">&#9888;&#65039; Classic Bugs</h2>
+          <p>
+            The complexity section above covers the costs. These are the
+            mistakes that most often break code that looks correct &mdash; check
+            your solution against every row before calling it done.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bug</th>
+                  <th>Symptom</th>
+                  <th>Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>mid = (lo + hi) / 2</code></td>
+                  <td>Overflow on huge indices</td>
+                  <td><code>mid = lo + (hi − lo) / 2</code></td>
+                </tr>
+                <tr>
+                  <td>Setting <code>lo = mid</code></td>
+                  <td>Infinite loop when <code>hi = lo + 1</code></td>
+                  <td>
+                    Use one template consistently: <code>lo = mid + 1</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Mixing <code>&lt;</code> and <code>≤</code> templates</td>
+                  <td>Misses the last candidate, or loops forever</td>
+                  <td>
+                    Pick one: inclusive <code>[lo, hi]</code> with
+                    <code>lo ≤ hi</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Returning <code>lo</code> when you needed <code>hi</code>
+                  </td>
+                  <td>Off-by-one answer</td>
+                  <td>Trace a one- and a two-element array</td>
+                </tr>
+                <tr>
+                  <td>Binary search on unsorted data</td>
+                  <td>Wrong answers with no crash</td>
+                  <td>Only search data that is monotonic</td>
+                </tr>
+                <tr>
+                  <td>Search on the answer with the wrong range</td>
+                  <td>The true answer lies outside <code>[lo, hi]</code></td>
+                  <td>
+                    <code>lo</code> = smallest possible answer,
+                    <code>hi</code> = largest
+                  </td>
+                </tr>
+                <tr>
+                  <td>A condition that is not monotonic</td>
+                  <td>The search skips the answer</td>
+                  <td>Check the yes/no condition flips exactly once</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr />
+
+          <h2 class="h1" id="practice">
+            &#128170; In-Lecture Practice Problems
+          </h2>
+
+          <!-- P1 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 01 · Rotated Shift</div>
+                <div class="prob-title">Search in Rotated Sorted Array</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/search-in-rotated-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 33 - Rotated Sorted Array</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co"
+                    >Google · Amazon · Meta · Microsoft</span
+                  >
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Search for a target in a rotated sorted array in
+                  <code>O(log n)</code>
+                  time.
+                </p>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      It is not sorted &mdash; but at any split, one of the two
+                      halves always is.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Compare a[lo] with a[mid] to find the sorted half. Check
+                      whether the target lies inside that half's range; if it
+                      does, search there, otherwise the other side.
+                    </p>
+                  </div>
+                </details>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+
+                <details>
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Full solution
+                  </summary>
+                  <div class="details-body">
+                    <div class="code-block pseudo">
+                      <div class="code-header">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Pivot Logic</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
+                          Copy
+                        </button>
+                      </div>
+                      <pre><span class="pc-kw">function</span> search(nums, target):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target: <span class="pc-kw">return</span> mid
+
+        <span class="pc-kw">if</span> nums[lo] ≤ nums[mid]:                       <span class="pc-cm">// left half sorted</span>
+            <span class="pc-kw">if</span> nums[lo] ≤ target &lt; nums[mid]: hi ← mid - 1
+            <span class="pc-kw">else</span>:                             lo ← mid + 1
+        <span class="pc-kw">else</span>:                                          <span class="pc-cm">// right half sorted</span>
+            <span class="pc-kw">if</span> nums[mid] &lt; target ≤ nums[hi]: lo ← mid + 1
+            <span class="pc-kw">else</span>:                             hi ← mid - 1
+    <span class="pc-kw">return</span> NOT_FOUND</pre>
                     </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
+                    <div class="complexity-row">
+                      <div class="cx-badge green">
+                        <span class="cx-label">Time</span
+                        ><span class="cx-val green">O(log N)</span>
+                      </div>
+                      <div class="cx-badge green">
+                        <span class="cx-label">Space</span
+                        ><span class="cx-val green">O(1)</span>
+                      </div>
+                    </div>
                   </div>
-                  <pre><span class="kw">class</span> <span class="cls">LRUCache</span> <span class="kw">extends</span> <span class="cls">LinkedHashMap</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; {
-    <span class="kw">private int</span> capacity;
+                </details>
+              </div>
+            </div>
+          </div>
 
-    <span class="fn">LRUCache</span>(<span class="kw">int</span> capacity) {
-        <span class="cm">// true = access-order (most recently used first)</span>
-        <span class="kw">super</span>(capacity, 0.75f, <span class="kw">true</span>);
-        <span class="kw">this</span>.capacity = capacity;
-    }
-
-    <span class="kw">public int</span> <span class="fn">get</span>(<span class="kw">int</span> key) {
-        <span class="ret">return</span> <span class="kw">super</span>.getOrDefault(key, -1);
-    }
-
-    <span class="kw">public void</span> <span class="fn">put</span>(<span class="kw">int</span> key, <span class="kw">int</span> value) {
-        <span class="kw">super</span>.put(key, value);
-    }
-
-    <span class="cm">// Called automatically by LinkedHashMap after each put</span>
-    @Override
-    <span class="kw">protected boolean</span> <span class="fn">removeEldestEntry</span>(<span class="cls">Map</span>.<span class="cls">Entry</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; e) {
-        <span class="ret">return</span> size() &gt; capacity; <span class="cm">// evict when over capacity</span>
-    }
-}</pre>
+          <!-- P2 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 02 · Unsorted Array Bounds</div>
+                <div class="prob-title">Find Peak Element</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-peak-element/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 162 - Find Peak Element</a
+                  >
                 </div>
-                <div class="callout purple" style="margin-top: 8px">
-                  <span class="callout-icon">&#128301;</span>
-                  <div class="callout-body">
-                    <strong>Interview note:</strong> Mention LinkedHashMap first
-                    (shows Java knowledge), then say: "If you need me to
-                    implement from scratch, I'd use a HashMap of key → DLL node,
-                    plus sentinel head/tail nodes to avoid null checks." The
-                    interviewer will usually say LinkedHashMap is fine — but
-                    know the DLL approach too for follow-ups.
-                  </div>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">get Time</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">put Time</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                  <div class="cx-badge yellow">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val yellow">O(capacity)</span>
-                  </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Uber · Google · Meta</span>
                 </div>
               </div>
-            </details>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find a local maximum in an array where neighbours aren't
+                  equal. Implement strictly in <code>O(log n)</code> time.
+                </p>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      You do not need the global maximum &mdash; any local peak
+                      counts. That makes it binary-searchable.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      If a[mid] &lt; a[mid+1] you are on an ascending slope, so
+                      a peak lies to the right; otherwise it lies at mid or to
+                      the left.
+                    </p>
+                  </div>
+                </details>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+
+                <details>
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Full solution
+                  </summary>
+                  <div class="details-body">
+                    <div class="code-block pseudo">
+                      <div class="code-header">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Upward Slope</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
+                          Copy
+                        </button>
+                      </div>
+                      <pre><span class="pc-kw">function</span> findPeakElement(nums):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] &lt; nums[mid + 1]:
+            lo ← mid + 1          <span class="pc-cm">// rising slope → a peak lies to the right</span>
+        <span class="pc-kw">else</span>:
+            hi ← mid              <span class="pc-cm">// falling slope → peak at mid or to the left</span>
+    <span class="pc-kw">return</span> lo</pre>
+                    </div>
+                    <div class="complexity-row">
+                      <div class="cx-badge green">
+                        <span class="cx-label">Time</span
+                        ><span class="cx-val green">O(log N)</span>
+                      </div>
+                      <div class="cx-badge green">
+                        <span class="cx-label">Space</span
+                        ><span class="cx-val green">O(1)</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <hr />
+          <!-- P3 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 03 · Dual Partition Arrays</div>
+                <div class="prob-title">Median of Two Sorted Arrays</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/median-of-two-sorted-arrays/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 4 - Median of Two Arrays</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-hard">Hard</span>
+                  <span class="tag tag-co"
+                    >Apple · Google · Amazon · Adobe</span
+                  >
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find the combined median in
+                  <code>O(log(min(m, n)))</code> time. This relies heavily on
+                  precise array partitioning boundaries.
+                </p>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Merging is O(m+n). Log time means you must binary search
+                      the <em>partition point</em>, not the values.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Binary search the shorter array for how many of its
+                      elements go left. The partition is correct when maxLeftA
+                      &le; minRightB and maxLeftB &le; minRightA.
+                    </p>
+                  </div>
+                </details>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
 
-        <!-- ══ ASSIGNMENT ══════════════════════════════════════ -->
+                <details>
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Full solution
+                  </summary>
+                  <div class="details-body">
+                    <div class="code-block pseudo">
+                      <div class="code-header">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Partition Search</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
+                          Copy
+                        </button>
+                      </div>
+                      <pre><span class="pc-kw">function</span> findMedianSortedArrays(A, B):
+    <span class="pc-kw">if</span> length(A) &gt; length(B): <span class="pc-kw">return</span> findMedianSortedArrays(B, A)   <span class="pc-cm">// search the shorter one</span>
+    x ← length(A);  y ← length(B)
+    lo ← 0;  hi ← x
+
+    <span class="pc-kw">while</span> lo ≤ hi:
+        px ← (lo + hi) ÷ 2                  <span class="pc-cm">// how many of A go on the left</span>
+        py ← (x + y + 1) ÷ 2 - px           <span class="pc-cm">// the rest of the left half comes from B</span>
+
+        maxLeftA  ← A[px-1] <span class="pc-kw">if</span> px &gt; 0 <span class="pc-kw">else</span> -INFINITY
+        minRightA ← A[px]   <span class="pc-kw">if</span> px &lt; x <span class="pc-kw">else</span>  INFINITY
+        maxLeftB  ← B[py-1] <span class="pc-kw">if</span> py &gt; 0 <span class="pc-kw">else</span> -INFINITY
+        minRightB ← B[py]   <span class="pc-kw">if</span> py &lt; y <span class="pc-kw">else</span>  INFINITY
+
+        <span class="pc-kw">if</span> maxLeftA ≤ minRightB <span class="pc-kw">and</span> maxLeftB ≤ minRightA:     <span class="pc-cm">// correct split</span>
+            <span class="pc-kw">if</span> (x + y) <span class="pc-kw">is even</span>:
+                <span class="pc-kw">return</span> (max(maxLeftA, maxLeftB) + min(minRightA, minRightB)) / 2
+            <span class="pc-kw">return</span> max(maxLeftA, maxLeftB)
+        <span class="pc-kw">else if</span> maxLeftA &gt; minRightB:
+            hi ← px - 1                     <span class="pc-cm">// took too many from A</span>
+        <span class="pc-kw">else</span>:
+            lo ← px + 1                     <span class="pc-cm">// took too few from A</span></pre>
+                    </div>
+                    <div class="complexity-row">
+                      <div class="cx-badge green">
+                        <span class="cx-label">Time</span
+                        ><span class="cx-val green">O(log(min(M,N)))</span>
+                      </div>
+                      <div class="cx-badge green">
+                        <span class="cx-label">Space</span
+                        ><span class="cx-val green">O(1)</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+
+          <!-- P4 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 04 · Answer Space bounds</div>
+                <div class="prob-title">Koko Eating Bananas</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/koko-eating-bananas/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 875 - Koko Eating Bananas</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Airbnb · Google · Amazon</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Find the minimum eating speed <code>K</code> such that Koko
+                  can eat all the bananas within <code>H</code> hours.
+                </p>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      You cannot search the array &mdash; but you can search the
+                      possible speeds.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Speeds run 1..max(piles), and 'finishes in time' is
+                      monotonic. Binary search the smallest feasible speed.
+                    </p>
+                  </div>
+                </details>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+
+                <details>
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Full solution
+                  </summary>
+                  <div class="details-body">
+                    <div class="code-block pseudo">
+                      <div class="code-header">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Monotonic Search</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
+                          Copy
+                        </button>
+                      </div>
+                      <pre><span class="pc-kw">function</span> minEatingSpeed(piles, h):
+    lo ← 1;  hi ← maximum of piles          <span class="pc-cm">// eating faster than the biggest pile never helps</span>
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> canFinish(piles, h, mid): hi ← mid
+        <span class="pc-kw">else</span>:                        lo ← mid + 1
+    <span class="pc-kw">return</span> lo
+
+<span class="pc-kw">function</span> canFinish(piles, h, k):
+    hours ← 0
+    <span class="pc-kw">for</span> pile <span class="pc-kw">in</span> piles:
+        hours ← hours + ceil(pile / k)      <span class="pc-cm">// = (pile + k - 1) ÷ k in integer arithmetic</span>
+    <span class="pc-kw">return</span> hours ≤ h</pre>
+                    </div>
+                    <div class="complexity-row">
+                      <div class="cx-badge green">
+                        <span class="cx-label">Time</span
+                        ><span class="cx-val green">O(N log(MaxP))</span>
+                      </div>
+                      <div class="cx-badge green">
+                        <span class="cx-label">Space</span
+                        ><span class="cx-val green">O(1)</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+
+          <!-- P5 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 05 · Grid Flattening</div>
+                <div class="prob-title">Search a 2D Matrix</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/search-a-2d-matrix/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 74 - Search a 2D Matrix</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Amazon · Microsoft · Meta</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Write an efficient algorithm that searches for a value inside
+                  an `M x N` matrix uniformly sorted perfectly across rows.
+                </p>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Every row starts after the previous row ends. What does
+                      that make the matrix?
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      One sorted array of length m&times;n. Binary search
+                      0..m&times;n-1 and map mid to (mid / cols, mid % cols).
+                    </p>
+                  </div>
+                </details>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+
+                <details>
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Full solution
+                  </summary>
+                  <div class="details-body">
+                    <div class="code-block pseudo">
+                      <div class="code-header">
+                        <span class="code-lang"
+                          >&#128208; Pseudocode &middot; Midpoint Mapping</span
+                        ><button class="copy-btn" onclick="copyCode(this)">
+                          Copy
+                        </button>
+                      </div>
+                      <pre><span class="pc-kw">function</span> searchMatrix(matrix, target):
+    m ← number of rows;  n ← number of columns
+    lo ← 0;  hi ← m × n - 1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        r ← mid ÷ n;  c ← mid mod n
+        <span class="pc-kw">if</span> matrix[r][c] = target: <span class="pc-kw">return</span> true
+        <span class="pc-kw">if</span> matrix[r][c] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                     hi ← mid - 1
+    <span class="pc-kw">return</span> false</pre>
+                    </div>
+                    <div class="complexity-row">
+                      <div class="cx-badge green">
+                        <span class="cx-label">Time</span
+                        ><span class="cx-val green">O(log(M * N))</span>
+                      </div>
+                      <div class="cx-badge green">
+                        <span class="cx-label">Space</span
+                        ><span class="cx-val green">O(1)</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+
+          <!-- P06 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 06 · Find Pivot</div>
+                <div class="prob-title">Minimum in Rotated Sorted Array</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 153</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Microsoft · Amazon · Google</span>
+                  <span class="tag tag-pat">Binary Search</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given a sorted array rotated at some unknown pivot, find the
+                  minimum element in O(log N) time.
+                </p>
+                <div class="ascii-tree">
+                  Original: [1, 2, 3, 4, 5] Rotated: [3, 4, 5, 1, 2] ← pivot at
+                  index 3 Minimum = 1
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      The minimum is the single place where the order breaks.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Compare a[mid] with a[hi], not a[lo]. If a[mid] &gt; a[hi]
+                      the pivot is to the right, so lo = mid + 1; otherwise hi =
+                      mid.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  The minimum is at the rotation point. At each step, compare
+                  <code>nums[mid]</code> with <code>nums[hi]</code>. If
+                  <code>nums[mid] > nums[hi]</code>, the minimum is to the RIGHT
+                  of mid (the right half is the "smaller" section). If
+                  <code>nums[mid] ≤ nums[hi]</code>, the minimum is at mid or to
+                  the LEFT.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Binary Search on Rotation
+                        Pivot</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> findMin(nums):
+    lo ← 0;  hi ← length(nums) - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] &gt; nums[hi]: lo ← mid + 1    <span class="pc-cm">// the drop is to the right</span>
+        <span class="pc-kw">else</span>:                    hi ← mid        <span class="pc-cm">// min is at mid or to the left</span>
+    <span class="pc-kw">return</span> nums[lo]
+<span class="pc-cm">// [3,4,5,1,2]: lo=0 hi=4 mid=2, 5 &gt; 2 → lo=3</span>
+<span class="pc-cm">//              lo=3 hi=4 mid=3, 1 ≤ 2 → hi=3</span>
+<span class="pc-cm">//              lo = hi = 3 → return 1 ✓</span></pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- P07 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 07 · Lower/Upper Bound</div>
+                <div class="prob-title">
+                  Find First and Last Position of Element
+                </div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 34</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co"
+                    >Meta · Amazon · Google · LinkedIn</span
+                  >
+                  <span class="tag tag-pat">Binary Search Bounds</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given a sorted array with possible duplicates and target,
+                  return <code>[firstIndex, lastIndex]</code> of the target, or
+                  <code>[-1, -1]</code> if not found. Must run in O(log N).
+                </p>
+                <div class="ascii-tree">
+                  nums=[5,7,7,8,8,10], target=8 First occurrence: index 3 Last
+                  occurrence: index 4 Output: [3, 4]
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      One binary search finds <em>a</em> match. You need the
+                      boundaries of the block.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Run it twice: once biased left (on a match set hi = mid -
+                      1) and once biased right (set lo = mid + 1), recording the
+                      index each time.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Run binary search <strong>twice</strong>: once to find the
+                  <em>leftmost</em> (lower bound) — when
+                  <code>nums[mid]==target</code>, record mid and continue left
+                  (<code>hi=mid-1</code>). Once for the
+                  <em>rightmost</em> (upper bound) — when
+                  <code>nums[mid]==target</code>, record mid and continue right
+                  (<code>lo=mid+1</code>).
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Two Binary Searches
+                        (Lower + Upper Bound)</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> searchRange(nums, target):
+    <span class="pc-kw">return</span> (bound(nums, target, findFirst = true), bound(nums, target, findFirst = false))
+
+<span class="pc-kw">function</span> bound(nums, target, findFirst):
+    lo ← 0;  hi ← length(nums) - 1;  ans ← -1
+    <span class="pc-kw">while</span> lo ≤ hi:
+        mid ← lo + (hi - lo) ÷ 2
+        <span class="pc-kw">if</span> nums[mid] = target:
+            ans ← mid
+            <span class="pc-kw">if</span> findFirst: hi ← mid - 1       <span class="pc-cm">// keep looking left</span>
+            <span class="pc-kw">else</span>:         lo ← mid + 1       <span class="pc-cm">// keep looking right</span>
+        <span class="pc-kw">else if</span> nums[mid] &lt; target: lo ← mid + 1
+        <span class="pc-kw">else</span>:                       hi ← mid - 1
+    <span class="pc-kw">return</span> ans</pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(log N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(1)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+        <!-- #practice -->
+
+        <!-- ══ SECTION: ASSIGNMENT ══════════════════════════════ -->
+
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
         <div class="callout orange" style="margin: 14px 0">
-          <span class="callout-icon">&#128203;</span>
+          <span class="callout-icon">📋</span>
           <div class="callout-body">
             <strong
-              >Lecture 13 Assignment &mdash; 25 Problems (7 Easy &middot; 13
-              Medium &middot; 5 Hard)</strong
+              >Lecture 13 Assignment &mdash; 28 Problems (8 Easy &middot; 13
+              Medium &middot; 7 Hard)</strong
             ><br />
-            Complete the assignment before moving to Matrix Problems. Covers
-            frequency counting, Two-Sum family variants, subarray sum patterns,
-            isomorphic strings, and cache design problems.<br /><br />
+            Complete the assignment before moving forward. It includes 8 Easy,
+            13 Medium, 7 Hard problems, and conceptual checks — all carefully
+            chosen to master Searching algorithms.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture13/Assignment.md"
               style="
@@ -2846,14 +2953,12 @@ longest ← 0
                 text-decoration: none;
                 display: inline-block;
               "
-              >&#128196; Open Assignment &rarr;</a
+              >📄 Open Assignment →</a
             >
           </div>
         </div>
 
-        <hr />
-
-        <!-- ══ CHECKLIST ═══════════════════════════════════════ -->
+        <!-- ══ SECTION: CHECKLIST ══════════════════════════════ -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
         <p>Check each item before advancing to Lecture 14.</p>
 
@@ -2866,93 +2971,91 @@ longest ← 0
           "
         >
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can explain why HashMap is O(1) average — and when it degrades
-              to O(n)
+              I can distinguish when to use Linear Search over Binary Search
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I know the difference between Separate Chaining and Open
-              Addressing collision resolution
+              I understand why `mid = low + (high - low) / 2` prevents integer
+              overflow
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can implement Two Sum from scratch in under 3 minutes, including
-              the "add after check" detail
+              I can implement standard Binary Search in under 2 minutes bug-free
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I understand the prefix sum + HashMap pattern and can derive it
-              from scratch
+              I know the 3 main Binary Search templates and their boundary
+              conditions
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can explain the Group Anagrams sorted-key approach AND the
-              frequency-array key alternative
+              I can map a 1D index to a 2D matrix safely via `[mid/nc][mid%nc]`
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I know why Longest Consecutive Sequence can be solved in O(n)
-              using "sequence start" trick
+              I understand the monotonic property required to pivot Rotated
+              Arrays
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can design LRU Cache using LinkedHashMap AND describe the
-              DLL+HashMap approach from scratch
+              I can solve 'Search in Rotated Sorted Array' efficiently
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I know when to use HashMap vs int[] frequency array vs TreeMap vs
-              LinkedHashMap
+              I can formulate `isValid(mid)` checks for Answer Space patterns
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I completed all 25 assignment problems and can explain the
-              approach to each
+              I understand the dual partition formula for Median of Two Arrays
+            </div>
+          </div>
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">✓</div>
+            <div class="cb-text">
+              I have completed successfully at least 20 problems from the
+              Assignment
             </div>
           </div>
         </div>
 
         <div class="callout green" style="margin-top: 24px">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">🧠</span>
           <div class="callout-body">
-            <strong>You're ready for Lecture 14: Matrix Problems</strong><br />
-            Matrix problems require combining array traversal with directional
-            logic (spiral, BFS over grid, DFS flood fill). The HashMap patterns
-            you just mastered appear inside those solutions too — especially for
-            island counting and multi-source BFS state tracking.
+            <strong>You're ready for Lecture 14: Linked Lists</strong><br />
+            We're stepping out of contiguous arrays and stepping into dynamic
+            node allocation! Master pointer tracking now because it will be
+            absolutely vital for Trees and Graphs.
           </div>
         </div>
 
         <div class="page-nav">
           <a href="../Lecture12/lecture12_notes.html"
-            >&larr; Lecture 12 &middot; Stacks &amp; Queues</a
+            >&larr; Lecture 12 &middot; Sorting Algorithms</a
           >
           <a class="next" href="../Lecture14/lecture14_notes.html"
-            >Lecture 14 &middot; Matrix Problems &rarr;</a
+            >Lecture 14 &middot; Linked Lists &rarr;</a
           >
         </div>
       </div>
-      <!-- #content -->
     </div>
-    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

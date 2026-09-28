@@ -1,274 +1,365 @@
-# 🧩 Assignment 25 — Dynamic Programming I — Foundations & 1D
+# 🎯 Assignment 18 — Two Pointers & Sliding Window
 
-> **Lecture:** 25 of 38 — Dynamic Programming I — Foundations & 1D
-> **Phase:** 4 — Dynamic Programming
-> **Estimated Time:** 6 days · **Total Problems:** 25 (10 Easy · 12 Medium · 3 Hard)
-> **Goal:** Write the recursion, spot the repeats, add the memo — then turn it into a table and squeeze the space.
+> **Lecture:** 25 of 45 — Two Pointers & Sliding Window
+> **Phase:** 3 — Core Patterns
+> **Estimated Time:** 6 days · **Total Problems:** 30 (9 Easy · 16 Medium · 5 Hard)
+> **Goal:** Stop choosing an algorithm and start recognising a shape. Every problem below is one of five.
 
 ---
 
 ## 🗺️ Pattern Recognition — Read Before Starting
 
-Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
+| Signal Phrase                         | Shape           | Move                                          |
+| ------------------------------------- | --------------- | --------------------------------------------- |
+| "sorted array" + find a pair / triple | Opposite Ends   | `lo = 0`, `hi = n-1`, move the one that helps |
+| "subarray of size exactly k"          | Fixed Window    | add right, remove left, every step            |
+| "longest subarray such that …"        | Variable Window | expand right, shrink left while invalid       |
+| "shortest subarray such that …"       | Variable Window | same loop — record **inside** the shrink      |
+| "in place, keep order, drop some"     | Same Direction  | `slow` writes, `fast` reads                   |
+| "exactly k distinct"                  | At-Most Trick   | `atMost(k) - atMost(k-1)`                     |
+| "maximum of every window"             | Monotonic Deque | deque of indices, decreasing by value         |
 
-| Signal in the Problem                     | Pattern             | Move                                          |
-| ----------------------------------------- | ------------------- | --------------------------------------------- |
-| "maximum / minimum / number of ways"      | Dynamic Programming | write the recursion, then memoise it          |
-| "choose each item: take it or skip it"    | Take or Skip        | `dp[i] = max(dp[i-1], dp[i-2] + value)`       |
-| "make exactly this amount, reuse allowed" | Unbounded Choice    | loop amounts forward over the items           |
-| "longest increasing / chain / divisible"  | LIS                 | best ending at i, or patience + binary search |
-| "buy, sell, cooldown, fee, k times"       | DP over States      | one variable per situation per day            |
-| a choice that blocks a range after it     | Suffix DP           | fill the table from the end backwards         |
-
----
-
-## 🟢 Easy Tier (10 Problems)
-
-_Small recurrences, where the state is obvious and the table is short._
-
-### E1 · Divisor Game
-
-**🔗 [LC 1025 — Divisor Game](https://leetcode.com/problems/divisor-game/)** · Easy
-**Pattern:** Recurrence + Base Case | **Companies:** Amazon, Google
-
-**Hint:** Write `dp[n] = true if some divisor makes dp[n - x] false`. Compute the first few by hand — the pattern that emerges is the one-line answer worth proving.
+> ⚠️ **Precondition:** sliding windows need monotonicity — adding an element must never make an
+> invalid window valid again. Negative numbers break this. Those are prefix-sum problems (Lecture 26).
 
 ---
 
-### E2 · Is Subsequence
+---
 
-**🔗 [LC 392 — Is Subsequence](https://leetcode.com/problems/is-subsequence/)** · Easy
-**Pattern:** Two Pointers or DP | **Companies:** Amazon, Google, Meta
+## 🟢 Easy Tier (9 Problems)
 
-**Hint:** Greedy two pointers is O(n). Also write the DP version, `dp[i][j]`, because the follow-up (many queries against one long text) is what the table is for.
+_No Easy problems at this stage of the course._
+
+### E1 · Valid Palindrome
+
+**🔗 [LC 125 — Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)** · Easy
+**Pattern:** Opposite Ends | **Companies:** Meta, Amazon, Microsoft
+
+**Hint:** Two pointers converging, skipping any character that is not alphanumeric. Compare lowercase forms. The skipping happens inside the outer loop, not before it.
 
 ---
 
-### E3 · Get Maximum in Generated Array
+### E2 · Move Zeroes
 
-**🔗 [LC 1646 — Get Maximum in Generated Array](https://leetcode.com/problems/get-maximum-in-generated-array/)** · Easy
-**Pattern:** Direct Recurrence | **Companies:** Amazon
+**🔗 [LC 283 — Move Zeroes](https://leetcode.com/problems/move-zeroes/)** · Easy
+**Pattern:** Same Direction | **Companies:** Meta, Amazon, Microsoft
 
-**Hint:** The definition is the recurrence: even indices copy, odd indices add. Build the array to `n` and take the maximum.
-
----
-
-### E4 · Maximum Difference Between Increasing Elements
-
-**🔗 [LC 2016 — Maximum Difference Between Increasing Elements](https://leetcode.com/problems/maximum-difference-between-increasing-elements/)** · Easy
-**Pattern:** Prefix Minimum | **Companies:** Amazon, Google
-
-**Hint:** Keep the smallest value seen so far and, for every later element, try `nums[i] − minSoFar`. It is the Best Time to Buy and Sell Stock skeleton.
+**Hint:** `slow` is a write cursor, `fast` a read cursor. Copy every non-zero forward, then fill the tail with zeros. Order of the non-zeros must be preserved.
 
 ---
 
-### E5 · Maximum Score After Splitting a String
+### E3 · Remove Duplicates from Sorted Array
 
-**🔗 [LC 1422 — Maximum Score After Splitting a String](https://leetcode.com/problems/maximum-score-after-splitting-a-string/)** · Easy
-**Pattern:** Prefix Counts | **Companies:** Amazon
+**🔗 [LC 26 — Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)** · Easy
+**Pattern:** Same Direction | **Companies:** Amazon, Microsoft, Adobe
 
-**Hint:** Count zeros on the left and ones on the right in one pass each; then every split is O(1). Remember both sides must be non-empty.
-
----
-
-### E6 · Maximum Value of an Ordered Triplet I
-
-**🔗 [LC 2873 — Maximum Value of an Ordered Triplet I](https://leetcode.com/problems/maximum-value-of-an-ordered-triplet-i/)** · Easy
-**Pattern:** Prefix Max + Running Best | **Companies:** Amazon, Google
-
-**Hint:** For each middle index, you need the best `i` before it and the best `k` after it. Keep a running maximum from the left and a running maximum from the right.
+**Hint:** Duplicates are adjacent because the array is sorted. Write a value only when it differs from `a[slow]`. Return `slow + 1`.
 
 ---
 
-### E7 · Minimum Changes To Make Alternating Binary String
+### E4 · Remove Element
 
-**🔗 [LC 1758 — Minimum Changes To Make Alternating Binary String](https://leetcode.com/problems/minimum-changes-to-make-alternating-binary-string/)** · Easy
-**Pattern:** Count Both Targets | **Companies:** Amazon
+**🔗 [LC 27 — Remove Element](https://leetcode.com/problems/remove-element/)** · Easy
+**Pattern:** Same Direction | **Companies:** Amazon, Adobe
 
-**Hint:** Only two possible final strings exist. Count mismatches against one of them; the other costs `n − that`. Take the smaller.
-
----
-
-### E8 · Minimum Cost to Move Chips to The Same Position
-
-**🔗 [LC 1217 — Minimum Cost to Move Chips to The Same Position](https://leetcode.com/problems/minimum-cost-to-move-chips-to-the-same-position/)** · Easy
-**Pattern:** Parity Counting | **Companies:** Amazon, Google
-
-**Hint:** Moves of two are free, so only parity matters: count chips on even and odd positions, and move the smaller group.
+**Hint:** Same read/write cursors as Move Zeroes, but the keep-test is `a[fast] != val`. Order does not matter here, so a swap-with-end variant also works.
 
 ---
 
-### E9 · Longest Unequal Adjacent Groups Subsequence I
+### E5 · Reverse String II
 
-**🔗 [LC 2900 — Longest Unequal Adjacent Groups Subsequence I](https://leetcode.com/problems/longest-unequal-adjacent-groups-subsequence-i/)** · Easy
-**Pattern:** Take or Skip | **Companies:** Amazon
+**🔗 [LC 541 — Reverse String II](https://leetcode.com/problems/reverse-string-ii/)** · Easy
+**Pattern:** Opposite Ends in Blocks | **Companies:** Amazon, Microsoft
 
-**Hint:** Walk the array keeping the last group taken; take a word whenever its group differs from that one. A greedy pass that is also the simplest DP.
-
----
-
-### E10 · Maximum Repeating Substring
-
-**🔗 [LC 1668 — Maximum Repeating Substring](https://leetcode.com/problems/maximum-repeating-substring/)** · Easy
-**Pattern:** Try Every Count | **Companies:** Amazon
-
-**Hint:** `k` is small: test repetitions 1, 2, 3 … while the repeated word is still a substring. The DP framing is `dp[k] = dp[k−1] + 1` when the longer copy still fits.
+**Hint:** Step `i` by `2k`; reverse the chars in `[i, min(i + k, n) - 1]` with two pointers. Don't special-case the tail — the `min` handles it.
 
 ---
 
-## 🟡 Medium Tier (12 Problems)
+### E6 · Squares of a Sorted Array
 
-_The five 1D families: take-or-skip, unbounded choice, ending-here, state machines and suffixes._
+**🔗 [LC 977 — Squares of a Sorted Array](https://leetcode.com/problems/squares-of-a-sorted-array/)** · Easy
+**Pattern:** Opposite Ends | **Companies:** Amazon, Meta, Google
 
-### M1 · Coin Change
-
-**🔗 [LC 322 — Coin Change](https://leetcode.com/problems/coin-change/)** · Medium
-**Pattern:** Unbounded Choice | **Companies:** Amazon, Google, Meta
-
-**Hint:** `dp[a] = 1 + min(dp[a − coin])`. Seed `dp[0] = 0`, treat unreachable as infinity, and loop amounts forward so coins can repeat.
+**Hint:** The largest square is at one of the two ends, never in the middle. Fill the output array **backwards** from the larger of the two.
 
 ---
 
-### M2 · House Robber II
+### E7 · Maximum Average Subarray I
 
-**🔗 [LC 213 — House Robber II](https://leetcode.com/problems/house-robber-ii/)** · Medium
-**Pattern:** Linear DP, Twice | **Companies:** Amazon, Google, Microsoft
+**🔗 [LC 643 — Maximum Average Subarray I](https://leetcode.com/problems/maximum-average-subarray-i/)** · Easy
+**Pattern:** Fixed Window | **Companies:** Amazon, Google
 
-**Hint:** The circle only forbids robbing both ends. Run the straight-line House Robber on `[0, n−2]` and on `[1, n−1]`, and take the better.
-
----
-
-### M3 · Word Break
-
-**🔗 [LC 139 — Word Break](https://leetcode.com/problems/word-break/)** · Medium
-**Pattern:** Reachability DP | **Companies:** Amazon, Google, Meta
-
-**Hint:** `dp[i]` is true when some `j < i` has `dp[j]` true and `s[j..i)` is in the dictionary. Put the dictionary in a set first.
+**Hint:** Build the first k elements, then roll: `sum += a[r] - a[r-k]`. Never rebuild the window from scratch.
 
 ---
 
-### M4 · Longest Increasing Subsequence
+### E8 · Substrings of Size Three with Distinct Characters
 
-**🔗 [LC 300 — Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)** · Medium
-**Pattern:** LIS / Patience | **Companies:** Amazon, Google, Meta
+**🔗 [LC 1876 — Substrings of Size Three with Distinct Characters](https://leetcode.com/problems/substrings-of-size-three-with-distinct-characters/)** · Easy
+**Pattern:** Fixed Window | **Companies:** Amazon, Adobe
 
-**Hint:** `dp[i]` is the best subsequence ending at `i` — O(n²). For O(n log n), binary search each value into a `tails` array.
-
----
-
-### M5 · Perfect Squares
-
-**🔗 [LC 279 — Perfect Squares](https://leetcode.com/problems/perfect-squares/)** · Medium
-**Pattern:** Unbounded Choice | **Companies:** Amazon, Google
-
-**Hint:** Same shape as Coin Change with coins `1, 4, 9, 16, …`. `dp[i] = 1 + min(dp[i − square])` for every square at most `i`.
+**Hint:** Window size is fixed at 3, so you can check distinctness directly. Good warm-up for keeping counts in sync as the window rolls.
 
 ---
 
-### M6 · Arithmetic Slices
+### E9 · Defuse the Bomb
 
-**🔗 [LC 413 — Arithmetic Slices](https://leetcode.com/problems/arithmetic-slices/)** · Medium
-**Pattern:** Ending Exactly Here | **Companies:** Amazon, Google
+**🔗 [LC 1652 — Defuse the Bomb](https://leetcode.com/problems/defuse-the-bomb/)** · Easy
+**Pattern:** Fixed Window | **Companies:** Amazon, Google
 
-**Hint:** `dp[i]` counts arithmetic slices ending at `i`: if the difference continues, `dp[i] = dp[i−1] + 1`, else 0. Sum the table.
-
----
-
-### M7 · Largest Divisible Subset
-
-**🔗 [LC 368 — Largest Divisible Subset](https://leetcode.com/problems/largest-divisible-subset/)** · Medium
-**Pattern:** Sort + LIS Shape | **Companies:** Amazon, Google
-
-**Hint:** Sort first, so divisibility only needs checking against earlier elements. Then it is LIS with `nums[i] % nums[j] == 0`, plus parent pointers to rebuild the subset.
+**Hint:** A circular fixed window. Use modular indexing `(i + j) % n` rather than physically rotating the array, and handle `k < 0` by walking the other way.
 
 ---
 
-### M8 · Number of Longest Increasing Subsequence
+## 🟡 Medium Tier (16 Problems)
 
-**🔗 [LC 673 — Number of Longest Increasing Subsequence](https://leetcode.com/problems/number-of-longest-increasing-subsequence/)** · Medium
-**Pattern:** LIS + Counting | **Companies:** Google, Amazon, Meta
+_Core Interview Patterns._
 
-**Hint:** Keep two tables: the length ending at `i` and how many ways achieve it. On a strictly longer candidate, copy the count; on a tie, add it.
+### M1 · Two Sum II - Input Array Is Sorted
 
----
+**🔗 [LC 167 — Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)** · Medium
+**Pattern:** Opposite Ends | **Companies:** Amazon, Google, Adobe
 
-### M9 · Best Time to Buy and Sell Stock with Cooldown
-
-**🔗 [LC 309 — Best Time to Buy and Sell Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)** · Medium
-**Pattern:** DP over States | **Companies:** Google, Amazon, Meta
-
-**Hint:** Three running values — holding, just sold, free. Compute today's `sold` from yesterday's `hold`, and today's `rest` from yesterday's `sold`.
+**Hint:** Sorted input is the clue. Start at both ends; move `lo` right when the sum is too small, `hi` left when it is too big. O(1) space — no HashMap needed.
 
 ---
 
-### M10 · Best Time to Buy and Sell Stock with Transaction Fee
+### M2 · Container With Most Water
 
-**🔗 [LC 714 — Best Time to Buy and Sell Stock with Transaction Fee](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)** · Medium
-**Pattern:** DP over States | **Companies:** Amazon, Google
+**🔗 [LC 11 — Container With Most Water](https://leetcode.com/problems/container-with-most-water/)** · Medium
+**Pattern:** Opposite Ends | **Companies:** Google, Amazon, Meta, Bloomberg
 
-**Hint:** Two states, `hold` and `free`. Pay the fee on the sale: `free = max(free, hold + price − fee)`.
-
----
-
-### M11 · Minimum Cost For Tickets
-
-**🔗 [LC 983 — Minimum Cost For Tickets](https://leetcode.com/problems/minimum-cost-for-tickets/)** · Medium
-**Pattern:** Choose the Pass Length | **Companies:** Google, Amazon
-
-**Hint:** `dp[day]` is the cheapest cover through that day. For a travel day, take the minimum of buying a 1-, 7- or 30-day pass; for other days, copy the previous value.
+**Hint:** Area is width × the **shorter** wall. Width only shrinks as you converge, so always move the shorter side — moving the taller one can never improve the answer.
 
 ---
 
-### M12 · Solving Questions With Brainpower
+### M3 · 3Sum
 
-**🔗 [LC 2140 — Solving Questions With Brainpower](https://leetcode.com/problems/solving-questions-with-brainpower/)** · Medium
-**Pattern:** Suffix DP | **Companies:** Google, Amazon
+**🔗 [LC 15 — 3Sum](https://leetcode.com/problems/3sum/)** · Medium
+**Pattern:** Anchor + Converging Pair | **Companies:** Amazon, Meta, Google, Adobe
 
-**Hint:** Fill from the end: `dp[i] = max(points + dp[i + brainpower + 1], dp[i + 1])`. Clamp the jump to `n`, and use 64-bit totals.
-
----
-
-## 🔴 Hard Tier (3 Problems)
-
-_A second dimension: transactions, sorted pairs, and jump sizes._
-
-### H1 · Best Time to Buy and Sell Stock IV
-
-**🔗 [LC 188 — Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)** · Hard
-**Pattern:** DP over Transactions | **Companies:** Google, Amazon, Meta
-
-**Hint:** Keep `buy[t]` and `sell[t]` for each transaction count and update them for every price. When `k ≥ n / 2` the limit is meaningless — sum every rise instead.
+**Hint:** Sort, fix an anchor, run converging pointers on the rest. The difficulty is deduplication: skip repeated anchors before the inner loop, and repeated `lo`/`hi` only after recording a hit.
 
 ---
 
-### H2 · Russian Doll Envelopes
+### M4 · 3Sum Closest
 
-**🔗 [LC 354 — Russian Doll Envelopes](https://leetcode.com/problems/russian-doll-envelopes/)** · Hard
-**Pattern:** Sort + LIS | **Companies:** Google, Amazon, Meta
+**🔗 [LC 16 — 3Sum Closest](https://leetcode.com/problems/3sum-closest/)** · Medium
+**Pattern:** Anchor + Converging Pair | **Companies:** Amazon, Google, Meta
 
-**Hint:** Sort by width ascending and height descending, so equal widths cannot chain. Then the answer is the LIS of the heights, in O(n log n).
+**Hint:** Same skeleton as 3Sum, but instead of testing equality you track the smallest `abs(sum - target)` seen so far. No deduplication needed.
 
 ---
 
-### H3 · Frog Jump
+### M5 · 4Sum
 
-**🔗 [LC 403 — Frog Jump](https://leetcode.com/problems/frog-jump/)** · Hard
-**Pattern:** DP over (Stone, Jump) | **Companies:** Google, Amazon, Meta
+**🔗 [LC 18 — 4Sum](https://leetcode.com/problems/4sum/)** · Medium
+**Pattern:** Anchor + Converging Pair | **Companies:** Amazon, Google, Adobe
 
-**Hint:** The state is the stone plus the jump that reached it. Store, for each stone, the set of jump sizes that can arrive; from each, try `k−1`, `k` and `k+1`.
+**Hint:** Two nested anchors then a converging pair — O(n³). Watch integer overflow on the sum: use `long`. Deduplicate at both anchor levels.
+
+---
+
+### M6 · Longest Substring Without Repeating Characters
+
+**🔗 [LC 3 — Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)** · Medium
+**Pattern:** Variable Window | **Companies:** Amazon, Google, Meta, Bloomberg
+
+**Hint:** Store the last index of each character. On a repeat, jump `left` forward to just past the previous copy — use `Math.max` so a stale duplicate never drags `left` backwards.
+
+---
+
+### M7 · Longest Repeating Character Replacement
+
+**🔗 [LC 424 — Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)** · Medium
+**Pattern:** Variable Window | **Companies:** Google, Amazon, Meta
+
+**Hint:** A window is valid when `length - maxFreq <= k`. You do not need to recompute `maxFreq` when shrinking; letting it go stale only under-estimates, which never yields a wrong maximum.
+
+---
+
+### M8 · Minimum Size Subarray Sum
+
+**🔗 [LC 209 — Minimum Size Subarray Sum](https://leetcode.com/problems/minimum-size-subarray-sum/)** · Medium
+**Pattern:** Variable Window (shortest) | **Companies:** Amazon, Google, Meta
+
+**Hint:** All values are positive, so growing the window only increases the sum. Expand to reach the target, then shrink from the left while it still qualifies — record **inside** the shrink loop.
+
+---
+
+### M9 · Fruit Into Baskets
+
+**🔗 [LC 904 — Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/)** · Medium
+**Pattern:** Variable Window | **Companies:** Google, Amazon
+
+**Hint:** This is 'longest subarray with at most 2 distinct values' in disguise. Keep a frequency map; shrink while the map holds more than two keys.
+
+---
+
+### M10 · Permutation in String
+
+**🔗 [LC 567 — Permutation in String](https://leetcode.com/problems/permutation-in-string/)** · Medium
+**Pattern:** Fixed Window | **Companies:** Meta, Amazon, Microsoft
+
+**Hint:** A permutation means identical character counts. Slide a window of size `s1.length()` over `s2` and compare two 26-slot arrays — or track a single `matches` counter for O(1) checks.
+
+---
+
+### M11 · Find All Anagrams in a String
+
+**🔗 [LC 438 — Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)** · Medium
+**Pattern:** Fixed Window | **Companies:** Amazon, Meta, Google
+
+**Hint:** Identical to Permutation in String, but you record every start index instead of returning on the first hit.
+
+---
+
+### M12 · Max Consecutive Ones III
+
+**🔗 [LC 1004 — Max Consecutive Ones III](https://leetcode.com/problems/max-consecutive-ones-iii/)** · Medium
+**Pattern:** Variable Window | **Companies:** Amazon, Google, Meta
+
+**Hint:** Reframe it: the longest window containing at most k zeros. Count zeros in the window and shrink while that count exceeds k.
+
+---
+
+### M13 · Subarray Product Less Than K
+
+**🔗 [LC 713 — Subarray Product Less Than K](https://leetcode.com/problems/subarray-product-less-than-k/)** · Medium
+**Pattern:** Variable Window + counting | **Companies:** Amazon, Google
+
+**Hint:** Shrink while the product is ≥ k, then add `right - left + 1` — every subarray ending at `right` inside the window qualifies. Guard `k <= 1` as an early return.
+
+---
+
+### M14 · Maximum Number of Vowels in a Substring of Given Length
+
+**🔗 [LC 1456 — Maximum Number of Vowels in a Substring of Given Length](https://leetcode.com/problems/maximum-number-of-vowels-in-a-substring-of-given-length/)** · Medium
+**Pattern:** Fixed Window | **Companies:** Amazon, Microsoft
+
+**Hint:** Classic roll: add the incoming character's vowel-ness, subtract the outgoing one. No map required, just an integer.
+
+---
+
+### M15 · Interval List Intersections
+
+**🔗 [LC 986 — Interval List Intersections](https://leetcode.com/problems/interval-list-intersections/)** · Medium
+**Pattern:** Two Pointers on two arrays | **Companies:** Meta, Amazon, Google
+
+**Hint:** One pointer per list. The intersection is `[max(starts), min(ends)]`; it is real only when that start ≤ that end. Advance whichever interval ends first.
+
+---
+
+### M16 · Valid Triangle Number
+
+**🔗 [LC 611 — Valid Triangle Number](https://leetcode.com/problems/valid-triangle-number/)** · Medium
+**Pattern:** Anchor + Converging Pair | **Companies:** Amazon, Google
+
+**Hint:** Sort, fix the **largest** side at index `i`, then converge `lo`/`hi` below it. When `a[lo] + a[hi] > a[i]`, every index between `lo` and `hi` also works — add `hi - lo` at once.
+
+---
+
+## 🔴 Hard Tier (5 Problems)
+
+_FAANG Mastery._
+
+### H1 · Minimum Window Substring
+
+**🔗 [LC 76 — Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)** · Hard
+**Pattern:** Variable Window (shortest) | **Companies:** Meta, Amazon, Google, Uber
+
+**Hint:** Keep a `need` map and a single `missing` counter so validity is O(1). Record the answer **inside** the shrink loop, before moving `left`. Characters outside `t` go negative and are ignored by the `> 0` guards.
+
+---
+
+### H2 · Trapping Rain Water
+
+**🔗 [LC 42 — Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)** · Hard
+**Pattern:** Opposite Ends | **Companies:** Google, Amazon, Meta, Microsoft
+
+**Hint:** Water above a bar is `min(leftMax, rightMax) - height`. Converge from both ends: whichever side is shorter is the binding constraint, so its water is already decided — settle it and step inwards. O(1) space.
+
+---
+
+### H3 · Subarrays with K Different Integers
+
+**🔗 [LC 992 — Subarrays with K Different Integers](https://leetcode.com/problems/subarrays-with-k-different-integers/)** · Hard
+**Pattern:** At-Most Trick | **Companies:** Google, Amazon, Meta
+
+**Hint:** 'Exactly k' is not monotonic, so a window cannot answer it directly. Use `exactly(k) = atMost(k) - atMost(k-1)` and write the at-most window once.
+
+---
+
+### H4 · Minimum Number of K Consecutive Bit Flips
+
+**🔗 [LC 995 — Minimum Number of K Consecutive Bit Flips](https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/)** · Hard
+**Pattern:** Sliding Window of Flips | **Companies:** Google, Amazon
+
+**Hint:** Greedy left to right: if the current bit, after the flips affecting it, is 0, you must start a flip here. Track active flips with a queue or a difference array, and expire flips that started `k` positions ago.
+
+---
+
+### H5 · Substring with Concatenation of All Words
+
+**🔗 [LC 30 — Substring with Concatenation of All Words](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)** · Hard
+**Pattern:** Fixed Window on word blocks | **Companies:** Amazon, Meta, Google
+
+**Hint:** Slide in steps of one **word length**, not one character, and run `wordLen` separate passes so every alignment is covered. Each pass is an ordinary variable window over whole words.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — two pointers from both ends of a sorted array
+
+// Snippet 2
+for i from 0 to n - 1:
+    for j from i to n - 1:
+        check window [i, j]
+
+// Snippet 3 — variable-size sliding window (expand right, shrink left)
+
+// Snippet 4 — fixed-size window of k, recomputing each window's sum
+
+// Snippet 5 — fixed-size window of k, updating the sum as it slides
+
+// Snippet 6 — 3Sum: sort, then two pointers for each element
+```
+
+**Complexity Answers:**
+
+1. **O(n)** — each pointer moves at most n times.
+2. **O(n²)** windows.
+3. **O(n)** — each index enters and leaves the window once.
+4. **O(n · k)**.
+5. **O(n)**.
+6. **O(n²)** — O(n log n) sort plus n passes of O(n).
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. A sliding window with a nested while loop is O(n²). → **False** — each element is added once and removed once: O(n)
+2. Two pointers from both ends need a sorted array (or a similar monotonic property). → **True** — that is what makes moving one pointer safe
+3. A sliding window works for "longest subarray with sum ≤ k" even with negative numbers. → **False** — negatives break the shrinking rule; use prefix sums
+4. "Exactly k" can be computed as "at most k" minus "at most k − 1". → **True** — the at-most trick
+5. Fast and slow pointers can remove duplicates in place in O(1) space. → **True**
+6. A fixed-size window must recompute its sum each step. → **False** — add the new element, subtract the one leaving
 
 ---
 
 ## 🧠 Conceptual Check
 
-Answer these out loud, without looking at the notes:
-
-1. **The two signals:** Name them, and give a problem that has one but not the other.
-2. **State definition:** For LIS, why does "best over the first i" fail where "best ending at i" works?
-3. **Memo keys:** What must the memo key contain? Give an example where forgetting part of the key gives a subtly wrong answer.
-4. **Loop order:** In bottom-up Coin Change, why does the amount loop run forward? What would a backward loop mean?
-5. **Space:** When can a DP table be reduced to O(1) variables, and when can it not?
-6. **DP vs greedy:** Coin Change with {1, 3, 4} beats greedy. Explain, in terms of the two signals, why DP is needed.
+1. **Why is the expand/shrink template O(n) despite two nested loops?**
+2. **Longest vs shortest:** where does the answer get recorded in each, and why?
+3. **Why must the shrink step be a `while` and not an `if`?**
+4. **Why does `exactly(k) = atMost(k) - atMost(k-1)` work?** What property of "at most" makes it windowable?
+5. **Why do sliding windows fail on arrays containing negatives?** What replaces them?
+6. **In Container With Most Water, why is moving the taller wall provably useless?**
+7. **In 3Sum, why must the array be sorted before deduplicating?**
 
 ---
 
@@ -276,24 +367,27 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/), [Russian Doll Envelopes](https://leetcode.com/problems/russian-doll-envelopes/), [Frog Jump](https://leetcode.com/problems/frog-jump/), [Coin Change](https://leetcode.com/problems/coin-change/) |
-| **Google**    | [Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/), [Russian Doll Envelopes](https://leetcode.com/problems/russian-doll-envelopes/), [Frog Jump](https://leetcode.com/problems/frog-jump/), [Coin Change](https://leetcode.com/problems/coin-change/) |
-| **Meta**      | [Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/), [Russian Doll Envelopes](https://leetcode.com/problems/russian-doll-envelopes/), [Frog Jump](https://leetcode.com/problems/frog-jump/), [Coin Change](https://leetcode.com/problems/coin-change/) |
-| **Microsoft** | [House Robber II](https://leetcode.com/problems/house-robber-ii/)                                                                                                                                                                                                                                          |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Minimum Number of K Consecutive Bit Flips](https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/), [Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/), [Maximum Number of Vowels in a Substring of Given Length](https://leetcode.com/problems/maximum-number-of-vowels-in-a-substring-of-given-length/), [Subarray Product Less Than K](https://leetcode.com/problems/subarray-product-less-than-k/) |
+| **Google**    | [Valid Triangle Number](https://leetcode.com/problems/valid-triangle-number/), [Defuse the Bomb](https://leetcode.com/problems/defuse-the-bomb/), [Maximum Average Subarray I](https://leetcode.com/problems/maximum-average-subarray-i/), [Minimum Number of K Consecutive Bit Flips](https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/)                                                                               |
+| **Meta**      | [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/), [Subarrays with K Different Integers](https://leetcode.com/problems/subarrays-with-k-different-integers/), [Substring with Concatenation of All Words](https://leetcode.com/problems/substring-with-concatenation-of-all-words/), [3Sum Closest](https://leetcode.com/problems/3sum-closest/)                                                             |
+| **Microsoft** | [Reverse String II](https://leetcode.com/problems/reverse-string-ii/), [Maximum Number of Vowels in a Substring of Given Length](https://leetcode.com/problems/maximum-number-of-vowels-in-a-substring-of-given-length/), [Permutation in String](https://leetcode.com/problems/permutation-in-string/), [Move Zeroes](https://leetcode.com/problems/move-zeroes/)                                                                             |
+| **Adobe**     | [Remove Element](https://leetcode.com/problems/remove-element/), [Substrings of Size Three with Distinct Characters](https://leetcode.com/problems/substrings-of-size-three-with-distinct-characters/), [4Sum](https://leetcode.com/problems/4sum/), [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)                                                                                 |
 
 ---
 
 ## ✅ Completion Checklist
 
 - [ ] All 10 Easy problems solved
-- [ ] All 12 Medium problems solved
-- [ ] All 3 Hard problems attempted
-- [ ] All 6 conceptual questions answered out loud
-- [ ] I can climb all four steps — recursion, memo, table, rolling — on a new problem
-- [ ] I can write the dp definition as a sentence before writing any code
+- [ ] All 15 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 7 conceptual questions answered out loud
+- [ ] I can write the variable-window template from memory
+- [ ] I can name the shape for any new problem within 30 seconds
 
 ---
 
-**← [Lecture 24 · Union-Find (Disjoint Set Union)](../Lecture24/Assignment.md)** &nbsp;·&nbsp; **[Lecture 26 · Dynamic Programming II — Grids & Strings](../Lecture26/Assignment.md) →**
+**← [Lecture 24 · Backtracking — Systematic Search](../Lecture24/Assignment.md)** &nbsp;·&nbsp; **[Lecture 26 · Prefix Sums & Difference Arrays](../Lecture26/Assignment.md) →**

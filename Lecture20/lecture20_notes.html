@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 20 &mdash; Monotonic Stack &amp; Queue</title>
+    <title>Lecture 20 — Heaps &amp; Priority Queues</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Master heaps and priority queues: array representation, sift operations, Top-K, Two Heaps median, K-way merge — with full dry runs and Java code."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -86,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1391,43 +1391,46 @@
       }
     </style>
   </head>
+
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Monotonic Stack &amp; Queue</div>
+        <div class="sb-title">Heaps &amp; Priority Queues</div>
         <div class="sb-meta">
-          Lecture 20 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 20 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
         <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127757;</span>Introduction</a
+          ><span class="toc-icon">&#127774;</span>Introduction</a
         >
-        <a class="toc-item" href="#template"
-          ><span class="toc-icon">&#129513;</span>One Template, Four Variants</a
+        <a class="toc-item" href="#anatomy"
+          ><span class="toc-icon">&#127959;</span>Heap Anatomy</a
         >
-        <a class="toc-item toc-sub" href="#tpl-direction"
-          >Direction &amp; Sign</a
+        <a class="toc-item toc-sub" href="#array-rep">Array Representation</a>
+        <a class="toc-item toc-sub" href="#heap-property">Min vs Max Heap</a>
+        <a class="toc-item" href="#operations"
+          ><span class="toc-icon">&#9881;</span>Core Operations</a
         >
-        <a class="toc-item toc-sub" href="#tpl-ties">Handling Ties</a>
-        <a class="toc-item" href="#spans"
-          ><span class="toc-icon">&#128207;</span>What the Stack Stores</a
+        <a class="toc-item toc-sub" href="#sift-up">Insert &amp; Sift-Up</a>
+        <a class="toc-item toc-sub" href="#sift-down">Delete &amp; Sift-Down</a>
+        <a class="toc-item toc-sub" href="#build-heap">Build Heap O(n)</a>
+        <a class="toc-item" href="#java-api"
+          ><span class="toc-icon">&#9749;</span>Java PriorityQueue</a
         >
-        <a class="toc-item" href="#contribution"
-          ><span class="toc-icon">&#129518;</span>Contribution Technique</a
+        <a class="toc-item" href="#patterns"
+          ><span class="toc-icon">&#127919;</span>The 5 Patterns</a
         >
-        <a class="toc-item" href="#lexi"
-          ><span class="toc-icon">&#128290;</span>Building the Best Sequence</a
-        >
-        <a class="toc-item" href="#deque"
-          ><span class="toc-icon">&#127898;&#65039;</span>Monotone Deque</a
-        >
-        <a class="toc-item toc-sub" href="#deque-heap">Deque vs Heap</a>
+        <a class="toc-item toc-sub" href="#p1">1. Min/Max Heap Ops</a>
+        <a class="toc-item toc-sub" href="#p2">2. Top-K Elements</a>
+        <a class="toc-item toc-sub" href="#p3">3. Two Heaps (Median)</a>
+        <a class="toc-item toc-sub" href="#p4">4. K-way Merge</a>
+        <a class="toc-item toc-sub" href="#p5">5. Greedy Heap</a>
         <a class="toc-item" href="#pitfalls"
-          ><span class="toc-icon">&#9201;</span>Complexity &amp; Bugs</a
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
           ><span class="toc-icon">&#128170;</span>Practice Problems</a
@@ -1435,6 +1438,7 @@
         <a class="toc-item" href="#assignment"
           ><span class="toc-icon">&#128221;</span>Assignment</a
         >
+        <div class="sb-div"></div>
         <a class="toc-item" href="#checklist"
           ><span class="toc-icon">&#9989;</span>Checklist</a
         >
@@ -1442,14 +1446,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture19/lecture19_notes.html"
-          >&larr; Lecture 19 &middot; Prefix Sums &amp; Difference Arrays</a
+          >&larr; Lecture 19 &middot; Trees II</a
         >
         <a class="toc-item" href="../Lecture21/lecture21_notes.html"
-          >&rarr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+          >&rarr; Lecture 21 &middot; Graphs I</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1457,10 +1460,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 20 &mdash; Monotonic Stack &amp; Queue</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 20 &mdash; Heaps &amp; Priority Queues</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1478,35 +1480,39 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128201;</span>
-          <h1 class="page-title">Monotonic Stack &amp; Queue</h1>
+          <span class="page-emoji">&#9968;</span>
+          <h1 class="page-title">Heaps &amp; Priority Queues</h1>
           <p class="page-sub">
-            &ldquo;Throw away what can never be the answer. Whatever survives is
-            sorted &mdash; and that is the whole algorithm.&rdquo;
+            &ldquo;A heap is a complete binary tree stored in an array. Every
+            parent is smaller than its children (min-heap) &mdash; and that one
+            rule unlocks O(log n) insert &amp; extract.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 20 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
-            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip accent">&#128218; Lecture 20 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 5 days</span>
             <span class="meta-chip green">&#127919; 20 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta</span
+              >&#128188; Google &middot; Amazon &middot; Microsoft</span
             >
           </div>
         </div>
 
         <!-- WHY THIS MATTERS -->
-        <div class="callout blue" id="intro">
+        <div class="callout blue" id="intro" style="margin-bottom: 20px">
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 12 introduced the monotonic stack through Daily Temperatures
-            and the histogram, and Lecture 19 ended with a deque of prefix sums.
-            Both were the same move: keep candidates in sorted order, and drop
-            the ones a later element has made useless. This lecture names that
-            move, gives it one template with four settings, and then uses it for
-            the problems it was really invented for &mdash; counting each
-            element's contribution, and building the best possible subsequence.
+            Heaps appear in 15&ndash;20% of FAANG interviews. Three problem
+            families dominate:
+            <strong>Top-K</strong> (Kth largest, K closest points),
+            <strong>Two Heaps</strong> (running median), and
+            <strong>K-way Merge</strong> (merge K sorted lists). Master these
+            three and you have a pattern for roughly 80% of all heap problems.
+            Java&apos;s <code>PriorityQueue</code> is your primary tool &mdash;
+            understand what it does internally so you never misuse it.
           </div>
         </div>
 
@@ -1514,841 +1520,680 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Write one template and set it to next/previous &times;
-              greater/smaller without re-deriving it
+              Understand heap property (min-heap, max-heap) and heapify
+              operation
             </li>
+            <li>Implement a heap from scratch using array representation</li>
+            <li>Solve Top-K problems efficiently with a size-K min-heap</li>
             <li>
-              Say what a popped element means, and why the total work is O(n)
-            </li>
-            <li>
-              Use the contribution technique to sum a value over every subarray
-            </li>
-            <li>
-              Build lexicographically smallest subsequences with a stack and a
-              budget
-            </li>
-            <li>
-              Choose a monotone deque over a heap, and say what each one costs
+              Use two heaps for dynamic median computation in O(log n) per
+              element
             </li>
           </ul>
         </div>
 
-        <h2 class="h1" id="template">&#129513; One Template, Four Variants</h2>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: A hospital triage desk.</strong
+            >
+            Patients are not seen in the order they arrive &mdash; the most
+            urgent always goes next. New arrivals are slotted in by urgency, and
+            nobody keeps a fully sorted list of everyone waiting; the desk only
+            needs to know
+            <em>who is next</em>. That is a heap: cheap to add to, instant to
+            peek at, and never more sorted than it needs to be.
+          </div>
+        </div>
+
+        <!-- CONNECTION -->
+        <div class="callout green" style="margin-bottom: 32px">
+          <span class="callout-icon">&#128279;</span>
+          <div class="callout-body">
+            <strong>How it connects:</strong> A heap IS a complete binary tree
+            (Lecture 18) stored in an array (Lecture 11). The parent-child
+            formulas below come directly from BFS level-order indexing. After
+            this lecture, heaps underpin Dijkstra&apos;s algorithm (Lecture 22,
+            Graphs II) and the median-of-medians approach in Sorting.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- HEAP ANATOMY -->
+        <h2 class="h1" id="anatomy">
+          &#127968; Heap Anatomy &mdash; The Array Representation
+        </h2>
         <p>
-          Every monotonic stack problem asks the same question about each
-          element:
-          <strong
-            >who is the first element to my left (or right) that is bigger (or
-            smaller) than me?</strong
+          A <em>complete binary tree</em> can be stored perfectly in an array
+          with no pointers needed. The structural rules are fixed by index
+          arithmetic:
+        </p>
+        <h3 class="h3" id="array-rep">Array Representation</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >Array Representation &mdash; Index Formulas</span
+            >
+          </div>
+          <pre>
+ Index:   0    1    2    3    4    5    6
+ Array: [ 1,   3,   5,   7,   9,   8,   6 ]   ← min-heap
+
+ Visualised as a tree:
+            1          ← index 0  (root)
+          /   \
+         3     5       ← index 1, 2
+        / \   / \
+       7   9 8   6     ← index 3, 4, 5, 6
+
+ Parent of i  → (i - 1) / 2
+ Left child   → 2*i + 1
+ Right child  → 2*i + 2
+
+ Heap Property (min-heap): parent ≤ both children at EVERY node
+ Max-heap: flip to parent ≥ both children</pre
           >
-          Four combinations, one piece of code.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>stack ← empty stack            <span class="pc-cm">// holds INDICES, not values</span>
-answer ← array of n, filled with the &quot;none found&quot; default
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:                     <span class="pc-cm">// ← direction lives here</span>
-    <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> nums[stack.top()] &lt; nums[i]:   <span class="pc-cm">// ← comparison lives here</span>
-        j ← stack.pop()
-        answer[j] ← i          <span class="pc-cm">// i is j&#39;s answer: the first one that beat it</span>
-    stack.push(i)
-
-<span class="pc-cm">// Anything still on the stack never found an answer — it keeps the default.</span></pre>
         </div>
 
-        <h3 class="h2" id="tpl-direction">Direction &amp; Sign</h3>
+        <h3 class="h3" id="heap-property">Min vs Max Heap</h3>
         <p>
-          Two switches configure it. The <em>loop direction</em> decides whether
-          you are looking forwards or backwards; the <em>comparison</em> decides
-          greater or smaller.
+          The only difference between a min-heap and a max-heap is the
+          comparison in the heap property. Everything else &mdash; the index
+          arithmetic, sift-up, sift-down &mdash; is identical. Flip
+          <code>&le;</code> to <code>&ge;</code> and a min-heap becomes a
+          max-heap.
         </p>
-        <table>
-          <thead>
-            <tr>
-              <th>You want</th>
-              <th>Loop</th>
-              <th>Pop while</th>
-              <th>Stack ends up</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Next greater element</td>
-              <td>left &rarr; right</td>
-              <td><code>nums[top] &lt; nums[i]</code></td>
-              <td>decreasing</td>
-            </tr>
-            <tr>
-              <td>Next smaller element</td>
-              <td>left &rarr; right</td>
-              <td><code>nums[top] &gt; nums[i]</code></td>
-              <td>increasing</td>
-            </tr>
-            <tr>
-              <td>Previous greater element</td>
-              <td>right &rarr; left</td>
-              <td><code>nums[top] &lt; nums[i]</code></td>
-              <td>decreasing</td>
-            </tr>
-            <tr>
-              <td>Previous smaller element</td>
-              <td>right &rarr; left</td>
-              <td><code>nums[top] &gt; nums[i]</code></td>
-              <td>increasing</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Or keep one direction and read it twice.</strong> Walking
-            left to right and popping on <code>&lt;</code> also tells each
-            <em>surviving</em> element who its previous greater element is
-            &mdash; it is whatever sits below it on the stack at the moment it
-            is pushed. One pass can fill both arrays.
-          </div>
-        </div>
-
-        <h3 class="h2" id="tpl-ties">Handling Ties</h3>
         <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
+          <span class="callout-icon">&#128204;</span>
           <div class="callout-body">
-            <strong>Equal values decide whether you double-count.</strong> When
-            duplicates exist, make one side strict and the other not: pop on
-            <code>&le;</code> going left, and on <code>&lt;</code> going right
-            (or the mirror). Then a run of equal values is claimed by exactly
-            one of them, and totals come out right instead of doubled.
+            <strong>Key complexity facts:</strong><br />
+            Insert (offer): O(log n) &mdash; sift UP &nbsp;|&nbsp; Extract-min
+            (poll): O(log n) &mdash; sift DOWN &nbsp;|&nbsp; Peek-min: O(1)
+            &mdash; always at index 0 &nbsp;|&nbsp; Build heap from array: O(n)
+            &mdash; not O(n log n)!
           </div>
         </div>
 
-        <h2 class="h1" id="spans">&#128207; What the Stack Really Stores</h2>
+        <!-- CORE OPERATIONS -->
+        <h2 class="h1" id="operations">&#9881; Core Operations</h2>
         <p>
-          The stack is not a list of numbers; it is a list of
-          <strong>unresolved candidates</strong>. An index stays on it while no
-          later element has beaten it. The moment one does, that index&#39;s
-          span is fixed forever &mdash; and the span is usually what the problem
-          actually wants.
+          A heap only ever needs two repair routines. <strong>Sift-up</strong>
+          walks a node towards the root while it is smaller than its parent;
+          <strong>sift-down</strong> walks a node towards the leaves while it is
+          bigger than its smallest child. Insert, delete and build are all
+          written in terms of those two.
         </p>
 
-        <div class="ascii-tree">
-          heights = [2, 1, 5, 6, 2, 3] &nbsp;&nbsp; index 3 (value 6) is popped
-          at index 4 &nbsp;&nbsp; previous smaller = index 2 &nbsp;|&nbsp; next
-          smaller = index 4 &nbsp;&nbsp; so 6 rules the open range (2, 4)
-          &mdash; exactly one bar wide
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Why it is O(n), not O(n&sup2;).</strong> The
-            <code>while</code> loop looks nested, but each index is pushed once
-            and popped once in the whole run. Amortised, that is two operations
-            per element &mdash; the same argument as the two-stack queue in
-            Lecture 12.
-          </div>
-        </div>
-
-        <h2 class="h1" id="contribution">
-          &#129518; The Contribution Technique
-        </h2>
-        <p>
-          Some problems ask for a value summed over
-          <em>every subarray</em> &mdash; the minimum of each, the range of
-          each. There are O(n&sup2;) subarrays, so they cannot all be visited.
-          Turn the question inside out: instead of asking &ldquo;what is the
-          minimum of this subarray?&rdquo;, ask
-          <strong
-            >&ldquo;how many subarrays does this element rule?&rdquo;</strong
-          >
-        </p>
-
+        <h3 class="h3" id="sift-up">Insert &amp; Sift-Up</h3>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Sum of Subarray Minimums</span
+              >&#128208; Pseudocode &middot; Sift-Up, Sift-Down, Build</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-cm">// nums[i] is the minimum of every subarray that stays strictly inside
-// (previous smaller, next smaller) and includes i.</span>
-left[i]  ← distance to the previous smaller element   <span class="pc-cm">// pop on ≥ going left</span>
-right[i] ← distance to the next smaller element       <span class="pc-cm">// pop on &gt;  going right</span>
+          <pre><span class="pc-cm">// A heap is an array. parent(i) = (i-1)/2, children = 2i+1 and 2i+2.</span>
+<span class="pc-kw">function</span> siftUp(i):          <span class="pc-cm">// after inserting at the end</span>
+    <span class="pc-kw">while</span> i > 0 <span class="pc-kw">and</span> heap[parent(i)] > heap[i]:
+        swap(i, parent(i))
+        i <span class="pc-kw">&larr;</span> parent(i)
 
-total ← 0
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    count ← left[i] × right[i]        <span class="pc-cm">// choices on each side multiply</span>
-    total ← total + nums[i] × count
-<span class="pc-kw">return</span> total mod 1000000007
+<span class="pc-kw">function</span> siftDown(i):        <span class="pc-cm">// after moving the last element to the root</span>
+    <span class="pc-kw">while</span> leftChild(i) &lt; size:
+        smallest <span class="pc-kw">&larr;</span> index of the smaller existing child of i
+        <span class="pc-kw">if</span> heap[i] &le; heap[smallest]: <span class="pc-kw">break</span>
+        swap(i, smallest)
+        i <span class="pc-kw">&larr;</span> smallest
 
-<span class="pc-cm">// nums = [3, 1, 2, 4], element 1 at index 1
-// previous smaller: none → 2 choices of start (index 0 or 1)
-// next smaller: none → 3 choices of end (index 1, 2 or 3)
-// so 1 is the minimum of 2 × 3 = 6 subarrays</span></pre>
+<span class="pc-kw">function</span> insert(x):  heap[size] <span class="pc-kw">&larr;</span> x; size <span class="pc-kw">&larr;</span> size + 1; siftUp(size - 1)
+<span class="pc-kw">function</span> extractMin():
+    min <span class="pc-kw">&larr;</span> heap[0]
+    heap[0] <span class="pc-kw">&larr;</span> heap[size-1]      <span class="pc-cm">// move the last leaf to the root</span>
+    size <span class="pc-kw">&larr;</span> size - 1
+    siftDown(0)
+    <span class="pc-kw">return</span> min
+
+<span class="pc-kw">function</span> build(array):       <span class="pc-cm">// O(n), NOT O(n log n)</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> size&divide;2 - 1 <span class="pc-kw">down to</span> 0: siftDown(i)
+
+<span class="pc-cm">// Why is build O(n)? Leaves need 0 work, and the bottom half of the array is all leaves.</span>
+<span class="pc-cm">// Formal proof: the sum of sift-down heights is a geometric series = O(n).</span></pre>
         </div>
 
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
+        <h3 class="h3" id="sift-down">Delete &amp; Sift-Down</h3>
+        <p>
+          <code>poll()</code> can't just remove index&nbsp;0 &mdash; that would
+          leave a hole. Instead move the <em>last</em> element into the root and
+          sift it down. One O(log n) walk restores the whole heap.
+        </p>
+
+        <h3 class="h3" id="build-heap">Build Heap in O(n)</h3>
+        <p>
+          Inserting n elements one at a time costs O(n log n). Heapifying an
+          existing array costs only <strong>O(n)</strong>: half the nodes are
+          leaves and need no work at all, and the number of nodes at height h
+          shrinks geometrically while the work per node grows only linearly in
+          h. The sum &sum; h &middot; n/2<sup>h+1</sup> converges to O(n).
+        </p>
+
+        <!-- SIFT DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
           <div class="callout-body">
-            <strong>The duplicate trap.</strong> With equal values, &ldquo;the
-            minimum&rdquo; is ambiguous, and a symmetric rule counts some
-            subarrays twice. Break the tie by direction: going left, stop at
-            values <code>&ge;</code> this one; going right, stop only at values
-            strictly <code>&lt;</code>. Each subarray then belongs to the
-            leftmost copy of its minimum, once.
+            <strong>Dry Run &mdash; Insert 2 into min-heap [1,3,5,7,9]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">Before: heap = [<span class="hl">1</span>, 3, 5, 7, 9]
+         <span class="hl">1</span>
+        / \
+       3   5
+      / \
+     7   9
+
+Insert 2 at index 5: heap = [1, 3, 5, 7, 9, <span class="nd">2</span>]
+i=5, parent=(5-1)/2=2, heap[2]=5 > heap[5]=<span class="nd">2</span> &rarr; swap
+heap = [1, 3, <span class="nd">2</span>, 7, 9, 5]
+i=2, parent=(2-1)/2=0, heap[0]=1 &le; heap[2]=2 &rarr; STOP &#10003;
+
+After:  heap = [<span class="hl">1</span>, 3, <span class="nd">2</span>, 7, 9, 5]
+         <span class="hl">1</span>
+        / \
+       3   <span class="nd">2</span>    &larr; min-heap property restored
+      / \ /
+     7  9 5</div>
           </div>
         </div>
 
+        <!-- JAVA PQ NOTE -->
+        <h3 class="h3" id="java-api">Java PriorityQueue</h3>
         <p>
-          The same counting answers a family of questions. Sum of subarray
-          <em>maximums</em> flips every comparison. Sum of subarray
-          <em>ranges</em> is the maximum total minus the minimum total. Maximum
-          min-product weights each element&#39;s span by a prefix sum &mdash;
-          the technique from Lecture 19, reused inside this one.
+          In an interview you almost never hand-roll a heap &mdash; you reach
+          for <code>PriorityQueue</code>. Know its defaults cold: it is a
+          <em>min</em>-heap, and it is not sorted when you iterate it.
         </p>
-
-        <h2 class="h1" id="lexi">&#128290; Building the Best Sequence</h2>
-        <p>
-          The third family uses the stack as the <em>answer being built</em>
-          rather than a bookkeeping device. The rule is always the same: before
-          pushing the current character, pop anything that makes the result
-          worse &mdash; but only while you can still afford to.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Smallest Subsequence, k
-              Removals</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> mostCompetitive(nums, k):        <span class="pc-cm">// keep k items, smallest sequence</span>
-    stack ← empty stack
-    drops ← length(nums) - k                <span class="pc-cm">// how many we may throw away</span>
-
-    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> stack.top() &gt; x <span class="pc-kw">and</span> drops &gt; 0:
-            stack.pop()                     <span class="pc-cm">// a smaller value arrived — the bigger one must go</span>
-            drops ← drops - 1
-        stack.push(x)
-
-    <span class="pc-kw">return</span> the first k items of the stack
-
-<span class="pc-cm">// The budget is what makes it correct: without it, the stack would
-// happily drop everything down to the single smallest element.</span></pre>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Same shape, different budget.</strong> Remove K Digits
-            spends a fixed budget. Remove Duplicate Letters may only pop a
-            letter that appears again later &mdash; the remaining-count array is
-            its budget. Once you see the budget, the problems stop looking
-            different.
-          </div>
-        </div>
-
-        <h2 class="h1" id="deque">
-          &#127898;&#65039; Monotone Deque &mdash; Windows That Move
-        </h2>
-        <p>
-          A stack answers questions about a growing prefix. When the left end
-          moves too, you need the same idea with a second door: a
-          <strong>monotone deque</strong>. Indices leave from the back when a
-          better candidate arrives, and from the front when they fall out of the
-          window.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Window Maximum in O(n)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>dq ← empty deque of indices        <span class="pc-cm">// values decrease front → back</span>
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    <span class="pc-kw">if</span> dq is not empty <span class="pc-kw">and</span> dq.front() ≤ i - k:
-        dq.popFront()                  <span class="pc-cm">// expired: left the window</span>
-
-    <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> nums[dq.back()] ≤ nums[i]:
-        dq.popBack()                   <span class="pc-cm">// useless: later AND bigger</span>
-
-    dq.pushBack(i)
-    <span class="pc-kw">if</span> i ≥ k - 1: report nums[dq.front()]   <span class="pc-cm">// front is always the window max</span></pre>
-        </div>
-
-        <p>
-          The deque is the engine behind three different-looking problems:
-          window extremes, DP where a state may only reach back
-          <code>k</code> steps (Constrained Subsequence Sum), and pair problems
-          where one term is fixed and the other must be maximised over a moving
-          range (Max Value of Equation).
-        </p>
-
-        <h3 class="h2" id="deque-heap">Deque vs Heap</h3>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Monotone deque</th>
-              <th>Max-heap</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Per element</td>
-              <td>O(1) amortised</td>
-              <td>O(log n)</td>
-            </tr>
-            <tr>
-              <td>Removing an expired item</td>
-              <td>pop the front &mdash; it is right there</td>
-              <td>lazy deletion, or a heap that supports removal</td>
-            </tr>
-            <tr>
-              <td>Answers</td>
-              <td>one extreme, over a contiguous window</td>
-              <td>any top-k, over any set</td>
-            </tr>
-            <tr>
-              <td>Use it when</td>
-              <td>the window slides in one direction</td>
-              <td>items arrive and leave arbitrarily</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong>When a monotonic structure is the wrong tool.</strong> It
-            only ever answers about the <em>nearest</em> qualifying element or
-            the extreme of a contiguous window. &ldquo;How many elements to my
-            left are smaller?&rdquo; is a counting question &mdash; that needs a
-            Fenwick tree (Lecture 30), not a stack.
-          </div>
-        </div>
-
-        <h2 class="h1" id="pitfalls">
-          &#9201; Complexity &amp; The Classic Bugs
-        </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Technique</th>
-              <th>Time</th>
-              <th>Space</th>
-              <th>Answers</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Monotonic stack (one pass)</td>
-              <td>O(n)</td>
-              <td>O(n)</td>
-              <td>nearest greater / smaller, on either side</td>
-            </tr>
-            <tr>
-              <td>Contribution technique</td>
-              <td>O(n)</td>
-              <td>O(n)</td>
-              <td>a value summed over all O(n&sup2;) subarrays</td>
-            </tr>
-            <tr>
-              <td>Stack with a budget</td>
-              <td>O(n)</td>
-              <td>O(n)</td>
-              <td>lexicographically best subsequence</td>
-            </tr>
-            <tr>
-              <td>Monotone deque</td>
-              <td>O(n)</td>
-              <td>O(k)</td>
-              <td>extreme of a sliding window</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Bug</th>
-              <th>Symptom</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Storing values instead of indices</td>
-              <td>You know <em>what</em> beat it, not <em>where</em></td>
-              <td>Push indices; read values through them</td>
-            </tr>
-            <tr>
-              <td>Both sides use the same comparison</td>
-              <td>Duplicates counted twice; totals too large</td>
-              <td>One side strict, the other not</td>
-            </tr>
-            <tr>
-              <td>Forgetting what is left on the stack</td>
-              <td>Trailing elements get no answer</td>
-              <td>Flush after the loop, or use a sentinel</td>
-            </tr>
-            <tr>
-              <td>No sentinel in area problems</td>
-              <td>The last bars are never resolved</td>
-              <td>Append a height of 0 (or &minus;&infin;) at the end</td>
-            </tr>
-            <tr>
-              <td>Deque expiry checked after pushing</td>
-              <td>A stale index is reported as the window extreme</td>
-              <td>Drop the front before reading it</td>
-            </tr>
-            <tr>
-              <td>Overflow in contribution sums</td>
-              <td>Negative totals on large inputs</td>
-              <td>64-bit accumulation, modulo as you go</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout green">
+        <div class="callout purple">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> The words
-            &ldquo;next greater&rdquo;, &ldquo;nearest smaller&rdquo;,
-            &ldquo;span&rdquo;, &ldquo;how many days until&rdquo;, &ldquo;sum
-            over all subarrays&rdquo;, &ldquo;lexicographically smallest after
-            removing k&rdquo;, or &ldquo;maximum of every window&rdquo;. All
-            seven are this lecture.
+            <strong>Java PriorityQueue cheatsheet:</strong><br />
+            <code
+              >PriorityQueue&lt;Integer&gt; minH = new
+              PriorityQueue&lt;&gt;();</code
+            >
+            &nbsp;&nbsp; <em>(default: min-heap)</em><br />
+            <code
+              >PriorityQueue&lt;Integer&gt; maxH = new
+              PriorityQueue&lt;&gt;(Collections.reverseOrder());</code
+            ><br />
+            <code
+              >PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b)
+              -&gt; a[0]-b[0]);</code
+            >
+            &nbsp;&mdash; sort by first element<br /><br />
+            Key methods: <code>offer(x)</code> O(log n) &nbsp;|&nbsp;
+            <code>poll()</code> O(log n) &nbsp;|&nbsp; <code>peek()</code> O(1)
+            &nbsp;|&nbsp; <code>size()</code> O(1)
           </div>
         </div>
 
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <hr />
+
+        <!-- PATTERNS TABLE -->
+        <h2 class="h1" id="patterns">&#127919; The 5 Core Patterns</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pattern</th>
+                <th>Signal Phrase</th>
+                <th>Tool</th>
+                <th>Canonical Problem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>Min/Max Heap Ops</td>
+                <td>Kth largest, running max/min</td>
+                <td>Single heap</td>
+                <td>Kth Largest in Array</td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>Top K Elements</td>
+                <td>"top K", "K most frequent", "K closest"</td>
+                <td>Size-K min-heap</td>
+                <td>Top K Frequent, K Closest Points</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>Two Heaps (Median)</td>
+                <td>"median", "sliding window median"</td>
+                <td>maxH + minH balanced</td>
+                <td>Median from Data Stream</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td>K-way Merge</td>
+                <td>"merge K sorted", "smallest from K"</td>
+                <td>Min-heap of size K</td>
+                <td>Merge K Sorted Lists</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td>Greedy Heap</td>
+                <td>"schedule", "reorganize", "cooldown"</td>
+                <td>Max-heap + queue</td>
+                <td>Task Scheduler, Reorganize String</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr />
+
+        <!-- P1: MIN/MAX HEAP -->
+        <h2 class="h1" id="p1">
+          &#128200; Pattern 1 &mdash; Single Heap (Kth Largest)
+        </h2>
         <p>
-          Six problems, one per idea: the template, reading the popped values,
-          contribution, a budget, and two deques. Name the variant before you
-          write any code.
+          The simplest heap pattern. Use a <strong>size-K min-heap</strong> to
+          track the K largest elements seen so far. The root (min of heap) is
+          always the Kth largest. If a new element is larger than the root, pop
+          root and push new element.
         </p>
-
-        <!-- Problem 01: Next Greater Node In Linked List -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; The Template</div>
-              <div class="prob-title">Next Greater Node In Linked List</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/next-greater-node-in-linked-list/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1019 - Next Greater Node In Linked List</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Next Greater Element</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Kth Largest Element in Array (LC
+              215)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For every node of a linked list, return the value of the first
-                later node with a strictly greater value, or 0 if there is none.
-              </p>
-              <div class="iobox">
-                head = [2, 1, 5] → [5, 5, 0] &nbsp;&nbsp;|&nbsp;&nbsp; head =
-                [2, 7, 4, 3, 5] → [7, 0, 5, 5, 0]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A linked list has no indices &mdash; but nothing stops you
-                    from copying the values into an array first.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Run the standard template over the array: keep a stack of
-                    indices whose answer is still unknown, and when a bigger
-                    value arrives, pop and fill them in.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two structures from earlier lectures meet here. Walk the list
-                once into an array (Lecture 11), then apply the monotonic
-                template (this one). Anything still on the stack at the end
-                never found a greater value, which is why the default of 0 is
-                filled in first.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Copy Out, Then
-                      Template</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> nextLargerNodes(head):
-    nums ← values of the list, in order          <span class="pc-cm">// one walk</span>
-    answer ← array of length(nums), all 0        <span class="pc-cm">// "none found" default</span>
-    stack ← empty stack                          <span class="pc-cm">// indices, values decreasing</span>
+          <pre><span class="pc-cm">// Maintain a min-heap of size K.</span>
+<span class="pc-kw">function</span> findKthLargest(nums, k):
+    minH ← empty min-heap
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        minH.push(n)
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()    <span class="pc-cm">// evict the smallest; the top K survive</span>
+    <span class="pc-kw">return</span> minH.peek()                      <span class="pc-cm">// min of the top K = Kth largest</span>
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> nums[stack.top()] &lt; nums[i]:
-            answer[stack.pop()] ← nums[i]
-        stack.push(i)
-    <span class="pc-kw">return</span> answer
-
-<span class="pc-cm">// [2,7,4,3,5]: 7 pops 2 → ans[0]=7
-// 5 pops 3 and 4 → ans[3]=5, ans[2]=5;  7 and 5 never popped → 0</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
+<span class="pc-cm">// Why a size-K MIN-heap? The K largest elements survive, and</span>
+<span class="pc-cm">// their minimum (the heap root) is exactly the Kth largest.</span>
+<span class="pc-cm">// Time O(n log k)  Space O(k)</span>
+<span class="pc-cm">// Why NOT sort? Sort is O(n log n). If k is much smaller than n, the heap is much faster.</span></pre>
         </div>
 
-        <!-- Problem 02: 132 Pattern -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot; Scan From the Right
-              </div>
-              <div class="prob-title">132 Pattern</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/132-pattern/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 456 - 132 Pattern</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Monotonic Stack + Best Popped</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return true if there are indices
-                <code>i &lt; j &lt; k</code> with
-                <code>nums[i] &lt; nums[k] &lt; nums[j]</code> &mdash; a small
-                value, then a big one, then a middle one.
-              </p>
-              <div class="iobox">
-                nums = [3, 1, 4, 2] → true &nbsp;(1, 4,
-                2)&nbsp;&nbsp;|&nbsp;&nbsp; nums = [1, 2, 3, 4] → false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Fix the middle value (the &ldquo;2&rdquo;) last. Scanning
-                    right to left, what is the best candidate for it?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep a decreasing stack from the right. Every popped value
-                    was smaller than the current one, so remember the largest
-                    popped value as <code>third</code>; if any later element is
-                    smaller than <code>third</code>, the pattern exists.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The clever part is what the popped values mean. Going right to
-                left, popping happens when the current element is bigger &mdash;
-                so a popped value is a candidate &ldquo;2&rdquo; with a known
-                &ldquo;3&rdquo; to its right. Keep the largest such value, and
-                the test for the remaining element is a single comparison.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Track the Best Popped
-                      Value</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> find132pattern(nums):
-    stack ← empty stack            <span class="pc-cm">// values, decreasing from bottom to top</span>
-    third ← -infinity              <span class="pc-cm">// best "2" seen so far, with a bigger "3" to its right</span>
+        <!-- P1 DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; findKthLargest([3,2,1,5,6,4], k=2):</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">offer 3: heap=[3]
+offer 2: heap=[2,3]
+offer 1: heap=[1,2,3] size=3 > k=2 &rarr; poll 1  heap=[<span class="nd">2</span>,3]
+offer 5: heap=[2,3,5] size=3 > k=2 &rarr; poll 2  heap=[<span class="nd">3</span>,5]
+offer 6: heap=[3,5,6] size=3 > k=2 &rarr; poll 3  heap=[<span class="nd">5</span>,6]
+offer 4: heap=[4,5,6] size=3 > k=2 &rarr; poll 4  heap=[<span class="nd">5</span>,6]
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> length(nums) - 1 <span class="pc-kw">down to</span> 0:
-        <span class="pc-kw">if</span> nums[i] &lt; third: <span class="pc-kw">return</span> true      <span class="pc-cm">// found the "1"</span>
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> stack.top() &lt; nums[i]:
-            third ← max(third, stack.pop())       <span class="pc-cm">// popped &lt; nums[i]: a valid middle</span>
-        stack.push(nums[i])
-    <span class="pc-kw">return</span> false
-
-<span class="pc-cm">// [3,1,4,2]: push 2; at 4 → pop 2, third = 2; at 1 → 1 &lt; 2 → true ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+peek = <span class="hl">5</span> &#10003;  (5 is the 2nd largest in [3,2,1,5,6,4])</div>
           </div>
         </div>
+        <hr />
 
-        <!-- Problem 03: Sum of Subarray Minimums -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Contribution</div>
-              <div class="prob-title">Sum of Subarray Minimums</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/sum-of-subarray-minimums/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 907 - Sum of Subarray Minimums</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Contribution Technique</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <!-- P2: TOP K -->
+        <h2 class="h1" id="p2">&#127942; Pattern 2 &mdash; Top K Elements</h2>
+        <p>
+          A generalisation of Pattern 1. Any problem asking for the
+          <em>K most/least something</em> follows this shape. Key insight:
+          <strong>use a min-heap of size K for top-K largest</strong>
+          (counterintuitive &mdash; min-heap, not max-heap).
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Top K Frequent Elements (LC 347) +
+              K Closest Points (LC 973)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the sum of the minimum of every contiguous subarray,
-                modulo 10<sup>9</sup>+7.
-              </p>
-              <div class="iobox">
-                arr = [3, 1, 2, 4] → 17 &nbsp;(mins: 3,1,2,4,1,1,2,1,1,1)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    There are O(n²) subarrays, so you cannot visit them. Turn it
-                    around: for one element, how many subarrays does it
-                    minimise?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Find the previous smaller and next smaller element. If the
-                    gaps are <code>left</code> and <code>right</code>, this
-                    element is the minimum of
-                    <code>left × right</code> subarrays &mdash; multiply by its
-                    value and add.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the lecture&rsquo;s centrepiece. Each element rules the
-                stretch between its two smaller neighbours; the number of
-                subarrays containing it and staying inside that stretch is a
-                simple product of the two gaps. Handle duplicates asymmetrically
-                (stop at <code>&ge;</code> on one side, <code>&gt;</code> on the
-                other) or equal values will each claim the same subarray.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Span Counting</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> sumSubarrayMins(arr):
-    n ← length(arr);  MOD ← 1000000007
-    left ← array of n;  right ← array of n
+          <pre><span class="pc-cm">// Top K Frequent Elements:</span>
+<span class="pc-cm">// 1. Count frequencies with a hash map</span>
+<span class="pc-cm">// 2. Push (freq, num) into a min-heap of size K</span>
+<span class="pc-cm">// 3. If heap size &gt; K, pop (removes the least frequent)</span>
+<span class="pc-cm">// 4. The remaining K entries are the top-K frequent</span>
+<span class="pc-kw">function</span> topKFrequent(nums, k):
+    freq ← empty map
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums: freq[n] ← (freq[n] <span class="pc-kw">if</span> n <span class="pc-kw">in</span> freq, <span class="pc-kw">else</span> 0) + 1
+    minH ← empty min-heap of (freq, num), ordered by freq
+    <span class="pc-kw">for</span> (num, f) <span class="pc-kw">in</span> freq:
+        minH.push((f, num))
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()
+    res ← array of length k
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← minH.popMin().num
+    <span class="pc-kw">return</span> res
 
-    stack ← empty stack                     <span class="pc-cm">// previous smaller, strict on the left</span>
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> arr[stack.top()] ≥ arr[i]: stack.pop()
-        <span class="pc-kw">if</span> stack is empty: left[i] ← i + 1 <span class="pc-kw">else</span>: left[i] ← i - stack.top()
-        stack.push(i)
+<span class="pc-cm">// Why a MIN-heap? We want to EVICT the least frequent to keep the top K.</span>
+<span class="pc-cm">// The min is always at the root, so discarding it costs O(log k).</span>
+<span class="pc-cm">// Time O(n log k)  Space O(n) for the frequency map</span>
 
-    stack ← empty stack                     <span class="pc-cm">// next smaller, non-strict on the right</span>
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> arr[stack.top()] &gt; arr[i]: stack.pop()
-        <span class="pc-kw">if</span> stack is empty: right[i] ← n - i <span class="pc-kw">else</span>: right[i] ← stack.top() - i
-        stack.push(i)
+<span class="pc-cm">// K Closest Points to Origin — same pattern, flipped heap:</span>
+<span class="pc-kw">function</span> kClosest(pts, k):
+    maxH ← empty max-heap ordered by x² + y²     <span class="pc-cm">// farthest point on top</span>
+    <span class="pc-kw">for</span> p <span class="pc-kw">in</span> pts:
+        maxH.push(p)
+        <span class="pc-kw">if</span> maxH.size &gt; k: maxH.popMax()          <span class="pc-cm">// evict the farthest</span>
+    <span class="pc-kw">return</span> all points <span class="pc-kw">in</span> maxH
 
-    total ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        total ← (total + arr[i] × left[i] × right[i]) mod MOD
-    <span class="pc-kw">return</span> total
+<span class="pc-cm">// Note: compare SQUARED distances — no square root, no floating point</span></pre>
+        </div>
+        <hr />
 
-<span class="pc-cm">// arr = [3,1,2,4]: element 1 → left=2, right=3 → rules 6 subarrays</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+        <!-- P3: TWO HEAPS -->
+        <h2 class="h1" id="p3">
+          &#9878; Pattern 3 &mdash; Two Heaps (Running Median)
+        </h2>
+        <p>
+          Split the data stream into two halves: a
+          <strong>max-heap for the lower half</strong> and a
+          <strong>min-heap for the upper half</strong>. Keep their sizes
+          balanced (differ by at most 1). The median is always at one of the two
+          roots.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Find Median from Data Stream (LC
+              295) — Hard</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>maxH ← empty max-heap        <span class="pc-cm">// lower half</span>
+minH ← empty min-heap        <span class="pc-cm">// upper half</span>
+
+<span class="pc-kw">function</span> addNum(n):
+    maxH.push(n)
+    minH.push(maxH.popMax())         <span class="pc-cm">// push the max of the lower half up</span>
+    <span class="pc-kw">if</span> minH.size &gt; maxH.size:
+        maxH.push(minH.popMin())     <span class="pc-cm">// rebalance: maxH keeps the extra element</span>
+
+<span class="pc-kw">function</span> findMedian():
+    <span class="pc-kw">if</span> maxH.size = minH.size:
+        <span class="pc-kw">return</span> (maxH.peek() + minH.peek()) ÷ 2     <span class="pc-cm">// real division, e.g. 2.5</span>
+    <span class="pc-kw">return</span> maxH.peek()               <span class="pc-cm">// maxH always has the extra element</span>
+
+<span class="pc-cm">// addNum: O(log n)  findMedian: O(1)</span>
+<span class="pc-cm">// Invariant: maxH.peek() ≤ minH.peek() always (the cross-push enforces this)</span></pre>
+        </div>
+        <div class="callout teal">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; addNum sequence [1, 2, 3]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">addNum(1):
+  maxH.offer(1)=[1]  minH.offer(maxH.poll()=1)=[1]  maxH=[]
+  minH.size()=1 > maxH.size()=0 &rarr; maxH.offer(minH.poll()=1)
+  maxH=[<span class="hl">1</span>]  minH=[]    findMedian()=<span class="hl">1.0</span>
+
+addNum(2):
+  maxH.offer(2)=[1,2]  minH.offer(maxH.poll()=2)=[2]  maxH=[<span class="nd">1</span>]
+  sizes equal(1,1)     findMedian()=(<span class="nd">1</span>+2)/2=<span class="hl">1.5</span>
+
+addNum(3):
+  maxH.offer(3)=[1,3]  minH.offer(maxH.poll()=3)=[2,3]  maxH=[<span class="nd">1</span>]
+  minH.size()=2 > maxH.size()=1 &rarr; maxH.offer(minH.poll()=2)
+  maxH=[<span class="nd">2</span>,1]  minH=[3]    findMedian()=<span class="hl">2.0</span> &#10003;</div>
           </div>
         </div>
+        <hr />
 
-        <!-- Problem 04: Remove Duplicate Letters -->
+        <!-- P4: K-WAY MERGE -->
+        <h2 class="h1" id="p4">&#128257; Pattern 4 &mdash; K-way Merge</h2>
+        <p>
+          Given K sorted lists (or arrays), use a min-heap to efficiently pull
+          the globally smallest element each time. Always keep exactly one
+          element from each active list in the heap.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Merge K Sorted Lists (LC 23)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// K-way merge: the heap holds at most one "front" node per list.</span>
+<span class="pc-kw">function</span> mergeKLists(lists):
+    pq ← empty min-heap ordered by node value
+    <span class="pc-kw">for</span> head <span class="pc-kw">in</span> lists:
+        <span class="pc-kw">if</span> head ≠ null: pq.push(head)
+
+    dummy ← ListNode(0)
+    curr ← dummy
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        curr.next ← pq.popMin()               <span class="pc-cm">// pull the globally smallest</span>
+        curr ← curr.next
+        <span class="pc-kw">if</span> curr.next ≠ null: pq.push(curr.next)   <span class="pc-cm">// push the next from the same list</span>
+    <span class="pc-kw">return</span> dummy.next
+
+<span class="pc-cm">// Key: the heap has at most K elements → each pop is O(log K), not O(log N)</span>
+<span class="pc-cm">// Time O(N log K) where N = total nodes, K = number of lists</span>
+<span class="pc-cm">// Space O(K) for the heap</span></pre>
+        </div>
+
+        <!-- P4 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong
+              >Dry Run &mdash; Merge K=3 lists [[1,4,5],[1,3,4],[2,6]]:</strong
+            >
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">Initial heap (heads): [<span class="hl">1</span>(L1), 1(L2), 2(L3)]
+
+Step 1: poll 1(L1) &rarr; result=[<span class="hl">1</span>] push 4(L1) heap=[1(L2),2(L3),4(L1)]
+Step 2: poll 1(L2) &rarr; result=[1,<span class="nd">1</span>] push 3(L2) heap=[2,3,4]
+Step 3: poll 2(L3) &rarr; result=[1,1,<span class="nd">2</span>] push 6(L3) heap=[3,4,6]
+Step 4: poll 3(L2) &rarr; result=[1,1,2,<span class="nd">3</span>] push 4(L2) heap=[4,4,6]
+Step 5: poll 4(L1) &rarr; result=[...,<span class="nd">4</span>] push 5(L1) heap=[4,5,6]
+Step 6: poll 4(L2) &rarr; result=[...,<span class="nd">4</span>] L2 done heap=[5,6]
+Step 7: poll 5(L1) &rarr; result=[...,<span class="nd">5</span>] L1 done heap=[6]
+Step 8: poll 6(L3) &rarr; result=[...,<span class="nd">6</span>] done &#10003;
+Result: 1&rarr;1&rarr;2&rarr;3&rarr;4&rarr;4&rarr;5&rarr;6</div>
+          </div>
+        </div>
+        <hr />
+
+        <!-- P5: GREEDY HEAP -->
+        <h2 class="h1" id="p5">
+          &#9889; Pattern 5 &mdash; Greedy Heap (Task Scheduler)
+        </h2>
+        <p>
+          Use a max-heap to always process the most frequent/highest-priority
+          task next. When a cooldown constraint exists, pair the heap with a
+          wait queue.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Task Scheduler (LC 621) +
+              Reorganize String (LC 767)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Task Scheduler — greedy: always run the most frequent available task</span>
+<span class="pc-kw">function</span> leastInterval(tasks, n):
+    cnt ← count of each task letter (26 slots)
+    maxH ← max-heap of every non-zero count
+    waitQ ← empty queue of (remaining count, available at time)
+    time ← 0
+    <span class="pc-kw">while</span> maxH <span class="pc-kw">is not empty</span> <span class="pc-kw">or</span> waitQ <span class="pc-kw">is not empty</span>:
+        time ← time + 1
+        <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+            rem ← maxH.popMax() - 1
+            <span class="pc-kw">if</span> rem &gt; 0: waitQ.enqueue((rem, time + n))     <span class="pc-cm">// cooling down</span>
+        <span class="pc-kw">if</span> waitQ <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> waitQ.front().availableAt = time:
+            maxH.push(waitQ.dequeue().rem)                  <span class="pc-cm">// cooled down — back in play</span>
+    <span class="pc-kw">return</span> time
+<span class="pc-cm">// Time O(T × 26) where T = total tasks  Space O(26) = O(1)</span>
+
+<span class="pc-cm">// Reorganize String — same greedy idea:</span>
+<span class="pc-cm">// always place the most frequent char that differs from the previous one</span>
+<span class="pc-kw">function</span> reorganizeString(s):
+    maxH ← max-heap of (count, char) <span class="pc-kw">for</span> every char <span class="pc-kw">in</span> s
+    out ← empty string
+    <span class="pc-kw">while</span> maxH.size ≥ 2:
+        a ← maxH.popMax();  b ← maxH.popMax()    <span class="pc-cm">// two DIFFERENT chars</span>
+        append a.char, then b.char <span class="pc-kw">to</span> out
+        a.count ← a.count - 1;  <span class="pc-kw">if</span> a.count &gt; 0: maxH.push(a)
+        b.count ← b.count - 1;  <span class="pc-kw">if</span> b.count &gt; 0: maxH.push(b)
+    <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">if</span> maxH.peek().count &gt; 1: <span class="pc-kw">return</span> ""      <span class="pc-cm">// impossible</span>
+        append maxH.popMax().char <span class="pc-kw">to</span> out
+    <span class="pc-kw">return</span> out
+<span class="pc-cm">// Time O(n log 26) = O(n)  Space O(n) for the output</span></pre>
+        </div>
+        <hr />
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
+        <p>
+          The costs worth quoting in an interview first, then the mistakes that
+          most often break code that looks correct. Every row in the second
+          table is a bug someone has shipped.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Cost</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>peek</code></td>
+                <td>O(1)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td><code>offer</code>, <code>poll</code></td>
+                <td>O(log n)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Build a heap from n items</td>
+                <td>O(n)</td>
+                <td>Faster than n inserts</td>
+              </tr>
+              <tr>
+                <td><code>remove(x)</code>, <code>contains(x)</code></td>
+                <td>O(n)</td>
+                <td>Heaps are not for searching</td>
+              </tr>
+              <tr>
+                <td>Top k with a heap of size k</td>
+                <td>O(n log k)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Heap sort</td>
+                <td>O(n log n), O(1) space</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Forgetting Java&#39;s <code>PriorityQueue</code> is a min-heap
+                </td>
+                <td>You get the smallest when you wanted the largest</td>
+                <td>
+                  <code
+                    >new PriorityQueue&lt;&gt;(Collections.reverseOrder())</code
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Comparator written as <code>a - b</code></td>
+                <td>Wrong order for large or negative values</td>
+                <td><code>Integer.compare(a, b)</code></td>
+              </tr>
+              <tr>
+                <td>Top k largest using a max-heap of everything</td>
+                <td>O(n log n) time and O(n) space</td>
+                <td>Min-heap of size k: O(n log k)</td>
+              </tr>
+              <tr>
+                <td>Iterating a heap expecting sorted order</td>
+                <td>The order looks random</td>
+                <td><code>poll()</code> repeatedly</td>
+              </tr>
+              <tr>
+                <td>Two heaps for the median, left unbalanced</td>
+                <td>Wrong median</td>
+                <td>Rebalance so the sizes differ by at most 1</td>
+              </tr>
+              <tr>
+                <td>Changing an element&#39;s priority in place</td>
+                <td>The heap order breaks silently</td>
+                <td>Remove and re-insert, or use lazy deletion</td>
+              </tr>
+              <tr>
+                <td><code>poll()</code> on an empty heap</td>
+                <td><code>null</code>, then a crash</td>
+                <td>Check <code>isEmpty()</code> first</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <!-- PRACTICE -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+
+        <!-- PROB 01 -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 04 &middot; Stack with a Budget
-              </div>
-              <div class="prob-title">Remove Duplicate Letters</div>
-              <div style="margin-top: 4px">
+                Problem 01 &middot;
                 <a
-                  href="https://leetcode.com/problems/remove-duplicate-letters/"
+                  href="https://leetcode.com/problems/kth-largest-element-in-an-array/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 316 - Remove Duplicate Letters</a
+                  style="font-size: 11px"
+                  >LC 215</a
                 >
               </div>
+              <div class="prob-title">Kth Largest Element in an Array</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Lexicographic Stack</span>
+                <span class="tag tag-pat">Pattern 1: Single Min-Heap</span>
                 <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
+                  >Amazon · Google · Meta · Microsoft</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Remove letters so that every distinct letter appears exactly
-                once, and the result is the lexicographically smallest such
-                string.
+                Given an integer array and integer k, return the kth largest
+                element (not kth distinct).
               </p>
-              <div class="iobox">
-                s = "bcabc" → "abc" &nbsp;&nbsp;|&nbsp;&nbsp; s = "cbacdcbc" →
-                "acdb"
-              </div>
+              <div class="iobox">Input: nums=[3,2,1,5,6,4] k=2 Output: 5</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2359,8 +2204,8 @@ total ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Build the answer on a stack. When a smaller letter arrives,
-                    when is it safe to pop the bigger one already there?
+                    Sorting is O(n log n). You only need one element in its
+                    correct place.
                   </p>
                 </div>
               </details>
@@ -2371,21 +2216,20 @@ total ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Only when that letter appears again later &mdash; count the
-                    remaining occurrences first. Also skip any letter already in
-                    the answer.
+                    A size-k min-heap gives O(n log k) &mdash; the root is the
+                    answer once every element has been offered. QuickSelect
+                    gives O(n) average.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The budget here is not a number but a pair of arrays: how many
-                of each letter remain, and which letters are already used. Pop
-                the top while it is bigger than the current letter
-                <em>and</em> still available later. Each letter is pushed and
-                popped at most once, so the pass is linear.
+                Maintain a <strong>min-heap of size k</strong>. After processing
+                all elements, the root is the Kth largest. The heap evicts
+                smaller elements &mdash; only the K biggest survive.
               </p>
             </div>
             <details>
@@ -2396,38 +2240,26 @@ total ← 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Count Remaining + In-Stack
-                      Flags</span
+                      >&#128208; Pseudocode &middot; LC 215</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> removeDuplicateLetters(s):
-    remaining ← count of each letter in s
-    inStack ← 26 booleans, all false
-    stack ← empty stack
-
-    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> s:
-        remaining[c] ← remaining[c] - 1          <span class="pc-cm">// c is being consumed now</span>
-        <span class="pc-kw">if</span> inStack[c]: <span class="pc-kw">continue</span>                 <span class="pc-cm">// already placed — never twice</span>
-
-        <span class="pc-kw">while</span> stack is not empty <span class="pc-kw">and</span> stack.top() &gt; c <span class="pc-kw">and</span> remaining[stack.top()] &gt; 0:
-            inStack[stack.pop()] ← false         <span class="pc-cm">// safe: it comes back later</span>
-
-        stack.push(c);  inStack[c] ← true
-    <span class="pc-kw">return</span> the stack, bottom to top
-
-<span class="pc-cm">// "cbacdcbc": c, then b pops c? c reappears → yes. a pops b and c → "a"
-// then c, d; b pops d? d never returns → keep → "acdb" ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> findKthLargest(nums, k):
+    minH ← empty min-heap
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums:
+        minH.push(n)
+        <span class="pc-kw">if</span> minH.size &gt; k: minH.popMin()
+    <span class="pc-kw">return</span> minH.peek()</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(n log k)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1) — 26 letters</span>
+                    ><span class="cx-val green">O(k)</span>
                   </div>
                 </div>
               </div>
@@ -2435,46 +2267,38 @@ total ← 0
           </div>
         </div>
 
-        <!-- Problem 05: Max Value of Equation -->
+        <!-- PROB 02 -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Monotone Deque</div>
-              <div class="prob-title">Max Value of Equation</div>
-              <div style="margin-top: 4px">
+              <div class="prob-num">
+                Problem 02 &middot;
                 <a
-                  href="https://leetcode.com/problems/max-value-of-equation/"
+                  href="https://leetcode.com/problems/top-k-frequent-elements/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1499 - Max Value of Equation</a
+                  style="font-size: 11px"
+                  >LC 347</a
                 >
               </div>
+              <div class="prob-title">Top K Frequent Elements</div>
               <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Monotone Deque</span>
-                <span class="tag tag-co">Google &middot; Amazon</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 2: Top K</span>
+                <span class="tag tag-co">Amazon · Google · Meta</span>
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Points are sorted by x. Maximise
-                <code
-                  >y<sub>i</sub> + y<sub>j</sub> + |x<sub>i</sub> &minus;
-                  x<sub>j</sub>|</code
-                >
-                over pairs with
-                <code>|x<sub>i</sub> &minus; x<sub>j</sub>| &le; k</code>.
+                Given an array and integer k, return the k most frequent
+                elements.
               </p>
-              <div class="iobox">
-                points = [[1,3],[2,0],[5,10],[6,-10]], k = 1 → 4 &nbsp;(points 0
-                and 1)
-              </div>
+              <div class="iobox">Input: [1,1,1,2,2,3] k=2 Output: [1,2]</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2484,10 +2308,7 @@ total ← 0
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>
-                    Points are sorted, so for a later point j the absolute value
-                    disappears. Rewrite the expression with i &lt; j.
-                  </p>
+                  <p>Count first; then pick the k biggest counts.</p>
                 </div>
               </details>
               <details class="hint">
@@ -2497,26 +2318,19 @@ total ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    It becomes
-                    <code
-                      >(y<sub>i</sub> &minus; x<sub>i</sub>) + (x<sub>j</sub> +
-                      y<sub>j</sub>)</code
-                    >. For each j you want the largest
-                    <code>y &minus; x</code> among points still within k &mdash;
-                    a sliding window maximum.
+                    Size-k min-heap ordered by frequency for O(n log k), or
+                    bucket sort by count for O(n).
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The algebra does the real work: once <code>i &lt; j</code>, the
-                expression splits into a part that depends only on
-                <code>i</code> and a part that depends only on <code>j</code>.
-                What remains is the window-maximum problem, so a deque keyed on
-                <code>y &minus; x</code> answers every <code>j</code> in O(1).
-                Expiry is by x-distance, not by index count.
+                Count frequencies in a HashMap, then maintain a
+                <strong>size-K min-heap by frequency</strong>. The min-heap
+                evicts the least frequent, so only top-K frequent remain.
               </p>
             </div>
             <details>
@@ -2527,32 +2341,25 @@ total ← 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Rewrite, Then Slide</span
+                      >&#128208; Pseudocode &middot; LC 347</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> findMaxValueOfEquation(points, k):
-    dq ← empty deque of (y - x, x)     <span class="pc-cm">// y - x decreasing front → back</span>
-    best ← -infinity
-
-    <span class="pc-kw">for</span> (x, y) <span class="pc-kw">in</span> points:
-        <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> x - dq.front().x &gt; k:
-            dq.popFront()                          <span class="pc-cm">// too far away now</span>
-
-        <span class="pc-kw">if</span> dq is not empty:
-            best ← max(best, dq.front().value + x + y)
-
-        <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> dq.back().value ≤ y - x:
-            dq.popBack()                           <span class="pc-cm">// later AND no better</span>
-
-        dq.pushBack((y - x, x))
-    <span class="pc-kw">return</span> best</pre>
+                  <pre><span class="pc-kw">function</span> topKFrequent(nums, k):
+    freq ← count of each value <span class="pc-kw">in</span> nums
+    pq ← empty min-heap of (freq, num), ordered by freq
+    <span class="pc-kw">for</span> (num, f) <span class="pc-kw">in</span> freq:
+        pq.push((f, num))
+        <span class="pc-kw">if</span> pq.size &gt; k: pq.popMin()
+    res ← array of length k
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> k - 1 <span class="pc-kw">down to</span> 0: res[i] ← pq.popMin().num
+    <span class="pc-kw">return</span> res</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge green">
+                  <div class="cx-badge yellow">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val yellow">O(n log k)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2564,41 +2371,43 @@ total ← 0
           </div>
         </div>
 
-        <!-- Problem 06: Constrained Subsequence Sum -->
+        <!-- PROB 03 -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Deque + DP</div>
-              <div class="prob-title">Constrained Subsequence Sum</div>
-              <div style="margin-top: 4px">
+              <div class="prob-num">
+                Problem 03 &middot;
                 <a
-                  href="https://leetcode.com/problems/constrained-subsequence-sum/"
+                  href="https://leetcode.com/problems/find-median-from-data-stream/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1425 - Constrained Subsequence Sum</a
+                  style="font-size: 11px"
+                  >LC 295</a
                 >
               </div>
+              <div class="prob-title">Find Median from Data Stream</div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Monotone Deque over DP</span>
+                <span class="tag tag-pat">Pattern 3: Two Heaps</span>
                 <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
+                  >Amazon · Google · Microsoft · Meta</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Choose a non-empty subsequence where consecutive chosen indices
-                are at most <code>k</code> apart, maximising the sum.
+                Design a data structure supporting <code>addNum(int)</code> and
+                <code>findMedian()</code> with the stream arriving one number at
+                a time.
               </p>
               <div class="iobox">
-                nums = [10, 2, -10, 5, 20], k = 2 → 37 &nbsp;(10 + 2 + 5 + 20)
+                addNum(1), addNum(2), findMedian()=1.5, addNum(3),
+                findMedian()=2.0
               </div>
             </div>
             <div class="prob-section">
@@ -2610,11 +2419,8 @@ total ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Write the recurrence first:
-                    <code
-                      >dp[i] = nums[i] + max(0, best dp in the last k
-                      positions)</code
-                    >.
+                    The median sits between the smaller half and the larger
+                    half. Keep those two halves separate.
                   </p>
                 </div>
               </details>
@@ -2625,23 +2431,20 @@ total ← 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Scanning that window for every <code>i</code> is O(n·k). The
-                    window only moves forward, so keep its maximum in a monotone
-                    deque instead.
+                    A max-heap for the low half and a min-heap for the high
+                    half, sizes kept within one of each other. The median is the
+                    top of the bigger heap, or the average of both tops.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                This is the lecture applied to a DP table rather than to the
-                input. The recurrence needs one number &mdash; the best
-                <code>dp</code> value within the last <code>k</code> indices
-                &mdash; and that is exactly a sliding window maximum. Note
-                <code>max(0, ...)</code>: starting fresh is always allowed,
-                which is what makes an all-negative array return its largest
-                element.
+                Two heaps: <strong>maxH</strong> holds the lower half,
+                <strong>minH</strong> holds the upper half. Always push to maxH
+                first, then rebalance. Median lives at one or both roots.
               </p>
             </div>
             <details>
@@ -2652,154 +2455,373 @@ total ← 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Window Maximum over
-                      dp[]</span
+                      >&#128208; Pseudocode &middot; LC 295</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> constrainedSubsetSum(nums, k):
-    dp ← array of length(nums)
-    dq ← empty deque of indices         <span class="pc-cm">// dp values decreasing front → back</span>
-    best ← -infinity
+                  <pre>maxH ← empty max-heap;  minH ← empty min-heap
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">if</span> dq is not empty <span class="pc-kw">and</span> dq.front() &lt; i - k:
-            dq.popFront()                           <span class="pc-cm">// out of reach</span>
+<span class="pc-kw">function</span> addNum(n):
+    maxH.push(n)
+    minH.push(maxH.popMax())
+    <span class="pc-kw">if</span> minH.size &gt; maxH.size: maxH.push(minH.popMin())
 
-        <span class="pc-kw">if</span> dq is empty: dp[i] ← nums[i]
-        <span class="pc-kw">else</span>: dp[i] ← nums[i] + max(0, dp[dq.front()])
-
-        best ← max(best, dp[i])
-
-        <span class="pc-kw">while</span> dq is not empty <span class="pc-kw">and</span> dp[dq.back()] ≤ dp[i]:
-            dq.popBack()
-        dq.pushBack(i)
-    <span class="pc-kw">return</span> best</pre>
+<span class="pc-kw">function</span> findMedian():
+    <span class="pc-kw">if</span> maxH.size = minH.size: <span class="pc-kw">return</span> (maxH.peek() + minH.peek()) ÷ 2
+    <span class="pc-kw">return</span> maxH.peek()</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">addNum</span
+                    ><span class="cx-val yellow">O(log n)</span>
                   </div>
                   <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    <span class="cx-label">findMedian</span
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
+
+        <!-- PROB 04 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot;
+                <a
+                  href="https://leetcode.com/problems/merge-k-sorted-lists/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 23</a
+                >
+              </div>
+              <div class="prob-title">Merge K Sorted Lists</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Pattern 4: K-way Merge</span>
+                <span class="tag tag-co"
+                  >Amazon · Google · Microsoft · Uber</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Merge K sorted linked lists and return the sorted linked list.
+              </p>
+              <div class="iobox">
+                Input: [[1,4,5],[1,3,4],[2,6]] Output: [1,1,2,3,4,4,5,6]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The next node in the answer is always the smallest current
+                    head among k lists.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Min-heap holding one node from each list. Pop the smallest,
+                    append it, then push its successor. O(N log k).
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Push all K heads into a min-heap. Each poll gives the globally
+                smallest node. Then push the next node from that list. Heap size
+                stays ≤ K throughout.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 23</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> mergeKLists(lists):
+    pq ← min-heap (by value) of every non-null head
+    dummy ← ListNode(0);  cur ← dummy
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        cur.next ← pq.popMin()
+        cur ← cur.next
+        <span class="pc-kw">if</span> cur.next ≠ null: pq.push(cur.next)
+    <span class="pc-kw">return</span> dummy.next</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(N log K)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(K)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 05 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/task-scheduler/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 621</a
+                >
+              </div>
+              <div class="prob-title">Task Scheduler</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Pattern 5: Greedy Heap</span>
+                <span class="tag tag-co">Amazon · Meta · Google</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given tasks with a cooldown n, return the minimum time to finish
+                all tasks. Same-letter tasks must be separated by n intervals.
+              </p>
+              <div class="iobox">
+                Input: tasks=["A","A","A","B","B","B"] n=2 Output: 8 (ABAB_A_B
+                or similar)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The most frequent task is the bottleneck &mdash; it dictates
+                    the skeleton of the schedule.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    With maxCount occurrences of the most frequent task there
+                    are maxCount-1 gaps of size n. Answer = max(len,
+                    (maxCount-1)&times;(n+1) + numberOfTasksTiedForMax).
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Greedy: always do the most-frequent available task. Max-heap
+                gives the most frequent. If none available, idle. A wait queue
+                tracks when each task becomes available again.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 621</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> leastInterval(tasks, n):
+    maxH ← max-heap of every non-zero task count
+    waitQ ← empty queue of (remaining, availableAt)
+    time ← 0
+    <span class="pc-kw">while</span> maxH <span class="pc-kw">is not empty</span> <span class="pc-kw">or</span> waitQ <span class="pc-kw">is not empty</span>:
+        time ← time + 1
+        <span class="pc-kw">if</span> maxH <span class="pc-kw">is not empty</span>:
+            r ← maxH.popMax() - 1
+            <span class="pc-kw">if</span> r &gt; 0: waitQ.enqueue((r, time + n))
+        <span class="pc-kw">if</span> waitQ <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> waitQ.front().availableAt = time:
+            maxH.push(waitQ.dequeue().remaining)
+    <span class="pc-kw">return</span> time</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(T)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <hr />
 
         <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
-        <div class="callout orange" style="margin: 14px 0">
+        <div class="callout orange" style="margin-bottom: 18px">
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 20 Assignment &mdash; 20 Problems (5 Easy &middot; 11
-              Medium &middot; 4 Hard)</strong
+              >Lecture 20 Assignment &mdash; 20 Problems (5 Easy &middot; 10
+              Medium &middot; 5 Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by the
-            variant it needs. Complete it before moving to Lecture 21.<br /><br />
+            All 5 heap patterns covered. Every problem tagged with pattern,
+            company, and difficulty.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture20/Assignment.md"
               style="
+                display: inline-block;
+                margin-top: 6px;
+                padding: 6px 16px;
                 background: var(--accent);
                 color: #fff;
-                padding: 8px 16px;
                 border-radius: 6px;
-                text-decoration: none;
+                font-size: 13px;
                 font-weight: 600;
-                display: inline-block;
+                text-decoration: none;
               "
-              >&#128196; Open Assignment &rarr;</a
+            >
+              &#128196; Open Assignment.md &rarr;</a
             >
           </div>
         </div>
+        <hr />
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 21.</p>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can write the template once and set it to any of the four variants
+        <p>
+          Check each item before advancing to Lecture 21 (Graphs I). Be honest
+          &mdash; these are your interview readiness criteria.
+        </p>
+        <div style="margin: 14px 0">
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can explain the array representation of a heap (parent/child
+              index formulas) without looking it up
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can say what a pop means, and why the whole pass is O(n)
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement sift-up and sift-down from scratch and explain why
+              build-heap is O(n), not O(n log n)
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I store indices, not values, and know why that matters
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I know when to use a min-heap vs max-heap for Top-K problems
+              (counterintuitive: use min-heap for K largest)
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can derive the span product in the contribution technique
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can implement the Two Heaps pattern (addNum + findMedian) from
+              memory in under 2 minutes
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can explain the strict/non-strict rule for duplicates and what
-            goes wrong without it
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I understand why K-way merge is O(N log K) and not O(N log N)
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can write the lexicographic stack with a budget from memory
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I can write a custom PriorityQueue comparator for arrays, objects,
+              and lambda expressions
+            </div>
           </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can say when a monotone deque beats a heap, and when it cannot be
-            used at all
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I completed all 20 assignment problems and can name the variant for
-            each
+          <div class="checklist-item" onclick="this.classList.toggle('done')">
+            <div class="cb-box">&#10003;</div>
+            <div class="cb-text">
+              I have completed all 20 assignment problems and can identify the
+              pattern within 30 seconds
+            </div>
           </div>
         </div>
 
-        <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+        <div class="callout green" style="margin-top: 24px">
+          <span class="callout-icon">&#11088;</span>
           <div class="callout-body">
-            <strong
-              >You're ready for Lecture 21: Intervals &amp; Sweep Line</strong
-            ><br />
-            Both lectures so far in this phase kept a running structure while
-            moving along one axis. Intervals do the same thing with events: sort
-            by position, keep what is currently open, and read the answer off
-            the sweep.
+            <strong>You are ready for Lecture 21: Graphs I</strong><br />
+            Graphs generalise trees: a node can have more than 2 neighbours. BFS
+            and DFS patterns you used on trees apply directly. The heap you
+            built here comes back in Lecture 22, where it powers Dijkstra&apos;s
+            shortest path algorithm.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture19/lecture19_notes.html"
-            >&larr; Lecture 19 &middot; Prefix Sums &amp; Difference Arrays</a
+            >&larr; Lecture 19 &middot; Trees II</a
           >
           <a class="next" href="../Lecture21/lecture21_notes.html"
-            >Lecture 21 &middot; Intervals &amp; Sweep Line &rarr;</a
+            >Lecture 21 &middot; Graphs I &rarr;</a
           >
         </div>
       </div>
-      <!-- /content -->
+      <!-- #content -->
     </div>
-    <!-- /main -->
+    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

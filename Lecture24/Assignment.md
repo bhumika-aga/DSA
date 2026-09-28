@@ -1,9 +1,9 @@
-# 🔗 Assignment 24 — Union-Find (Disjoint Set Union)
+# ↩️ Assignment 24 — Backtracking — Systematic Search
 
-> **Lecture:** 24 of 38 — Union-Find (Disjoint Set Union)
-> **Phase:** 3 — Core Patterns
-> **Estimated Time:** 4 days · **Total Problems:** 20 (6 Easy · 10 Medium · 4 Hard)
-> **Goal:** Ten lines of code, then all the thinking goes into deciding what to unite.
+> **Lecture:** 24 of 45 — Backtracking — Systematic Search
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 4 days · **Total Problems:** 19 (1 Easy · 13 Medium · 5 Hard)
+> **Goal:** Recognise the two decision trees behind every "return all" problem, write choose → explore → un-choose from memory, and prune before you explore.
 
 ---
 
@@ -11,206 +11,252 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                      | Pattern              | Move                                          |
-| ------------------------------------------ | -------------------- | --------------------------------------------- |
-| "are these two connected?"                 | Union-Find           | `find(a) == find(b)` — near O(1)              |
-| "how many groups / provinces / islands"    | Count Components     | one counter, decremented per successful union |
-| "which edge creates a cycle"               | Failed Union         | the first union that returns false            |
-| "merge accounts / emails / names"          | Map to Ids First     | give every object an integer, then union      |
-| edges arrive over time, queries in between | Union-Find           | DFS would rebuild the traversal each time     |
-| things get removed over time               | Reverse the Timeline | DSU can add, never split                      |
+| Signal in the Problem                      | Pattern                 | Move                                     |
+| ------------------------------------------ | ----------------------- | ---------------------------------------- |
+| "return all subsets / subsequences"        | Include / Exclude       | two branches per element, 2ⁿ leaves      |
+| "return all arrangements / orderings"      | Permutations            | used[] array or swap; n! leaves          |
+| "choose k", "sum to target"                | Combinations            | start index; prune when over target      |
+| the same element may be reused             | Combinations with reuse | recurse with i, not i + 1                |
+| the input has duplicates, answers must not | Sort + skip             | skip when i > start and a[i] = a[i−1]    |
+| "split the string into valid pieces"       | Partitioning            | try every cut, recurse on the rest       |
+| "paths in a grid / maze / board"           | Grid backtracking       | mark, recurse in 4 directions, unmark    |
+| a board with rules (queens, digits)        | Constraint backtracking | check the rule before placing, not after |
 
 ---
 
-## 🟢 Easy Tier (6 Problems)
+## 🟢 Easy Tier (1 Problem)
 
-_Grouping warm-ups: canonical keys and counting by group, before the structure arrives._
+_The include/exclude shape with no LeetCode wrapper. Print every subsequence of a short array by hand before writing code._
 
-### E1 · Merge Similar Items
+### E1 · Print Subsequences ("Pick/Don't Pick")
 
-**🔗 [LC 2363 — Merge Similar Items](https://leetcode.com/problems/merge-similar-items/)** · Easy
-**Pattern:** Group by Key | **Companies:** Amazon
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Include / Exclude (Subsets) | **Companies:** Amazon, Google, Adobe
 
-**Hint:** Two sorted lists merged on a shared key — the same combine step a DSU does when it groups members by root. A map from value to total weight is enough.
-
----
-
-### E2 · Divide Array Into Equal Pairs
-
-**🔗 [LC 2206 — Divide Array Into Equal Pairs](https://leetcode.com/problems/divide-array-into-equal-pairs/)** · Easy
-**Pattern:** Pair by Equality | **Companies:** Amazon
-
-**Hint:** Count each value. Every group must have an even size, which is the simplest form of "is this partition valid?".
+**Task:** Given "abc", print all 2³ = 8 subsequences. This is the **most important pattern** for backtracking.
 
 ---
 
-### E3 · Count Number of Pairs With Absolute Difference K
+## 🟡 Medium Tier (13 Problems)
 
-**🔗 [LC 2006 — Count Number of Pairs With Absolute Difference K](https://leetcode.com/problems/count-number-of-pairs-with-absolute-difference-k/)** · Easy
-**Pattern:** Complement Counting | **Companies:** Amazon, Google
+_The working set. For each one, name the shape first — include/exclude, arrange-all, or fill-the-slots — then decide what "un-choose" means._
 
-**Hint:** Count each value in a map; for every `x`, add `count[x - k]`. Grouping by value first, comparing second.
+### M1 · Subsets
 
----
+**🔗 [LC 78 — Subsets](https://leetcode.com/problems/subsets/)** · Medium
+**Pattern:** Include / Exclude | **Companies:** Google, Amazon, Meta, Microsoft
 
-### E4 · Count Pairs Of Similar Strings
-
-**🔗 [LC 2506 — Count Pairs Of Similar Strings](https://leetcode.com/problems/count-pairs-of-similar-strings/)** · Easy
-**Pattern:** Signature as the Group Key | **Companies:** Amazon
-
-**Hint:** Two words are similar when their letter _sets_ match, so reduce each word to a 26-bit mask and count equal masks — a canonical key, exactly like sorting characters for anagrams.
+**Hint:** Build all power sets. Use the template: `helper(index, currentList)`.
 
 ---
 
-### E5 · Count Items Matching a Rule
+### M2 · Subsets II
 
-**🔗 [LC 1773 — Count Items Matching a Rule](https://leetcode.com/problems/count-items-matching-a-rule/)** · Easy
-**Pattern:** Filter by Attribute | **Companies:** Amazon
+**🔗 [LC 90 — Subsets II](https://leetcode.com/problems/subsets-ii/)** · Medium
+**Pattern:** Sort + Skip Duplicates | **Companies:** Amazon, Google, Meta
 
-**Hint:** Pick the field named by `ruleKey` and count matches. A warm-up in mapping a name to an index before you do it for DSU ids.
-
----
-
-### E6 · Counting Words With a Given Prefix
-
-**🔗 [LC 2185 — Counting Words With a Given Prefix](https://leetcode.com/problems/counting-words-with-a-given-prefix/)** · Easy
-**Pattern:** Prefix Match | **Companies:** Amazon
-
-**Hint:** Count words starting with the given prefix. Simple, but note how a shared prefix defines a group — the idea Tries formalise in Lecture 29.
+**Hint:** Same as above, but with duplicate numbers. Sort first, then skip `nums[i]` if `nums[i] == nums[i-1]`.
 
 ---
 
-## 🟡 Medium Tier (10 Problems)
+### M3 · Permutations
 
-_The structure proper — nodes, letters, emails, grid cells and ratios._
+**🔗 [LC 46 — Permutations](https://leetcode.com/problems/permutations/)** · Medium
+**Pattern:** Swapping / Visited Array | **Companies:** Google, Amazon, Microsoft, Meta
 
-### M1 · Redundant Connection
-
-**🔗 [LC 684 — Redundant Connection](https://leetcode.com/problems/redundant-connection/)** · Medium
-**Pattern:** Cycle Detection | **Companies:** Amazon, Google, Meta
-
-**Hint:** Union the edges in order; the first union that fails joins two already-connected nodes, so that edge closes the cycle.
+**Hint:** Find all possible orderings of N distinct elements. O(n!).
 
 ---
 
-### M2 · Satisfiability of Equality Equations
+### M4 · Combinations
 
-**🔗 [LC 990 — Satisfiability of Equality Equations](https://leetcode.com/problems/satisfiability-of-equality-equations/)** · Medium
-**Pattern:** Union, Then Verify | **Companies:** Google, Amazon, Meta
+**🔗 [LC 77 — Combinations](https://leetcode.com/problems/combinations/)** · Medium
+**Pattern:** Range Recursion | **Companies:** Google, Amazon, Microsoft
 
-**Hint:** Union every `==` pair first, then check each `!=` pair. Doing both in one pass lets a later equality invalidate an earlier check.
-
----
-
-### M3 · Accounts Merge
-
-**🔗 [LC 721 — Accounts Merge](https://leetcode.com/problems/accounts-merge/)** · Medium
-**Pattern:** Map to Ids, Then Union | **Companies:** Amazon, Google, Meta
-
-**Hint:** Give every email an id and remember its owner. Union each account's emails to its first email, then group by root and sort.
+**Hint:** Backtrack with a start index: at each level try numbers from `start` to `n`, add one, recurse with `start = i + 1`, then remove it. Prune when there aren't enough numbers left to reach size `k` (`i <= n - (k - path.size()) + 1`).
 
 ---
 
-### M4 · Most Stones Removed with Same Row or Column
+### M5 · Combination Sum
 
-**🔗 [LC 947 — Most Stones Removed with Same Row or Column](https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/)** · Medium
-**Pattern:** Union Rows with Columns | **Companies:** Google, Amazon, Meta
+**🔗 [LC 39 — Combination Sum](https://leetcode.com/problems/combination-sum/)** · Medium
+**Pattern:** Unlimited Reuse | **Companies:** Google, Amazon, Meta, Uber
 
-**Hint:** The answer is `stones − components`. Union row `r` with column `c`, keeping the two id ranges apart so a row never collides with a column.
-
----
-
-### M5 · Regions Cut By Slashes
-
-**🔗 [LC 959 — Regions Cut By Slashes](https://leetcode.com/problems/regions-cut-by-slashes/)** · Medium
-**Pattern:** Split Each Cell | **Companies:** Google, Amazon
-
-**Hint:** Cut every cell into four triangles. Union across cell borders always, and inside a cell according to the slash. The component count is the number of regions.
+**Hint:** Find all unique combinations that sum to target. You can reuse the same element.
 
 ---
 
-### M6 · Lexicographically Smallest Equivalent String
+### M6 · Combination Sum II
 
-**🔗 [LC 1061 — Lexicographically Smallest Equivalent String](https://leetcode.com/problems/lexicographically-smallest-equivalent-string/)** · Medium
-**Pattern:** Smallest Member as Root | **Companies:** Google, Amazon
+**🔗 [LC 40 — Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)** · Medium
+**Pattern:** Single Use + Duplicates | **Companies:** Amazon, Google, Meta
 
-**Hint:** Union the matching letters, but always make the alphabetically smaller letter the root. Then map each character of the string to its root.
-
----
-
-### M7 · Minimum Score of a Path Between Two Cities
-
-**🔗 [LC 2492 — Minimum Score of a Path Between Two Cities](https://leetcode.com/problems/minimum-score-of-a-path-between-two-cities/)** · Medium
-**Pattern:** Components + Minimum Edge | **Companies:** Amazon, Google
-
-**Hint:** Any path may reuse edges, so the answer is the smallest edge weight in the component containing city 1. Union everything, then scan the edges once.
+**Hint:** Each element used only once. Skip duplicates logic applied.
 
 ---
 
-### M8 · Evaluate Division
+### M7 · Palindrome Partitioning
 
-**🔗 [LC 399 — Evaluate Division](https://leetcode.com/problems/evaluate-division/)** · Medium
-**Pattern:** Union-Find with Ratios | **Companies:** Google, Amazon, Meta
+**🔗 [LC 131 — Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)** · Medium
+**Pattern:** Cut / Validation | **Companies:** Google, Amazon, Meta
 
-**Hint:** Store each node's value relative to its root and multiply the ratios during path compression. Same root means the answer is a division; different roots mean −1.
-
----
-
-### M9 · Minimize Hamming Distance After Swap Operations
-
-**🔗 [LC 1722 — Minimize Hamming Distance After Swap Operations](https://leetcode.com/problems/minimize-hamming-distance-after-swap-operations/)** · Medium
-**Pattern:** Union the Swappable Indices | **Companies:** Google, Amazon
-
-**Hint:** Indices connected by swaps can be permuted freely, so within each group compare the multiset of source and target values; mismatches count as errors.
+**Hint:** Partition string so every substring is a palindrome.
 
 ---
 
-### M10 · Count the Number of Complete Components
+### M8 · Word Search
 
-**🔗 [LC 2685 — Count the Number of Complete Components](https://leetcode.com/problems/count-the-number-of-complete-components/)** · Medium
-**Pattern:** Count Nodes and Edges per Group | **Companies:** Amazon, Google
+**🔗 [LC 79 — Word Search](https://leetcode.com/problems/word-search/)** · Medium
+**Pattern:** Grid Backtracking (DFS) | **Companies:** Google, Amazon, Microsoft, Meta
 
-**Hint:** A component with `k` nodes is complete when it has exactly `k(k−1)/2` edges. Union everything, then tally nodes and edges per root.
-
----
-
-## 🔴 Hard Tier (4 Problems)
-
-_DSU carrying an extra argument: direction, similarity, sorted queries or value order._
-
-### H1 · Redundant Connection II
-
-**🔗 [LC 685 — Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/)** · Hard
-**Pattern:** Directed Variant | **Companies:** Google, Amazon
-
-**Hint:** A directed graph adds a second failure mode: a node with two parents. Find that node's two candidate edges first, then use DSU to decide which one to drop.
+**Hint:** Find if word exists in a 2D grid. Mark visited cell (e.g., set to '#'), search neighbours, then **unmark** (Backtrack).
 
 ---
 
-### H2 · Similar String Groups
+### M9 · Letter Combinations of a Phone Number
 
-**🔗 [LC 839 — Similar String Groups](https://leetcode.com/problems/similar-string-groups/)** · Hard
-**Pattern:** Union on Similarity | **Companies:** Google, Amazon
+**🔗 [LC 17 — Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)** · Medium
+**Pattern:** Mapping + Recursion | **Companies:** Google, Amazon, Meta, Uber
 
-**Hint:** Compare every pair of strings (they are short) and union those differing in at most two positions. The answer is the number of components.
-
----
-
-### H3 · Checking Existence of Edge Length Limited Paths
-
-**🔗 [LC 1697 — Checking Existence of Edge Length Limited Paths](https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/)** · Hard
-**Pattern:** Sort Edges + Sort Queries | **Companies:** Google, Amazon
-
-**Hint:** Answer queries offline: sort edges by weight and queries by limit, then sweep, adding edges below the current limit before each connectivity check.
+**Hint:** E.g., 2="abc", 3="def". Return all strings "ad", "ae", "af"...
 
 ---
 
-### H4 · Number of Good Paths
+### M10 · Generate Parentheses
 
-**🔗 [LC 2421 — Number of Good Paths](https://leetcode.com/problems/number-of-good-paths/)** · Hard
-**Pattern:** Sort by Value, Union Upwards | **Companies:** Google, Amazon
+**🔗 [LC 22 — Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)** · Medium
+**Pattern:** Count-based Backtracking | **Companies:** Google, Amazon, Meta, Uber
 
-**Hint:** Process nodes in increasing value, uniting each node with neighbours of smaller or equal value. Count paths as groups merge, tracking how many maximum-value nodes each root holds.
+**Hint:** Keep track of open and close counts. Only add `)` if `close < open`.
+
+---
+
+### M11 · Path with Maximum Gold
+
+**🔗 [LC 1219 — Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/)** · Medium
+**Pattern:** Grid DFS + Max result | **Companies:** Amazon, Google
+
+**Hint:** From every cell with gold, DFS in 4 directions, temporarily setting the cell to 0 so a path can't revisit it and restoring it on the way back. Return `cell + best neighbour result` and take the maximum over all starts.
+
+---
+
+### M12 · All Paths From Source to Target
+
+**🔗 [LC 797 — All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/)** · Medium
+**Pattern:** Graph DFS | **Companies:** Amazon, Google
+
+**Hint:** The graph is a DAG, so no visited set is needed. DFS from node 0 with a path list; when you reach `n - 1`, copy the path into the results. Add a node before recursing and remove it after.
+
+---
+
+### M13 · Restore IP Addresses
+
+**🔗 [LC 93 — Restore IP Addresses](https://leetcode.com/problems/restore-ip-addresses/)** · Medium
+**Pattern:** String Segmenting | **Companies:** Amazon, Google, Meta
+
+**Hint:** Place 3 dots with backtracking: at each step take the next 1–3 digits as a segment. A segment is valid if it's ≤ 255 and has no leading zero (unless it is exactly "0"). Stop when you have 4 segments and have used every digit.
+
+---
+
+## 🔴 Hard Tier (5 Problems)
+
+_Real constraints to prune against: a board, a grid you must fully cover, a dictionary, an arithmetic target._
+
+### H1 · N-Queens
+
+**🔗 [LC 51 — N-Queens](https://leetcode.com/problems/n-queens/)** · Hard
+**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Meta
+
+**Hint:** The classic backtracking problem. Use sets for columns, row-sum, and row-diff diagonals.
+
+---
+
+### H2 · Sudoku Solver
+
+**🔗 [LC 37 — Sudoku Solver](https://leetcode.com/problems/sudoku-solver/)** · Hard
+**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Uber
+
+**Hint:** Find the next empty cell, try digits 1–9 that don't clash with the row, column or 3×3 box (track these with boolean arrays for O(1) checks), recurse, and undo on failure. Return `true` as soon as the board is full so the solved state isn't undone.
+
+---
+
+### H3 · Word Break II
+
+**🔗 [LC 140 — Word Break II](https://leetcode.com/problems/word-break-ii/)** · Hard
+**Pattern:** Backtracking + Memoisation | **Companies:** Google, Amazon, Meta, Uber
+
+**Hint:** Recurse on the suffix starting at `i`: for every dictionary word that is a prefix, combine it with each sentence of the rest. Memoise `i → list of sentences` so each suffix is solved once.
+
+---
+
+### H4 · Expression Add Operators
+
+**🔗 [LC 282 — Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)** · Hard
+**Pattern:** Expression Backtracking | **Companies:** Google, Meta, Amazon
+
+**Hint:** Backtrack over every split of the digit string, carrying `value` and `prev` (the last operand). For `*`, undo the last operand: `value - prev + prev * cur`. Skip operands with a leading zero and use `long` for the running value.
+
+---
+
+### H5 · Unique Paths III
+
+**🔗 [LC 980 — Unique Paths III](https://leetcode.com/problems/unique-paths-iii/)** · Hard
+**Pattern:** Grid Backtracking | **Companies:** Amazon, Google, Adobe
+
+**Hint:** Count the empty cells first. DFS from the start, marking cells visited and unmarking on the way back. A path counts only if it reaches the end having visited every non-obstacle cell. The same template solves Rat in a Maze.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Draw the decision tree first, count its leaves, then multiply by the work done at each leaf.
+
+```pseudocode
+// Snippet 1
+// All subsets of an array of size n, each copied into the result
+
+// Snippet 2
+// All permutations of an array of size n, each copied into the result
+
+// Snippet 3
+// All combinations of size k chosen from n elements
+
+// Snippet 4
+// N-Queens on an n × n board
+
+// Snippet 5
+// Sudoku Solver (worst case vs average case)
+
+// Snippet 6
+// Word Search: a word of length L on an m × n board
+
+// Snippet 7
+function gen(open, close, n):          // Generate Parentheses
+    if open = n and close = n: record; return
+    if open < n: gen(open + 1, close, n)
+    if close < open: gen(open, close + 1, n)
+```
+
+**Complexity Answers:**
+
+1. **O(n · 2ⁿ)** Time — 2ⁿ subsets, O(n) to copy each. O(n) stack.
+2. **O(n · n!)** Time — n! permutations, O(n) to copy each. O(n) stack.
+3. **O(k · C(n, k))** Time — C(n, k) results, O(k) to copy each.
+4. **O(n!)** Time before pruning — each queen removes at least one column for the next row. O(n) stack.
+5. **O(9ᴰ)** worst case, where D is the number of empty cells; constraint checks make the real tree tiny.
+6. **O(m · n · 3ᴸ)** — start anywhere, then at most 3 new directions per step (you never go straight back).
+7. **O(4ⁿ / √n)** — the n-th Catalan number of valid strings, each of length 2n. Not needed by heart; the point is that the constraint `close < open` keeps the tree far smaller than 2²ⁿ.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. Backtracking is systematic trial and error. → **True** — it tries every candidate, but in an order that lets it abandon hopeless ones early.
+2. In backtracking, un-choosing is what makes it different from a plain DFS. → **True** — DFS marks a node once; backtracking undoes the mark so another path can use it.
+3. Pruning changes the worst-case complexity of backtracking. → **False** — it usually leaves the worst case alone and shrinks the typical case enormously.
+4. Adding `path` directly to the result list is fine as long as you copy it at the end. → **False** — every entry is the same object, so they all change when `path` does.
+5. Subsets and permutations of the same array produce the same number of results. → **False** — 2ⁿ versus n!; for n = 10 that is 1,024 versus 3,628,800.
+6. If a problem asks only for the _number_ of valid arrangements, backtracking is the only option. → **False** — overlapping subproblems often make it dynamic programming.
 
 ---
 
@@ -218,12 +264,12 @@ _DSU carrying an extra argument: direction, similarity, sorted queries or value 
 
 Answer these out loud, without looking at the notes:
 
-1. **The two optimisations:** What does path compression fix, and what does union by size fix? Give the input that breaks a DSU without each one.
-2. **Complexity:** What is α(n), and why do we treat O(α(n)) as constant?
-3. **Cycles:** Why does a failed union mean a cycle in an undirected graph? Does the same argument hold for directed graphs?
-4. **Id spaces:** In Most Stones Removed you union rows with columns. What goes wrong if both use the same range of indices?
-5. **DSU vs BFS:** Give one problem where DSU is clearly better, and one where BFS is — and say what makes the difference.
-6. **Deletion:** DSU cannot split a group. How do problems that remove edges or bricks get solved anyway?
+1. **State space tree**: What is the state space tree for N-Queens on a 4×4 board? How does pruning change the number of nodes you actually visit?
+2. **Two shapes**: What is the structural difference between the recursion tree of a subset generator (pick / don't pick) and a permutation generator (fill each position)? Count the leaves of each for n = 3.
+3. **The copy**: Why must you add a _copy_ of the current path to the results rather than the path itself? What does the result look like if you forget?
+4. **Reuse**: In Combination Sum you recurse with `i`; in Combination Sum II you recurse with `i + 1`. Explain what each allows, using [2, 3] and target 4.
+5. **Duplicates**: Why must the input be sorted before the "skip if equal to the previous element" rule works? Give an input where skipping without sorting fails.
+6. **Backtracking or DP?**: Word Break asks _whether_ a split exists; Word Break II asks for _every_ split. Which one is dynamic programming and which is backtracking, and why?
 
 ---
 
@@ -231,23 +277,29 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                               |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Amazon** | [Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/), [Similar String Groups](https://leetcode.com/problems/similar-string-groups/), [Checking Existence of Edge Length Limited Paths](https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/), [Number of Good Paths](https://leetcode.com/problems/number-of-good-paths/)     |
-| **Google** | [Redundant Connection II](https://leetcode.com/problems/redundant-connection-ii/), [Similar String Groups](https://leetcode.com/problems/similar-string-groups/), [Checking Existence of Edge Length Limited Paths](https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/), [Number of Good Paths](https://leetcode.com/problems/number-of-good-paths/)     |
-| **Meta**   | [Redundant Connection](https://leetcode.com/problems/redundant-connection/), [Satisfiability of Equality Equations](https://leetcode.com/problems/satisfiability-of-equality-equations/), [Accounts Merge](https://leetcode.com/problems/accounts-merge/), [Most Stones Removed with Same Row or Column](https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/) |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Unique Paths III](https://leetcode.com/problems/unique-paths-iii/), [All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/), [Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/) |
+| **Google**    | [Unique Paths III](https://leetcode.com/problems/unique-paths-iii/), [All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/), [Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/), [N-Queens](https://leetcode.com/problems/n-queens/)                                 |
+| **Meta**      | [Combination Sum II](https://leetcode.com/problems/combination-sum-ii/), [Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/), [Restore IP Addresses](https://leetcode.com/problems/restore-ip-addresses/), [Subsets II](https://leetcode.com/problems/subsets-ii/)                                             |
+| **Uber**      | [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Combination Sum](https://leetcode.com/problems/combination-sum/), [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)                                                                 |
+| **Microsoft** | [Combinations](https://leetcode.com/problems/combinations/), [Permutations](https://leetcode.com/problems/permutations/), [Subsets](https://leetcode.com/problems/subsets/), [Word Search](https://leetcode.com/problems/word-search/)                                                                                                       |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 6 Easy problems solved
-- [ ] All 10 Medium problems solved
-- [ ] All 4 Hard problems attempted
+- [ ] All 1 Easy problems solved
+- [ ] All 13 Medium problems solved
+- [ ] All 5 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
 - [ ] All 6 conceptual questions answered out loud
-- [ ] I can write a DSU class from memory in under three minutes
-- [ ] I can decide what to union — and with what ids — before writing any code
+- [ ] I can name the shape of a backtracking problem before writing code
+- [ ] I can write choose → explore → un-choose from memory
+- [ ] I always add a copy of the path, and can explain why
+- [ ] I can prune before recursing and estimate how much it saves
 
 ---
 
-**← [Lecture 23 · Divide & Conquer](../Lecture23/Assignment.md)** &nbsp;·&nbsp; **[Lecture 25 · Dynamic Programming I — Foundations & 1D](../Lecture25/Assignment.md) →**
+**← [Lecture 23 · Graphs III — MST, Bipartite & Bridges](../Lecture23/Assignment.md)** &nbsp;·&nbsp; **[Lecture 25 · Two Pointers & Sliding Window](../Lecture25/Assignment.md) →**

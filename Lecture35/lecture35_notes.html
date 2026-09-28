@@ -1,0 +1,2936 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 35 &mdash; Dynamic Programming IV</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behaviour: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        flex-shrink: 0;
+        padding-top: 20px;
+      }
+
+      .sb-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 4px 0 12px;
+      }
+
+      .sb-foot {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 10px 0 14px;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 56px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Course-wide additions (cover every class used in any lecture) ── */
+      .footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 8px;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+
+      .stack-vis {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 14px 0;
+      }
+
+      .stack-frame {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: var(--text2);
+      }
+
+      .tag-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .cx-badge.time {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .cx-badge.space {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .gr {
+        color: #22863a;
+      }
+
+      [data-theme="dark"] .gr {
+        color: #7ee787;
+      }
+
+      /* ── Pseudocode blocks — language-neutral algorithm statements ── */
+      .code-block.pseudo {
+        border-color: var(--teal);
+      }
+
+      .code-block.pseudo .code-header {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      .code-block.pseudo pre {
+        font-family: var(--mono);
+      }
+
+      .pc-kw {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .pc-cm {
+        color: var(--text3);
+        font-style: italic;
+      }
+
+      /* ── Learning objectives ── */
+      .objectives {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0 26px;
+      }
+
+      .objectives-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .objectives ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .objectives li {
+        font-size: 14px;
+        color: var(--text2);
+        margin: 5px 0;
+      }
+
+      /* ── Graded hints on practice problems ── */
+      details.hint {
+        border-color: var(--accent-bg);
+        margin: 8px 0;
+      }
+
+      details.hint summary {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        padding: 9px 14px;
+      }
+
+      details.hint[open] summary {
+        border-bottom: 1px solid var(--border);
+      }
+
+      details.hint .details-body {
+        font-size: 13.5px;
+        color: var(--text2);
+      }
+
+      details.hint .details-body p {
+        margin: 0;
+      }
+
+      .tag-concept {
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border2);
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+
+        .breadcrumb {
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .topbar-right {
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .topbar-right > span {
+          display: none;
+        }
+
+        .progress-bar {
+          width: 56px;
+        }
+      }
+
+      /* ── Bottom-of-page navigation ── */
+      .page-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text2);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+
+      .page-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .page-nav a.next {
+        margin-left: auto;
+        text-align: right;
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      @media (max-width: 560px) {
+        .page-nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .page-nav a,
+        .page-nav a.next {
+          margin-left: 0;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Dynamic Programming IV</div>
+        <div class="sb-meta">
+          Lecture 35 of 45 &middot; Phase 4 &mdash; Dynamic Programming
+        </div>
+      </div>
+      <div class="sb-scroll">
+        <div class="toc-label">On this page</div>
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127757;</span>Introduction</a
+        >
+        <a class="toc-item" href="#interval"
+          ><span class="toc-icon">&#128207;</span>Interval DP</a
+        >
+        <a class="toc-item toc-sub" href="#i-last">Think Last, Not First</a>
+        <a class="toc-item toc-sub" href="#i-games">Games on a Range</a>
+        <a class="toc-item" href="#tree"
+          ><span class="toc-icon">&#127795;</span>Tree DP</a
+        >
+        <a class="toc-item toc-sub" href="#t-reroot">Rerooting</a>
+        <a class="toc-item" href="#bitmask"
+          ><span class="toc-icon">&#128290;</span>Bitmask DP</a
+        >
+        <a class="toc-item" href="#digit"
+          ><span class="toc-icon">&#128290;</span>Digit DP</a
+        >
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129513;</span>Choosing the State</a
+        >
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
+        >
+        <a class="toc-item" href="#practice"
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+        >
+        <a class="toc-item" href="#assignment"
+          ><span class="toc-icon">&#128221;</span>Assignment</a
+        >
+        <a class="toc-item" href="#checklist"
+          ><span class="toc-icon">&#9989;</span>Checklist</a
+        >
+      </div>
+      <div class="sb-foot">
+        <div class="toc-label">Navigate</div>
+        <a class="toc-item" href="../Lecture34/lecture34_notes.html"
+          >&larr; Lecture 34 &middot; Dynamic Programming III</a
+        >
+        <a class="toc-item" href="../Lecture36/lecture36_notes.html"
+          >&rarr; Lecture 36 &middot; Tries (Prefix Trees)</a
+        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase4">Phase 4</a><span>&rsaquo;</span>
+          <span>Lecture 35 &mdash; Dynamic Programming IV</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#127899;&#65039;</span>
+          <h1 class="page-title">
+            Dynamic Programming IV &mdash; Interval, Tree, Bitmask &amp; Digit
+          </h1>
+          <p class="page-sub">
+            &ldquo;When the state is no longer an index: a range, a node, a set,
+            or a position in a number.&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 35 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 4 &mdash; Dynamic Programming</span
+            >
+            <span class="meta-chip yellow">&#9201; 7 days</span>
+            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Meta</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            The last three lectures used indices and budgets as states. These
+            four families use stranger ones, and each has a trick that makes it
+            possible: interval DP asks which element is handled
+            <em>last</em>, tree DP returns several numbers from a post-order
+            walk, bitmask DP packs a whole subset into an integer, and digit DP
+            counts numbers without visiting them. They are the hard tier of most
+            interview loops, and they all reuse the machinery you already have.
+          </div>
+        </div>
+
+        <div class="objectives">
+          <div class="objectives-title">By the end of this lecture you can</div>
+          <ul>
+            <li>
+              Write interval DP by looping over length and splitting at a pivot
+            </li>
+            <li>Carry several values up a tree in one post-order pass</li>
+            <li>Encode a subset of up to about 20 items as a bitmask state</li>
+            <li>Count numbers with a property using a tight flag</li>
+            <li>
+              Say which of the four a new problem needs, from its constraints
+            </li>
+          </ul>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: Four kinds of bookmark.</strong
+            >
+            Each family here keeps a different bookmark of progress. Interval DP
+            remembers <em>which stretch</em> of a row is left, like planning the
+            order to demolish a row of houses. Tree DP remembers
+            <em>which subtree</em>, like managers reporting figures up an
+            organisation. Bitmask DP remembers <em>which errands are done</em>,
+            as a checklist. Digit DP remembers
+            <em>how far along a number</em> you are, like an odometer rolling
+            over.
+          </div>
+        </div>
+
+        <h2 class="h1" id="interval">&#128207; Interval DP</h2>
+        <p>
+          The state is a range: <code>dp[i][j]</code> is the answer for
+          <code>arr[i..j]</code>. You saw the shape with palindromes in Lecture
+          26; here it gains a pivot.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Interval Template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:                  <span class="pc-cm">// shortest ranges first</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+        j ← i + len - 1
+        dp[i][j] ← worst possible value
+        <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i <span class="pc-kw">to</span> j:          <span class="pc-cm">// the pivot: what happens LAST</span>
+            candidate ← dp[i][k-1] + cost(i, k, j) + dp[k+1][j]
+            dp[i][j] ← best(dp[i][j], candidate)
+
+<span class="pc-kw">return</span> dp[0][n-1]
+
+<span class="pc-cm">// Three nested loops → O(n³). That is the normal price of interval DP.</span></pre>
+        </div>
+
+        <h3 class="h2" id="i-last">Think Last, Not First</h3>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Burst Balloons is the lesson.</strong> Asking &ldquo;which
+            balloon do I burst first?&rdquo; leaves two ranges whose neighbours
+            have changed &mdash; the subproblems are not independent. Asking
+            &ldquo;which balloon bursts <em>last</em> in this range?&rdquo;
+            fixes its neighbours as the untouched boundaries, and the two sides
+            become independent subproblems. Whenever a choice damages its
+            neighbours, reverse the question.
+          </div>
+        </div>
+
+        <h3 class="h2" id="i-games">Games on a Range</h3>
+        <p>
+          Two players taking turns from the ends of an array is interval DP with
+          a sign flip. Define <code>dp[i][j]</code> as
+          <em>the current player&#39;s advantage</em> over the other, and the
+          opponent&#39;s best play is simply your loss.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Take From Either End</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[i][j] = (current player&#39;s score − opponent&#39;s score) on arr[i..j]</span>
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: dp[i][i] ← arr[i]
+
+<span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - len:
+        j ← i + len - 1
+        dp[i][j] ← max(arr[i] - dp[i+1][j],     <span class="pc-cm">// take the left end</span>
+                       arr[j] - dp[i][j-1])     <span class="pc-cm">// take the right end</span>
+
+<span class="pc-kw">return</span> dp[0][n-1] ≥ 0                        <span class="pc-cm">// first player at least ties</span>
+
+<span class="pc-cm">// The minus sign is the whole trick: after your move, the opponent faces
+// the smaller range and their advantage counts against you.</span></pre>
+        </div>
+
+        <h2 class="h1" id="tree">&#127795; Tree DP</h2>
+        <p>
+          The state is a node, and the recursion is the post-order traversal
+          from Lecture 18. The only new idea is that a node may need to return
+          <em>more than one number</em>.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Two Values per Node</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Classic: the best you can take from a subtree, with and without its root.</span>
+<span class="pc-kw">function</span> solve(node):
+    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span> (0, 0)          <span class="pc-cm">// (taken, skipped)</span>
+
+    (lTake, lSkip) ← solve(node.left)
+    (rTake, rSkip) ← solve(node.right)
+
+    take ← node.value + lSkip + rSkip         <span class="pc-cm">// children must be skipped</span>
+    skip ← max(lTake, lSkip) + max(rTake, rSkip)
+    <span class="pc-kw">return</span> (take, skip)
+
+<span class="pc-cm">// The answer is max(take, skip) at the root. One walk, O(n).</span></pre>
+        </div>
+
+        <h3 class="h2" id="t-reroot">
+          Rerooting &mdash; Answers for Every Node
+        </h3>
+        <p>
+          Some problems want the answer <em>for every node as the root</em>.
+          Running the whole DP n times is O(n&sup2;); two passes are enough.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Two-Pass Rerooting</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Pass 1 (post-order from node 0): subtree sizes and distances downward.</span>
+<span class="pc-kw">function</span> down(u, parent):
+    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+        down(v, u)
+        size[u] ← size[u] + size[v]
+        answer[u] ← answer[u] + answer[v] + size[v]
+
+<span class="pc-cm">// Pass 2 (pre-order): move the root one edge and patch the answer.</span>
+<span class="pc-kw">function</span> up(u, parent):
+    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+        answer[v] ← answer[u] - size[v] + (n - size[v])
+        <span class="pc-cm">// everything inside v got 1 closer; everything outside got 1 further</span>
+        up(v, u)
+
+<span class="pc-cm">// Two O(n) walks answer n questions. Sum of Distances in Tree is exactly this.</span></pre>
+        </div>
+
+        <h2 class="h1" id="bitmask">&#128290; Bitmask DP</h2>
+        <p>
+          When the state is &ldquo;which of these items have I already
+          used?&rdquo;, and there are at most about twenty of them, the whole
+          subset fits in one integer. Bit <code>i</code> set means item
+          <code>i</code> is used.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Assignment over Subsets</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[mask] = answer when exactly the items in mask are used.
+// popcount(mask) tells you how many are placed, so position = popcount.</span>
+dp ← array of 2ⁿ, all zero (or -infinity)
+dp[0] ← 1
+
+<span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2ⁿ - 1:
+    position ← popcount(mask)              <span class="pc-cm">// next slot to fill</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> mask AND (1 &lt;&lt; i) ≠ 0: <span class="pc-kw">continue</span>   <span class="pc-cm">// item i already used</span>
+        <span class="pc-kw">if</span> item i is allowed at position:
+            dp[mask OR (1 &lt;&lt; i)] ← dp[mask OR (1 &lt;&lt; i)] + dp[mask]
+
+<span class="pc-kw">return</span> dp[2ⁿ - 1]                        <span class="pc-cm">// everything used</span></pre>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>Expression</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Is item <code>i</code> in the set?</td>
+              <td><code>mask AND (1 &lt;&lt; i) &ne; 0</code></td>
+            </tr>
+            <tr>
+              <td>Add item <code>i</code></td>
+              <td><code>mask OR (1 &lt;&lt; i)</code></td>
+            </tr>
+            <tr>
+              <td>Remove item <code>i</code></td>
+              <td><code>mask AND NOT (1 &lt;&lt; i)</code></td>
+            </tr>
+            <tr>
+              <td>Full set</td>
+              <td><code>(1 &lt;&lt; n) - 1</code></td>
+            </tr>
+            <tr>
+              <td>How many are used</td>
+              <td><code>popcount(mask)</code> &mdash; Lecture 9</td>
+            </tr>
+            <tr>
+              <td>Every submask of <code>mask</code></td>
+              <td>
+                <code>s = mask; while s &gt; 0: s = (s - 1) AND mask</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
+          <div class="callout-body">
+            <strong>Read n before reaching for a bitmask.</strong> 2&#8319;
+            states is fine for n &le; 20 and hopeless by n = 30. A constraint
+            like &ldquo;<code>n &le; 12</code>&rdquo; or &ldquo;at most 16
+            people&rdquo; is the problem telling you which technique it wants
+            &mdash; small, strange limits usually mean bitmask or meet in the
+            middle.
+          </div>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Bitmask plus BFS.</strong> Shortest Path Visiting All Nodes
+            needs the state <code>(node, visitedMask)</code> &mdash; the same
+            node is worth revisiting with a different set of visited nodes. Once
+            the state is a pair, it is ordinary BFS from Lecture 21 over
+            <code>n &middot; 2&#8319;</code> states.
+          </div>
+        </div>
+
+        <h2 class="h1" id="digit">&#128290; Digit DP</h2>
+        <p>
+          &ldquo;How many numbers below N have property P?&rdquo; N can be
+          10&#185;&#8312;, so the numbers cannot be visited. Build them digit by
+          digit instead, carrying one crucial flag.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Digit DP Skeleton</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>digits ← decimal digits of N
+
+<span class="pc-kw">function</span> count(pos, tight, started, state):
+    <span class="pc-cm">// tight   = the prefix so far equals N&#39;s prefix, so this digit is capped
+    // started = we have placed a non-zero digit (handles leading zeros)
+    // state   = whatever the property needs (last digit, remainder, mask…)</span>
+    <span class="pc-kw">if</span> pos = length(digits): <span class="pc-kw">return</span> 1 <span class="pc-kw">if</span> state is acceptable <span class="pc-kw">else</span> 0
+    <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight <span class="pc-kw">and</span> memo[pos][started][state] is known:
+        <span class="pc-kw">return</span> memo[pos][started][state]
+
+    limit ← digits[pos] <span class="pc-kw">if</span> tight <span class="pc-kw">else</span> 9
+    total ← 0
+    <span class="pc-kw">for</span> d <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> limit:
+        total ← total + count(pos + 1,
+                             tight <span class="pc-kw">and</span> d = limit,
+                             started <span class="pc-kw">or</span> d &gt; 0,
+                             updated state)
+
+    <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight: memo[pos][started][state] ← total
+    <span class="pc-kw">return</span> total
+
+<span class="pc-cm">// "Between A and B" = count(B) − count(A − 1). Always.</span></pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Only memoise the loose states.</strong> A tight prefix
+            happens once per position, so caching it would poison the table for
+            every other prefix of the same length. Memoise when
+            <code>tight</code> is false &mdash; that is where the reuse is, and
+            it is what makes the whole thing O(digits &times; states &times;
+            10).
+          </div>
+        </div>
+
+        <h2 class="h1" id="choose">&#129513; Choosing the State</h2>
+        <p>
+          All four families answer the same question differently: what is the
+          smallest description of &ldquo;where I am&rdquo; that makes the future
+          independent of the past?
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>The state is</th>
+              <th>Family</th>
+              <th>Typical size</th>
+              <th>Constraint that hints at it</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>a range <code>[i, j]</code></td>
+              <td>Interval</td>
+              <td>O(n&sup2;) states, O(n&sup3;) time</td>
+              <td>n &le; 500, and choices damage neighbours</td>
+            </tr>
+            <tr>
+              <td>a node</td>
+              <td>Tree</td>
+              <td>O(n) states</td>
+              <td>the input is a tree or a rooted graph</td>
+            </tr>
+            <tr>
+              <td>a subset</td>
+              <td>Bitmask</td>
+              <td>O(2&#8319;) states</td>
+              <td>n &le; 20, &ldquo;assign each to each&rdquo;</td>
+            </tr>
+            <tr>
+              <td>a position in a number</td>
+              <td>Digit</td>
+              <td>O(digits &times; state)</td>
+              <td>&ldquo;count numbers up to 10&#185;&#8312;&rdquo;</td>
+            </tr>
+            <tr>
+              <td>a node of a DAG</td>
+              <td>DP on a DAG</td>
+              <td>O(V + E)</td>
+              <td>longest path, counting paths</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; The Classic Bugs
+        </h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Family</th>
+              <th>States</th>
+              <th>Per state</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Interval</td>
+              <td>n&sup2;</td>
+              <td>O(n) pivots</td>
+              <td>O(n&sup3;)</td>
+            </tr>
+            <tr>
+              <td>Tree</td>
+              <td>n</td>
+              <td>O(children)</td>
+              <td>O(n)</td>
+            </tr>
+            <tr>
+              <td>Rerooting</td>
+              <td>n</td>
+              <td>O(1) patch</td>
+              <td>O(n), two passes</td>
+            </tr>
+            <tr>
+              <td>Bitmask</td>
+              <td>2&#8319;</td>
+              <td>O(n)</td>
+              <td>O(n &middot; 2&#8319;)</td>
+            </tr>
+            <tr>
+              <td>Bitmask over submasks</td>
+              <td>2&#8319;</td>
+              <td>submasks</td>
+              <td>O(3&#8319;)</td>
+            </tr>
+            <tr>
+              <td>Digit</td>
+              <td>digits &times; state</td>
+              <td>10</td>
+              <td>O(10 &middot; digits &middot; state)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Bug</th>
+              <th>Symptom</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Interval loops by index instead of length</td>
+              <td>Reads an inner range that is still empty</td>
+              <td>Loop over length, or i downward and j upward</td>
+            </tr>
+            <tr>
+              <td>Choosing what happens first in Burst Balloons</td>
+              <td>Subproblems are not independent; answers too low</td>
+              <td>Pick what happens <em>last</em> in the range</td>
+            </tr>
+            <tr>
+              <td>Forgetting the sign flip in a game DP</td>
+              <td>Both players appear to cooperate</td>
+              <td>Store the advantage and subtract the opponent&#39;s</td>
+            </tr>
+            <tr>
+              <td>Returning one value per tree node</td>
+              <td>Cannot express &ldquo;with or without this node&rdquo;</td>
+              <td>Return a pair (or a small tuple) and combine both</td>
+            </tr>
+            <tr>
+              <td>Bitmask with n = 25</td>
+              <td>Out of memory or time</td>
+              <td>Check n first &mdash; this needs another technique</td>
+            </tr>
+            <tr>
+              <td>Memoising tight states in digit DP</td>
+              <td>Counts are wrong for some bounds only</td>
+              <td>Cache only when <code>tight</code> is false</td>
+            </tr>
+            <tr>
+              <td>Ignoring leading zeros</td>
+              <td>&ldquo;007&rdquo; counted as a three-digit number</td>
+              <td>Carry a <code>started</code> flag in the state</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>How to spot it in an interview.</strong> Read the
+            constraints first. <code>n &le; 20</code> means bitmask;
+            <code>n &le; 500</code> with merging or bursting means interval; a
+            tree input with a &ldquo;for every node&rdquo; question means
+            rerooting; and a bound like 10&#185;&#8312; means you are counting
+            digits, not numbers.
+          </div>
+        </div>
+
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Six problems, one per family plus two on intervals. Read the
+          constraints first &mdash; in this lecture they tell you the answer.
+        </p>
+
+        <!-- Problem 01: Burst Balloons -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 &middot; Think Last</div>
+              <div class="prob-title">Burst Balloons</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/burst-balloons/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 312 - Burst Balloons</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Interval DP</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Bursting balloon <code>i</code> earns
+                <code>nums[left] × nums[i] × nums[right]</code>, where the
+                neighbours are the balloons currently beside it. Return the
+                maximum coins from bursting them all.
+              </p>
+              <div class="iobox">nums = [3, 1, 5, 8] → 167</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Try choosing which balloon to burst first, and watch the two
+                    halves stop being independent — their neighbours change.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Choose which balloon bursts <strong>last</strong> in a range
+                    instead. Its neighbours are then the untouched boundaries,
+                    and the two sides never interact.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The reversal is the whole problem. Pad the array with virtual 1s
+                at both ends, then let <code>dp[i][j]</code> be the best coins
+                from bursting everything strictly inside <code>(i, j)</code>.
+                Choosing the last balloon <code>k</code> fixes its multipliers
+                as <code>nums[i]</code> and <code>nums[j]</code> &mdash; both
+                still present &mdash; so the answer is
+                <code>dp[i][k] + nums[i]·nums[k]·nums[j] + dp[k][j]</code>. Loop
+                over length so inner ranges are ready.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Last Balloon in the
+                      Range</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxCoins(nums):
+    a ← [1] + nums + [1]                    <span class="pc-cm">// virtual boundaries</span>
+    n ← length(a)
+    dp ← n × n table of zeros                <span class="pc-cm">// dp[i][j]: strictly between i and j</span>
+
+    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n - 1:            <span class="pc-cm">// distance between the boundaries</span>
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1 - len:
+            j ← i + len
+            <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> j - 1:   <span class="pc-cm">// k bursts LAST</span>
+                gain ← a[i] × a[k] × a[j]
+                dp[i][j] ← max(dp[i][j], dp[i][k] + gain + dp[k][j])
+
+    <span class="pc-kw">return</span> dp[0][n-1]
+
+<span class="pc-cm">// [3,1,5,8] → 167 ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n³)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n²)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Minimum Cost to Cut a Stick -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Interval on Coordinates
+              </div>
+              <div class="prob-title">Minimum Cost to Cut a Stick</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/minimum-cost-to-cut-a-stick/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1547 - Minimum Cost to Cut a Stick</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Interval DP</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A stick of length <code>n</code> must be cut at the given
+                positions, in any order. Each cut costs the length of the piece
+                being cut. Return the minimum total cost.
+              </p>
+              <div class="iobox">n = 7, cuts = [1, 3, 4, 5] → 16</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The state is not an index into the stick — it is a pair of
+                    cut positions. What should the array of cuts include?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Add 0 and <code>n</code> as sentinels and sort. Then
+                    <code>dp[i][j]</code> is the cost of cutting the piece
+                    between cut <code>i</code> and cut <code>j</code>, and you
+                    pick which cut happens first inside it.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Same template as Burst Balloons, with coordinates instead of
+                values. Adding the two endpoints means every piece is described
+                by a pair of cut indices, so the cost of a cut is
+                <code>cuts[j] − cuts[i]</code> regardless of order. Here you may
+                think &ldquo;first&rdquo; rather than &ldquo;last&rdquo;,
+                because a cut splits the piece cleanly into two independent
+                pieces &mdash; the damage that ruins Burst Balloons does not
+                happen.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sentinels + Pivot</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> minCost(n, cuts):
+    c ← sort([0] + cuts + [n])
+    m ← length(c)
+    dp ← m × m table of zeros
+
+    <span class="pc-kw">for</span> len <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> m - 1:
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1 - len:
+            j ← i + len
+            best ← infinity
+            <span class="pc-kw">for</span> k <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> j - 1:      <span class="pc-cm">// k cut first</span>
+                best ← min(best, dp[i][k] + dp[k][j])
+            dp[i][j] ← best + (c[j] - c[i])          <span class="pc-cm">// this piece&#39;s length</span>
+
+    <span class="pc-kw">return</span> dp[0][m-1]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m³)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m²)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Sum of Distances in Tree -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Rerooting</div>
+              <div class="prob-title">Sum of Distances in Tree</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sum-of-distances-in-tree/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 834 - Sum of Distances in Tree</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Tree DP (Two Passes)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For every node of a tree, return the sum of the distances from
+                it to all other nodes.
+              </p>
+              <div class="iobox">
+                n = 6, edges = [[0,1],[0,2],[2,3],[2,4],[2,5]] → [8, 12, 6, 10,
+                10, 10]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Computing one node&rsquo;s answer is an easy DFS. Doing that
+                    n times is O(n²) — what changes when the root moves one
+                    edge?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Everything inside the new root&rsquo;s subtree gets one step
+                    closer, and everything else gets one step further:
+                    <code
+                      >answer[child] = answer[parent] − size[child] + (n −
+                      size[child])</code
+                    >.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two passes. The first, post-order from node 0, computes subtree
+                sizes and the distance sum <em>within</em> each subtree. The
+                second, pre-order, moves the root down one edge at a time and
+                patches the answer in O(1) using the size split. This rerooting
+                pattern answers &ldquo;for every node&rdquo; questions in linear
+                time, and it generalises far beyond distances.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Down, Then Up</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> sumOfDistancesInTree(n, edges):
+    adj ← adjacency list
+    size ← array of 1s;  ans ← array of zeros
+
+    <span class="pc-kw">function</span> down(u, parent):                <span class="pc-cm">// post-order</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+            down(v, u)
+            size[u] ← size[u] + size[v]
+            ans[u] ← ans[u] + ans[v] + size[v]
+
+    <span class="pc-kw">function</span> up(u, parent):                  <span class="pc-cm">// pre-order</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u] <span class="pc-kw">if</span> v ≠ parent:
+            ans[v] ← ans[u] - size[v] + (n - size[v])
+            up(v, u)
+
+    down(0, -1);  up(0, -1)
+    <span class="pc-kw">return</span> ans</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Beautiful Arrangement -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Subset as a State</div>
+              <div class="prob-title">Beautiful Arrangement</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/beautiful-arrangement/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 526 - Beautiful Arrangement</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Bitmask DP</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the permutations of <code>1..n</code> where, at every
+                position <code>i</code> (1-based), either the value divides
+                <code>i</code> or <code>i</code> divides the value.
+              </p>
+              <div class="iobox">
+                n = 2 → 2 &nbsp;([1,2] and [2,1])&nbsp;&nbsp;|&nbsp;&nbsp; n = 3
+                → 3
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Backtracking works but revisits the same situations. What
+                    actually distinguishes one partial arrangement from another?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Only the <em>set</em> of numbers already placed — not their
+                    order. Encode that set as a bitmask, and the next position
+                    is <code>popcount(mask) + 1</code>.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two different partial arrangements using the same numbers have
+                identical futures, which is exactly the overlapping-subproblems
+                signal. With the set as a bitmask, the position is free (it is
+                the popcount), so a single array of 2&#8319; entries suffices.
+                <code>n ≤ 15</code> in the constraints is the giveaway that a
+                bitmask is intended.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; dp[mask] = ways to fill
+                      popcount(mask) slots</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> countArrangement(n):
+    full ← (1 &lt;&lt; n) - 1
+    dp ← array of full + 1 zeros
+    dp[0] ← 1
+
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> full:
+        <span class="pc-kw">if</span> dp[mask] = 0: <span class="pc-kw">continue</span>
+        pos ← popcount(mask) + 1               <span class="pc-cm">// next slot, 1-based</span>
+        <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+            bit ← 1 &lt;&lt; (v - 1)
+            <span class="pc-kw">if</span> mask AND bit ≠ 0: <span class="pc-kw">continue</span>      <span class="pc-cm">// already used</span>
+            <span class="pc-kw">if</span> v mod pos = 0 <span class="pc-kw">or</span> pos mod v = 0:
+                dp[mask OR bit] ← dp[mask OR bit] + dp[mask]
+
+    <span class="pc-kw">return</span> dp[full]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n · 2ⁿ)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(2ⁿ)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Shortest Path Visiting All Nodes -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Bitmask + BFS</div>
+              <div class="prob-title">Shortest Path Visiting All Nodes</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/shortest-path-visiting-all-nodes/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 847 - Shortest Path Visiting All Nodes</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">State = (node, mask)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a connected undirected graph, return the length of the
+                shortest walk that visits every node. You may start anywhere and
+                revisit nodes and edges.
+              </p>
+              <div class="iobox">graph = [[1,2,3],[0],[0],[0]] → 4</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Plain BFS marks a node visited once. Why is that wrong here?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Because arriving at the same node with a different set of
+                    visited nodes is a genuinely different situation. Make the
+                    state <code>(node, visitedMask)</code> and BFS over that.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The lesson is that &ldquo;visited&rdquo; is part of the state,
+                not a side effect. Start the queue with every node (each with
+                only its own bit set), then expand: moving to a neighbour sets
+                that neighbour&rsquo;s bit. The first state whose mask is full
+                gives the answer, since BFS explores by distance. There are
+                <code>n · 2&#8319;</code> states, which is why
+                <code>n ≤ 12</code>.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; BFS over n · 2ⁿ
+                      States</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> shortestPathLength(graph):
+    n ← length(graph);  full ← (1 &lt;&lt; n) - 1
+    queue ← empty;  seen ← empty set
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        queue.push((i, 1 &lt;&lt; i));  seen.add((i, 1 &lt;&lt; i))    <span class="pc-cm">// start anywhere</span>
+
+    steps ← 0
+    <span class="pc-kw">while</span> queue is not empty:
+        <span class="pc-kw">repeat</span> queue.size <span class="pc-kw">times</span>:
+            (node, mask) ← queue.popFront()
+            <span class="pc-kw">if</span> mask = full: <span class="pc-kw">return</span> steps
+            <span class="pc-kw">for</span> nb <span class="pc-kw">in</span> graph[node]:
+                state ← (nb, mask OR (1 &lt;&lt; nb))
+                <span class="pc-kw">if</span> state <span class="pc-kw">not</span> <span class="pc-kw">in</span> seen:
+                    seen.add(state);  queue.pushBack(state)
+        steps ← steps + 1</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n² · 2ⁿ)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n · 2ⁿ)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Non-negative Integers without Consecutive Ones -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Digit DP</div>
+              <div class="prob-title">
+                Non-negative Integers without Consecutive Ones
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/non-negative-integers-without-consecutive-ones/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 600 - Non-negative Integers without Consecutive
+                  Ones</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Digit DP (Binary)</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the integers in <code>[0, n]</code> whose binary
+                representation contains no two adjacent 1s.
+              </p>
+              <div class="iobox">
+                n = 5 → 5 &nbsp;(0, 1, 2, 4, 5 — but not 3)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    <code>n</code> can be a billion, so the numbers cannot be
+                    enumerated. Build them bit by bit from the most significant
+                    end.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Carry two things: whether the prefix still matches
+                    <code>n</code> (tight), and the previous bit. Without tight,
+                    the count depends only on the position and the previous bit
+                    — so memoise those.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Digit DP in its smallest form, in base 2. Once the prefix is
+                strictly below <code>n</code>, everything after it is free, and
+                the number of valid suffixes is a Fibonacci count &mdash; which
+                is why the closed-form solution people quote works. Writing the
+                general skeleton is more useful than the shortcut: change the
+                state and the same code counts numbers with no repeated digit, a
+                digit sum divisible by k, and so on.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Tight Flag + Previous
+                      Bit</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> findIntegers(n):
+    bits ← binary digits of n, most significant first
+    memo ← empty map
+
+    <span class="pc-kw">function</span> count(pos, prevOne, tight):
+        <span class="pc-kw">if</span> pos = length(bits): <span class="pc-kw">return</span> 1        <span class="pc-cm">// a complete valid number</span>
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight <span class="pc-kw">and</span> (pos, prevOne) <span class="pc-kw">in</span> memo:
+            <span class="pc-kw">return</span> memo[(pos, prevOne)]
+
+        limit ← bits[pos] <span class="pc-kw">if</span> tight <span class="pc-kw">else</span> 1
+        total ← 0
+        <span class="pc-kw">for</span> d <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> limit:
+            <span class="pc-kw">if</span> d = 1 <span class="pc-kw">and</span> prevOne: <span class="pc-kw">continue</span>       <span class="pc-cm">// no two adjacent ones</span>
+            total ← total + count(pos + 1, d = 1, tight <span class="pc-kw">and</span> d = limit)
+
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> tight: memo[(pos, prevOne)] ← total
+        <span class="pc-kw">return</span> total
+
+    <span class="pc-kw">return</span> count(0, false, true)</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(bits)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(bits)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Lecture 35 Assignment &mdash; 25 Problems (5 Easy &middot; 12
+              Medium &middot; 8 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by the
+            kind of state it needs. Complete it before moving to Phase 5.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture35/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 36.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write the interval template and explain the length loop
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can say why Burst Balloons picks the last balloon, not the first
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write a game DP as an advantage, with the sign flip
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can return a tuple from a post-order walk and combine it at the
+            parent
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can reroot a tree DP in two passes and derive the patch formula
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know the bitmask operations by heart, and the n where they stop
+            being viable
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write the digit DP skeleton with tight and started flags
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I completed all 25 assignment problems and can name the state for
+            each
+          </div>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#127881;</span>
+          <div class="callout-body">
+            <strong
+              >Phase 4 complete &mdash; next up, Phase 5: Advanced
+              Structures</strong
+            ><br />
+            Four lectures of dynamic programming are behind you. Phase 5 returns
+            to data structures, starting with Tries &mdash; the structure that
+            makes prefix questions disappear, and the one behind the maximum-XOR
+            problem you met in Lecture 9.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="page-nav">
+          <a href="../Lecture34/lecture34_notes.html"
+            >&larr; Lecture 34 &middot; Dynamic Programming III</a
+          >
+          <a class="next" href="../Lecture36/lecture36_notes.html"
+            >Lecture 36 &middot; Tries (Prefix Trees) &rarr;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Theme toggle — remembered across pages of the course
+      function applyTheme(theme) {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (theme === "dark") html.setAttribute("data-theme", "dark");
+        else html.removeAttribute("data-theme");
+        if (btn)
+          btn.innerText =
+            theme === "dark" ? "\u2600\ufe0f Light" : "\ud83c\udf19 Dark";
+      }
+
+      function toggleDark() {
+        const next =
+          document.documentElement.getAttribute("data-theme") === "dark"
+            ? "light"
+            : "dark";
+        applyTheme(next);
+        try {
+          localStorage.setItem("dsa-notes-theme", next);
+        } catch (e) {
+          /* private browsing — the toggle still works for this page */
+        }
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("dsa-notes-theme");
+        } catch (e) {
+          /* ignore */
+        }
+        applyTheme(saved === "dark" ? "dark" : "light");
+      })();
+
+      // 2. Reading progress + active table-of-contents entry
+      (function initScrollSync() {
+        const main = document.getElementById("main");
+        if (!main) return;
+        const fill = document.getElementById("progressFill");
+        const headings = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const tocItems = document.querySelectorAll(".toc-item");
+
+        main.addEventListener("scroll", function () {
+          const range = main.scrollHeight - main.clientHeight;
+          if (fill && range > 0) {
+            const pct = (main.scrollTop / range) * 100;
+            fill.style.width = (pct > 98.5 ? 100 : pct) + "%";
+          }
+          let current = "";
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top < 150) current = h.id;
+          });
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              item.getAttribute("href") === "#" + current,
+            );
+          });
+        });
+      })();
+
+      // 3. Practice-problem cards expand and collapse
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy a code block
+      function copyCode(btn) {
+        const block = btn.closest(".code-block");
+        const pre = block && block.querySelector("pre");
+        if (!pre) return;
+        const done = () => {
+          const original = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(done, () => {
+            btn.innerText = "Press Ctrl+C";
+          });
+        } else {
+          btn.innerText = "Press Ctrl+C";
+        }
+      }
+
+      // 5. Disclosure arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

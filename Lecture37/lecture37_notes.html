@@ -1,0 +1,3082 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 37 &mdash; Segment &amp; Fenwick Trees</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behaviour: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        flex-shrink: 0;
+        padding-top: 20px;
+      }
+
+      .sb-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 4px 0 12px;
+      }
+
+      .sb-foot {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 10px 0 14px;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 56px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Course-wide additions (cover every class used in any lecture) ── */
+      .footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 8px;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+
+      .stack-vis {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 14px 0;
+      }
+
+      .stack-frame {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: var(--text2);
+      }
+
+      .tag-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .cx-badge.time {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .cx-badge.space {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .gr {
+        color: #22863a;
+      }
+
+      [data-theme="dark"] .gr {
+        color: #7ee787;
+      }
+
+      /* ── Pseudocode blocks — language-neutral algorithm statements ── */
+      .code-block.pseudo {
+        border-color: var(--teal);
+      }
+
+      .code-block.pseudo .code-header {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      .code-block.pseudo pre {
+        font-family: var(--mono);
+      }
+
+      .pc-kw {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .pc-cm {
+        color: var(--text3);
+        font-style: italic;
+      }
+
+      /* ── Learning objectives ── */
+      .objectives {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0 26px;
+      }
+
+      .objectives-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .objectives ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .objectives li {
+        font-size: 14px;
+        color: var(--text2);
+        margin: 5px 0;
+      }
+
+      /* ── Graded hints on practice problems ── */
+      details.hint {
+        border-color: var(--accent-bg);
+        margin: 8px 0;
+      }
+
+      details.hint summary {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        padding: 9px 14px;
+      }
+
+      details.hint[open] summary {
+        border-bottom: 1px solid var(--border);
+      }
+
+      details.hint .details-body {
+        font-size: 13.5px;
+        color: var(--text2);
+      }
+
+      details.hint .details-body p {
+        margin: 0;
+      }
+
+      .tag-concept {
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border2);
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+
+        .breadcrumb {
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .topbar-right {
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .topbar-right > span {
+          display: none;
+        }
+
+        .progress-bar {
+          width: 56px;
+        }
+      }
+
+      /* ── Bottom-of-page navigation ── */
+      .page-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text2);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+
+      .page-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .page-nav a.next {
+        margin-left: auto;
+        text-align: right;
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      @media (max-width: 560px) {
+        .page-nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .page-nav a,
+        .page-nav a.next {
+          margin-left: 0;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Segment &amp; Fenwick Trees</div>
+        <div class="sb-meta">
+          Lecture 37 of 45 &middot; Phase 5 &mdash; Advanced Structures
+        </div>
+      </div>
+      <div class="sb-scroll">
+        <div class="toc-label">On this page</div>
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127757;</span>Introduction</a
+        >
+        <a class="toc-item" href="#why"
+          ><span class="toc-icon">&#9878;&#65039;</span>Why Prefix Sums Break</a
+        >
+        <a class="toc-item" href="#segtree"
+          ><span class="toc-icon">&#127795;</span>The Segment Tree</a
+        >
+        <a class="toc-item toc-sub" href="#s-build">Build</a>
+        <a class="toc-item toc-sub" href="#s-query">Query &amp; Update</a>
+        <a class="toc-item" href="#lazy"
+          ><span class="toc-icon">&#128164;</span>Lazy Propagation</a
+        >
+        <a class="toc-item" href="#bit"
+          ><span class="toc-icon">&#128290;</span>Fenwick Tree (BIT)</a
+        >
+        <a class="toc-item toc-sub" href="#b-count">Counting With a BIT</a>
+        <a class="toc-item" href="#variants"
+          ><span class="toc-icon">&#129513;</span>Variants You Will Meet</a
+        >
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#128269;</span>Choosing a Structure</a
+        >
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
+        >
+        <a class="toc-item" href="#practice"
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+        >
+        <a class="toc-item" href="#assignment"
+          ><span class="toc-icon">&#128221;</span>Assignment</a
+        >
+        <a class="toc-item" href="#checklist"
+          ><span class="toc-icon">&#9989;</span>Checklist</a
+        >
+      </div>
+      <div class="sb-foot">
+        <div class="toc-label">Navigate</div>
+        <a class="toc-item" href="../Lecture36/lecture36_notes.html"
+          >&larr; Lecture 36 &middot; Tries (Prefix Trees)</a
+        >
+        <a class="toc-item" href="../index.html"
+          >&rarr; Lecture 38 &middot; coming soon</a
+        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
+          <span>Lecture 37 &mdash; Segment &amp; Fenwick Trees</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#128246;</span>
+          <h1 class="page-title">Segment Trees &amp; Fenwick Trees</h1>
+          <p class="page-sub">
+            &ldquo;Prefix sums are fast until someone changes one number.&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 37 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 5 &mdash; Advanced Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 6 days</span>
+            <span class="meta-chip green">&#127919; 22 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Microsoft</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Every structure so far has been good at one thing. A prefix-sum
+            array answers range queries instantly but has to be rebuilt after
+            any change; a plain array updates instantly but has to be scanned
+            for every query. Segment trees and Fenwick trees refuse that
+            trade-off: both operations become O(log n). They are also the point
+            where interviews stop asking you to recall a structure and start
+            asking you to <em>design</em> one, which is why they appear in
+            senior loops far more often than their LeetCode frequency suggests.
+          </div>
+        </div>
+
+        <div class="objectives">
+          <div class="objectives-title">By the end of this lecture you can</div>
+          <ul>
+            <li>Say exactly when a prefix-sum array stops being the answer</li>
+            <li>Build a segment tree and write query and point update</li>
+            <li>Add lazy propagation for range updates</li>
+            <li>
+              Write a Fenwick tree from memory and explain the low-bit trick
+            </li>
+            <li>Use a BIT over values to count, not just to sum</li>
+          </ul>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: Sales reports in a
+              company.</strong
+            >
+            Head office knows total sales, each region knows its subtotal, and
+            each store knows its own. To total a run of stores, you combine a
+            few regional subtotals instead of phoning every store. When one
+            store&rsquo;s figure changes, only its chain of managers updates
+            their numbers. That hierarchy of subtotals is a segment tree.
+          </div>
+        </div>
+
+        <h2 class="h1" id="why">&#9878;&#65039; Why Prefix Sums Break</h2>
+        <p>
+          Consider <code>q</code> operations on an array of
+          <code>n</code> numbers, mixing &ldquo;sum of
+          <code>[l, r]</code>&rdquo; with &ldquo;set <code>a[i]</code> to
+          <code>v</code>&rdquo;. Two obvious designs each fail on one half of
+          the workload.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Design</th>
+                <th>Query</th>
+                <th>Update</th>
+                <th>Total for n = q = 10&#8309;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Plain array, scan the range</td>
+                <td>O(n)</td>
+                <td>O(1)</td>
+                <td>10&#185;&#8304; &mdash; far too slow</td>
+              </tr>
+              <tr>
+                <td>Prefix-sum array</td>
+                <td>O(1)</td>
+                <td>O(n) rebuild</td>
+                <td>10&#185;&#8304; &mdash; equally hopeless</td>
+              </tr>
+              <tr>
+                <td>Square-root blocks</td>
+                <td>O(&radic;n)</td>
+                <td>O(1)</td>
+                <td>~3 &times; 10&#8312; &mdash; borderline</td>
+              </tr>
+              <tr>
+                <td>Segment tree / Fenwick tree</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>~4 &times; 10&#8311; &mdash; comfortable</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>The idea behind all three fixes is the same:</strong> store
+            the answer for <em>blocks</em> of the array instead of for every
+            prefix. A prefix sum uses one block per prefix, so a change touches
+            almost all of them. Square-root decomposition uses &radic;n blocks;
+            a segment tree uses a hierarchy of halves, so a change touches only
+            the log n blocks on one root-to-leaf path. Lecture 38 comes back to
+            the &radic;n version, which is easier to write under pressure and
+            often fast enough.
+          </div>
+        </div>
+
+        <h2 class="h1" id="segtree">&#127795; The Segment Tree</h2>
+        <p>
+          Node 1 covers the whole array. Its children cover the two halves,
+          theirs cover the quarters, and the leaves are single elements. Each
+          node stores the answer for its own range, so a query assembles its
+          answer from at most 2&nbsp;log&nbsp;n nodes, and an update repairs one
+          path.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang">&#128208; Pseudocode &middot; Layout</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Array of size 4n, no pointers. For node i covering [lo, hi]:
+//     left child  = 2i,     covering [lo, mid]
+//     right child = 2i + 1, covering [mid + 1, hi]
+//     mid = lo + (hi - lo) ÷ 2
+//
+// a = [2, 5, 1, 4]
+//
+//              [0..3] = 12
+//             /            //        [0..1] = 7      [2..3] = 5
+//        /      \         /      //      2         5       1        4
+//
+// Why 4n and not 2n? Because the tree is only perfect when n is a power of
+// two; 4n is the safe bound for every n, and it costs nothing to allocate.</span></pre>
+        </div>
+
+        <h3 class="h2" id="s-build">Build</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Build in O(n)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> build(node, lo, hi):
+    <span class="pc-kw">if</span> lo = hi:
+        tree[node] ← a[lo]                  <span class="pc-cm">// a leaf is its element</span>
+        <span class="pc-kw">return</span>
+
+    mid ← lo + (hi - lo) ÷ 2
+    build(2·node,     lo,      mid)
+    build(2·node + 1, mid + 1, hi)
+    tree[node] ← tree[2·node] + tree[2·node + 1]   <span class="pc-cm">// pull up</span>
+
+<span class="pc-cm">// Every node is written exactly once → O(n), not O(n log n).
+// Replace + with min, max, gcd or OR and nothing else changes: the operation
+// only has to be associative.</span></pre>
+        </div>
+
+        <h3 class="h2" id="s-query">Query &amp; Update</h3>
+        <p>
+          The query is a three-way decision at every node: my range is outside
+          yours (contribute nothing), my range is inside yours (return my stored
+          answer), or we overlap partially (ask both children).
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Range Query, Point Update</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> query(node, lo, hi, l, r):        <span class="pc-cm">// sum of [l, r]</span>
+    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span> 0        <span class="pc-cm">// 1. no overlap</span>
+    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r: <span class="pc-kw">return</span> tree[node]   <span class="pc-cm">// 2. fully inside</span>
+
+    mid ← lo + (hi - lo) ÷ 2                 <span class="pc-cm">// 3. partial → split</span>
+    <span class="pc-kw">return</span> query(2·node,     lo,      mid, l, r)
+         + query(2·node + 1, mid + 1, hi,  l, r)
+
+<span class="pc-kw">function</span> update(node, lo, hi, i, value):
+    <span class="pc-kw">if</span> lo = hi:
+        tree[node] ← value
+        <span class="pc-kw">return</span>
+
+    mid ← lo + (hi - lo) ÷ 2
+    <span class="pc-kw">if</span> i ≤ mid: update(2·node,     lo,      mid, i, value)
+    <span class="pc-kw">else</span>:       update(2·node + 1, mid + 1, hi,  i, value)
+    tree[node] ← tree[2·node] + tree[2·node + 1]   <span class="pc-cm">// repair on the way up</span>
+
+<span class="pc-cm">// Dry run on a = [2, 5, 1, 4], query(l=1, r=2):
+//   [0..3] partial → split
+//     [0..1] partial → left [0..0] no overlap = 0, right [1..1] inside = 5
+//     [2..3] partial → left [2..2] inside = 1, right [3..3] no overlap = 0
+//   total = 6 ✓  (visited 7 of 7 nodes here because n is tiny; for large n
+//   the &quot;fully inside&quot; case cuts the recursion after ~2 log n nodes)</span></pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>The identity element matters.</strong> The no-overlap branch
+            must return something that cannot affect the answer: 0 for sums,
+            <code>+infinity</code> for minimums, <code>-infinity</code> for
+            maximums, 0 for gcd. Returning 0 from a minimum query is the single
+            most common segment-tree bug.
+          </div>
+        </div>
+
+        <h2 class="h1" id="lazy">&#128164; Lazy Propagation</h2>
+        <p>
+          &ldquo;Add 3 to every element of <code>[l, r]</code>&rdquo; would
+          touch O(n) leaves if you did it honestly. Lazy propagation is the
+          refusal to do it honestly: mark the node that covers the range with a
+          debt, and pay the debt only when someone descends through it.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Range Add, Range Sum</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> push(node, lo, hi):               <span class="pc-cm">// pay the debt one level down</span>
+    <span class="pc-kw">if</span> lazy[node] = 0: <span class="pc-kw">return</span>
+    mid ← lo + (hi - lo) ÷ 2
+    apply(2·node,     lo,      mid, lazy[node])
+    apply(2·node + 1, mid + 1, hi,  lazy[node])
+    lazy[node] ← 0
+
+<span class="pc-kw">function</span> apply(node, lo, hi, add):
+    tree[node] ← tree[node] + add × (hi - lo + 1)   <span class="pc-cm">// whole range</span>
+    lazy[node] ← lazy[node] + add                   <span class="pc-cm">// owe it to the children</span>
+
+<span class="pc-kw">function</span> rangeAdd(node, lo, hi, l, r, add):
+    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span>
+    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r:
+        apply(node, lo, hi, add)             <span class="pc-cm">// stop here — this is the trick</span>
+        <span class="pc-kw">return</span>
+
+    push(node, lo, hi)
+    mid ← lo + (hi - lo) ÷ 2
+    rangeAdd(2·node,     lo,      mid, l, r, add)
+    rangeAdd(2·node + 1, mid + 1, hi,  l, r, add)
+    tree[node] ← tree[2·node] + tree[2·node + 1]
+
+<span class="pc-kw">function</span> query(node, lo, hi, l, r):
+    <span class="pc-kw">if</span> r &lt; lo <span class="pc-kw">or</span> hi &lt; l: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">if</span> l ≤ lo <span class="pc-kw">and</span> hi ≤ r: <span class="pc-kw">return</span> tree[node]
+    push(node, lo, hi)                       <span class="pc-cm">// never read a stale child</span>
+    mid ← lo + (hi - lo) ÷ 2
+    <span class="pc-kw">return</span> query(2·node, lo, mid, l, r) + query(2·node + 1, mid + 1, hi, l, r)</pre>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Two rules keep lazy propagation correct.</strong> First,
+            <code>tree[node]</code> is always already correct for its own range
+            &mdash; the lazy value is what the <em>children</em> have not been
+            told. Second, <code>push</code> before you descend, in every
+            operation, including queries. Almost every lazy bug is a missing
+            push.
+          </div>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Assignment is not addition.</strong> For &ldquo;set the
+            whole range to <code>v</code>&rdquo;, the pending value must be
+            stored as &ldquo;assign v&rdquo; with a separate &ldquo;is
+            pending&rdquo; flag, because a later assignment overwrites an
+            earlier one instead of stacking with it. Mixing add and assign in
+            one tree means deciding how the two compose &mdash; say that out
+            loud before you write it.
+          </div>
+        </div>
+
+        <h2 class="h1" id="bit">&#128290; Fenwick Tree (BIT)</h2>
+        <p>
+          A Fenwick tree does less than a segment tree &mdash; prefix aggregates
+          only, and the operation must be invertible if you want arbitrary
+          ranges &mdash; but it is twenty lines, uses <code>n</code>
+          integers instead of 4n, and is noticeably faster in practice. When the
+          problem is prefix sums with point updates, this is the answer.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Whole Structure</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// bit[i] stores the sum of the lowbit(i) elements ending at index i.
+// lowbit(i) = i AND (-i) — the lowest set bit of i.
+//   lowbit(6) = lowbit(0b110) = 2  → bit[6] covers a[5] + a[6]
+//   lowbit(8) = lowbit(0b1000) = 8 → bit[8] covers a[1..8]
+// Indices are 1-based. This is not optional: index 0 has no low bit.</span>
+
+<span class="pc-kw">function</span> update(i, delta):               <span class="pc-cm">// add delta to a[i]</span>
+    <span class="pc-kw">while</span> i ≤ n:
+        bit[i] ← bit[i] + delta
+        i ← i + (i AND -i)                <span class="pc-cm">// next range that covers i</span>
+
+<span class="pc-kw">function</span> prefix(i):                      <span class="pc-cm">// sum of a[1..i]</span>
+    total ← 0
+    <span class="pc-kw">while</span> i &gt; 0:
+        total ← total + bit[i]
+        i ← i - (i AND -i)                <span class="pc-cm">// strip the low bit</span>
+    <span class="pc-kw">return</span> total
+
+<span class="pc-kw">function</span> rangeSum(l, r):
+    <span class="pc-kw">return</span> prefix(r) - prefix(l - 1)  <span class="pc-cm">// needs an invertible op</span>
+
+<span class="pc-cm">// Both loops strip or add one bit per step, so both are O(log n).
+// Building by calling update n times is O(n log n); the O(n) build adds each
+// bit[i] into bit[i + lowbit(i)] in one pass, which is worth knowing.</span></pre>
+        </div>
+
+        <h3 class="h2" id="b-count">Counting With a BIT</h3>
+        <p>
+          The move that turns a BIT into an interview weapon is indexing it by
+          <em>value</em> rather than by position. <code>bit[v]</code> then means
+          &ldquo;how many values &le; v have I seen so far&rdquo;, and questions
+          about order become prefix sums.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Count Smaller Elements to the
+              Right</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> countSmallerAfter(a):
+    ranks ← compress(a)                   <span class="pc-cm">// sorted distinct values → 1..m</span>
+    bit ← empty Fenwick tree of size m
+    answer ← array of zeros
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:   <span class="pc-cm">// right to left</span>
+        r ← ranks[a[i]]
+        answer[i] ← prefix(r - 1)         <span class="pc-cm">// already seen, strictly smaller</span>
+        update(r, 1)                      <span class="pc-cm">// now a[i] has been seen</span>
+
+    <span class="pc-kw">return</span> answer
+
+<span class="pc-cm">// Coordinate compression is what makes this work when values are huge or
+// negative: only the ORDER of the values matters, never their magnitude.</span></pre>
+        </div>
+
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Recognise the family.</strong> Counting inversions, counting
+            smaller elements to the right, reverse pairs, counting good triplets
+            &mdash; all of them are &ldquo;sweep in one direction, ask how many
+            earlier values fall in a range&rdquo;. You solved several of these
+            with merge sort in Lecture 12; the BIT version is usually shorter
+            and extends to weights and to more than two conditions.
+          </div>
+        </div>
+
+        <h2 class="h1" id="variants">&#129513; Variants You Will Meet</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Variant</th>
+                <th>What changes</th>
+                <th>Use it for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Min / max segment tree</td>
+                <td>Combine with min or max; identity is &plusmn;infinity</td>
+                <td>Range extremes, DP transitions over a value window</td>
+              </tr>
+              <tr>
+                <td>Segment tree over values</td>
+                <td>Index by compressed value, not position</td>
+                <td>&ldquo;Best DP answer among values &lt; x&rdquo;</td>
+              </tr>
+              <tr>
+                <td>Dynamic (sparse) segment tree</td>
+                <td>Create nodes on demand instead of allocating 4n</td>
+                <td>Coordinates up to 10&#8313; with few queries</td>
+              </tr>
+              <tr>
+                <td>Coordinate compression + static tree</td>
+                <td>Map the endpoints that actually occur to 1..m</td>
+                <td>The same situation, when all queries are known up front</td>
+              </tr>
+              <tr>
+                <td>Difference array + one prefix pass</td>
+                <td>No tree at all</td>
+                <td>Range updates, then a single query phase at the end</td>
+              </tr>
+              <tr>
+                <td>Merge-sort tree</td>
+                <td>Each node stores its range sorted</td>
+                <td>&ldquo;How many values in [l, r] are &le; k&rdquo;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Check the difference array first.</strong> If every update
+            arrives before every query, you do not need a tree at all: record
+            <code>+v</code> at <code>l</code> and <code>-v</code> at
+            <code>r + 1</code>, then take one prefix pass at the end. That is
+            O(n + q) and five lines. Reach for a tree only when updates and
+            queries are interleaved.
+          </div>
+        </div>
+
+        <h2 class="h1" id="choose">&#128269; Choosing a Structure</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>The workload</th>
+                <th>Structure</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Range query, no updates</td>
+                <td>Prefix sums (or a sparse table for min/max)</td>
+                <td>O(1) per query, nothing to maintain</td>
+              </tr>
+              <tr>
+                <td>All updates first, then all queries</td>
+                <td>Difference array</td>
+                <td>O(n + q) with no structure at all</td>
+              </tr>
+              <tr>
+                <td>Point update + prefix sum</td>
+                <td>Fenwick tree</td>
+                <td>Shortest correct answer, smallest constant</td>
+              </tr>
+              <tr>
+                <td>Point update + range min / max / gcd</td>
+                <td>Segment tree</td>
+                <td>A BIT cannot invert min or max</td>
+              </tr>
+              <tr>
+                <td>Range update + range query</td>
+                <td>Segment tree with lazy propagation</td>
+                <td>Deferred work keeps both at O(log n)</td>
+              </tr>
+              <tr>
+                <td>Huge coordinates, few operations</td>
+                <td>Dynamic tree, or compress then build</td>
+                <td>Allocate only what is touched</td>
+              </tr>
+              <tr>
+                <td>Counting by value while sweeping</td>
+                <td>BIT over compressed values</td>
+                <td>Order questions become prefix sums</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="h1" id="pitfalls">&#9888;&#65039; Complexity &amp; Bugs</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Segment tree</th>
+                <th>Fenwick tree</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Build</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>
+                  Both have an O(n) build; the naive BIT build is O(n log n)
+                </td>
+              </tr>
+              <tr>
+                <td>Point update</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>One root-to-leaf path, or one chain of low bits</td>
+              </tr>
+              <tr>
+                <td>Range query</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>BIT needs an invertible operation</td>
+              </tr>
+              <tr>
+                <td>Range update</td>
+                <td>O(log n) with lazy</td>
+                <td>O(log n) with two BITs</td>
+                <td>The two-BIT trick handles range add + range sum</td>
+              </tr>
+              <tr>
+                <td>Memory</td>
+                <td>4n</td>
+                <td>n + 1</td>
+                <td>Plus 4n more for the lazy array</td>
+              </tr>
+              <tr>
+                <td>Lines of code</td>
+                <td>~40</td>
+                <td>~12</td>
+                <td>Under interview pressure this matters</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tree array sized 2n</td>
+                <td>Index out of bounds for non-power-of-two n</td>
+                <td>Allocate 4n</td>
+              </tr>
+              <tr>
+                <td>Returning 0 for a min query with no overlap</td>
+                <td>Every minimum comes back as 0</td>
+                <td>Return the identity: <code>+infinity</code></td>
+              </tr>
+              <tr>
+                <td>Forgetting to pull up after an update</td>
+                <td>Leaf is right, ancestors are stale</td>
+                <td>Recombine children on the way back up</td>
+              </tr>
+              <tr>
+                <td>Missing <code>push</code> in the query</td>
+                <td>Range updates seem to vanish</td>
+                <td>Push before descending, in every operation</td>
+              </tr>
+              <tr>
+                <td>0-based Fenwick indices</td>
+                <td>Infinite loop or silently wrong sums</td>
+                <td><code>lowbit(0) = 0</code> &mdash; index from 1</td>
+              </tr>
+              <tr>
+                <td>Compressing values but querying with raw ones</td>
+                <td>Out of range, or counts far too small</td>
+                <td>Map every read and write through the same rank table</td>
+              </tr>
+              <tr>
+                <td>Overflow on sums</td>
+                <td>Wrong answers only on large inputs</td>
+                <td>Use 64-bit accumulators for sums of n &times; 10&#8313;</td>
+              </tr>
+              <tr>
+                <td>Rebuilding the tree per query</td>
+                <td>Correct but times out</td>
+                <td>Build once outside the loop</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it in an interview.</strong> Two numbers
+            together give it away: an array of 10&#8309; and a query count of
+            10&#8309;, with updates mixed into the queries. If the updates all
+            come first, say &ldquo;difference array&rdquo;; if there are no
+            updates, say &ldquo;prefix sums&rdquo;; only when they interleave do
+            you reach for a tree &mdash; and then say which one and why, because
+            choosing the Fenwick tree when it suffices is itself the signal they
+            are looking for.
+          </div>
+        </div>
+
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Six problems: the canonical structure, two uses of a Fenwick tree, one
+          that needs no tree at all, and two that combine a tree with
+          compression or laziness.
+        </p>
+
+        <!-- Problem 01: Range Sum Query - Mutable -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 &middot; The Canonical One</div>
+              <div class="prob-title">Range Sum Query - Mutable</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/range-sum-query-mutable/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 307 - Range Sum Query - Mutable</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Segment Tree / Fenwick Tree</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Support <code>update(index, value)</code> and
+                <code>sumRange(left, right)</code> on an integer array.
+              </p>
+              <div class="iobox">
+                nums = [1, 3, 5]; sumRange(0, 2) → 9; update(1, 2); sumRange(0,
+                2) → 8
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A prefix-sum array answers the query in O(1) but costs O(n)
+                    per update. What does that cost over 10⁴ mixed operations?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Both operations need to be logarithmic. A Fenwick tree is
+                    the shortest structure that does it — store deltas, not
+                    values, when updating.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Write it both ways and know when to offer each. The Fenwick
+                version is twelve lines and is what you should produce first:
+                <code>update</code> takes the <em>delta</em>
+                <code>value − old[i]</code>, so you must keep the original array
+                alongside the tree. The segment tree version is longer but
+                generalises to minimum, maximum and gcd, which a Fenwick tree
+                cannot do &mdash; say that explicitly, because the follow-up
+                question is almost always &ldquo;now make it range
+                minimum&rdquo;.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Fenwick Tree, Storing
+                      Deltas</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> NumArray(nums):
+    n ← length(nums)
+    a ← copy of nums                      <span class="pc-cm">// needed to compute deltas</span>
+    bit ← array of n + 1 zeros
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1: add(i + 1, nums[i])
+
+<span class="pc-kw">function</span> add(i, delta):
+    <span class="pc-kw">while</span> i ≤ n:
+        bit[i] ← bit[i] + delta
+        i ← i + (i AND -i)
+
+<span class="pc-kw">function</span> prefix(i):
+    s ← 0
+    <span class="pc-kw">while</span> i &gt; 0:
+        s ← s + bit[i]
+        i ← i - (i AND -i)
+    <span class="pc-kw">return</span> s
+
+<span class="pc-kw">function</span> update(index, value):
+    add(index + 1, value - a[index])      <span class="pc-cm">// the delta, not the value</span>
+    a[index] ← value
+
+<span class="pc-kw">function</span> sumRange(left, right):
+    <span class="pc-kw">return</span> prefix(right + 1) - prefix(left)</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log n) per op</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Count Number of Teams -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; BIT Over Values</div>
+              <div class="prob-title">Count Number of Teams</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/count-number-of-teams/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1395 - Count Number of Teams</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Fenwick Tree (counting)</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the triples <code>i &lt; j &lt; k</code> whose ratings are
+                strictly increasing or strictly decreasing.
+              </p>
+              <div class="iobox">rating = [2, 5, 3, 4, 1] → 3</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    n ≤ 1000, so O(n²) passes — but solve it as if n were 10⁵.
+                    Fix the middle soldier: what do you need to know about each
+                    side?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    For each j: how many smaller ratings lie to its left, and
+                    how many larger lie to its right. Sweep with a BIT indexed
+                    by rating.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The cubic loop is the intended solution here, and the quadratic
+                one fixes the middle element. The reason to write the BIT
+                version anyway is that it is the same code as counting
+                inversions: sweep left to right maintaining a Fenwick tree over
+                compressed ratings, and each position asks two prefix queries.
+                Every &ldquo;count pairs or triples in order&rdquo; problem
+                &mdash; inversions, reverse pairs, good triplets &mdash; is this
+                pattern with a different multiplier.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Fix the Middle, Count Both
+                      Sides</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> numTeams(rating):
+    m ← number of distinct ratings
+    left  ← Fenwick tree of size m        <span class="pc-cm">// seen so far</span>
+    right ← Fenwick tree of size m        <span class="pc-cm">// everything, then removed</span>
+    <span class="pc-kw">for</span> r <span class="pc-kw">in</span> rating: right.add(rank(r), 1)
+
+    total ← 0
+    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        r ← rank(rating[j])
+        right.add(r, -1)                  <span class="pc-cm">// j is no longer &quot;to the right&quot;</span>
+
+        lessLeft   ← left.prefix(r - 1)
+        moreLeft   ← j - left.prefix(r)
+        lessRight  ← right.prefix(r - 1)
+        moreRight  ← (n - 1 - j) - right.prefix(r)
+
+        total ← total + lessLeft × moreRight     <span class="pc-cm">// increasing</span>
+                      + moreLeft × lessRight     <span class="pc-cm">// decreasing</span>
+
+        left.add(r, 1)
+    <span class="pc-kw">return</span> total</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Range Frequency Queries -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Query Without a Tree
+              </div>
+              <div class="prob-title">Range Frequency Queries</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/range-frequency-queries/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2080 - Range Frequency Queries</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Bucketed Indices + Binary Search</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Answer many queries of the form &ldquo;how many times does
+                <code>value</code> occur in
+                <code>arr[left..right]</code>?&rdquo;
+              </p>
+              <div class="iobox">
+                arr = [12, 33, 4, 56, 22, 2, 34, 33, 22, 12, 34, 56], query(1,
+                2, 33) → 1
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The array never changes. Does that remove the need for a
+                    tree?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Store, for each value, the sorted list of positions where it
+                    occurs. A query is then two binary searches inside one list.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This problem is here as a corrective. It looks like a
+                range-query problem, so people reach for a segment tree &mdash;
+                but nothing is ever updated, so the right answer is a map from
+                value to its sorted index list, and a pair of binary searches.
+                Knowing when <em>not</em> to build a tree is half of what this
+                lecture is for. If the array did change, this becomes a
+                merge-sort tree or a BIT per value, and the cost of that jump is
+                worth stating.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Positions Per Value +
+                      Binary Search</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> RangeFreqQuery(arr):
+    positions ← map from value → list of indices
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        positions[arr[i]].append(i)       <span class="pc-cm">// already sorted</span>
+
+<span class="pc-kw">function</span> query(left, right, value):
+    <span class="pc-kw">if</span> value <span class="pc-kw">not</span> <span class="pc-kw">in</span> positions: <span class="pc-kw">return</span> 0
+    list ← positions[value]
+    lo ← first index in list ≥ left       <span class="pc-cm">// lower bound</span>
+    hi ← first index in list &gt; right      <span class="pc-cm">// upper bound</span>
+    <span class="pc-kw">return</span> hi - lo
+
+<span class="pc-cm">// No updates → no tree. If updates existed, this becomes a BIT per value
+// or a merge-sort tree, at a real cost in memory and code.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O(n) build, O(log n) per query</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Longest Increasing Subsequence II -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Tree Over Values</div>
+              <div class="prob-title">Longest Increasing Subsequence II</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/longest-increasing-subsequence-ii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2407 - Longest Increasing Subsequence II</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Segment Tree (max) over values</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the longest strictly increasing subsequence in which
+                consecutive elements differ by at most <code>k</code>.
+              </p>
+              <div class="iobox">
+                nums = [4, 2, 1, 4, 3, 4, 5, 8, 15], k = 3 → 5
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The O(n²) DP asks, for each i, the best dp[j] among earlier
+                    valid j. What kind of query is that over the
+                    <em>values</em>?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    dp[v] = best length ending at value v. Then dp[nums[i]] = 1
+                    + max of dp over the value window [nums[i] − k, nums[i] − 1]
+                    — a range maximum query.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the lecture&rsquo;s main lesson applied to dynamic
+                programming: when a DP transition is &ldquo;the best of all
+                previous states in a range&rdquo;, a segment tree turns O(n) per
+                step into O(log n). Index the tree by value, not by position, so
+                the constraint &ldquo;differs by at most k&rdquo; becomes a
+                contiguous range. Point update, range maximum, no lazy
+                propagation &mdash; and a Fenwick tree cannot replace it here,
+                because maximum is not invertible.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Range Max Over the Value
+                      Axis</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> lengthOfLIS(nums, k):
+    V ← max(nums)
+    tree ← segment tree over values 1..V, combine = max, identity = 0
+    best ← 0
+
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+        lo ← max(1, x - k)
+        hi ← x - 1                        <span class="pc-cm">// strictly increasing</span>
+
+        prev ← 0
+        <span class="pc-kw">if</span> lo ≤ hi: prev ← tree.queryMax(lo, hi)
+
+        length ← prev + 1
+        tree.update(x, length)            <span class="pc-cm">// point update, keep the max</span>
+        best ← max(best, length)
+
+    <span class="pc-kw">return</span> best
+
+<span class="pc-cm">// The DP is unchanged — only the &quot;best previous state&quot; lookup got faster.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log V)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(V)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: My Calendar III -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Dynamic + Lazy</div>
+              <div class="prob-title">My Calendar III</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/my-calendar-iii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 732 - My Calendar III</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Lazy Segment Tree / Sweep</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                After each booked interval <code>[start, end)</code>, return the
+                maximum number of bookings that overlap at any single point.
+              </p>
+              <div class="iobox">
+                book(10, 20) → 1, book(50, 60) → 1, book(10, 40) → 2, book(5,
+                15) → 3
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A booking adds 1 to every point in a range, and the answer
+                    is the maximum over all points. Which two operations is
+                    that?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Range add and global maximum — exactly lazy propagation. The
+                    coordinates go up to 10⁹, so either create nodes on demand
+                    or compress.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two solutions, and both are worth knowing. The sweep-line one is
+                shorter: a sorted map with <code>+1</code> at each start and
+                <code>−1</code> at each end, then a running total over the keys
+                &mdash; O(n) per call, which passes here. The segment tree one
+                is the scalable answer: range add with lazy propagation over a
+                dynamic tree keyed by coordinate, giving O(log C) per booking.
+                Offer the sweep, then say how you would make it logarithmic;
+                that sequence is what interviewers are grading.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Range Add, Global Max</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-cm">// Sweep version — short, O(n) per call, enough for the constraints</span>
+<span class="pc-kw">function</span> book(start, end):
+    delta[start] ← delta[start] + 1
+    delta[end]   ← delta[end] - 1
+
+    active ← 0;  best ← 0
+    <span class="pc-kw">for</span> key <span class="pc-kw">in</span> sorted keys of delta:
+        active ← active + delta[key]
+        best ← max(best, active)
+    <span class="pc-kw">return</span> best
+
+<span class="pc-cm">// Segment tree version — O(log C), the one that scales</span>
+<span class="pc-kw">function</span> book(start, end):
+    rangeAdd(root, 0, 10⁹, start, end - 1, +1)   <span class="pc-cm">// end is exclusive</span>
+    <span class="pc-kw">return</span> tree[root]                            <span class="pc-cm">// root holds the maximum</span>
+
+<span class="pc-cm">// Nodes are created only when a range is first touched, so the tree holds
+// O(n log C) nodes instead of pre-allocating 4 × 10⁹.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log C) per booking</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n log C)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Falling Squares -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Compress First</div>
+              <div class="prob-title">Falling Squares</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/falling-squares/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 699 - Falling Squares</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat"
+                  >Coordinate Compression + Lazy Assign</span
+                >
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Squares drop one at a time onto a number line and rest on
+                whatever is below them. After each drop, return the height of
+                the tallest stack so far.
+              </p>
+              <div class="iobox">
+                positions = [[1,2],[2,3],[6,1]] → [2, 5, 5]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A square landing on [l, r) sits at 1 + the maximum current
+                    height in that interval. What two operations does that need?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Range maximum query, then range assign of the new height.
+                    Coordinates reach 10⁸, but there are at most 2n distinct
+                    endpoints — compress them.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Every square is one query and one update on the same interval:
+                read the maximum height under it, then set the whole interval to
+                that plus its side length. The assignment is a <em>set</em>, not
+                an add, so the lazy value needs a pending-assign flag rather
+                than an accumulator. Compression is the other half: only the
+                interval endpoints that actually occur can ever matter, so map
+                the at most 2n of them to a small index range and build a static
+                tree over that.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Query Max, Then
+                      Assign</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> fallingSquares(positions):
+    xs ← sorted distinct of all l and (l + side) values   <span class="pc-cm">// compress</span>
+    tree ← lazy segment tree over 0..len(xs) - 1, op = max, lazy = assign
+    best ← 0;  result ← empty list
+
+    <span class="pc-kw">for</span> (left, side) <span class="pc-kw">in</span> positions:
+        l ← index of left <span class="pc-kw">in</span> xs
+        r ← index of (left + side) <span class="pc-kw">in</span> xs - 1        <span class="pc-cm">// half-open</span>
+
+        base ← tree.queryMax(l, r)
+        top  ← base + side
+        tree.assign(l, r, top)                        <span class="pc-cm">// range set, not add</span>
+
+        best ← max(best, top)
+        result.add(best)
+
+    <span class="pc-kw">return</span> result
+
+<span class="pc-cm">// Touching squares must not stack: using a half-open range is what keeps
+// [1,2] and [2,3] independent.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Lecture 37 Assignment &mdash; 22 Problems (3 Easy &middot; 12
+              Medium &middot; 7 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by the
+            structure it needs &mdash; including the ones that need none.
+            Complete it before moving to Lecture 38.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture37/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 38.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain why a prefix-sum array fails once updates appear
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write build, query and point update for a segment tree from
+            memory
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know the identity element for sum, min, max and gcd queries
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can add lazy propagation and say where every push belongs
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write a Fenwick tree in twelve lines and explain
+            <code>i AND -i</code>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can index a BIT by value and count inversions with it
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can recognise when a difference array or plain prefix sums are
+            enough
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I completed all 22 assignment problems and can justify the structure
+            I chose for each
+          </div>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#127881;</span>
+          <div class="callout-body">
+            <strong
+              >Next up &mdash; Lecture 38: Square Root Decomposition &amp;
+              Mo&#39;s Algorithm</strong
+            ><br />
+            The &radic;n bridge mentioned at the start of this lecture gets its
+            own treatment: a structure that is worse asymptotically, much easier
+            to write, and &mdash; with Mo&#39;s algorithm for offline queries
+            &mdash; able to answer questions no segment tree can.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="page-nav">
+          <a href="../Lecture36/lecture36_notes.html"
+            >&larr; Lecture 36 &middot; Tries (Prefix Trees)</a
+          >
+          <a class="next" href="../index.html"
+            >Lecture 38 &middot; coming soon &rarr;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Theme toggle — remembered across pages of the course
+      function applyTheme(theme) {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (theme === "dark") html.setAttribute("data-theme", "dark");
+        else html.removeAttribute("data-theme");
+        if (btn)
+          btn.innerText =
+            theme === "dark" ? "\u2600\ufe0f Light" : "\ud83c\udf19 Dark";
+      }
+
+      function toggleDark() {
+        const next =
+          document.documentElement.getAttribute("data-theme") === "dark"
+            ? "light"
+            : "dark";
+        applyTheme(next);
+        try {
+          localStorage.setItem("dsa-notes-theme", next);
+        } catch (e) {
+          /* private browsing — the toggle still works for this page */
+        }
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("dsa-notes-theme");
+        } catch (e) {
+          /* ignore */
+        }
+        applyTheme(saved === "dark" ? "dark" : "light");
+      })();
+
+      // 2. Reading progress + active table-of-contents entry
+      (function initScrollSync() {
+        const main = document.getElementById("main");
+        if (!main) return;
+        const fill = document.getElementById("progressFill");
+        const headings = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const tocItems = document.querySelectorAll(".toc-item");
+
+        main.addEventListener("scroll", function () {
+          const range = main.scrollHeight - main.clientHeight;
+          if (fill && range > 0) {
+            const pct = (main.scrollTop / range) * 100;
+            fill.style.width = (pct > 98.5 ? 100 : pct) + "%";
+          }
+          let current = "";
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top < 150) current = h.id;
+          });
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              item.getAttribute("href") === "#" + current,
+            );
+          });
+        });
+      })();
+
+      // 3. Practice-problem cards expand and collapse
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy a code block
+      function copyCode(btn) {
+        const block = btn.closest(".code-block");
+        const pre = block && block.querySelector("pre");
+        if (!pre) return;
+        const done = () => {
+          const original = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(done, () => {
+            btn.innerText = "Press Ctrl+C";
+          });
+        } else {
+          btn.innerText = "Press Ctrl+C";
+        }
+      }
+
+      // 5. Disclosure arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

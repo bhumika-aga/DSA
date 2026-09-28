@@ -1,275 +1,322 @@
-# 🗃️ Assignment 13 — HashMap & HashSet
+# 🔎 Assignment 10 — Searching Algorithms
 
-> **Lecture:** 13 of 38 — HashMap & HashSet
+> **Lecture:** 13 of 45 — Searching Algorithms
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 4 days · **Total Problems:** 25 (7 Easy · 13 Medium · 5 Hard)
-> **Goal:** Master the 5 core HashMap patterns: Frequency Map, Complement Lookup, Prefix Sum + Map, Group-by-Key, and Set Membership. Understand hashing internals, collision resolution, and cache design.
+> **Estimated Time:** 5 days · **Total Problems:** 28 (6 Easy · 16 Medium · 6 Hard)
+> **Goal:** Master unconditional Linear Searching, classic O(log n) Binary Search templates, **Binary Search on
+> Answer Space** (Monotonic optimisation), and matrix traversal boundaries.
 
 ---
 
 ## 🗺️ Pattern Recognition — Read Before Starting
 
-The HashMap is the single most-used data structure in FAANG coding interviews. It transforms O(n) linear scans into O(1) lookups. Understanding **when** to use it and **which pattern** to apply is the difference between a 30-minute solution and a 3-minute one.
-
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem             | Pattern              | Move                                        |
-| --------------------------------- | -------------------- | ------------------------------------------- |
-| "pair sums to target"             | Complement Lookup    | check `target - x` before storing `x`       |
-| "count subarrays with sum k"      | Prefix Sum + HashMap | count earlier prefixes equal to `sum - k`   |
-| "group items that are equivalent" | Canonical Key        | sorted string or count signature as the key |
-| "longest consecutive run"         | HashSet Starts       | only expand from `x` when `x - 1` is absent |
-| "one-to-one mapping"              | Bijection            | two maps, one per direction                 |
-| "frequency of frequencies"        | Nested Counting      | count values, then count the counts         |
+| Signal in the Problem                         | Pattern                 | Move                                             |
+| --------------------------------------------- | ----------------------- | ------------------------------------------------ |
+| "sorted array" + "find"                       | Classic Binary Search   | `while lo <= hi`, `mid = lo + (hi - lo) / 2`     |
+| "first / last position"                       | Lower / Upper Bound     | keep searching after a match                     |
+| "rotated sorted array"                        | Find the Sorted Half    | compare `nums[mid]` with `nums[lo]`              |
+| "minimum capacity / speed / days such that …" | Binary Search on Answer | search the answer space with a feasibility check |
+| "peak", "mountain"                            | Slope Search            | move toward the rising side                      |
+| "sorted matrix"                               | 2D Binary Search        | flatten indices, or search the value range       |
 
 ---
 
-## 🟢 Easy Tier (7 Problems)
+## 🟢 Easy Tier (6 Problems)
 
-_Build confidence with the core HashMap API and the simplest pattern variants._
+_No Easy problems at this stage of the course._
 
-### E1 · Two Sum
+### E1 · Binary Search
 
-**🔗 [LC 1 — Two Sum](https://leetcode.com/problems/two-sum/)** · Easy
-**Pattern:** Complement Lookup | **Companies:** Amazon, Google, Meta, Microsoft
+**🔗 [LC 704 — Binary Search](https://leetcode.com/problems/binary-search/)** · Easy
+**Pattern:** Classic Binary Search | **Companies:** Google, Amazon, Microsoft
 
-**Hint:** Map each value to its index. For `nums[i]`, check whether `target - nums[i]` is already in the map before inserting `nums[i]` — that stops an element pairing with itself.
-
----
-
-### E2 · Roman to Integer
-
-**🔗 [LC 13 — Roman to Integer](https://leetcode.com/problems/roman-to-integer/)** · Easy
-**Pattern:** Character Map | **Companies:** Amazon, Microsoft, Adobe
-
-**Hint:** Map the symbols to values. A symbol smaller than the one after it is subtracted (as in `IV`). Scanning right to left: add the value if it's `>=` the previous value, otherwise subtract.
+**Hint:** The template: `lo = 0`, `hi = n - 1`, `while lo <= hi`, `mid = lo + (hi - lo) / 2`. Compare and discard half. Write it until you can do it without thinking — every later problem modifies this loop.
 
 ---
 
-### E3 · Check if the Sentence Is Pangram
+### E2 · Search Insert Position
 
-**🔗 [LC 1832 — Check if the Sentence Is Pangram](https://leetcode.com/problems/check-if-the-sentence-is-pangram/)** · Easy
-**Pattern:** HashSet / Boolean Array | **Companies:** Amazon, Google
+**🔗 [LC 35 — Search Insert Position](https://leetcode.com/problems/search-insert-position/)** · Easy
+**Pattern:** Lower Bound | **Companies:** Amazon, Google, Microsoft
 
-**Hint:** Add each character to a `boolean[26]` (or a set) and check all 26 are seen. Early exit once the count reaches 26.
-
----
-
-### E4 · Contains Duplicate
-
-**🔗 [LC 217 — Contains Duplicate](https://leetcode.com/problems/contains-duplicate/)** · Easy
-**Pattern:** Set Membership | **Companies:** Amazon, Google, Apple
-
-**Hint:** Add elements to a `HashSet`; `add` returns `false` on a duplicate, so return `true` then. O(n) time, O(n) space — compare with the sort-first O(1)-space version.
+**Hint:** Find the first index with `nums[i] >= target` (lower bound). With `lo = 0, hi = n` and `while lo < hi`, set `hi = mid` when `nums[mid] >= target` and `lo = mid + 1` otherwise. The answer is `lo`, even if the target isn't present.
 
 ---
 
-### E5 · Ransom Note
+### E3 · Guess Number Higher or Lower
 
-**🔗 [LC 383 — Ransom Note](https://leetcode.com/problems/ransom-note/)** · Easy
-**Pattern:** Frequency Map | **Companies:** Amazon, Google, Apple
+**🔗 [LC 374 — Guess Number Higher or Lower](https://leetcode.com/problems/guess-number-higher-or-lower/)** · Easy
+**Pattern:** Classic Binary Search | **Companies:** Google, Amazon
 
-**Hint:** Count the magazine's letters in `int[26]`, then walk the ransom note decrementing counts; if any count goes below zero, return false.
-
----
-
-### E6 · Word Pattern
-
-**🔗 [LC 290 — Word Pattern](https://leetcode.com/problems/word-pattern/)** · Easy
-**Pattern:** Bijective Map | **Companies:** Google, Amazon, Uber
-
-**Hint:** Split `s` into words (lengths must match the pattern's). Keep `char → word` and `word → char` maps and fail on any conflicting mapping in either direction.
+**Hint:** Plain binary search over `[1, n]`, but the comparison comes from `guess(mid)`: -1 means go left, 1 means go right. Use `lo + (hi - lo) / 2` — `n` can be `2³¹ - 1`.
 
 ---
 
-### E7 · Isomorphic Strings
+### E4 · Valid Perfect Square
 
-**🔗 [LC 205 — Isomorphic Strings](https://leetcode.com/problems/isomorphic-strings/)** · Easy
-**Pattern:** Bijective Map | **Companies:** Google, Amazon, LinkedIn
+**🔗 [LC 367 — Valid Perfect Square](https://leetcode.com/problems/valid-perfect-square/)** · Easy
+**Pattern:** Binary Search on Answer | **Companies:** Google, Amazon, LinkedIn
 
-**Hint:** Map `s[i] → t[i]` and `t[i] → s[i]`. If either map already holds a different partner, the strings aren't isomorphic. Arrays of size 256 work as maps.
-
----
-
-## 🟡 Medium Tier (13 Problems)
-
-_Focus on multi-step HashMap reasoning and patterns within patterns._
-
-### M1 · Group Anagrams
-
-**🔗 [LC 49 — Group Anagrams](https://leetcode.com/problems/group-anagrams/)** · Medium
-**Pattern:** Group-by-Key | **Companies:** Amazon, Meta, Uber, Google
-
-**Hint:** Group by a canonical key: the sorted characters, or a 26-count signature like `"#1#0#2…"`, which avoids the `k log k` sort. `computeIfAbsent(key, x -> new ArrayList<>()).add(s)`.
+**Hint:** Binary search `mid` in `[1, num]` and compare `mid * mid` with `num` using `long`. No `sqrt` allowed.
 
 ---
 
-### M2 · Display Table of Food Orders in a Restaurant
+### E5 · Arranging Coins
 
-**🔗 [LC 1418 — Display Table of Food Orders in a Restaurant](https://leetcode.com/problems/display-table-of-food-orders-in-a-restaurant/)** · Medium
-**Pattern:** Nested HashMaps | **Companies:** JPMorgan, Amazon
+**🔗 [LC 441 — Arranging Coins](https://leetcode.com/problems/arranging-coins/)** · Easy
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Microsoft
 
-**Hint:** Map `table → (food → count)` with a `TreeMap` for tables (numeric order) and a `TreeSet` for food names. Build the header from the food set, then one row per table.
-
----
-
-### M3 · Subarray Sum Equals K
-
-**🔗 [LC 560 — Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)** · Medium
-**Pattern:** Prefix Sum + Map | **Companies:** Meta, Amazon, Google
-
-**Hint:** Keep a map of prefix sum → how many times it has appeared, starting with `{0: 1}`. At each step add `map.getOrDefault(sum - k, 0)` to the answer, then record the current sum. Negative numbers are why a sliding window fails here.
+**Hint:** Find the largest `k` with `k(k + 1) / 2 <= n`. The condition is monotonic in `k`, so binary search over `[0, n]` with `long` arithmetic.
 
 ---
 
-### M4 · Longest Consecutive Sequence
+### E6 · Maximum Count of Positive Integer and Negative Integer
 
-**🔗 [LC 128 — Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)** · Medium
-**Pattern:** Set Membership | **Companies:** Google, Amazon, Meta
+**🔗 [LC 2529 — Maximum Count of Positive Integer and Negative Integer](https://leetcode.com/problems/maximum-count-of-positive-integer-and-negative-integer/)** · Easy
+**Pattern:** Lower / Upper Bound | **Companies:** Amazon, Microsoft
 
-**Hint:** Put everything in a `HashSet`. Only start counting from `x` when `x - 1` is not in the set (a sequence start), then walk `x + 1, x + 2, …`. Each number is visited a constant number of times: O(n).
-
----
-
-### M5 · 4Sum II
-
-**🔗 [LC 454 — 4Sum II](https://leetcode.com/problems/4sum-ii/)** · Medium
-**Pattern:** Complement Lookup | **Companies:** Amazon, Google
-
-**Hint:** Count all sums `a + b` from the first two arrays in a map. For every `c + d`, add `map.getOrDefault(-(c + d), 0)`. O(n²) instead of O(n⁴).
+**Hint:** The array is sorted. `neg` = first index with value ≥ 0 (lower bound of 0), `pos` = n − first index with value > 0 (upper bound of 0). Return `max(neg, pos)` in O(log n).
 
 ---
 
-### M6 · Contiguous Array
+## 🟡 Medium Tier (16 Problems)
 
-**🔗 [LC 525 — Contiguous Array](https://leetcode.com/problems/contiguous-array/)** · Medium
-**Pattern:** Prefix Sum + Map | **Companies:** Meta, Amazon, Google
+_Focus on Rotated Arrays, Index Parity, and Monotonic Optimisation problems._
 
-**Hint:** Treat 0 as -1; you now need the longest subarray with sum 0. Store the first index at which each prefix sum appears (with `0 → -1`); when a sum repeats at `i`, the candidate length is `i - first[sum]`.
+### M1 · Find First and Last Position of Element in Sorted Array
 
----
+**🔗 [LC 34 — Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)** · Medium
+**Pattern:** Boundary Search | **Companies:** Meta, Amazon, Google, LinkedIn
 
-### M7 · Repeated DNA Sequences
-
-**🔗 [LC 187 — Repeated DNA Sequences](https://leetcode.com/problems/repeated-dna-sequences/)** · Medium
-**Pattern:** Rolling Hash / Set of Substrings | **Companies:** Amazon, Google, LinkedIn
-
-**Hint:** Slide a length-10 window. Put each substring (or its 20-bit encoding — 2 bits per letter) in `seen`; if it was already there, add it to `result` (also a set, to avoid duplicates).
+**Hint:** Run two boundary searches: the first index `>= target` and the first index `> target`. If the first one is out of range or doesn't hold `target`, return `[-1, -1]`; otherwise return `[first, second - 1]`.
 
 ---
 
-### M8 · Divide Players Into Teams of Equal Skill
+### M2 · Peak Index in a Mountain Array
 
-**🔗 [LC 2491 — Divide Players Into Teams of Equal Skill](https://leetcode.com/problems/divide-players-into-teams-of-equal-skill/)** · Medium
-**Pattern:** Counting + Complement | **Companies:** Amazon, Google
+**🔗 [LC 852 — Peak Index in a Mountain Array](https://leetcode.com/problems/peak-index-in-a-mountain-array/)** · Medium
+**Pattern:** Peak | **Companies:** Google, Amazon
 
-**Hint:** The pair total must be `2 × sum / n`. Count skills in a map, and for each skill `x` pair it with `target - x`; if the counts don't match, return -1. Chemistry adds up `x × (target - x)`.
-
----
-
-### M9 · Max Number of K-Sum Pairs
-
-**🔗 [LC 1679 — Max Number of K-Sum Pairs](https://leetcode.com/problems/max-number-of-k-sum-pairs/)** · Medium
-**Pattern:** Complement Counting | **Companies:** Amazon, Google, Meta
-
-**Hint:** For each `x`, if `k - x` has a positive count in the map, form an operation and decrement it; otherwise increment the count of `x`. One pass, O(n).
+**Hint:** Compare `arr[mid]` with `arr[mid + 1]`: if it is rising, the peak is to the right (`lo = mid + 1`); otherwise it's at `mid` or to the left (`hi = mid`). Loop while `lo < hi`.
 
 ---
 
-### M10 · Brick Wall
+### M3 · Search in Rotated Sorted Array
 
-**🔗 [LC 554 — Brick Wall](https://leetcode.com/problems/brick-wall/)** · Medium
-**Pattern:** Frequency Map | **Companies:** Meta, Amazon
+**🔗 [LC 33 — Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)** · Medium
+**Pattern:** Rotated | **Companies:** Google, Amazon, Meta, Microsoft
 
-**Hint:** Count how many rows have a brick edge at each position (prefix widths, excluding the wall's end). Cutting at the most common edge crosses the fewest bricks: `rows - maxEdgeCount`.
-
----
-
-### M11 · Number of Pairs of Interchangeable Rectangles
-
-**🔗 [LC 2001 — Number of Pairs of Interchangeable Rectangles](https://leetcode.com/problems/number-of-pairs-of-interchangeable-rectangles/)** · Medium
-**Pattern:** Group-by-Key | **Companies:** Amazon, Google
-
-**Hint:** Two rectangles are interchangeable when `w / h` is equal. Use the reduced fraction `(w / g, h / g)` as the key (not a `double`). A group of size `c` contributes `c × (c - 1) / 2` pairs — or add the running count as you go.
+**Hint:** At every `mid`, one half is sorted. If `nums[lo] <= nums[mid]`, the left half is sorted — check whether the target lies in `[nums[lo], nums[mid])` to decide the side. Otherwise the right half is sorted; apply the mirror check.
 
 ---
 
-### M12 · Max Sum of a Pair With Equal Sum of Digits
+### M4 · Search in Rotated Sorted Array II
 
-**🔗 [LC 2342 — Max Sum of a Pair With Equal Sum of Digits](https://leetcode.com/problems/max-sum-of-a-pair-with-equal-sum-of-digits/)** · Medium
-**Pattern:** Group by Derived Key | **Companies:** Amazon, Google
+**🔗 [LC 81 — Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)** · Medium
+**Pattern:** Rotated | **Companies:** Amazon, Google, Meta
 
-**Hint:** Key each number by its digit sum. Keep only the largest value seen per key; when a new number shares a key, update the answer with `best[key] + x`, then update `best[key]`.
-
----
-
-### M13 · Subarray Sums Divisible by K
-
-**🔗 [LC 974 — Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)** · Medium
-**Pattern:** Prefix Sum + Map | **Companies:** Amazon, Google, Meta
-
-**Hint:** Count prefix sums modulo `k`, normalised to be non-negative (`((sum % k) + k) % k`), starting with `{0: 1}`. Two prefixes with equal remainders bound a divisible subarray, so add the current count before incrementing it.
+**Hint:** Same as the version without duplicates, but when `nums[lo] == nums[mid] == nums[hi]` you can't tell which half is sorted — shrink with `lo++` and `hi--`. This makes the worst case O(n).
 
 ---
 
-## 🔴 Hard Tier (5 Problems)
+### M5 · Find Minimum in Rotated Sorted Array
 
-_Focus on cache design, complex mapping invariants, and advanced grouping._
+**🔗 [LC 153 — Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)** · Medium
+**Pattern:** Index-based | **Companies:** Microsoft, Amazon, Google
 
-### H1 · LRU Cache
-
-**🔗 [LC 146 — LRU Cache](https://leetcode.com/problems/lru-cache/)** · Medium
-**Pattern:** HashMap + Doubly Linked List | **Companies:** Amazon, Microsoft, Meta, Google
-
-**Hint:** A HashMap from key to node, plus a doubly linked list with head and tail sentinels in recency order. `get` moves the node to the front; `put` inserts or updates at the front and evicts `tail.prev` when over capacity. In Java, `LinkedHashMap` in access order with `removeEldestEntry` does the same.
+**Hint:** Compare `nums[mid]` with `nums[hi]`: if `nums[mid] > nums[hi]`, the minimum is to the right (`lo = mid + 1`); otherwise it's at `mid` or to the left (`hi = mid`). Loop while `lo < hi`.
 
 ---
 
-### H2 · Maximum Equal Frequency
+### M6 · Search a 2D Matrix
 
-**🔗 [LC 1224 — Maximum Equal Frequency](https://leetcode.com/problems/maximum-equal-frequency/)** · Hard
-**Pattern:** Frequency of Frequencies | **Companies:** Google, Amazon
+**🔗 [LC 74 — Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)** · Medium
+**Pattern:** 2D | **Companies:** Amazon, Microsoft, Meta
 
-**Hint:** Maintain `count[x]` and `freqOfCount[c]`. After each prefix, it's valid if: every count is 1; or one value has count 1 and the rest share a max count; or one value has max count `mx` and the rest have `mx - 1`.
-
----
-
-### H3 · Longest Duplicate Substring
-
-**🔗 [LC 1044 — Longest Duplicate Substring](https://leetcode.com/problems/longest-duplicate-substring/)** · Hard
-**Pattern:** Rolling Hash + Binary Search | **Companies:** Google, Amazon
-
-**Hint:** Binary search the length `L` (if a duplicate of length `L` exists, one of length `L - 1` does too). For each `L`, hash every substring with a rolling hash and check for repeats in a set — verify real matches to guard against collisions.
+**Hint:** Treat the matrix as one sorted array of length `m × n`. Binary search the index and convert it to a cell with `row = mid / n`, `col = mid % n`.
 
 ---
 
-### H4 · All O`one Data Structure
+### M7 · Find Peak Element
 
-**🔗 [LC 432 — All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/)** · Hard
-**Pattern:** HashMap + Frequency Bucket List | **Companies:** Google, Amazon, Meta
+**🔗 [LC 162 — Find Peak Element](https://leetcode.com/problems/find-peak-element/)** · Medium
+**Pattern:** Peak | **Companies:** Uber, Google, Meta
 
-**Hint:** Keep a doubly linked list of buckets in increasing count order, each holding a set of keys, plus `key → bucket`. `inc` and `dec` move a key to the neighbouring bucket (creating or removing buckets as needed). `getMaxKey` and `getMinKey` read the list's ends in O(1).
+**Hint:** Any neighbour that's bigger leads uphill to a peak. If `nums[mid] < nums[mid + 1]`, go right; otherwise go left, keeping `mid`. The array ends count as -∞, so a peak always exists.
 
 ---
 
-### H5 · Palindrome Pairs
+### M8 · Single Element in a Sorted Array
 
-**🔗 [LC 336 — Palindrome Pairs](https://leetcode.com/problems/palindrome-pairs/)** · Hard
-**Pattern:** Hashing Reversed Words | **Companies:** Google, Airbnb, Amazon
+**🔗 [LC 540 — Single Element in a Sorted Array](https://leetcode.com/problems/single-element-in-a-sorted-array/)** · Medium
+**Pattern:** Binary Search on Pairs | **Companies:** Amazon, Google, Meta
 
-**Hint:** Map each reversed word to its index. For every word and split point, if the left part is a palindrome and the reversed right part is in the map (a different index), you've found a pair — and symmetrically for the right part.
+**Hint:** Before the single element, pairs start at even indices. Force `mid` to be even (`mid -= mid % 2`); if `nums[mid] == nums[mid + 1]`, the single is to the right (`lo = mid + 2`), otherwise `hi = mid`.
+
+---
+
+### M9 · Koko Eating Bananas
+
+**🔗 [LC 875 — Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/)** · Medium
+**Pattern:** Search-on-Answer | **Companies:** Airbnb, Google, Amazon
+
+**Hint:** Binary search the speed `k` in `[1, max(piles)]`. Hours needed is `sum(ceil(pile / k))` — use `(pile + k - 1) / k`. Find the smallest `k` whose hours are `<= h`.
+
+---
+
+### M10 · Capacity To Ship Packages Within D Days
+
+**🔗 [LC 1011 — Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)** · Medium
+**Pattern:** Search-on-Answer | **Companies:** Amazon, Google, Meta
+
+**Hint:** The answer lies between `max(weights)` and `sum(weights)`. For a capacity, greedily fill days and count how many you need. Find the smallest capacity that needs at most `days` days.
+
+---
+
+### M11 · Find the Smallest Divisor Given a Threshold
+
+**🔗 [LC 1283 — Find the Smallest Divisor Given a Threshold](https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Google
+
+**Hint:** The sum of `ceil(num / d)` only shrinks as `d` grows, so binary search `d` in `[1, max(nums)]` for the smallest divisor whose sum is `<= threshold`.
+
+---
+
+### M12 · Minimum Number of Days to Make m Bouquets
+
+**🔗 [LC 1482 — Minimum Number of Days to Make m Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Amazon, Google
+
+**Hint:** If `m * k > n`, return -1. Otherwise binary search the day in `[min(bloom), max(bloom)]`. For a day, count bouquets by scanning runs of consecutive flowers that have bloomed. Find the first day that yields `m`.
+
+---
+
+### M13 · Magnetic Force Between Two Balls
+
+**🔗 [LC 1552 — Magnetic Force Between Two Balls](https://leetcode.com/problems/magnetic-force-between-two-balls/)** · Medium
+**Pattern:** Binary Search on Answer (Max-Min) | **Companies:** Amazon, Google
+
+**Hint:** Sort positions. Binary search the minimum distance `d`; it's feasible if greedily placing each ball at the first position at least `d` from the previous one fits all `m` balls. Find the largest feasible `d`.
+
+---
+
+### M14 · Maximum Candies Allocated to K Children
+
+**🔗 [LC 2226 — Maximum Candies Allocated to K Children](https://leetcode.com/problems/maximum-candies-allocated-to-k-children/)** · Medium
+**Pattern:** Binary Search on Answer | **Companies:** Google, Amazon
+
+**Hint:** Search `x` in `[1, max(candies)]`. `x` is feasible if `sum(pile / x) >= k` (use `long`). Find the largest feasible `x`; if even `x = 1` fails, return 0.
+
+---
+
+### M15 · Heaters
+
+**🔗 [LC 475 — Heaters](https://leetcode.com/problems/heaters/)** · Medium
+**Pattern:** Sort + Binary Search | **Companies:** Amazon, Google
+
+**Hint:** Sort the heaters. For each house, binary search its nearest heater on each side and take the smaller distance. The answer is the largest of these distances.
+
+---
+
+### M16 · Kth Smallest Element in a Sorted Matrix
+
+**🔗 [LC 378 — Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)** · Medium
+**Pattern:** 2D Value Search | **Companies:** Amazon, Google, Meta
+
+**Hint:** Binary search the value, not the index: in `[matrix[0][0], matrix[n-1][n-1]]`, count cells `<= mid` with a staircase walk from the bottom-left (O(n)). The smallest value with count `>= k` is the answer.
+
+---
+
+## 🔴 Hard Tier (6 Problems)
+
+_Focus on extremely tight constraints and dual-array partitioning logic._
+
+### H1 · Median of Two Sorted Arrays
+
+**🔗 [LC 4 — Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/)** · Hard
+**Pattern:** Dual-Partitioning | **Companies:** Apple, Google, Amazon, Adobe
+
+**Hint:** Binary search a cut in the smaller array so the left parts of both arrays hold half the elements. The cut is correct when `maxLeftA <= minRightB` and `maxLeftB <= minRightA`. The median comes from the max-left and min-right values. O(log(min(m, n))).
+
+---
+
+### H2 · Split Array Largest Sum
+
+**🔗 [LC 410 — Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/)** · Hard
+**Pattern:** Binary Search on Answer (Min-Max) | **Companies:** Google, Amazon, Meta
+
+**Hint:** Binary search the largest allowed subarray sum in `[max(nums), sum(nums)]`. For a limit, greedily count how many pieces you need; find the smallest limit that needs at most `k` pieces.
+
+---
+
+### H3 · Maximise the Minimum Powered City
+
+**🔗 [LC 2528 — Maximize the Minimum Powered City](https://leetcode.com/problems/maximize-the-minimum-powered-city/)** · Hard
+**Pattern:** Max-Min | **Companies:** Google, Amazon
+
+**Hint:** The "maximise the minimum" dual of Split Array Largest Sum: binary search the answer, then greedily place stations with a difference array to check feasibility.
+
+---
+
+### H4 · Find K-th Smallest Pair Distance
+
+**🔗 [LC 719 — Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/)** · Hard
+**Pattern:** Binary Search on Answer + Two Pointers | **Companies:** Google, Amazon
+
+**Hint:** Sort. Binary search the distance `d` in `[0, max - min]`. Count pairs with distance `<= d` using a sliding right pointer (O(n)). Find the smallest `d` whose count is `>= k`.
+
+---
+
+### H5 · Preimage Size of Factorial Zeroes Function
+
+**🔗 [LC 793 — Preimage Size of Factorial Zeroes Function](https://leetcode.com/problems/preimage-size-of-factorial-zeroes-function/)** · Hard
+**Pattern:** Binary Search on a Monotonic Function | **Companies:** Google, Amazon
+
+**Hint:** The number of trailing zeros of `x!` is `x/5 + x/25 + …`, which never decreases as `x` grows. Binary search the smallest `x` with at least `k` zeros; if it has exactly `k`, the answer is 5, otherwise 0.
+
+---
+
+### H6 · Smallest Good Base
+
+**🔗 [LC 483 — Smallest Good Base](https://leetcode.com/problems/smallest-good-base/)** · Hard
+**Pattern:** Binary Search per Length | **Companies:** Google, Amazon
+
+**Hint:** `n = 1 + k + k² + … + k^m`. Try each length `m` from the largest (about 60) down to 1, and binary search the base `k` for that length. Watch overflow when summing. The first match gives the smallest base.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+| Search Space         | Conditions      | Complexity       | Use Case         |
+| :------------------- | :-------------- | :--------------- | :--------------- |
+| Unsorted Array       | None            | O(n)             | General search   |
+| Sorted Array         | Monotonicity    | O(log n)         | Standard BS      |
+| Rotated Array        | Sorted segments | O(log n)         | Pivot search     |
+| Matrix (m × n)       | Row/Col Sorted  | O(log(m · n))    | 2D Mapping       |
+| Integer Range [1, k] | `isValid(mid)`  | O(check · log k) | Search-on-Answer |
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. Binary search works on any array. → **False** — only on data where the condition is monotonic, such as a sorted array
+2. mid = (lo + hi) / 2 can overflow. → **True** — lo + hi can exceed the int limit; use lo + (hi − lo) / 2
+3. Binary search on the answer requires the input array to be sorted. → **False** — it requires the yes/no check to be monotonic in the answer
+4. A binary search over n items needs about log₂ n steps. → **True** — each step halves the range
+5. Finding the first occurrence and any occurrence cost the same Big-O. → **True** — both O(log n); only the update rule differs
+6. A rotated sorted array cannot be binary searched. → **False** — one half is always sorted, and you can tell which
 
 ---
 
 ## 🧠 Conceptual Check
 
-Answer these without looking at code:
-
-1. **Load Factor**: Java's HashMap doubles capacity when load factor exceeds 0.75. Why 0.75 specifically? What are the tradeoffs of 0.5 vs 0.99?
-2. **hashCode() contract**: If two objects are `equals()`, what must be true of their `hashCode()`? What about the reverse?
-3. **Treeification**: Why does Java 8's HashMap convert a linked list bucket to a Red-Black tree when chain length > 8? What's the worst-case complexity improvement?
-4. **int[] vs HashMap**: For character frequency counting on lowercase alpha strings, why is `int[26]` preferable to `HashMap<Character, Integer>`?
-5. **LinkedHashMap**: Explain how `removeEldestEntry` works. How does access-order mode differ from insertion-order mode?
+1. **The Invariant**: What property MUST `isValid(mid)` satisfy to allow Binary Search? (Hint: Monotonicity).
+2. **Post-Loop State**: If the target is NOT found, what is the relative position of `lo` and `hi`?
+3. **Infinite Loops**: Why is `mid = lo + (hi - lo + 1) / 2` necessary in some variants?
+4. **Binary Search on Doubles**: How do you decide the loop condition for decimal ranges? (e.g., while
+   `hi - lo > 1e-9`).
 
 ---
 
@@ -277,25 +324,27 @@ Answer these without looking at code:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [LRU Cache](https://leetcode.com/problems/lru-cache/), [Maximum Equal Frequency](https://leetcode.com/problems/maximum-equal-frequency/), [Longest Duplicate Substring](https://leetcode.com/problems/longest-duplicate-substring/), [All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/) |
-| **Google**    | [LRU Cache](https://leetcode.com/problems/lru-cache/), [Maximum Equal Frequency](https://leetcode.com/problems/maximum-equal-frequency/), [Longest Duplicate Substring](https://leetcode.com/problems/longest-duplicate-substring/), [All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/) |
-| **Meta**      | [LRU Cache](https://leetcode.com/problems/lru-cache/), [All O`one Data Structure](https://leetcode.com/problems/all-oone-data-structure/), [Group Anagrams](https://leetcode.com/problems/group-anagrams/), [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)                               |
-| **Microsoft** | [LRU Cache](https://leetcode.com/problems/lru-cache/), [Two Sum](https://leetcode.com/problems/two-sum/), [Roman to Integer](https://leetcode.com/problems/roman-to-integer/)                                                                                                                                           |
-| **Apple**     | [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/), [Ransom Note](https://leetcode.com/problems/ransom-note/)                                                                                                                                                                                      |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Find K-th Smallest Pair Distance](https://leetcode.com/problems/find-k-th-smallest-pair-distance/), [Maximize the Minimum Powered City](https://leetcode.com/problems/maximize-the-minimum-powered-city/), [Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/), [Preimage Size of Factorial Zeroes Function](https://leetcode.com/problems/preimage-size-of-factorial-zeroes-function/) |
+| **Google**    | [Smallest Good Base](https://leetcode.com/problems/smallest-good-base/), [Find Peak Element](https://leetcode.com/problems/find-peak-element/), [Find the Smallest Divisor Given a Threshold](https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/), [Heaters](https://leetcode.com/problems/heaters/)                                                                                                   |
+| **Meta**      | [Find Peak Element](https://leetcode.com/problems/find-peak-element/), [Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/), [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/), [Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)                                 |
+| **Microsoft** | [Arranging Coins](https://leetcode.com/problems/arranging-coins/), [Maximum Count of Positive Integer and Negative Integer](https://leetcode.com/problems/maximum-count-of-positive-integer-and-negative-integer/), [Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/), [Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)                       |
+| **LinkedIn**  | [Valid Perfect Square](https://leetcode.com/problems/valid-perfect-square/), [Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)                                                                                                                                                                                                 |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 7 Easy problems solved
+- [ ] All 8 Easy problems solved
 - [ ] All 13 Medium problems solved
-- [ ] All 5 Hard problems attempted
-- [ ] All 5 conceptual questions answered out loud
-- [ ] I can explain load factor, collisions and treeification in Java's HashMap
-- [ ] I can choose between `int[26]` and a HashMap for counting
+- [ ] All 7 Hard problems attempted
+- [ ] Self-assessment completed without looking at the notes
+- [ ] Every complexity exercise answered before checking
+- [ ] All 4 conceptual questions answered out loud
+- [ ] I can write lower bound and upper bound without off-by-one errors
+- [ ] I can recognise a monotonic feasibility function in a word problem
 
 ---
 
-**← [Lecture 12 · Stacks & Queues](../Lecture12/Assignment.md)** &nbsp;·&nbsp; **[Lecture 14 · Matrix Problems](../Lecture14/Assignment.md) →**
+**← [Lecture 12 · Sorting Algorithms](../Lecture12/Assignment.md)** &nbsp;·&nbsp; **[Lecture 14 · Linked Lists](../Lecture14/Assignment.md) →**

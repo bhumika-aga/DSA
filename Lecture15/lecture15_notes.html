@@ -3,16 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 15 — Trees (Binary Trees &amp; BST)</title>
+    <title>Lecture 15 — Stacks &amp; Queues</title>
     <meta
       name="description"
-      content="Master binary trees and BSTs: DFS traversals, BFS level-order, height recursion, diameter, BST property, and LCA — with full dry runs and Java code."
+      content="Master Stacks and Queues for FAANG interviews: LIFO/FIFO, a first look at the monotonic stack, deques, expression evaluation, and classic design problems."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
       rel="stylesheet"
     />
+
     <style>
       *,
       *::before,
@@ -86,7 +87,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1393,71 +1394,68 @@
   </head>
 
   <body>
-    <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Trees (Binary Trees &amp; BST)</div>
+        <div class="sb-title">Stacks &amp; Queues</div>
         <div class="sb-meta">
-          Lecture 15 of 38 &middot; Phase 2 &mdash; Core Data Structures
+          Lecture 15 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
-        <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127807;</span>Introduction</a
+        <a class="toc-item" href="#background"
+          ><span class="toc-icon">🌍</span>Background</a
         >
-        <a class="toc-item toc-sub" href="#anatomy">Tree Anatomy</a>
-        <a class="toc-item toc-sub" href="#node-class">TreeNode Class</a>
-        <a class="toc-item" href="#patterns"
-          ><span class="toc-icon">&#127919;</span>The 6 Core Patterns</a
+        <a class="toc-item" href="#stack-fundamentals"
+          ><span class="toc-icon">📚</span>Stack Fundamentals</a
         >
-        <a class="toc-item toc-sub" href="#p1">1. DFS Traversals</a>
-        <a class="toc-item toc-sub" href="#p2">2. BFS Level-Order</a>
-        <a class="toc-item toc-sub" href="#p3">3. Height Recursion</a>
-        <a class="toc-item toc-sub" href="#p4">4. Global via Local</a>
-        <a class="toc-item toc-sub" href="#p5">5. BST Property</a>
-        <a class="toc-item toc-sub" href="#p6">6. LCA</a>
-        <a class="toc-item" href="#morris"
-          ><span class="toc-icon">&#129525;</span>Morris Traversal</a
+        <a class="toc-item toc-sub" href="#stack-impl">Implementation</a>
+        <a class="toc-item toc-sub" href="#stack-java">Java Stack APIs</a>
+        <a class="toc-item" href="#monotonic"
+          ><span class="toc-icon">📈</span>Monotonic Stack</a
         >
-        <a class="toc-item" href="#construct"
-          ><span class="toc-icon">&#127959;&#65039;</span>Build from
-          Traversals</a
+        <a class="toc-item toc-sub" href="#nge">Next Greater Element</a>
+        <a class="toc-item" href="#queue-fundamentals"
+          ><span class="toc-icon">🚶</span>Queue Fundamentals</a
+        >
+        <a class="toc-item toc-sub" href="#queue-impl">Implementations</a>
+        <a class="toc-item toc-sub" href="#deque">The Deque</a>
+        <a class="toc-item" href="#expressions"
+          ><span class="toc-icon">🔢</span>Expression Evaluation</a
+        >
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
-          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+          ><span class="toc-icon">💪</span>Practice Problems</a
         >
         <a class="toc-item" href="#assignment"
-          ><span class="toc-icon">&#128221;</span>Assignment</a
+          ><span class="toc-icon">📝</span>Assignment</a
         >
-        <div class="sb-div"></div>
         <a class="toc-item" href="#checklist"
-          ><span class="toc-icon">&#9989;</span>Checklist</a
+          ><span class="toc-icon">✅</span>Checklist</a
         >
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture14/lecture14_notes.html"
-          >&larr; Lecture 14 &middot; Matrix Problems</a
+          >&larr; Lecture 14 &middot; Linked Lists</a
         >
         <a class="toc-item" href="../Lecture16/lecture16_notes.html"
-          >&rarr; Lecture 16 &middot; Heaps &amp; Priority Queues</a
+          >&rarr; Lecture 16 &middot; HashMap &amp; HashSet</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
-    <!-- MAIN -->
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase2">Phase 2</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 15 &mdash; Trees (Binary Trees &amp; BST)</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 15 &mdash; Stacks &amp; Queues</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1473,41 +1471,41 @@
       </div>
 
       <div id="content">
-        <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#127807;</span>
-          <h1 class="page-title">Trees &mdash; Binary Trees &amp; BST</h1>
+          <span class="page-emoji">📚</span>
+          <h1 class="page-title">Stacks &amp; Queues</h1>
           <p class="page-sub">
-            &ldquo;Everything is just recursion on a node. Trust the function
-            for the subtrees, combine at the root.&rdquo;
+            "A stack is memory that thinks last-in first-out. A queue is the
+            world — it's fair."
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 15 of 38</span>
+            <span class="meta-chip accent">&#128218; Lecture 15 of 45</span>
             <span class="meta-chip accent"
               >Phase 2 &mdash; Core Data Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 10 days</span>
-            <span class="meta-chip green">&#127919; 45 problems</span>
-            <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta &middot; Microsoft
-              &middot; Apple</span
-            >
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 16 problems</span>
+            <span class="meta-chip">💼 Google · Amazon · Microsoft · Meta</span>
           </div>
         </div>
-        <!-- /.page-header -->
 
-        <!-- WHY THIS MATTERS -->
-        <div class="callout blue" style="margin-bottom: 20px" id="intro">
-          <span class="callout-icon">&#127757;</span>
+        <!-- ══ BACKGROUND ══════════════════════════════════════ -->
+        <div class="callout blue" id="background">
+          <span class="callout-icon">🌍</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Trees appear in roughly 25&ndash;30% of all FAANG on-site rounds.
-            Google in particular is famous for tree problems. More importantly,
-            trees are the first <em>non-linear</em> data structure you encounter
-            &mdash; they force you to think recursively, which is the
-            fundamental skill underlying graphs, dynamic programming, and almost
-            everything that follows. Once you truly understand trees, you
-            understand recursion.
+            Stacks and queues are the two most fundamental sequential data
+            structures after arrays and linked lists. Every operating system
+            uses a call stack to manage function invocations — that's why you
+            see "stack overflow" when recursion goes too deep. Every web browser
+            uses a history stack for the back button. Every customer service
+            system uses queues. In interview problems, the
+            <strong>monotonic stack</strong> pattern alone appears in dozens of
+            FAANG questions, and this lecture gives you a first look at it
+            through Next Greater Element and Daily Temperatures; Lecture 27
+            covers it in full, together with the <strong>deque</strong>, which
+            extends the same idea to sliding windows. These are not just data
+            structures — they are thinking tools.
           </div>
         </div>
 
@@ -1515,1638 +1513,1379 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Master all traversals (pre, in, post, level-order, Morris
-              traversal)
+              Understand LIFO (stack) and FIFO (queue) principles and their
+              implementations
             </li>
             <li>
-              Think recursively &mdash; every tree problem is root + left
-              sub-problem + right sub-problem
+              Master monotonic stack for next greater/smaller element problems
             </li>
-            <li>Leverage BST property for O(log n) operations</li>
+            <li>Use queues for BFS and level-order traversals</li>
             <li>
-              Solve path-sum, ancestor, construction, and serialization problems
+              Recognise the monotonic stack shape (taught fully in Lecture 27)
             </li>
           </ul>
         </div>
 
         <h3 class="h2" style="margin-top: 0">
-          &#128218; Before We Start &mdash; The Recursive Leap of Faith
+          📖 Before We Start — The Mental Model
         </h3>
         <p>
-          Every tree function follows one template:
-          <strong
-            >assume that <code>solve(node.left)</code> and
-            <code>solve(node.right)</code> already return the correct
-            answer</strong
-          >
-          for their subtrees. Your only job is to combine those two answers with
-          the current node to produce the answer for the whole tree. This is
-          called the
-          <em>recursive leap of faith</em> &mdash; trust the function.
+          Think of a <strong>stack</strong> as a pile of plates — you can only
+          add or remove from the <em>top</em> (Last In, First Out = LIFO). Think
+          of a <strong>queue</strong> as a line at a coffee shop — first person
+          in line is first to be served (First In, First Out = FIFO).
         </p>
         <p>
-          You have been doing this implicitly since Lecture 5 (Recursion). Every
-          recursive call stack <em>is</em> a tree. Now you make it explicit with
-          actual tree nodes and pointers.
+          These simple behaviours unlock surprisingly powerful patterns: you can
+          use a stack to <em>reverse order</em>, to <em>match pairs</em>, and to
+          <em>track history</em>. You can use a queue to process things
+          <em>level by level</em> — which is exactly what BFS does on graphs and
+          trees.
         </p>
 
         <div class="callout green" style="margin-bottom: 32px">
-          <span class="callout-icon">&#128279;</span>
+          <span class="callout-icon">🔗</span>
           <div class="callout-body">
-            <strong>How it connects:</strong> This lecture builds on Lecture 5
-            (Recursion) and Lecture 12 (Stacks &amp; Queues). You will use a
-            stack for iterative DFS and a queue for BFS level-order. Trees are
-            the prerequisite for Lecture 16 (Heaps), Lecture 17 (Graphs), and
-            the ordered-structure problems in Lecture 34.
+            <strong>How it connects:</strong> Lecture 14 (Linked Lists) showed
+            you how to build singly/doubly linked lists. A stack is just a
+            linked list where you only touch the head. A queue is a linked list
+            where you add at the tail and remove from the head. Lecture 18
+            (Trees) uses stacks for DFS traversal and queues for BFS level-order
+            traversal — you'll use everything from this lecture there.
           </div>
         </div>
 
         <hr />
 
-        <!-- ANATOMY -->
-        <h2 class="h1" id="anatomy">&#129520; Tree Anatomy</h2>
-        <p>Build the mental model before writing a single line of code:</p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang"
-              >Tree Vocabulary &mdash; Memorise These</span
-            >
+        <!-- ══ STACK FUNDAMENTALS ══════════════════════════════ -->
+        <section id="stack-fundamentals">
+          <h2 class="h1">📚 Stack Fundamentals — LIFO</h2>
+
+          <div class="callout purple">
+            <span class="callout-icon">🎯</span>
+            <div class="callout-body">
+              <strong>Core Property:</strong> Last In, First Out (LIFO). Only
+              the <em>top</em> element is accessible. Three operations —
+              <code>push(x)</code> (add to top), <code>pop()</code> (remove
+              top), <code>peek()</code> (read top without removing) — all
+              <strong>O(1)</strong>.
+            </div>
           </div>
-          <pre>
-          1          &#x2190; Root (no parent)
-        /   &#92;
-       2     3       &#x2190; Internal nodes (have children)
-      / &#92;     &#92;
-     4   5     6    &#x2190; Leaf nodes (no children)
 
- Node 1: depth = 0, height = 2
- Node 2: depth = 1, height = 1
- Node 4: depth = 2, height = 0  (leaf)
-
- Tree height   = longest root-to-leaf path = 2
- Subtree of 2  = the entire tree rooted at node 2
-
- Full BT    : every node has 0 or 2 children
- Complete BT: all levels full except last (left-filled)
- Perfect BT : all internal nodes 2 children, all leaves same depth
- Balanced BT: |height(left) - height(right)| &lt;= 1 at EVERY node
- BST        : left &lt; root &lt; right at EVERY node</pre
-          >
-        </div>
-
-        <h2 class="h1" id="node-class">&#129518; The TreeNode Class</h2>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang">&#128208; Pseudocode &middot; TreeNode</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <div class="ascii-tree">
+            Stack visualisation — push(1), push(2), push(3): After push(1): [1]
+            ← top After push(2): [2] ← top [1] After push(3): [3] ← top [2] [1]
+            pop() → returns 3. Stack: [2][1] peek()→ returns 2. Stack unchanged:
+            [2][1]
           </div>
-          <pre><span class="pc-kw">record</span> TreeNode:
-    val
-    left      <span class="pc-cm">// null when there is no left child</span>
-    right     <span class="pc-cm">// null when there is no right child</span>
 
-<span class="pc-cm">// This is ALL you need. Every LeetCode tree problem uses exactly this shape.</span>
-<span class="pc-cm">// A new node starts as a leaf: TreeNode(val, left = null, right = null)</span></pre>
-        </div>
-
-        <div class="callout purple">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>The Recursive Leap of Faith:</strong> When solving any tree
-            function, assume <code>solve(node.left)</code> and
-            <code>solve(node.right)</code> already return the correct answer.
-            Your job is only to combine those answers with the current node.
-            Trust the recursion. This insight is the core of every single tree
-            solution.
+          <h3 class="h2" id="stack-impl">Stack Implementations in Java</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Implementation</th>
+                  <th>Backed By</th>
+                  <th>push</th>
+                  <th>pop</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>ArrayDeque&lt;T&gt;</code> (preferred)</td>
+                  <td>Resizable array</td>
+                  <td>O(1)*</td>
+                  <td>O(1)</td>
+                  <td>Fastest, no synchronisation overhead</td>
+                </tr>
+                <tr>
+                  <td><code>Stack&lt;T&gt;</code> (legacy)</td>
+                  <td>Vector</td>
+                  <td>O(1)*</td>
+                  <td>O(1)</td>
+                  <td>Synchronized — avoid in single-threaded code</td>
+                </tr>
+                <tr>
+                  <td>LinkedList (as Deque)</td>
+                  <td>Doubly linked list</td>
+                  <td>O(1)</td>
+                  <td>O(1)</td>
+                  <td>More GC pressure from node allocation</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">
+                &#9749; Java &middot; Stack using ArrayDeque (Gold Standard)
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// ✅ PREFERRED — ArrayDeque used as a stack</span>
+Deque&lt;Integer&gt; stack = <span class="kw">new</span> ArrayDeque&lt;&gt;();
+
+stack.<span class="fn">push</span>(<span class="num">10</span>);          <span class="cm">// addFirst(10) — add to top</span>
+stack.<span class="fn">push</span>(<span class="num">20</span>);
+stack.<span class="fn">push</span>(<span class="num">30</span>);
+
+stack.<span class="fn">peek</span>();            <span class="cm">// 30 — read top, do NOT remove</span>
+stack.<span class="fn">pop</span>();             <span class="cm">// 30 — removes and returns top</span>
+stack.<span class="fn">isEmpty</span>();         <span class="cm">// false</span>
+stack.<span class="fn">size</span>();            <span class="cm">// 2</span>
+
+<span class="cm">// ❌ AVOID in interviews — legacy, synchronized</span>
+Stack&lt;Integer&gt; legacyStack = <span class="kw">new</span> Stack&lt;&gt;();
+legacyStack.<span class="fn">push</span>(<span class="num">10</span>);   <span class="cm">// works, but prefer Deque</span></pre>
+          </div>
+
+          <h3 class="h2" id="stack-java">Java Stack API Quick Reference</h3>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">
+                &#9749; Java &middot; Deque as Stack — All Key Methods
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Push: addFirst / push / offerFirst</span>
+stack.<span class="fn">push</span>(x);          <span class="cm">// throws if capacity exceeded (rare)</span>
+stack.<span class="fn">offerFirst</span>(x);    <span class="cm">// returns false if capacity exceeded</span>
+
+<span class="cm">// Pop: removeFirst / pop / pollFirst</span>
+stack.<span class="fn">pop</span>();             <span class="cm">// throws NoSuchElementException if empty</span>
+stack.<span class="fn">pollFirst</span>();       <span class="cm">// returns null if empty — safer for conditionals</span>
+
+<span class="cm">// Peek: peekFirst / peek / getFirst</span>
+stack.<span class="fn">peek</span>();            <span class="cm">// null if empty</span>
+stack.<span class="fn">getFirst</span>();        <span class="cm">// throws if empty</span>
+
+<span class="cm">// Check</span>
+stack.<span class="fn">isEmpty</span>();
+stack.<span class="fn">size</span>();
+
+<span class="cm">// ⚠️ Common interview pattern — check before pop:</span>
+<span class="kw">if</span> (!stack.<span class="fn">isEmpty</span>() &amp;&amp; stack.<span class="fn">peek</span>() &lt; threshold)
+    stack.<span class="fn">pop</span>();</pre>
+          </div>
+        </section>
 
         <hr />
 
-        <!-- PATTERNS TABLE -->
-        <h2 class="h1" id="patterns">&#127919; The 6 Core Patterns</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Pattern</th>
-                <th>When to Use</th>
-                <th>Core Tool</th>
-                <th>Canonical Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>1</strong></td>
-                <td>DFS Traversals</td>
-                <td>Visit nodes in a specific order</td>
-                <td>Recursion / Stack</td>
-                <td>Inorder traversal, flatten BT to LL</td>
-              </tr>
-              <tr>
-                <td><strong>2</strong></td>
-                <td>BFS Level-Order</td>
-                <td>Process one level at a time</td>
-                <td>Queue</td>
-                <td>Right side view, zigzag, avg of levels</td>
-              </tr>
-              <tr>
-                <td><strong>3</strong></td>
-                <td>Height Recursion</td>
-                <td>Answer depends on height of subtrees</td>
-                <td>Return int from DFS</td>
-                <td>Max depth, balanced check, diameter</td>
-              </tr>
-              <tr>
-                <td><strong>4</strong></td>
-                <td>Global via Local</td>
-                <td>Global answer updated inside DFS</td>
-                <td>Instance variable</td>
-                <td>Diameter, max path sum</td>
-              </tr>
-              <tr>
-                <td><strong>5</strong></td>
-                <td>BST Property</td>
-                <td>Tree is a BST &mdash; exploit ordering</td>
-                <td>Range check or inorder</td>
-                <td>Validate BST, kth smallest</td>
-              </tr>
-              <tr>
-                <td><strong>6</strong></td>
-                <td>LCA</td>
-                <td>Find where two nodes split</td>
-                <td>Return node from DFS</td>
-                <td>LCA of binary tree / BST</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <hr />
+        <!-- ══ MONOTONIC STACK ═════════════════════════════════ -->
+        <section id="monotonic">
+          <h2 class="h1">📈 Monotonic Stack — A Preview</h2>
+          <div class="callout teal">
+            <span class="callout-icon">&#128064;</span>
+            <div class="callout-body">
+              <strong>Preview &mdash; covered fully in Lecture 27.</strong> This
+              section shows the idea through its simplest use, the next greater
+              element, so that you recognise the shape. Lecture 27 (Monotonic
+              Stack &amp; Queue) is the full treatment: the four variants, spans
+              and the histogram, counting contributions, building the best
+              sequence, and monotonic deques.
+            </div>
+          </div>
 
-        <!-- P1: DFS -->
-        <h2 class="h1" id="p1">
-          &#128970; Pattern 1 &mdash; DFS Traversals (Pre / In / Post)
-        </h2>
-        <p>
-          The foundational tree pattern. Everything else builds on top of this.
-          The three orders all use the same recursive skeleton &mdash; only the
-          position of the &ldquo;process root&rdquo; step changes:
-        </p>
-        <div class="pattern-banner">
-          <h4>Pattern Skeleton</h4>
+          <div class="callout purple">
+            <span class="callout-icon">🎯</span>
+            <div class="callout-body">
+              <strong>What is a Monotonic Stack?</strong> A stack that is always
+              kept in a sorted order (either monotonically increasing or
+              decreasing). When a new element arrives that <em>violates</em> the
+              order, we pop elements until the order is restored. Each popped
+              element has "found its answer" — the new element is the answer it
+              was waiting for.
+            </div>
+          </div>
+
+          <h3 class="h2" id="nge">Next Greater Element Pattern</h3>
           <p>
-            Base case: if node is null &rarr; return<br />
-            Preorder : process root &rarr; left &rarr; right<br />
-            Inorder : left &rarr; process root &rarr; right<br />
-            Postorder : left &rarr; right &rarr; process root
+            For each element, find the <em>first</em> element to its right that
+            is greater than it. Brute force is O(n²). Monotonic stack solves it
+            in <strong>O(n)</strong>.
+          </p>
+
+          <div class="ascii-tree">
+            Array: [2, 1, 5, 3, 4] NGE: [5, 5, -1, 4, -1] Walk left→right.
+            Maintain a DECREASING stack of indices. i=0, val=2: stack empty →
+            push 0. stack=[0] (vals:[2]) i=1, val=1: 1 ≤ 2 → push 1. stack=[0,1]
+            (vals:[2,1]) i=2, val=5: 5>1 → pop 1, ans[1]=5 5>2 → pop 0, ans[0]=5
+            stack empty → push 2. stack=[2] (vals:[5]) i=3, val=3: 3 ≤ 5 → push
+            3. stack=[2,3] (vals:[5,3]) i=4, val=4: 4>3 → pop 3, ans[3]=4 4 ≤ 5
+            → push 4. stack=[2,4] (vals:[5,4]) End: remaining on stack → NGE =
+            -1. ans[2]=-1, ans[4]=-1 Result: [5, 5, -1, 4, -1] ✓
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Monotonic Stack</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-cm">// The stack holds indices whose answer is still unknown, and it stays</span>
+<span class="pc-cm">// sorted. Pop everything the new element beats — it is their answer.</span>
+stack <span class="pc-kw">&larr;</span> empty          <span class="pc-cm">// holds INDICES, kept decreasing by value</span>
+result <span class="pc-kw">&larr;</span> array of -1, length n
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">while</span> stack not empty <span class="pc-kw">and</span> a[stack.top] &lt; a[i]:
+        j <span class="pc-kw">&larr;</span> stack.pop()
+        result[j] <span class="pc-kw">&larr;</span> a[i]      <span class="pc-cm">// a[i] is j's next greater element</span>
+    stack.push(i)
+
+<span class="pc-cm">// Anything still on the stack has no greater element to its right.</span>
+<span class="pc-kw">return</span> result
+
+<span class="pc-cm">// next SMALLER  -> flip '&lt;' to '>'</span>
+<span class="pc-cm">// previous ...  -> walk i from n-1 down to 0</span></pre>
+          </div>
+        </section>
+
+        <hr />
+
+        <!-- ══ QUEUE FUNDAMENTALS ═════════════════════════════ -->
+        <section id="queue-fundamentals">
+          <h2 class="h1">🚶 Queue Fundamentals — FIFO</h2>
+
+          <div class="callout blue">
+            <span class="callout-icon">📌</span>
+            <div class="callout-body">
+              <strong>Core Property:</strong> First In, First Out (FIFO).
+              Elements enter at the <em>tail (rear)</em> and exit from the
+              <em>head (front)</em>. Operations:
+              <code>offer(x)</code> (enqueue), <code>poll()</code> (dequeue),
+              <code>peek()</code> — all <strong>O(1)</strong>.
+            </div>
+          </div>
+
+          <h3 class="h2" id="queue-impl">Queue Implementations in Java</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Implementation</th>
+                  <th>Use Case</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>ArrayDeque&lt;T&gt;</code> (preferred)</td>
+                  <td>General FIFO</td>
+                  <td>Fastest, no null elements</td>
+                </tr>
+                <tr>
+                  <td><code>LinkedList&lt;T&gt;</code></td>
+                  <td>When null needed</td>
+                  <td>Slower due to GC</td>
+                </tr>
+                <tr>
+                  <td><code>PriorityQueue&lt;T&gt;</code></td>
+                  <td>Min/Max ordering</td>
+                  <td>NOT FIFO — ordering by priority</td>
+                </tr>
+                <tr>
+                  <td><code>ArrayBlockingQueue&lt;T&gt;</code></td>
+                  <td>Thread-safe bounded</td>
+                  <td>For multi-threaded use</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-lang">
+                &#9749; Java &middot; Queue using ArrayDeque (FIFO)
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// ArrayDeque used as a QUEUE — add at tail, remove from head</span>
+Queue&lt;Integer&gt; queue = <span class="kw">new</span> ArrayDeque&lt;&gt;();
+
+queue.<span class="fn">offer</span>(<span class="num">1</span>);         <span class="cm">// enqueue to tail</span>
+queue.<span class="fn">offer</span>(<span class="num">2</span>);
+queue.<span class="fn">offer</span>(<span class="num">3</span>);
+                         <span class="cm">// queue: [1, 2, 3]  (1 is head)</span>
+queue.<span class="fn">peek</span>();           <span class="cm">// → 1  (read head, no remove)</span>
+queue.<span class="fn">poll</span>();           <span class="cm">// → 1  (remove head)</span>
+queue.<span class="fn">peek</span>();           <span class="cm">// → 2</span>
+queue.<span class="fn">size</span>();           <span class="cm">// → 2</span>
+queue.<span class="fn">isEmpty</span>();        <span class="cm">// → false</span>
+
+<span class="cm">// BFS template — bread-and-butter queue usage:</span>
+<span class="kw">while</span> (!queue.<span class="fn">isEmpty</span>()) {
+    <span class="kw">int</span> node = queue.<span class="fn">poll</span>();
+    <span class="cm">// process node</span>
+    <span class="cm">// add neighbours: queue.offer(neighbour)</span>
+}</pre>
+          </div>
+
+          <h3 class="h2" id="deque">
+            The Deque &mdash; a Queue With Two Doors
+          </h3>
+          <p>
+            A <strong>deque</strong> (&ldquo;deck&rdquo;, double-ended queue)
+            lets you add and remove at <em>both</em> ends in O(1). In Java it is
+            <code>ArrayDeque</code>, and it is the recommended way to get both a
+            stack and a queue &mdash; faster than the old
+            <code>Stack</code> class.
+          </p>
+          <div class="callout teal">
+            <span class="callout-icon">&#128064;</span>
+            <div class="callout-body">
+              <strong>Preview &mdash; covered fully in Lecture 27.</strong> Keep
+              a deque sorted and it answers &ldquo;what is the maximum of this
+              sliding window?&rdquo; in O(n) total. That trick &mdash; the
+              monotonic deque &mdash; is taught with its template and problems
+              in Lecture 27.
+            </div>
+          </div>
+        </section>
+
+        <hr />
+
+        <!-- ══ EXPRESSION EVALUATION ══════════════════════════ -->
+        <section id="expressions">
+          <h2 class="h1">🔢 Expression Evaluation — Stack Arithmetic</h2>
+
+          <p>
+            Evaluating arithmetic expressions is a classic stack application.
+            The key idea: numbers go onto an operand stack; operators control
+            when to compute. Reverse Polish Notation (RPN / postfix) eliminates
+            the need for parentheses — operators come <em>after</em> their
+            operands.
+          </p>
+
+          <div class="ascii-tree">
+            RPN: ["2","1","+","3","*"] → (2+1)*3 = 9 Process token by token: "2"
+            → push 2. stack=[2] "1" → push 1. stack=[2,1] "+" → pop 1, pop 2 →
+            2+1=3 → push 3. stack=[3] "3" → push 3. stack=[3,3] "*" → pop 3, pop
+            3 → 3*3=9 → push 9. stack=[9] Result = 9 ✓
+          </div>
+
+          <div class="code-block pseudo">
+            <div class="code-header">
+              <span class="code-lang"
+                >&#128208; Pseudocode &middot; Evaluate Reverse Polish
+                Notation</span
+              ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="pc-kw">function</span> evalRPN(tokens):
+    stack ← empty stack
+    <span class="pc-kw">for</span> t <span class="pc-kw">in</span> tokens:
+        <span class="pc-kw">if</span> t is an operator (+ - × ÷):
+            b ← stack.pop()          <span class="pc-cm">// popped FIRST = right operand — order matters!</span>
+            a ← stack.pop()
+            stack.push(apply t <span class="pc-kw">to</span> a <span class="pc-kw">and</span> b)   <span class="pc-cm">// ÷ truncates toward zero</span>
+        <span class="pc-kw">else</span>:
+            stack.push(integer value of t)
+    <span class="pc-kw">return</span> stack.pop()</pre>
+          </div>
+        </section>
+
+        <hr />
+
+        <!-- ══ PATTERN SUMMARY ════════════════════════════════ -->
+        <div class="pattern-banner">
+          <h4>🗺 Pattern Decision Guide</h4>
+          <p>
+            Balanced brackets / undo history → Plain Stack<br />
+            Next greater/smaller element → Monotonic Stack (preview here; full
+            treatment in Lecture 27)<br />
+            BFS / level-order traversal → Queue<br />
+            Span, histogram, sliding-window max → Lecture 27<br />
+            Priority scheduling, top-K → PriorityQueue (Heap)<br />
+            Stack using queues / Queue using stacks → Design (two data
+            structures)
           </p>
         </div>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Three DFS Orders</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+
+        <hr />
+
+        <!-- ══ PRACTICE PROBLEMS ══════════════════════════════ -->
+        <section>
+          <h2 class="h1" id="pitfalls">
+            &#9888;&#65039; Complexity &amp; Classic Bugs
+          </h2>
+          <p>
+            The costs worth quoting in an interview first, then the mistakes
+            that most often break code that looks correct. Every row in the
+            second table is a bug someone has shipped.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Operation</th>
+                  <th>Cost</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>push</code>, <code>pop</code>,
+                    <code>peek</code> (ArrayDeque)
+                  </td>
+                  <td>O(1)</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td><code>offer</code>, <code>poll</code> (queue)</td>
+                  <td>O(1)</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Queue built from two stacks</td>
+                  <td>O(1) amortised per operation</td>
+                  <td>Each item moves at most twice</td>
+                </tr>
+                <tr>
+                  <td>Stack built from two queues</td>
+                  <td>O(n) for push or pop</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Evaluate an expression with two stacks</td>
+                  <td>O(n)</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre><span class="pc-cm">// Same walk, three different moments to do the work.</span>
-<span class="pc-kw">function</span> dfs(node):
-    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span>
-
-    visit(node)        <span class="pc-cm">// PRE-order  — root, left, right</span>
-    dfs(node.left)
-    visit(node)        <span class="pc-cm">// IN-order   — left, root, right  (sorted, for a BST)</span>
-    dfs(node.right)
-    visit(node)        <span class="pc-cm">// POST-order — left, right, root  (children first)</span>
-
-<span class="pc-cm">// Keep exactly ONE visit() line. Which one you keep is the whole choice:</span>
-<span class="pc-cm">//   pre  -> you need the root before its children (clone, serialise)</span>
-<span class="pc-cm">//   in   -> you need sorted order (BST validation, kth smallest)</span>
-<span class="pc-cm">//   post -> you need child answers before the root (height, delete, sizes)</span></pre>
-        </div>
-        <h3 class="h3">Iterative Traversals (No Recursion)</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Iterative Preorder + Inorder</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bug</th>
+                  <th>Symptom</th>
+                  <th>Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <code>pop</code> or <code>peek</code> on an empty stack
+                  </td>
+                  <td>Exception, or <code>null</code> then a crash</td>
+                  <td>Check <code>isEmpty()</code> first</td>
+                </tr>
+                <tr>
+                  <td>Using <code>java.util.Stack</code></td>
+                  <td>Slower than necessary</td>
+                  <td>Use <code>ArrayDeque</code></td>
+                </tr>
+                <tr>
+                  <td>
+                    Transferring between the two stacks on every operation
+                  </td>
+                  <td>O(n) per operation instead of amortised O(1)</td>
+                  <td>Only transfer when the output stack is empty</td>
+                </tr>
+                <tr>
+                  <td>Ignoring operator precedence</td>
+                  <td><code>2 + 3 × 4</code> evaluates to 20</td>
+                  <td>Apply operators of higher or equal precedence first</td>
+                </tr>
+                <tr>
+                  <td>Assuming division rounds down</td>
+                  <td>Java&#39;s <code>-7 / 2</code> is −3</td>
+                  <td>Check what the problem expects</td>
+                </tr>
+                <tr>
+                  <td>Circular queue: full and empty look the same</td>
+                  <td><code>head = tail</code> is ambiguous</td>
+                  <td>Track the size separately</td>
+                </tr>
+                <tr>
+                  <td>A closing bracket with an empty stack</td>
+                  <td>Crash instead of &ldquo;invalid&rdquo;</td>
+                  <td>
+                    An empty stack on <code>)</code> means the string is invalid
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre><span class="pc-cm">// Iterative Preorder — push RIGHT first, then LEFT (so left is processed first)</span>
-<span class="pc-kw">function</span> preorderIterative(root):
-    res ← empty list
-    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
-    stack ← [root]
-    <span class="pc-kw">while</span> stack <span class="pc-kw">is not empty</span>:
-        n ← stack.pop()
-        append n.val <span class="pc-kw">to</span> res                      <span class="pc-cm">// visit ROOT immediately</span>
-        <span class="pc-kw">if</span> n.right ≠ null: stack.push(n.right)   <span class="pc-cm">// right first → processed last</span>
-        <span class="pc-kw">if</span> n.left ≠ null: stack.push(n.left)
-    <span class="pc-kw">return</span> res
 
-<span class="pc-cm">// Iterative Inorder — go left until null, pop and visit, then go right</span>
-<span class="pc-kw">function</span> inorderIterative(root):
-    res ← empty list
+          <hr />
+
+          <h2 class="h1" id="practice">
+            &#128170; In-Lecture Practice Problems
+          </h2>
+
+          <!-- P01 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 01 · Plain Stack</div>
+                <div class="prob-title">Valid Parentheses</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/valid-parentheses/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 20</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-easy">Easy</span>
+                  <span class="tag tag-co"
+                    >Google · Amazon · Meta · Microsoft</span
+                  >
+                  <span class="tag tag-pat">Stack</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given a string containing only <code>'('</code>,
+                  <code>')'</code>, <code>'{'</code>, <code>'}'</code>,
+                  <code>'['</code>, <code>']'</code>, determine if the input
+                  string is valid. Open brackets must be closed by the same type
+                  bracket and in the correct order.
+                </p>
+                <div class="iobox">
+                  "()[]{}" → true "([)]" → false "{[]}" → true "[" → false
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>The most recently opened bracket must close first.</p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Push openers; on a closer, pop and compare. Fail if you
+                      pop an empty stack, or if the stack is non-empty at the
+                      end.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Push every open bracket. When you encounter a close bracket,
+                  check if the stack's top is the matching open bracket — if
+                  not, immediately return false. At the end, the stack must be
+                  empty (every open was properly closed).
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Stack Matching</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> isValid(s):
     stack ← empty stack
-    curr ← root
-    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
-        <span class="pc-kw">while</span> curr ≠ null:
-            stack.push(curr)
-            curr ← curr.left
-        curr ← stack.pop()
-        append curr.val <span class="pc-kw">to</span> res
-        curr ← curr.right
-    <span class="pc-kw">return</span> res
-
-<span class="pc-cm">// Time O(n), Space O(h). Key trick for preorder: push RIGHT before LEFT.</span></pre>
-        </div>
-
-        <!-- P1 DRY RUN -->
-        <div class="callout purple">
-          <span class="callout-icon">&#128202;</span>
-          <div class="callout-body">
-            <strong>Dry Run &mdash; All 3 orders on this tree:</strong>
-            <div class="ascii-tree" style="margin-top: 8px">
-              <span class="hl">1</span>
-              / \
-              <span class="nd">2</span> <span class="nd">3</span>
-              /
-              <span class="nd">4</span>
-
-              Preorder (Root→L→R) : <span class="hl">1</span>
-              <span class="nd">2</span> <span class="nd">4</span>
-              <span class="nd">3</span> ← use for: clone tree, serialize, prefix
-              Inorder (L→Root→R) : <span class="nd">4</span>
-              <span class="nd">2</span> <span class="hl">1</span>
-              <span class="nd">3</span> ← use for: BST sorted output, kth
-              smallest Postorder (L→R→Root) : <span class="nd">4</span>
-              <span class="nd">2</span> <span class="nd">3</span>
-              <span class="hl">1</span> ← use for: delete tree, height, evaluate
-              expression Iterative inorder — stack state trace: curr=1 → push 1,
-              go left curr=2 → push 2, go left curr=4 → push 4, go left
-              curr=null → pop 4, visit <span class="nd">4</span>,
-              curr=4.right=null curr=null → pop 2, visit
-              <span class="nd">2</span>, curr=2.right=null curr=null → pop 1,
-              visit <span class="hl">1</span>, curr=1.right=3 curr=3 → push 3,
-              go left curr=null → pop 3, visit <span class="nd">3</span>,
-              curr=3.right=null ✓ Result: [4, 2, 1, 3]
-            </div>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- P2: BFS -->
-        <h2 class="h1" id="p2">&#127775; Pattern 2 &mdash; BFS Level-Order</h2>
-        <p>
-          Use a queue. Process the tree one level at a time. Any problem
-          mentioning &ldquo;by level,&rdquo; &ldquo;row,&rdquo; or &ldquo;right
-          side view&rdquo; is Pattern 2.
-        </p>
-        <div class="callout orange">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>The Critical Trick:</strong> Snapshot
-            <code>int size = q.size()</code> <em>before</em> the inner loop.
-            This locks in how many nodes are in the current level. As you add
-            children mid-loop, the queue grows, but you only process
-            <code>size</code> nodes per level.
-          </div>
-        </div>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; BFS Level-Order</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Fixing the level size before the inner loop is what separates</span>
-<span class="pc-cm">// one level from the next.</span>
-<span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> empty
-queue <span class="pc-kw">&larr;</span> [root]
-levels <span class="pc-kw">&larr;</span> empty list
-
-<span class="pc-kw">while</span> queue not empty:
-    size <span class="pc-kw">&larr;</span> length(queue)      <span class="pc-cm">// &lt;-- snapshot THIS level</span>
-    level <span class="pc-kw">&larr;</span> empty list
-
-    <span class="pc-kw">repeat</span> size <span class="pc-kw">times</span>:
-        node <span class="pc-kw">&larr;</span> queue.popFront()
-        level.append(node.value)
-        <span class="pc-kw">if</span> node.left  &ne; null: queue.pushBack(node.left)
-        <span class="pc-kw">if</span> node.right &ne; null: queue.pushBack(node.right)
-
-    levels.append(level)
-
-<span class="pc-kw">return</span> levels
-
-<span class="pc-cm">// Variants built on this template:</span>
-<span class="pc-cm">//   Right side view   → last element of each level</span>
-<span class="pc-cm">//   Zigzag traversal  → alternate direction per level (add to front on odd levels)</span>
-<span class="pc-cm">//   Average of levels → sum ÷ size per level</span></pre>
-        </div>
-
-        <!-- P2 DRY RUN -->
-        <div class="callout orange">
-          <span class="callout-icon">&#128202;</span>
-          <div class="callout-body">
-            <strong>Dry Run &mdash; Level-Order on tree [1, 2, 3, 4]:</strong>
-            <!-- prettier-ignore -->
-            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
-   / \
-  <span class="nd">2</span>   <span class="nd">3</span>
- /
-<span class="nd">4</span>
-
-Queue=[<span class="hl">1</span>]      size=1 &rarr; visit 1, enqueue 2,3   Level 0: [<span class="hl">1</span>]
-Queue=[<span class="nd">2</span>,<span class="nd">3</span>]   size=2 &rarr; visit 2 (enqueue 4), visit 3  Level 1: [<span class="nd">2</span>,<span class="nd">3</span>]
-Queue=[<span class="nd">4</span>]      size=1 &rarr; visit 4, no children   Level 2: [<span class="nd">4</span>]
-Queue=[]  done &#10003;
-
-Result: [[<span class="hl">1</span>], [<span class="nd">2</span>,<span class="nd">3</span>], [<span class="nd">4</span>]]
-Right side view = last of each level = [<span class="hl">1</span>, <span class="nd">3</span>, <span class="nd">4</span>]</div>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- P3: HEIGHT -->
-        <h2 class="h1" id="p3">
-          &#127918; Pattern 3 &mdash; Height Recursion (Bottom-Up)
-        </h2>
-        <p>
-          The function <em>returns</em> a number to its caller. Root combines
-          left &amp; right results. This is postorder DFS where each call
-          computes something useful for its parent.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Max Depth + Balanced Check</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Height recursion — children compute FIRST (postorder), the parent uses both results.</span>
-<span class="pc-kw">function</span> maxDepth(n):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
-    lh ← maxDepth(n.left)
-    rh ← maxDepth(n.right)
-    <span class="pc-kw">return</span> 1 + max(lh, rh)
-
-<span class="pc-cm">// Balanced tree — use -1 as a sentinel for "unbalanced", O(n) single pass:</span>
-<span class="pc-kw">function</span> isBalanced(root):
-    <span class="pc-kw">return</span> check(root) ≠ -1
-
-<span class="pc-kw">function</span> check(n):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
-    lh ← check(n.left);   <span class="pc-kw">if</span> lh = -1: <span class="pc-kw">return</span> -1
-    rh ← check(n.right);  <span class="pc-kw">if</span> rh = -1: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">if</span> |lh - rh| &gt; 1: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> 1 + max(lh, rh)</pre>
-        </div>
-        <div class="callout green">
-          <span class="callout-icon">&#128218;</span>
-          <div class="callout-body">
-            <strong
-              >Dry Run &mdash; maxDepth on [3, 9, 20, null, null, 15,
-              7]:</strong
-            ><br />
-            <!-- prettier-ignore -->
-            <div class="ascii-tree" style="margin-top:8px">       <span class="hl">3</span>
-      / \
-     <span class="nd">9</span>   <span class="nd">20</span>
-         / \
-       <span class="nd">15</span>   <span class="nd">7</span>
-
-Call-stack unwind (children resolve before parent):
-  maxDepth(<span class="nd">9</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
-  maxDepth(<span class="nd">15</span>) &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
-  maxDepth(<span class="nd">7</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
-  maxDepth(<span class="nd">20</span>) &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">1</span> &rarr; 1+max(1,1) = <span class="ret">2</span>
-  maxDepth(<span class="hl">3</span>)  &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">2</span> &rarr; 1+max(1,2) = <span class="hl">3</span> &#10003;</div>
-          </div>
-        </div>
-        <hr />
-
-        <!-- P4: GLOBAL -->
-        <h2 class="h1" id="p4">
-          &#127942; Pattern 4 &mdash; Global State via Local Traversal
-        </h2>
-        <p>
-          The answer lives in a class-level variable updated during DFS. The
-          function&apos;s return value is a <em>helper</em> value, not the final
-          answer. This trips up beginners the most.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Diameter of Binary Tree (LC
-              543)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Global state pattern: the recursion RETURNS a helper value (height)</span>
-<span class="pc-cm">// but UPDATES a global answer (diameter) at every node.</span>
-maxD ← 0                               <span class="pc-cm">// global answer</span>
-
-<span class="pc-kw">function</span> diameterOfBinaryTree(root):
-    dfs(root)
-    <span class="pc-kw">return</span> maxD
-
-<span class="pc-kw">function</span> dfs(n):                       <span class="pc-cm">// returns HEIGHT, not diameter</span>
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
-    lh ← dfs(n.left)
-    rh ← dfs(n.right)
-    maxD ← max(maxD, lh + rh)          <span class="pc-cm">// diameter through THIS node</span>
-    <span class="pc-kw">return</span> 1 + max(lh, rh)             <span class="pc-cm">// height handed back to the parent</span>
-
-<span class="pc-cm">// Diameter at a node = leftHeight + rightHeight (edges through it)</span>
-<span class="pc-cm">// We check EVERY node as a potential "peak" of the diameter path</span></pre>
-        </div>
-        <div class="callout blue">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong
-              >Same pattern solves Binary Tree Maximum Path Sum (LC
-              124).</strong
-            >
-            Return the max gain from one branch; update global with
-            <code>leftGain + node.val + rightGain</code>. Once you understand
-            Pattern 4, LC 124 is a 10-line solution.
-          </div>
-        </div>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Binary Tree Maximum Path Sum (LC
-              124) — Hard</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>maxSum ← -∞                           <span class="pc-cm">// global: reset per problem instance</span>
-
-<span class="pc-kw">function</span> maxPathSum(root):
-    gain(root)
-    <span class="pc-kw">return</span> maxSum
-
-<span class="pc-cm">// gain(n) = the most this subtree can add to a path going UP to its parent</span>
-<span class="pc-kw">function</span> gain(n):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
-    lGain ← max(0, gain(n.left))         <span class="pc-cm">// ignore negative branches</span>
-    rGain ← max(0, gain(n.right))
-    maxSum ← max(maxSum, lGain + n.val + rGain)   <span class="pc-cm">// path THROUGH this node</span>
-    <span class="pc-kw">return</span> n.val + max(lGain, rGain)     <span class="pc-cm">// can only go ONE direction up</span>
-
-<span class="pc-cm">// Why max(0, gain)? A negative subtree hurts the path — better to skip it.</span>
-<span class="pc-cm">// Why return only ONE side? A path going up can't branch — the parent picks one.</span></pre>
-        </div>
-
-        <!-- P4 DRY RUN -->
-        <div class="callout purple">
-          <span class="callout-icon">&#128202;</span>
-          <div class="callout-body">
-            <strong>Dry Run &mdash; Diameter of [1,2,3,4,5] (answer=3):</strong>
-            <!-- prettier-ignore -->
-            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
-   / \
-  <span class="nd">2</span>   <span class="nd">3</span>
- / \
-<span class="nd">4</span>   <span class="nd">5</span>
-
-&#9888; dfs() returns HEIGHT; global maxD stores DIAMETER
-
-Call-stack unwind (postorder):
-  dfs(<span class="nd">4</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
-  dfs(<span class="nd">5</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
-  dfs(<span class="nd">2</span>) &rarr; lh=<span class="ret">1</span>,rh=<span class="ret">1</span> &rarr; maxD=max(0,<span class="nd">2</span>) &rarr; return <span class="ret">2</span>
-  dfs(<span class="nd">3</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(2,0)=<span class="nd">2</span> &rarr; return <span class="ret">1</span>
-  dfs(<span class="hl">1</span>) &rarr; lh=<span class="ret">2</span>,rh=<span class="ret">1</span> &rarr; maxD=max(2,<span class="hl">3</span>) &rarr; return <span class="ret">3</span>
-
-Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)</div>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- P5: BST -->
-        <h2 class="h1" id="p5">&#127381; Pattern 5 &mdash; The BST Property</h2>
-        <p>
-          For <em>every</em> node in a BST, all values in its left subtree are
-          strictly less, and all values in its right subtree are strictly
-          greater.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; BST Operations</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// The BST rule: everything in the left subtree &lt; node &lt; everything in the right</span>
-<span class="pc-kw">function</span> search(node, val):
-    <span class="pc-kw">while</span> node ≠ null:
-        <span class="pc-kw">if</span> val = node.val: <span class="pc-kw">return</span> node          <span class="pc-cm">// found</span>
-        <span class="pc-kw">if</span> val &lt; node.val: node ← node.left
-        <span class="pc-kw">else</span>: node ← node.right
-    <span class="pc-kw">return</span> null
-
-<span class="pc-cm">// Insert:   same walk as search until null, place the new node there</span>
-<span class="pc-cm">// Validate: pass (min, max) bounds down; every node needs min &lt; val &lt; max</span>
-<span class="pc-cm">// Inorder:  always produces a sorted sequence ← the key BST insight</span></pre>
-        </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Classic Mistake &mdash; Wrong BST validation:</strong>
-            Checking only
-            <code>node.left.val &lt; node.val &lt; node.right.val</code> at each
-            node is <strong>wrong</strong>. You must pass a valid range
-            <code>[min, max]</code> down the tree. Going left narrows the max;
-            going right narrows the min. Start the bounds at &plusmn;&infin; (in
-            Java, use <code>Long</code> bounds) so a node holding the smallest
-            or largest possible integer isn't wrongly rejected.
-          </div>
-        </div>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Validate BST + Kth Smallest</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Validate BST — range propagation:</span>
-<span class="pc-kw">function</span> isValidBST(root):
-    <span class="pc-kw">return</span> check(root, -∞, +∞)
-
-<span class="pc-kw">function</span> check(n, lo, hi):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
-    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
-    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)
-    <span class="pc-cm">// going left narrows the max; going right narrows the min</span>
-
-<span class="pc-cm">// Kth Smallest — inorder = sorted, count as you go:</span>
-k ← the requested rank;  result ← none
-<span class="pc-kw">function</span> kth(n):
-    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> result is set: <span class="pc-kw">return</span>
-    kth(n.left)
-    k ← k - 1
-    <span class="pc-kw">if</span> k = 0:
-        result ← n.val
-        <span class="pc-kw">return</span>
-    kth(n.right)</pre>
-        </div>
-        <h3 class="h3">BST Insert &amp; Delete</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; BST Insert (LC 701) + Delete (LC
-              450)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// INSERT: navigate like search until a null spot, place the node there</span>
-<span class="pc-kw">function</span> insertIntoBST(root, val):
-    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> TreeNode(val)
-    <span class="pc-kw">if</span> val &lt; root.val: root.left ← insertIntoBST(root.left, val)
-    <span class="pc-kw">else</span>: root.right ← insertIntoBST(root.right, val)
-    <span class="pc-kw">return</span> root                  <span class="pc-cm">// return root so the parent's pointer stays valid</span>
-
-<span class="pc-cm">// DELETE: 3 cases</span>
-<span class="pc-cm">// Case 1: leaf node    → return null</span>
-<span class="pc-cm">// Case 2: one child    → return that child</span>
-<span class="pc-cm">// Case 3: two children → copy the inorder successor up, delete the successor below</span>
-<span class="pc-kw">function</span> deleteNode(root, key):
-    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> null
-    <span class="pc-kw">if</span> key &lt; root.val: root.left ← deleteNode(root.left, key)
-    <span class="pc-kw">else if</span> key &gt; root.val: root.right ← deleteNode(root.right, key)
-    <span class="pc-kw">else</span>:
-        <span class="pc-kw">if</span> root.left = null: <span class="pc-kw">return</span> root.right       <span class="pc-cm">// Cases 1 and 2</span>
-        <span class="pc-kw">if</span> root.right = null: <span class="pc-kw">return</span> root.left
-        succ ← root.right
-        <span class="pc-kw">while</span> succ.left ≠ null: succ ← succ.left      <span class="pc-cm">// leftmost = successor</span>
-        root.val ← succ.val                           <span class="pc-cm">// copy value up</span>
-        root.right ← deleteNode(root.right, succ.val) <span class="pc-cm">// delete the old successor</span>
-    <span class="pc-kw">return</span> root
-
-<span class="pc-cm">// Time O(h): O(log n) for a balanced BST, O(n) worst case (skewed)</span></pre>
-        </div>
-        <hr />
-
-        <!-- P6: LCA -->
-        <h2 class="h1" id="p6">
-          &#127760; Pattern 6 &mdash; Lowest Common Ancestor (LCA)
-        </h2>
-        <p>
-          The LCA of two nodes p and q is the deepest node that is an ancestor
-          of both. It is the first node where they &ldquo;split&rdquo; in the
-          tree.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; LCA Binary Tree (LC 236) + BST (LC
-              235)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Binary Tree — works for any tree:</span>
-<span class="pc-kw">function</span> lca(n, p, q):
-    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
-    l ← lca(n.left, p, q)
-    r ← lca(n.right, p, q)
-    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n     <span class="pc-cm">// split here → this IS the LCA</span>
-    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
-    <span class="pc-kw">return</span> r                               <span class="pc-cm">// whichever side found something</span>
-
-<span class="pc-cm">// BST — exploit the ordering (simpler):</span>
-<span class="pc-kw">function</span> lcaBST(n, p, q):
-    <span class="pc-kw">if</span> p.val &lt; n.val <span class="pc-kw">and</span> q.val &lt; n.val: <span class="pc-kw">return</span> lcaBST(n.left, p, q)
-    <span class="pc-kw">if</span> p.val &gt; n.val <span class="pc-kw">and</span> q.val &gt; n.val: <span class="pc-kw">return</span> lcaBST(n.right, p, q)
-    <span class="pc-kw">return</span> n                               <span class="pc-cm">// split point → LCA</span></pre>
-        </div>
-        <div class="callout teal">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong
-              >Dry Run &mdash; LCA(root=3, p=5, q=1) on [3,5,1,6,2,0,8]:</strong
-            >
-            <!-- prettier-ignore -->
-            <div class="ascii-tree" style="margin-top:8px">         <span class="hl">3</span>
-        / \
-      <span class="nd">5</span>     <span class="nd">1</span>
-     / \   / \
-   <span class="nd">6</span>   <span class="nd">2</span> <span class="nd">0</span>   <span class="nd">8</span>
-
-lca(<span class="hl">3</span>, p=5, q=1):
-  left  = lca(<span class="nd">5</span>, p=5, q=1) &rarr; node==p &rarr; return <span class="nd">5</span>  &#9668; found p
-  right = lca(<span class="nd">1</span>, p=5, q=1) &rarr; node==q &rarr; return <span class="nd">1</span>  &#9668; found q
-  both non-null &rarr; split point &rarr; return <span class="hl">3</span> &#10003;
-
-Key: once both sides return non-null, the current node IS the LCA.</div>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- MORRIS -->
-        <h2 class="h1" id="morris">
-          &#129525; Morris Traversal &mdash; O(1) Space
-        </h2>
-        <p>
-          Every traversal so far has cost O(h) memory &mdash; the call stack, or
-          an explicit stack. Morris traversal gets in-order out of a tree in
-          <strong>O(1)</strong> extra space by borrowing the null right pointers
-          of leaf nodes as temporary threads back up the tree, then putting them
-          back. Every node is visited at most twice, so it is still O(n) time.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Morris In-order Traversal</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// In-order traversal with NO recursion and NO stack.</span>
-<span class="pc-cm">// Idea: temporarily point each predecessor's right pointer back</span>
-<span class="pc-cm">// at its successor, so you can climb back up without a stack.</span>
-cur <span class="pc-kw">&larr;</span> root
-
-<span class="pc-kw">while</span> cur &ne; null:
-    <span class="pc-kw">if</span> cur.left = null:
-        visit(cur)
-        cur <span class="pc-kw">&larr;</span> cur.right
-    <span class="pc-kw">else</span>:
-        <span class="pc-cm">// find the rightmost node of the left subtree</span>
-        pred <span class="pc-kw">&larr;</span> cur.left
-        <span class="pc-kw">while</span> pred.right &ne; null <span class="pc-kw">and</span> pred.right &ne; cur:
-            pred <span class="pc-kw">&larr;</span> pred.right
-
-        <span class="pc-kw">if</span> pred.right = null:
-            pred.right <span class="pc-kw">&larr;</span> cur      <span class="pc-cm">// 1st visit: thread it, go left</span>
-            cur <span class="pc-kw">&larr;</span> cur.left
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> s:
+        <span class="pc-kw">if</span> c is '(' <span class="pc-kw">or</span> '[' <span class="pc-kw">or</span> '{':
+            stack.push(c)
         <span class="pc-kw">else</span>:
-            pred.right <span class="pc-kw">&larr;</span> null     <span class="pc-cm">// 2nd visit: unthread, restore tree</span>
-            visit(cur)
-            cur <span class="pc-kw">&larr;</span> cur.right</pre>
-        </div>
+            <span class="pc-kw">if</span> stack <span class="pc-kw">is empty</span>: <span class="pc-kw">return</span> false
+            top ← stack.pop()
+            <span class="pc-kw">if</span> top is <span class="pc-kw">not</span> the opening partner of c: <span class="pc-kw">return</span> false
+    <span class="pc-kw">return</span> stack <span class="pc-kw">is empty</span>
 
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green"
-              >O(n) &mdash; each edge walked at most twice</span
-            >
+<span class="pc-cm">// "{[]}" → push {, push [, ] matches [ pop, } matches { pop, stack empty → true ✓</span></pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
           </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1)</span>
-          </div>
-        </div>
 
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>It mutates the tree while it runs</strong><br />Between the
-            threading and the unthreading, the tree is temporarily
-            <em>not</em> a tree &mdash; it has cycles. The algorithm always
-            restores it, but never run it concurrently with anything else
-            reading the tree, and never on a structure you must not modify.
+          <!-- P02 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 02 · Design</div>
+                <div class="prob-title">Min Stack</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/min-stack/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 155</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Amazon · Google · Bloomberg</span>
+                  <span class="tag tag-pat">Two-Stack Design</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Design a stack that supports <code>push</code>,
+                  <code>pop</code>, <code>top</code>, and <code>getMin</code> —
+                  all in O(1) time.
+                </p>
+                <div class="iobox">
+                  push(5)→push(3)→push(7)→getMin()=3→pop()→getMin()=3→pop()→getMin()=5
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      getMin() must not scan. What if each entry carried its own
+                      answer?
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Push (value, minSoFar) pairs, or keep a parallel stack of
+                      minima. The top always holds the current minimum.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Run two parallel stacks: a main stack for values, and a
+                  <em>min-stack</em> where each level records the
+                  <em>current minimum at that depth</em>. When you push, also
+                  push <code>min(val, minStack.peek())</code>. When you pop, pop
+                  both. <code>getMin()</code> is always the top of the min-stack
+                  — O(1).
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Parallel Min-Stack</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">record</span> MinStack:
+    stack       <span class="pc-cm">// the values</span>
+    minStack    <span class="pc-cm">// minStack.top() = minimum of everything currently in stack</span>
+
+<span class="pc-kw">function</span> push(ms, val):
+    ms.stack.push(val)
+    <span class="pc-kw">if</span> ms.minStack <span class="pc-kw">is empty</span>: curMin ← val
+    <span class="pc-kw">else</span>: curMin ← min(val, ms.minStack.top())
+    ms.minStack.push(curMin)
+
+<span class="pc-kw">function</span> pop(ms):    ms.stack.pop();  ms.minStack.pop()
+<span class="pc-kw">function</span> top(ms):    <span class="pc-kw">return</span> ms.stack.top()
+<span class="pc-kw">function</span> getMin(ms): <span class="pc-kw">return</span> ms.minStack.top()
+
+<span class="pc-cm">// push(5): stack=[5], min=[5]</span>
+<span class="pc-cm">// push(3): stack=[3,5], min=[3,5]</span>
+<span class="pc-cm">// push(7): stack=[7,3,5], min=[3,3,5]  ← min stays 3</span>
+<span class="pc-cm">// getMin()=3 ✓   pop() → stack=[3,5], min=[3,5] → getMin()=3 ✓</span></pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(1) all ops</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
           </div>
-        </div>
+
+          <!-- P03 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 03 · Monotonic Stack</div>
+                <div class="prob-title">Daily Temperatures</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/daily-temperatures/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 739</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Amazon · Google · Meta</span>
+                  <span class="tag tag-pat">Monotonic Stack</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Given daily temperatures, return an array where
+                  <code>answer[i]</code> is the number of days you have to wait
+                  after day <code>i</code> to get a warmer temperature. If no
+                  warmer day exists, put <code>0</code>.
+                </p>
+                <div class="iobox">
+                  [73,74,75,71,69,72,76,73] → [1,1,4,2,1,1,0,0]
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      For each day you want the next warmer day. That is 'next
+                      greater element'.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Monotonic decreasing stack of indices. When today beats
+                      the top, pop it &mdash; today is its answer, and the
+                      distance is i - poppedIndex.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  This is "Next Greater Element" — the answer for each day is
+                  the distance (in indices) to its next greater temperature. Use
+                  a <strong>monotonic decreasing stack of indices</strong>. When
+                  a warmer day arrives, pop all cooler days and record the gap.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Monotonic Decreasing
+                        Stack</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> dailyTemperatures(temps):
+    ans ← array of length(temps), filled with 0
+    stack ← empty stack                         <span class="pc-cm">// indices</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(temps) - 1:
+        <span class="pc-kw">while</span> stack <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> temps[stack.top()] &lt; temps[i]:
+            j ← stack.pop()
+            ans[j] ← i - j                      <span class="pc-cm">// days waited = index difference</span>
+        stack.push(i)
+    <span class="pc-kw">return</span> ans            <span class="pc-cm">// anything left on the stack keeps 0 (no warmer day)</span>
+
+<span class="pc-cm">// [73,74,...]: i=0 push 0. i=1 temp[1]=74 &gt; 73 → pop 0, ans[0]=1-0=1 ✓</span></pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- P04 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">
+                  Problem 04 · Monotonic Stack + HashMap
+                </div>
+                <div class="prob-title">Next Greater Element I</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/next-greater-element-i/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 496</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-easy">Easy</span>
+                  <span class="tag tag-co">Amazon · Microsoft · Adobe</span>
+                  <span class="tag tag-pat">Mono Stack + HashMap</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  <code>nums1</code> is a subset of <code>nums2</code>. For each
+                  element in <code>nums1</code>, find its Next Great Element in
+                  <code>nums2</code>. Return <code>-1</code> if none exists.
+                </p>
+                <div class="iobox">
+                  nums1=[4,1,2], nums2=[1,3,4,2] → [-1,3,-1] (4 has no NGE in
+                  nums2; 1's NGE is 3; 2 has no NGE)
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Solve it for the whole second array first, then just look
+                      answers up.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Build a value &rarr; nextGreater map with one
+                      monotonic-stack pass over nums2, then read off nums1 in
+                      O(1) each.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Pre-compute NGE for every element in <code>nums2</code> using
+                  a monotonic stack and store the results in a HashMap
+                  <code>val → NGE</code>. Then answer each query in O(1) from
+                  the map. This pattern decouples the "compute" step from the
+                  "query" step.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Pre-compute NGE then
+                        Query</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> nextGreaterElement(nums1, nums2):
+    nge ← empty map                     <span class="pc-cm">// value → its next greater value</span>
+    stack ← empty stack                 <span class="pc-cm">// values, decreasing</span>
+    <span class="pc-kw">for</span> n <span class="pc-kw">in</span> nums2:
+        <span class="pc-kw">while</span> stack <span class="pc-kw">is not empty</span> <span class="pc-kw">and</span> stack.top() &lt; n:
+            nge[stack.pop()] ← n
+        stack.push(n)
+    <span class="pc-cm">// whatever remains on the stack has no greater element</span>
+
+    ans ← array of length(nums1)
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums1) - 1:
+        <span class="pc-kw">if</span> nums1[i] <span class="pc-kw">in</span> nge: ans[i] ← nge[nums1[i]]
+        <span class="pc-kw">else</span>: ans[i] ← -1
+    <span class="pc-kw">return</span> ans</pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(M+N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- P05 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 05 · Stack Arithmetic</div>
+                <div class="prob-title">Evaluate Reverse Polish Notation</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/evaluate-reverse-polish-notation/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 150</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Amazon · LinkedIn · Meta</span>
+                  <span class="tag tag-pat">Stack</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Evaluate the value of an arithmetic expression in Reverse
+                  Polish Notation (postfix). Valid operators: <code>+</code>,
+                  <code>-</code>, <code>*</code>, <code>/</code>. Each operand
+                  may be an integer or another expression. Division truncates
+                  toward zero.
+                </p>
+                <div class="iobox">
+                  ["2","1","+","3","*"] → 9 ((2+1)*3) ["4","13","5","/","+"] → 6
+                  (4+(13/5))
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Postfix notation was designed for exactly one data
+                      structure.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Push numbers; on an operator pop two and push the result.
+                      Order matters for - and /: the second pop is the left
+                      operand.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Process tokens left to right. If a number, push to stack. If
+                  an operator, pop two numbers (order matters:
+                  <code>b = pop()</code>, <code>a = pop()</code>, then compute
+                  <code>a op b</code>) and push the result. The final stack
+                  contains the answer.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Operand Stack</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> evalRPN(tokens):
+    stack ← empty stack
+    <span class="pc-kw">for</span> t <span class="pc-kw">in</span> tokens:
+        <span class="pc-kw">if</span> t is an operator:
+            b ← stack.pop()
+            a ← stack.pop()
+            stack.push(apply t <span class="pc-kw">to</span> a <span class="pc-kw">and</span> b)
+        <span class="pc-kw">else</span>:
+            stack.push(integer value of t)
+    <span class="pc-kw">return</span> stack.pop()</pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(N)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- P08 -->
+          <div class="prob-card">
+            <div class="prob-header" onclick="toggleProb(this)">
+              <div class="prob-left">
+                <div class="prob-num">Problem 06 · Circular Queue Design</div>
+                <div class="prob-title">Design Circular Queue</div>
+                <div style="margin-top: 4px">
+                  <a
+                    href="https://leetcode.com/problems/design-circular-queue/"
+                    target="_blank"
+                    style="font-size: 12px"
+                    >🔗 LC 622</a
+                  >
+                </div>
+                <div class="prob-tags">
+                  <span class="tag tag-med">Medium</span>
+                  <span class="tag tag-co">Microsoft · Amazon · Google</span>
+                  <span class="tag tag-pat">Array + Two Pointers</span>
+                </div>
+              </div>
+              <span
+                style="color: var(--text3); font-size: 18px; margin-top: 2px"
+                >›</span
+              >
+            </div>
+            <div class="prob-body" style="display: none">
+              <div class="prob-section">
+                <div class="prob-section-label">Problem</div>
+                <p>
+                  Design a circular queue (ring buffer) supporting
+                  <code>enQueue</code>, <code>deQueue</code>,
+                  <code>Front</code>, <code>Rear</code>, <code>isEmpty</code>,
+                  <code>isFull</code> — all O(1).
+                </p>
+                <div class="ascii-tree">
+                  Circular buffer of capacity 5: Indices: [0] [1] [2] [3] [4]
+                  [A] [B] [C] [ ] [ ] ↑head ↑tail(next write) After deQueue():
+                  head=1, B is front After enQueue(D): [A][B][C][D][ ], tail=4
+                  After filling and deQueuing, tail wraps: tail = (tail+1) %
+                  capacity
+                </div>
+              </div>
+              <div class="prob-section">
+                <div class="prob-section-label">Hints</div>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                    nudge
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      A fixed array plus modular arithmetic beats shifting
+                      elements.
+                    </p>
+                  </div>
+                </details>
+                <details class="hint">
+                  <summary>
+                    <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                    key idea
+                  </summary>
+                  <div class="details-body">
+                    <p>
+                      Keep head, count and a capacity-sized array. Tail is (head
+                      + count) % capacity. Storing count avoids the classic
+                      full-vs-empty ambiguity.
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              <div class="prob-section">
+                <div class="prob-section-label">Solution</div>
+                <p>
+                  Use a fixed-size array, a <code>head</code> pointer, a
+                  <code>tail</code> pointer, and a <code>size</code> counter.
+                  Advance pointers using <code>% capacity</code> to wrap around.
+                  <code>isFull</code> when <code>size == capacity</code>,
+                  <code>isEmpty</code> when <code>size == 0</code>.
+                </p>
+              </div>
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Ring Buffer</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">record</span> CircularQueue:
+    buf ← array of size k
+    head ← 0;  tail ← 0;  size ← 0;  cap ← k
+
+<span class="pc-kw">function</span> enQueue(q, val):
+    <span class="pc-kw">if</span> isFull(q): <span class="pc-kw">return</span> false
+    q.buf[q.tail] ← val
+    q.tail ← (q.tail + 1) mod q.cap          <span class="pc-cm">// wrap around</span>
+    q.size ← q.size + 1
+    <span class="pc-kw">return</span> true
+
+<span class="pc-kw">function</span> deQueue(q):
+    <span class="pc-kw">if</span> isEmpty(q): <span class="pc-kw">return</span> false
+    q.head ← (q.head + 1) mod q.cap
+    q.size ← q.size - 1
+    <span class="pc-kw">return</span> true
+
+<span class="pc-kw">function</span> front(q):   <span class="pc-kw">if</span> isEmpty(q): <span class="pc-kw">return</span> -1 <span class="pc-kw">else</span>: <span class="pc-kw">return</span> q.buf[q.head]
+<span class="pc-kw">function</span> rear(q):    <span class="pc-kw">if</span> isEmpty(q): <span class="pc-kw">return</span> -1 <span class="pc-kw">else</span>: <span class="pc-kw">return</span> q.buf[(q.tail - 1 + q.cap) mod q.cap]
+<span class="pc-kw">function</span> isEmpty(q): <span class="pc-kw">return</span> q.size = 0
+<span class="pc-kw">function</span> isFull(q):  <span class="pc-kw">return</span> q.size = q.cap</pre>
+                  </div>
+                  <div class="complexity-row">
+                    <div class="cx-badge green">
+                      <span class="cx-label">Time</span
+                      ><span class="cx-val green">O(1) all ops</span>
+                    </div>
+                    <div class="cx-badge green">
+                      <span class="cx-label">Space</span
+                      ><span class="cx-val green">O(K)</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
 
         <hr />
 
-        <!-- CONSTRUCTION -->
-        <h2 class="h1" id="construct">
-          &#127959;&#65039; Building a Tree from its Traversals
-        </h2>
-        <p>
-          One traversal is never enough to rebuild a tree &mdash; but two are,
-          as long as one of them is <strong>in-order</strong>. Preorder (or
-          postorder) tells you which node is the root; in-order tells you where
-          that root splits the remaining nodes into a left group and a right
-          group. Recurse on the two groups.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build from Preorder + Inorder</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// preorder tells you WHICH node is the root.</span>
-<span class="pc-cm">// inorder tells you WHERE that root splits left from right.</span>
-position <span class="pc-kw">&larr;</span> map from value &rarr; index in inorder
-p <span class="pc-kw">&larr;</span> 0                     <span class="pc-cm">// cursor into preorder</span>
-
-<span class="pc-kw">function</span> build(lo, hi):        <span class="pc-cm">// inorder range [lo, hi]</span>
-    <span class="pc-kw">if</span> lo > hi: <span class="pc-kw">return</span> null
-
-    node <span class="pc-kw">&larr;</span> Node(preorder[p])
-    p <span class="pc-kw">&larr;</span> p + 1
-    mid <span class="pc-kw">&larr;</span> position[node.value]
-
-    node.left  <span class="pc-kw">&larr;</span> build(lo, mid - 1)   <span class="pc-cm">// must come first: p is shared</span>
-    node.right <span class="pc-kw">&larr;</span> build(mid + 1, hi)
-    <span class="pc-kw">return</span> node
-
-<span class="pc-kw">return</span> build(0, length(inorder) - 1)</pre>
-        </div>
-
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green"
-              >O(n) &mdash; the map removes the linear scan</span
-            >
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(n)</span>
-          </div>
-        </div>
-
-        <div class="callout purple">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>The three variants</strong><br /><strong
-              >Preorder + inorder</strong
-            >
-            (LC 105) &mdash; take roots from the front.
-            <strong>Postorder + inorder</strong> (LC 106) &mdash; take roots
-            from the <em>back</em> and build <em>right</em> before left.
-            <strong>Preorder + postorder</strong> (LC 889) &mdash; only works
-            when every node has 0 or 2 children, and the answer is not unique.
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- PRACTICE -->
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-        <div class="callout blue">
-          <span class="callout-icon">&#128218;</span>
-          <div class="callout-body">
-            <strong>6 problems, one per pattern.</strong> Solve each yourself
-            before expanding the solution. Goal: within 30 seconds of reading
-            any tree problem, identify the pattern.
-          </div>
-        </div>
-
-        <!-- PROB 01: Inorder (Pattern 1 - DFS) -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 01 &middot;
-                <a
-                  href="https://leetcode.com/problems/binary-tree-inorder-traversal/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 94</a
-                >
-              </div>
-              <div class="prob-title">Binary Tree Inorder Traversal</div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Pattern 1: DFS Traversal</span>
-                <span class="tag tag-co"
-                  >Amazon · Microsoft · Google · Meta</span
-                >
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given the root of a binary tree, return the
-                <em>inorder traversal</em> of its node values (left &rarr; root
-                &rarr; right).
-              </p>
-              <div class="iobox">
-                Input: [1,null,2,3] Output: [1,3,2] Input: [] Output: []
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Recursion is three lines. The interview follow-up is always
-                    'now without recursion'.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Iterative: push left as far as you can, pop and visit, then
-                    move right. The loop condition is curr != null ||
-                    !stack.isEmpty() &mdash; the second half matters when the
-                    left spine runs out.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 1 &mdash; recursive inorder is trivial (3 lines). The
-                real interview ask:
-                <strong>can you do it iteratively?</strong> Use an explicit
-                stack. Keep going left until null, pop, visit, then move right.
-                The outer <code>while</code> condition
-                <code>curr != null || !stack.isEmpty()</code> covers the case
-                where all left nodes are exhausted but the stack still has nodes
-                to return to.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 94 — Both
-                      Approaches</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-cm">// Recursive — Pattern 1 in its purest form:</span>
-<span class="pc-kw">function</span> inorderRecursive(root):
-    res ← empty list
-    dfs(root, res)
-    <span class="pc-kw">return</span> res
-
-<span class="pc-kw">function</span> dfs(n, res):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span>
-    dfs(n.left, res)
-    append n.val <span class="pc-kw">to</span> res       <span class="pc-cm">// ROOT (after left)</span>
-    dfs(n.right, res)
-
-<span class="pc-cm">// Iterative — the classic interview follow-up:</span>
-<span class="pc-kw">function</span> inorderIterative(root):
-    res ← empty list;  stack ← empty stack;  curr ← root
-    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
-        <span class="pc-kw">while</span> curr ≠ null:
-            stack.push(curr);  curr ← curr.left
-        curr ← stack.pop()
-        append curr.val <span class="pc-kw">to</span> res
-        curr ← curr.right
-    <span class="pc-kw">return</span> res
-
-<span class="pc-cm">// Both: Time O(n), Space O(h) where h = tree height</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(h) stack</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- PROB 02: Max Depth (Pattern 3) -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot;
-                <a
-                  href="https://leetcode.com/problems/maximum-depth-of-binary-tree/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 104</a
-                >
-              </div>
-              <div class="prob-title">Maximum Depth of Binary Tree</div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Pattern 3: Height Recursion</span>
-                <span class="tag tag-co">Amazon · Google · LinkedIn</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given the root of a binary tree, return its maximum depth (nodes
-                along the longest root-to-leaf path).
-              </p>
-              <div class="iobox">Input: [3,9,20,null,null,15,7] Output: 3</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>A node's depth depends only on its children's depths.</p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Post-order: depth(node) = 1 + max(depth(left),
-                    depth(right)), with null returning 0.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 3.
-                <code>depth(node) = 1 + max(depth(left), depth(right))</code>.
-                Empty tree returns 0. Trust the recursion for both subtrees,
-                just combine.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 104</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> maxDepth(root):
-    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> 0
-    <span class="pc-kw">return</span> 1 + max(maxDepth(root.left), maxDepth(root.right))
-<span class="pc-cm">// 3 lines. This is the beauty of pattern recognition.</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(h) stack</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- PROB 03: Level Order (Pattern 2) -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 03 &middot;
-                <a
-                  href="https://leetcode.com/problems/binary-tree-level-order-traversal/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 102</a
-                >
-              </div>
-              <div class="prob-title">Binary Tree Level Order Traversal</div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Pattern 2: BFS Level-Order</span>
-                <span class="tag tag-co"
-                  >Amazon · Microsoft · Google · Meta</span
-                >
-                <span class="tag tag-lc">LC 102</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Return the level-order traversal as a list of lists.</p>
-              <div class="iobox">
-                Input: [3,9,20,null,null,15,7] Output: [[3],[9,20],[15,7]]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A plain queue mixes the levels together. How do you know
-                    where one level ends?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Snapshot queue.size() before the inner loop &mdash; that is
-                    exactly this level's node count. Process that many, then
-                    move to the next level.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 2. Queue + snapshot
-                <code>int size = q.size()</code> before inner loop separates
-                levels.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 102</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> levelOrder(root):
-    res ← empty list
-    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
-    q ← queue containing root
-    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
-        size ← q.size                  <span class="pc-cm">// snapshot: this many nodes in the level</span>
-        level ← empty list
-        <span class="pc-kw">repeat</span> size <span class="pc-kw">times</span>:
-            n ← q.dequeue()
-            append n.val <span class="pc-kw">to</span> level
-            <span class="pc-kw">if</span> n.left ≠ null: q.enqueue(n.left)
-            <span class="pc-kw">if</span> n.right ≠ null: q.enqueue(n.right)
-        append level <span class="pc-kw">to</span> res
-    <span class="pc-kw">return</span> res</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(w) queue</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P3 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 04 &middot;
-                <a
-                  href="https://leetcode.com/problems/diameter-of-binary-tree/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 543</a
-                >
-              </div>
-              <div class="prob-title">Diameter of Binary Tree</div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Pattern 4: Global via Local</span>
-                <span class="tag tag-co">Google · Meta · Amazon</span>
-                <span class="tag tag-lc">LC 543</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return the length of the longest path between any two nodes. The
-                path may not pass through the root.
-              </p>
-              <div class="iobox">
-                Input: [1,2,3,4,5] Output: 3 (path 4&#x2192;2&#x2192;1&#x2192;3
-                or 5&#x2192;2&#x2192;1&#x2192;3)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>The diameter may not pass through the root at all.</p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Compute height recursively, but at each node also record
-                    leftHeight + rightHeight against a global best. Return the
-                    height; update the answer as a side effect.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 4. Diameter <em>through any node</em> = leftHeight +
-                rightHeight. DFS returns height; global variable tracks the
-                maximum diameter seen at any node.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 543</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre>maxD ← 0
-<span class="pc-kw">function</span> diameterOfBinaryTree(root):
-    dfs(root)
-    <span class="pc-kw">return</span> maxD
-
-<span class="pc-kw">function</span> dfs(n):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
-    l ← dfs(n.left);  r ← dfs(n.right)
-    maxD ← max(maxD, l + r)
-    <span class="pc-kw">return</span> 1 + max(l, r)</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(h)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P4 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 05 &middot;
-                <a
-                  href="https://leetcode.com/problems/validate-binary-search-tree/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 98</a
-                >
-              </div>
-              <div class="prob-title">Validate Binary Search Tree</div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Pattern 5: BST Property</span>
-                <span class="tag tag-co"
-                  >Amazon · Microsoft · Bloomberg · Meta</span
-                >
-                <span class="tag tag-lc">LC 98</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Determine if a binary tree is a valid BST.</p>
-              <div class="iobox">
-                Input: [5,1,4,null,null,3,6] Output: false (root is 5 but right
-                child is 4 which is less)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Checking only node vs its two children is the classic wrong
-                    answer.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Every node must fall inside an inherited (min, max) range:
-                    recurse left with max = node.val and right with min =
-                    node.val. Use long bounds for Integer.MIN/MAX values.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 5. Pass a valid range <code>[lo, hi]</code> down. Going
-                left tightens the upper bound; going right tightens the lower
-                bound. Use <code>Long</code> to avoid
-                <code>Integer.MIN/MAX_VALUE</code> edge cases.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 98</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> isValidBST(root):
-    <span class="pc-kw">return</span> check(root, -∞, +∞)
-
-<span class="pc-kw">function</span> check(n, lo, hi):
-    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> true
-    <span class="pc-kw">if</span> n.val ≤ lo <span class="pc-kw">or</span> n.val ≥ hi: <span class="pc-kw">return</span> false
-    <span class="pc-kw">return</span> check(n.left, lo, n.val) <span class="pc-kw">and</span> check(n.right, n.val, hi)</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(h)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P5 -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 06 &middot;
-                <a
-                  href="https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 236</a
-                >
-              </div>
-              <div class="prob-title">
-                Lowest Common Ancestor of a Binary Tree
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Pattern 6: LCA</span>
-                <span class="tag tag-co"
-                  >Amazon · Google · Meta · Microsoft</span
-                >
-                <span class="tag tag-lc">LC 236</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Find the lowest common ancestor of two nodes p and q in a binary
-                tree.
-              </p>
-              <div class="iobox">
-                Input: root=[3,5,1,6,2,0,8], p=5, q=1 Output: 3
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    If both targets are in different subtrees, the current node
-                    is the answer.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Recurse both sides. If both return non-null, this node is
-                    the LCA; otherwise pass up whichever side is non-null. In a
-                    BST you can do better &mdash; walk down until the values
-                    straddle the node.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Pattern 6. Return node when null/p/q. If both left and right are
-                non-null &rarr; split here &rarr; current node IS the LCA. Else
-                bubble up the non-null side.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 236</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> lca(n, p, q):
-    <span class="pc-kw">if</span> n = null <span class="pc-kw">or</span> n = p <span class="pc-kw">or</span> n = q: <span class="pc-kw">return</span> n
-    l ← lca(n.left, p, q)
-    r ← lca(n.right, p, q)
-    <span class="pc-kw">if</span> l ≠ null <span class="pc-kw">and</span> r ≠ null: <span class="pc-kw">return</span> n
-    <span class="pc-kw">if</span> l ≠ null: <span class="pc-kw">return</span> l
-    <span class="pc-kw">return</span> r</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(h)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- ASSIGNMENT -->
+        <!-- ══ ASSIGNMENT ════════════════════════════════════ -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
-        <div class="callout orange" style="margin-bottom: 18px">
-          <span class="callout-icon">&#128203;</span>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">📋</span>
           <div class="callout-body">
             <strong
-              >Lecture 15 Assignment &mdash; 45 Problems (12 Easy &middot; 23
-              Medium &middot; 10 Hard)</strong
+              >Lecture 15 Assignment &mdash; 16 Problems (9 Easy &middot; 6
+              Medium &middot; 1 Hard)</strong
             ><br />
-            All 6 tree patterns covered. Every problem includes the LeetCode
-            link, pattern to apply, step-by-step hint, common mistakes, and
-            companies that ask it most.<br /><br />
+            Complete the assignment before moving to HashMap &amp; HashSet.
+            Includes stack and queue design problems, expression evaluation, and
+            two preview problems for the monotonic stack.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture15/Assignment.md"
               style="
-                display: inline-block;
-                margin-top: 6px;
-                padding: 6px 16px;
                 background: var(--accent);
                 color: #fff;
+                padding: 6px 16px;
                 border-radius: 6px;
                 font-size: 13px;
                 font-weight: 600;
                 text-decoration: none;
+                display: inline-block;
               "
-              >&#128196; Open Assignment.md &rarr;</a
+              >📄 Open Assignment →</a
             >
           </div>
         </div>
 
-        <hr />
-
-        <!-- CHECKLIST -->
+        <!-- ══ CHECKLIST ══════════════════════════════════════ -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>
-          Check each item before advancing to Lecture 16 (Heaps &amp; Priority
-          Queues). Be honest &mdash; these are your interview readiness
-          criteria.
-        </p>
-        <div style="margin: 14px 0">
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin: 14px 0;
+          "
+        >
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can write recursive preorder, inorder, and postorder from memory
-              in under 60 seconds
+              I can implement a stack using ArrayDeque and know why to prefer it
+              over Stack&lt;T&gt;
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can write the iterative inorder using an explicit stack and
-              explain every step
+              I can solve Valid Parentheses from memory in under 3 minutes
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can implement BFS level-order and explain why
-              <code>int size = q.size()</code> must come before the inner loop
+              I understand the Monotonic Stack pattern and can identify when to
+              use increasing vs decreasing
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can solve Max Depth, Balanced Tree, and Diameter using the
-              height recursion pattern
+              I can solve Daily Temperatures (Next Greater Element pattern) in
+              O(N)
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I understand why Diameter uses a global variable while the DFS
-              returns height
+              I can trace Next Greater Element with a stack, and say what the
+              stack holds
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can validate a BST using the <code>[min, max]</code> range
-              approach (not just parent comparison)
+              I can say what a deque adds over a stack or a queue, and name its
+              Java class
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can explain why inorder traversal of a BST gives a sorted
-              sequence
+              I know the difference between Queue.offer() vs add() and
+              Queue.poll() vs remove()
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can implement LCA for both BT (split-point logic) and BST
-              (direction logic) from memory
+              I can evaluate RPN expressions using a stack
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I can identify the correct pattern within 30 seconds for any tree
-              problem
+              I can design a circular queue with wrap-around using modulo
+              arithmetic
             </div>
           </div>
           <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">&#10003;</div>
+            <div class="cb-box">✓</div>
             <div class="cb-text">
-              I have completed all 45 assignment problems and can explain the
-              pattern behind each one
+              I can use the Pattern Decision Guide to choose the right
+              Stack/Queue variant for a problem
             </div>
           </div>
         </div>
 
         <div class="callout green" style="margin-top: 24px">
-          <span class="callout-icon">&#11088;</span>
+          <span class="callout-icon">🧠</span>
           <div class="callout-body">
             <strong
-              >You are ready for Lecture 16: Heaps &amp; Priority Queues</strong
+              >You're ready for Lecture 16: HashMap &amp; HashSet Deep
+              Dive</strong
             ><br />
-            Heaps are built on arrays but think like complete binary trees. The
-            heap property (parent &le; children for min-heap) is a weaker
-            version of the BST property &mdash; you only care about parent vs
-            child, not left vs right ordering. The tree intuition you built here
-            carries over directly.
+            You've mastered LIFO/FIFO, expression evaluation, and had a first
+            look at monotonic stacks. HashMap is the most used data structure in
+            FAANG interviews — it underlies complement lookup, frequency
+            counting, prefix sums, and grouping. Everything from here gets
+            faster with a HashMap.
           </div>
         </div>
 
-        <!-- BOTTOM NAV -->
+        <!-- Bottom Nav -->
         <div class="page-nav">
           <a href="../Lecture14/lecture14_notes.html"
-            >&larr; Lecture 14 &middot; Matrix Problems</a
+            >&larr; Lecture 14 &middot; Linked Lists</a
           >
           <a class="next" href="../Lecture16/lecture16_notes.html"
-            >Lecture 16 &middot; Heaps &amp; Priority Queues &rarr;</a
+            >Lecture 16 &middot; HashMap &amp; HashSet &rarr;</a
           >
         </div>
       </div>
-      <!-- #content -->
+      <!-- /content -->
     </div>
-    <!-- #main -->
+    <!-- /main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

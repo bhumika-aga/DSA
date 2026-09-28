@@ -1,9 +1,10 @@
-# 🏗️ Assignment 3 — OOP & Java Collections Deep Dive
+# 🧪 Assignment 3 — Testing & Debugging Your Own Code
 
-> **Lecture:** 3 of 38 — OOP & Java Collections Deep Dive
+> **Lecture:** 3 of 45 — Testing & Debugging Your Own Code
 > **Phase:** 1 — Foundations
-> **Estimated Time:** 4 days · **Total Problems:** 35 (15 Easy · 15 Medium · 5 Hard)
-> **Goal:** Master the abstractions of Java and the high-performance implementation of the Collections Framework.
+> **Estimated Time:** 3 days · **Total Problems:** 15 (12 Easy · 3 Medium · 0 Hard)
+> **Goal:** Find your own bugs before anyone else does: trace by hand, run the edge-case checklist, and read a judge's verdict calmly.
+> **No Java yet:** for each problem, write the edge cases and trace your idea by hand. Code them after Lecture 4.
 
 ---
 
@@ -11,418 +12,228 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                           | Pattern          | Move                                                  |
-| ----------------------------------------------- | ---------------- | ----------------------------------------------------- |
-| "only valid values allowed"                     | Encapsulation    | private fields + validating methods                   |
-| "is-a" relationship                             | Inheritance      | extend, override, call `super`                        |
-| "can-do" capability shared by unrelated classes | Interface        | program to the interface, not the class               |
-| "design a class that supports …"                | Class Design     | pick the backing structure first, then the invariants |
-| "sort objects by several fields"                | Comparator Chain | `comparing(...).thenComparing(...)`                   |
-| "iterate over my custom collection"             | Iterator Pattern | implement `Iterable<T>` / wrap an `Iterator`          |
+| Signal in the Problem                 | Pattern                    | Move                                       |
+| ------------------------------------- | -------------------------- | ------------------------------------------ |
+| Multiplying or adding many values     | Watch for overflow         | Compute the property, not the value        |
+| Values can be equal                   | Check strict vs non-strict | Test with all-equal input                  |
+| Processing runs or groups             | Leftover-group bug         | Handle the last group after the loop       |
+| Dates, times, versions, addresses     | Parsing edge cases         | Write every rule down first                |
+| Several possible verdicts or outcomes | Enumerate all cases        | Test one input per outcome                 |
+| Geometry with points and lines        | Degenerate cases           | Duplicates, collinear points, zero lengths |
+| A process that repeats                | Simulate one cycle         | Reason about what one cycle proves         |
 
 ---
 
-## 🟢 Easy Tier (15 Problems)
+## 🟢 Easy Tier (12 Problems)
 
-_OOP Foundations._
+_Easy algorithms, tricky edges. For each one, write the edge cases you will test before anything else — the hint tells you which one catches most people._
 
-### E1 · Encapsulation Audit
+### E1 · Sign of the Product of an Array
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1822 — Sign of the Product of an Array](https://leetcode.com/problems/sign-of-the-product-of-an-array/)** · Easy
+**Pattern:** Avoid overflow | **Companies:** Amazon, Microsoft
 
-**Task:** Create a `BankAccount` class with a `private` balance. Provide a `deposit()` method that validates the amount is positive. Why is `private balance` better than `public balance`?
-
----
-
-### E2 · Data Hiding
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Implement a `Person` class where the `age` can only be set between 0 and 150. If an invalid age is passed, print an error or throw an exception. This is the core of "Internal State Protection".
+**Hint:** Multiplying overflows. You only need the sign: any zero, and how many negatives.
 
 ---
 
-### E3 · Primitive vs Reference Packaging
+### E2 · Monotonic Array
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 896 — Monotonic Array](https://leetcode.com/problems/monotonic-array/)** · Easy
+**Pattern:** Equal values | **Companies:** Amazon, Google
 
-**Task:** Create a `WrapperTest` class. Pass a `StringBuilder` to a method and append text. Does the original `StringBuilder` change? Now pass an `Integer` and increment it. Does the original change? Explain.
-
----
-
-### E4 · Default vs Private Constructors
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Encapsulation & Constructors | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** When would you make a constructor `private`? (Hint: Utility classes or Singleton pattern). Implement a `MathUtils` class with a private constructor that only has static methods.
+**Hint:** Test with [2, 2, 2] and [1]. Both are monotonic — does your check agree? Use ≤ and ≥, not < and >.
 
 ---
 
-### E5 · Simple Inheritance
+### E3 · Consecutive Characters
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1446 — Consecutive Characters](https://leetcode.com/problems/consecutive-characters/)** · Easy
+**Pattern:** The leftover run | **Companies:** Amazon, Google
 
-**Task:** Create a `Shape` class with a `draw()` method. Create `Circle` and `Square` subclasses that override `draw()`. Use a `Shape` reference to call `draw()` on a `Circle` object.
-
----
-
-### E6 · The `super` Keyword
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** In a `Dog` class extending `Animal`, use `super()` to call the parent's constructor and `super.makeSound()` to call the parent's method before the dog's bark.
+**Hint:** Trace "aaa". If the best is only updated when a run ends, the last run is never counted.
 
 ---
 
-### E7 · Static vs Instance variables
+### E4 · Longer Contiguous Segments of Ones than Zeros
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Inheritance & static | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1869 — Longer Contiguous Segments of Ones than Zeros](https://leetcode.com/problems/longer-contiguous-segments-of-ones-than-zeros/)** · Easy
+**Pattern:** Two counters, last run | **Companies:** Amazon
 
-**Task:** Create a `Employee` class where `id` is instance-based and `companyName` is `static`. Create 3 employees. Change `companyName` for one. Check if it changed for others.
-
----
-
-### E8 · Method Overloading
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Implement `calculateArea(int side)`, `calculateArea(int length, int width)`, and `calculateArea(double radius)`. How does the compiler know which one to call? (Static Polymorphism).
+**Hint:** Same leftover bug twice over — both the longest ones-run and zeros-run can end at the last character.
 
 ---
 
-### E9 · Final Keyword
+### E5 · Remove Trailing Zeros From a String
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 2710 — Remove Trailing Zeros From a String](https://leetcode.com/problems/remove-trailing-zeros-from-a-string/)** · Easy
+**Pattern:** String boundaries | **Companies:** Amazon
 
-**Task:** What happens if you try to extend a `final class`? What happens if you try to override a `final method`? Implement a `ConstantManager` class to test this.
-
----
-
-### E10 · Overriding `toString()`
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Polymorphism & Object Methods | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Override the `toString()` method for a `Book` class (`title`, `author`). Print the object directly. Why is this better than calling `book.getTitle()`?
+**Hint:** What if the whole string is… well, it cannot be all zeros here. Check the constraints to see which edge cases you can skip.
 
 ---
 
-### E11 · Interface Basics
+### E6 · Slowest Key
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1629 — Slowest Key](https://leetcode.com/problems/slowest-key/)** · Easy
+**Pattern:** Tie-breaking | **Companies:** Amazon
 
-**Task:** Define a `Switchable` interface with `turnOn()` and `turnOff()`. Implement it in `LightBulb` and `Fan`. Why is an interface more flexible than an abstract class here?
-
----
-
-### E12 · Multiple Interface Implementation
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Implement `Readable` and `Writable` interfaces in a `SmartDocument` class.
+**Hint:** Ties are broken by the larger letter. Write a tie example first. The first key's duration is releaseTimes[0], not a difference.
 
 ---
 
-### E13 · Default Methods in Interfaces
+### E7 · Check if One String Swap Can Make Strings Equal
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1790 — Check if One String Swap Can Make Strings Equal](https://leetcode.com/problems/check-if-one-string-swap-can-make-strings-equal/)** · Easy
+**Pattern:** Enumerate the cases | **Companies:** Amazon, Google
 
-**Task:** Can an interface have a method body? Since Java 8, yes. Add a `logActivity()` default method to an interface. Does the implementing class _have_ to override it?
-
----
-
-### E14 · Comparable Basics
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Interfaces & Comparable | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Make a `Student` class implement `Comparable<Student>` to sort by `gpa` descending. Use `Collections.sort(students)`.
+**Hint:** Zero differences, exactly two differences that swap, or anything else. Trace "aa" vs "aa" and "ab" vs "ba".
 
 ---
 
-### E15 · ArrayList vs Raw Arrays
+### E8 · Valid Boomerang
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Arrays vs Collections | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1037 — Valid Boomerang](https://leetcode.com/problems/valid-boomerang/)** · Easy
+**Pattern:** Degenerate inputs | **Companies:** Google
 
-**Task:** Convert an `int[]` array to an `ArrayList<Integer>`. Practice `add()`, `remove(index)`, `set(index, val)`, and `contains()`. Why does `remove(0)` take O(n) time?
-
----
-
-## 🟡 Medium Tier (15 Problems)
-
-_Interview Staples._
-
-### M1 · Abstract Class Design
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Create an abstract `PaymentMethod` class with an abstract `processPayment(double amount)` and a concrete `printReceipt()` method. Why can't you instantiate `PaymentMethod`?
+**Hint:** Duplicate points and collinear points both fail. The cross-product test catches both in one line — and avoids dividing by zero.
 
 ---
 
-### M2 · Nested Classes
+### E9 · Day of the Year
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1154 — Day of the Year](https://leetcode.com/problems/day-of-the-year/)** · Easy
+**Pattern:** Leap years | **Companies:** Amazon
 
-**Task:** Explain the difference between a `static nested class` and an `inner class`. When would you use a `Local Inner Class` inside a method?
-
----
-
-### M3 · Interface vs Abstract Class (The Table)
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Abstraction & Nested Classes | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Write a 5-point comparison table for your notes. Key points: Constructor, Multi-inheritance, State (variables), Method visibility, Use cases.
+**Hint:** Divisible by 4 — unless divisible by 100 — unless divisible by 400. Test 1900, 2000 and 2004.
 
 ---
 
-### M4 · Generic Class Implementation
+### E10 · Find Winner on a Tic Tac Toe Game
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1275 — Find Winner on a Tic Tac Toe Game](https://leetcode.com/problems/find-winner-on-a-tic-tac-toe-game/)** · Easy
+**Pattern:** All the outcomes | **Companies:** Amazon, Google
 
-**Task:** Implement a generic `Box<T>` class that can hold any type. Add `set(T item)` and `T get()`.
-
----
-
-### M5 · Generic Methods
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Write a generic method `printArray(T[] array)` that prints any array type (Integer, String, Double). Why won't it work for primitives like `int[]`? (Hint: Type Erasure).
+**Hint:** Four answers: A, B, Draw, Pending. A game can be won before the board is full — and "Pending" is easy to forget.
 
 ---
 
-### M6 · Bounded Wildcards (UL/LL)
+### E11 · Distribute Candies to People
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Generics & Wildcards | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1103 — Distribute Candies to People](https://leetcode.com/problems/distribute-candies-to-people/)** · Easy
+**Pattern:** Last partial round | **Companies:** Amazon
 
-**Task:** Explain `List<? extends Shape>` (Upper Bound) and `List<? super Circle>` (Lower Bound). Which one allows adding elements? Why? (PECS: Producer Extends, Consumer Super).
-
----
-
-### M7 · Design a Stack With Increment Operation
-
-**🔗 [LC 1381 — Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/)** · Medium
-**Pattern:** Class Design — Array-backed Stack | **Companies:** Amazon, Microsoft
-
-**Hint:** Back the stack with an array and a `top` index. For O(1) `increment`, keep a lazy `inc[]` array: add `val` at index `min(k, size) - 1`, and when popping index `i`, carry `inc[i]` down to `inc[i - 1]`.
+**Hint:** The final person may get fewer candies than their turn asks for. That leftover case is the whole bug.
 
 ---
 
-### M8 · Comparator Chain
+### E12 · Reformat Date
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Comparators, Iterators & Copying | **Companies:** Amazon, Microsoft, Oracle
+**🔗 [LC 1507 — Reformat Date](https://leetcode.com/problems/reformat-date/)** · Easy
+**Pattern:** Parsing and padding | **Companies:** Amazon
 
-**Task:** Sort a `List<Product>` by `category` first (ASC), then by `price` (DESC) within the same category. Use `Comparator.comparing(...).thenComparing(...)`.
-
----
-
-### M9 · Design HashMap
-
-**🔗 [LC 706 — Design HashMap](https://leetcode.com/problems/design-hashmap/)** · Easy
-**Pattern:** Hashing + Collision Handling | **Companies:** Amazon, Google, Microsoft
-
-**Hint:** Implement `put`, `get`, and `remove` without using built-in HashMaps. Use an array of buckets (LinkedLists).
+**Hint:** Day "1st" becomes "01"; single-digit days need padding. Test the 1st, 2nd, 3rd, 11th and 22nd.
 
 ---
 
-### M10 · Design Linked List
+## 🟡 Medium Tier (3 Problems)
 
-**🔗 [LC 707 — Design Linked List](https://leetcode.com/problems/design-linked-list/)** · Medium
-**Pattern:** Pointer Manipulation | **Companies:** Amazon, Microsoft, Adobe
+_Parsing and simulation problems where the difficulty is completeness. Write every rule down as its own line first._
 
-**Hint:** Implement a singly linked list. This cements your understanding of node-based data structures.
+### M1 · Compare Version Numbers
 
----
+**🔗 [LC 165 — Compare Version Numbers](https://leetcode.com/problems/compare-version-numbers/)** · Medium
+**Pattern:** Different lengths, leading zeros | **Companies:** Amazon, Google, Microsoft
 
-### M11 · Design Parking System
-
-**🔗 [LC 1603 — Design Parking System](https://leetcode.com/problems/design-parking-system/)** · Easy
-**Pattern:** Class Design — Encapsulation | **Companies:** Amazon, Microsoft
-
-**Hint:** Hold the three remaining capacities in a `private` array indexed by car type. `addCar` checks and decrements. Nothing outside the class can change the counts directly — that's encapsulation.
+**Hint:** "1.0" equals "1.0.0" and "01" equals "1". Pad the shorter version with zeros.
 
 ---
 
-### M12 · Design an Ordered Stream
+### M2 · Validate IP Address
 
-**🔗 [LC 1656 — Design an Ordered Stream](https://leetcode.com/problems/design-an-ordered-stream/)** · Easy
-**Pattern:** Class Design — State | **Companies:** Bloomberg, Amazon
+**🔗 [LC 468 — Validate IP Address](https://leetcode.com/problems/validate-ip-address/)** · Medium
+**Pattern:** One check per rule | **Companies:** Amazon, Microsoft, Meta
 
-**Hint:** Keep a `String[]` of size n+1 and a `ptr` starting at 1. `insert` stores the value, then collects values while `arr[ptr]` is filled, moving `ptr` forward.
-
----
-
-### M13 · Simple Bank System
-
-**🔗 [LC 2043 — Simple Bank System](https://leetcode.com/problems/simple-bank-system/)** · Medium
-**Pattern:** Class Design — Validation | **Companies:** Amazon, Microsoft
-
-**Hint:** Wrap the balances in a class with one private helper `valid(account)`. Each operation validates the accounts and balances first and only then mutates — no half-finished transfers.
+**Hint:** List every rule before coding. "1..1.1", "01.1.1.1", "256.1.1.1" and a trailing "." should all fail.
 
 ---
 
-### M14 · Peeking Iterator
+### M3 · Robot Bounded In Circle
 
-**🔗 [LC 284 — Peeking Iterator](https://leetcode.com/problems/peeking-iterator/)** · Medium
-**Pattern:** Iterator Pattern — Decorator | **Companies:** Google, Apple, Amazon
+**🔗 [LC 1041 — Robot Bounded In Circle](https://leetcode.com/problems/robot-bounded-in-circle/)** · Medium
+**Pattern:** Simulate one cycle | **Companies:** Amazon, Google
 
-**Hint:** Wrap the given `Iterator` and cache one element ahead (`nextVal`, `hasPeeked`). `peek` fills the cache without consuming; `next` returns the cache if filled. Make it generic: `PeekingIterator<T>`.
-
----
-
-### M15 · Deep Copy vs Shallow Copy
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Comparators, Iterators & Copying | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Implement `Cloneable` on an `Engine` and a `Car` (which contains an `Engine`). Perform a shallow copy and a deep copy. Change the engine details in the clone. Does it affect the original?
+**Hint:** After one run of the instructions, the robot is bounded if it is back at the start OR not facing north. Test a single "L".
 
 ---
 
-## 🔴 Hard Tier (5 Problems)
+## 🔴 Hard Tier (0 Problems)
 
-_5 Advanced Problems._
-
-### H1 · Design a Text Editor
-
-**🔗 [LC 2296 — Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/)** · Hard
-**Pattern:** Class Design — Two Stacks | **Companies:** Amazon, Google
-
-**Hint:** Model the cursor as the gap between two stacks (text left of the cursor, text right of it). Moving the cursor pops from one and pushes onto the other; add and delete touch only the left stack. Use `StringBuilder`s for O(1) pushes and pops at the end.
-
----
-
-### H2 · Generic `MyLinkedList<T>`
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Generics + Iterator | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Implement a doubly linked list with Generics. Support `Iterator`, `Generic types`, and `O(1) size access`.
-
----
-
-### H3 · Maximum Frequency Stack
-
-**🔗 [LC 895 — Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/)** · Hard
-**Pattern:** Map of Stacks by Frequency | **Companies:** Amazon, Google, Meta
-
-**Hint:** Keep `freq: value → count` and `group: count → stack of values`, plus `maxFreq`. `push` increments the value's count and pushes it onto that count's stack. `pop` pops from `group[maxFreq]`, decrements the count, and lowers `maxFreq` when that stack empties.
-
----
-
-### H4 · Design Browser History
-
-**🔗 [LC 1472 — Design Browser History](https://leetcode.com/problems/design-browser-history/)** · Medium
-**Pattern:** Two Stacks / Doubly Linked List | **Companies:** Amazon, Google, Bloomberg
-
-**Hint:** Hold the history in an `ArrayList<String>` with a `cur` index and a `last` index. `visit` overwrites at `cur + 1` and sets `last = cur`; `back` and `forward` just clamp `cur` between 0 and `last`. Every operation is O(1).
-
----
-
-### H5 · Dependency Injection Preview
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Interfaces & Dependency Injection | **Companies:** Amazon, Microsoft, Oracle
-
-**Task:** Write a `EngineInterface` and two implementations: `ElectricEngine` and `GasEngine`. Write a `Car` class that accepts a `EngineInterface` in its constructor. Explain why this is better than
-
-"newing" up an engine inside the car.
-
----
+_No Hard problems here — the Medium tier already contains two of the most edge-case-heavy problems on LeetCode._
 
 ## 📊 Complexity Analysis Exercises
 
-Analyze the Time and Space complexity for these OOP/Collection patterns.
+Counting exactly — not just the Big-O — is how off-by-one errors are caught. Give the exact count for each.
 
-```java
-// Snippet A: Adding N elements to a LinkedList (at the end) vs ArrayList
-List<Integer> list = new LinkedList<>();
-for (int i = 0; i < n; i++) list.add(i);
+```pseudocode
+// Snippet 1 — how many times does the body run?
+for i from 0 to n - 1:
+    body()
 
-// Snippet B: Recursive Fibonacci (Object-based for some reason)
-Integer fib(int n) {
-    if (n <= 1) return n;
-    return fib(n - 1) + fib(n - 2);
-}
+// Snippet 2 — how many times does the body run?
+for i from 1 to n:
+    body()
 
-// Snippet C: ArrayList clear()
-// If list has N elements, what is the complexity of list.clear()? (Hint: it sets elements to null for GC)
+// Snippet 3 — how many times does the body run?
+i ← 0
+while i ≤ n:
+    body();  i ← i + 1
 
-// Snippet D: Custom Hash Function
-// If hashCode() always returns 1, what is the complexity of HashMap.get()?
+// Snippet 4 — pairs (i, j) with i < j, visited by:
+for i from 0 to n - 1:
+    for j from i + 1 to n - 1:
+        visit(i, j)
 
-// Snippet E: PriorityQueue (O?)
-PriorityQueue<Integer> pq = new PriorityQueue<>();
-for (int x : nums) pq.offer(x); // N insertions
+// Snippet 5 — a fence of length L with a post every metre.
+// How many posts?
 
-// Snippet F: Binary Search in Sorted ArrayList
-Collections.binarySearch(myArrayList, target);
-
-// Snippet G: Binary Search in Sorted LinkedList
-Collections.binarySearch(myLinkedList, target); // Warning: Think about random access!
-
-// Snippet H: Deep copy of a nested structure (N nodes, depth D)
+// Snippet 6 — the stress test from the lecture runs 1,000 trials,
+// each calling an O(n²) brute force on n ≤ 8. Roughly how many steps?
 ```
 
-**Answers:**
+**Complexity Answers:**
 
-| Snippet | Time       | Space | Explanation                                                           |
-| :------ | :--------- | :---- | :-------------------------------------------------------------------- |
-| **A**   | O(n)       | O(n)  | Both are O(n) total if adding to end.                                 |
-| **B**   | O(2ⁿ)      | O(n)  | Binary tree of depth N.                                               |
-| **C**   | O(n)       | O(1)  | Must nullify each element pointer for GC.                             |
-| **D**   | O(n)       | O(1)  | Degradation to a singly linked list.                                  |
-| **E**   | O(n log n) | O(n)  | n separate O(log n) heap adjustments.                                 |
-| **F**   | O(log n)   | O(1)  | ArrayList has RandomAccess (Direct index logic).                      |
-| **G**   | O(n)       | O(1)  | LinkedList lacks RandomAccess; binary search defaults to linear walk. |
-| **H**   | O(n)       | O(n)  | Must visit every node to copy.                                        |
+1. **n** times — i takes the values 0, 1, …, n − 1.
+2. **n** times — i takes the values 1, 2, …, n. Same count, different values: a classic source of off-by-one.
+3. **n + 1** times — ≤ includes n itself.
+4. **n(n − 1) ÷ 2** pairs — O(n²).
+5. **L + 1** posts — the fencepost question.
+6. About **1,000 × 64 = 64,000** steps — trivial. Small inputs make stress testing cheap.
 
 ---
 
 ## 🔍 Self-Assessment — True / False
 
-1. You can create an instance of an Abstract Class using `new`. → **False**.
-2. Private attributes are accessible within the same package. → **False** (only within same class).
-3. `Interface` methods are `public abstract` by default. → **True**.
-4. A class can extend multiple parent classes in Java. → **False** (Single inheritance for classes).
-5. `Generics` info is removed at runtime (Type Erasure). → **True**.
-6. `ArrayList` size is fixed once initialized. → **False** (it is dynamic).
-7. `HashSet` relies on `hashCode()` to find the correct bucket. → **True**.
-8. `static` methods can call non-static instance methods directly. → **False** (needs an object reference).
+1. If a solution passes all the example tests, it is correct. → **False** — the examples are chosen to be friendly; hidden tests target the edges
+2. An integer overflow crashes the program so you notice it. → **False** — it silently wraps to a wrong value
+3. "for i from 0 to n − 1" and "for i from 1 to n" run the same number of times. → **True** — n times each, over different values
+4. Time Limit Exceeded means the answer is wrong. → **False** — it means the answer took too long — often a Big-O problem
+5. A trace table is only useful for beginners. → **False** — it is the fastest reliable way to find a bug in short code, at any level
+6. Starting a "maximum so far" variable at 0 is always safe. → **False** — it fails when every value is negative
+7. Comparing two decimal results with = can fail even when the maths says they are equal. → **True** — 0.1 + 0.2 is not exactly 0.3 in floating point
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. **Composition vs Inheritance**: Why do senior engineers say "Favor composition over inheritance"? Give a real-world
-   scenario.
-2. **Type Erasure**: Why can't we use `instanceof T` or `new T()` in a generic class?
-3. **Internal Logic**: How does `ArrayList.add()` handle capacity? Explain the "doubling" amortized cost proof.
-4. **Abstract vs Interface**: If both allow abstract methods, when precisely do you choose an `Abstract Class` over an
-   `Interface`? (Hint: State vs Behavior).
-5. **Polymorphism in Production**: How does the JVM choose which overridden method to call at runtime? (Virtual Method
-   Table lookup).
+Answer these out loud, without looking at the notes:
+
+1. **Trace table**: Draw one for the leftover-bug example on "aabbb" and point to the exact row where the answer goes wrong.
+2. **Checklist**: Recite the edge-case checklist and, for Monotonic Array, say which rows matter and which do not.
+3. **Off-by-one**: Give the four boundary questions and one example of a bug caused by each.
+4. **Invariant**: State an invariant for a loop that finds the largest value in a list.
+5. **Verdicts**: For each of Wrong Answer, Time Limit, Runtime Error and Memory Limit, name the first thing you would check.
+6. **Stress testing**: Explain how a slow brute force helps you test a fast solution, and why small random inputs are enough.
 
 ---
 
@@ -430,27 +241,26 @@ Collections.binarySearch(myLinkedList, target); // Warning: Think about random a
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                             |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Amazon**    | [Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/), [Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/), [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/) |
-| **Google**    | [Design a Text Editor](https://leetcode.com/problems/design-a-text-editor/), [Maximum Frequency Stack](https://leetcode.com/problems/maximum-frequency-stack/), [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design HashMap](https://leetcode.com/problems/design-hashmap/)                                                   |
-| **Microsoft** | [Design a Stack With Increment Operation](https://leetcode.com/problems/design-a-stack-with-increment-operation/), [Design HashMap](https://leetcode.com/problems/design-hashmap/), [Design Linked List](https://leetcode.com/problems/design-linked-list/), [Design Parking System](https://leetcode.com/problems/design-parking-system/)                         |
-| **Bloomberg** | [Design Browser History](https://leetcode.com/problems/design-browser-history/), [Design an Ordered Stream](https://leetcode.com/problems/design-an-ordered-stream/)                                                                                                                                                                                               |
-| **Adobe**     | [Design Linked List](https://leetcode.com/problems/design-linked-list/)                                                                                                                                                                                                                                                                                            |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**    | [Day of the Year](https://leetcode.com/problems/day-of-the-year/), [Distribute Candies to People](https://leetcode.com/problems/distribute-candies-to-people/), [Longer Contiguous Segments of Ones than Zeros](https://leetcode.com/problems/longer-contiguous-segments-of-ones-than-zeros/), [Reformat Date](https://leetcode.com/problems/reformat-date/)             |
+| **Google**    | [Valid Boomerang](https://leetcode.com/problems/valid-boomerang/), [Robot Bounded In Circle](https://leetcode.com/problems/robot-bounded-in-circle/), [Check if One String Swap Can Make Strings Equal](https://leetcode.com/problems/check-if-one-string-swap-can-make-strings-equal/), [Consecutive Characters](https://leetcode.com/problems/consecutive-characters/) |
+| **Microsoft** | [Sign of the Product of an Array](https://leetcode.com/problems/sign-of-the-product-of-an-array/), [Compare Version Numbers](https://leetcode.com/problems/compare-version-numbers/), [Validate IP Address](https://leetcode.com/problems/validate-ip-address/)                                                                                                          |
+| **Meta**      | [Validate IP Address](https://leetcode.com/problems/validate-ip-address/)                                                                                                                                                                                                                                                                                                |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 15 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 12 Easy problems solved
+- [ ] All 3 Medium problems solved
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
-- [ ] All 5 conceptual questions answered out loud
-- [ ] I can explain when to choose an abstract class over an interface
-- [ ] I can override `equals` and `hashCode` correctly together
+- [ ] All 6 conceptual questions answered out loud
+- [ ] I wrote an edge-case list for each problem before looking at its hint
+- [ ] I traced at least three of my solutions with a full trace table
+- [ ] I have come back after Lecture 4 and coded all 15
 
 ---
 
-**← [Lecture 2 · Java Memory Management](../Lecture2/Assignment.md)** &nbsp;·&nbsp; **[Lecture 4 · Java 8+ Modern Features](../Lecture4/Assignment.md) →**
+**← [Lecture 2 · Attacking an Unseen Problem](../Lecture2/Assignment.md)** &nbsp;·&nbsp; **[Lecture 4 · Java & Programming Fundamentals](../Lecture4/Assignment.md) →**

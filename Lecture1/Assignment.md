@@ -1,9 +1,10 @@
-# ⚙️ Assignment 1 — Java & Programming Fundamentals
+# 🚀 Assignment 1 — How Fast Is It? — Complexity Analysis
 
-> **Lecture:** 1 of 38 — Java & Programming Fundamentals
+> **Lecture:** 1 of 45 — How Fast Is It? — Complexity Analysis
 > **Phase:** 1 — Foundations
-> **Estimated Time:** 5 days · **Total Problems:** 40 (20 Easy · 10 Medium · 10 Hard)
-> **Goal:** Cement control flow, array manipulation, type system mastery, and complexity analysis.
+> **Estimated Time:** 4 days · **Total Problems:** 20 (15 Easy · 5 Medium · 0 Hard)
+> **Goal:** Read the cost of any solution from its structure, and turn a problem's size limit into the speed your solution needs.
+> **No Java yet:** every task here can be done on paper — describe the obvious solution, then state its Big-O. Come back after Lecture 4 and code them.
 
 ---
 
@@ -11,494 +12,308 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                | Pattern                 | Move                                              |
-| ------------------------------------ | ----------------------- | ------------------------------------------------- |
-| "digits of a number"                 | Digit Extraction        | `n % 10` reads a digit, `n / 10` drops it         |
-| "sum / count / max over an array"    | Single Pass Accumulator | one loop, one or two running variables            |
-| "is it sorted / rotated / monotonic" | Adjacent Comparison     | compare `a[i]` with `a[i+1]`, count breaks        |
-| "how many pairs" with small values   | Counting Array          | count first, then combine counts — no nested loop |
-| "grid", "row", "column"              | 2D Index Mapping        | `idx = r * cols + c` and back with `/` and `%`    |
-| "might not fit in an int"            | Overflow Guard          | check before multiplying, or switch to `long`     |
+| Signal in the Problem                                | Pattern            | Move       |
+| ---------------------------------------------------- | ------------------ | ---------- |
+| One pass over the input                              | Linear             | O(n)       |
+| A loop inside a loop over the same input             | Quadratic          | O(n²)      |
+| The problem halves (or divides) something every step | Logarithmic        | O(log n)   |
+| Sort first, then scan                                | Sort-dominated     | O(n log n) |
+| A loop of fixed length (26 letters, 10 digits)       | Constant           | O(1)       |
+| n ≤ 20 and "every subset"                            | Exponential        | O(2ⁿ)      |
+| Simulation that gives a suspiciously clean pattern   | Look for a formula | Often O(1) |
 
 ---
 
-## 🟢 Easy Tier (20 Problems)
+## 🟢 Easy Tier (15 Problems)
 
-_Build the Foundation._
+_For each problem: read it, describe the obvious solution in one sentence, and write down its Big-O. Only then read the hint. You are practising analysis, not coding — you will code these after Lecture 4._
 
-### E1 · Fizz Buzz
+### E1 · Count Good Triplets
 
-**🔗 [LC 412 — Fizz Buzz](https://leetcode.com/problems/fizz-buzz/)** · Easy
-**Pattern:** Conditionals | **Companies:** Amazon, Google
+**🔗 [LC 1534 — Count Good Triplets](https://leetcode.com/problems/count-good-triplets/)** · Easy
+**Pattern:** Nested loops, counted exactly | **Companies:** Amazon, Google
 
-**Hint:** For numbers 1 to n: print "FizzBuzz" if divisible by both 3 and 5, "Fizz" if by 3, "Buzz" if by 5, else the number itself. **Check the combined case first.**
-
----
-
-### E2 · Count the Digits That Divide a Number
-
-**🔗 [LC 2520 — Count the Digits That Divide a Number](https://leetcode.com/problems/count-the-digits-that-divide-a-number/)** · Easy
-**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe
-
-**Hint:** Peel digits with `n % 10` and `n / 10`, but keep the original `n` in a separate variable — you need it to test `original % digit == 0`. Digits of the input are never 0 here, so no divide-by-zero guard is needed.
+**Hint:** Three loops, O(n³). Now read the constraint: n ≤ 100. Is O(n³) fast enough? Say why before you decide to optimise.
 
 ---
 
-### E3 · Reverse Integer
+### E2 · Build Array from Permutation
 
-**🔗 [LC 7 — Reverse Integer](https://leetcode.com/problems/reverse-integer/)** · Medium
-**Pattern:** Digit Extraction | **Companies:** Amazon, Apple, Bloomberg
+**🔗 [LC 1920 — Build Array from Permutation](https://leetcode.com/problems/build-array-from-permutation/)** · Easy
+**Pattern:** Single pass | **Companies:** Amazon, Google
 
-**Hint:** Given an integer `n`, return its digits reversed. If the reversed number overflows a 32-bit integer, return 0. **Use `long` to detect overflow.**
-
----
-
-### E4 · Subtract the Product and Sum of Digits of an Integer
-
-**🔗 [LC 1281 — Subtract the Product and Sum of Digits of an Integer](https://leetcode.com/problems/subtract-the-product-and-sum-of-digits-of-an-integer/)** · Easy
-**Pattern:** Digit Extraction | **Companies:** Amazon, Google
-
-**Hint:** One loop, two accumulators: `product *= n % 10` and `sum += n % 10`, then `n /= 10`. Start `product` at 1, not 0. Follow-up: the same loop checks an Armstrong number — sum each digit raised to the digit count and compare with the original.
+**Hint:** One pass builds the answer — O(n) time, O(n) space. Follow-up: can you do it in O(1) extra space by storing two numbers in one slot?
 
 ---
 
-### E5 · Palindrome Number
+### E3 · Find Numbers with Even Number of Digits
 
-**🔗 [LC 9 — Palindrome Number](https://leetcode.com/problems/palindrome-number/)** · Easy
-**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe, Apple
+**🔗 [LC 1295 — Find Numbers with Even Number of Digits](https://leetcode.com/problems/find-numbers-with-even-number-of-digits/)** · Easy
+**Pattern:** Digit counting | **Companies:** Amazon
 
-**Hint:** Check if a number reads the same backward without string conversion. Negative numbers are never palindromes.
-
----
-
-### E6 · N-th Tribonacci Number
-
-**🔗 [LC 1137 — N-th Tribonacci Number](https://leetcode.com/problems/n-th-tribonacci-number/)** · Easy
-**Pattern:** Iteration — Rolling Variables | **Companies:** Amazon, Google
-
-**Hint:** Don't recurse — keep only the last three values `a, b, c` and slide them forward `n - 2` times (`next = a + b + c`). Handle `n = 0, 1, 2` first. O(n) time, O(1) space.
+**Hint:** Counting digits of x takes about log₁₀(x) steps. So the whole thing is O(n · d), where d is the number of digits.
 
 ---
 
-### E7 · Smallest Even Multiple
+### E4 · Average Salary Excluding the Minimum and Maximum Salary
 
-**🔗 [LC 2413 — Smallest Even Multiple](https://leetcode.com/problems/smallest-even-multiple/)** · Easy
-**Pattern:** GCD & LCM | **Companies:** Amazon, Adobe
+**🔗 [LC 1491 — Average Salary Excluding the Minimum and Maximum Salary](https://leetcode.com/problems/average-salary-excluding-the-minimum-and-maximum-salary/)** · Easy
+**Pattern:** One pass vs sorting | **Companies:** Amazon, Google
 
-**Hint:** The answer is `lcm(n, 2)`. Write `gcd(a, b)` with Euclid's rule `gcd(b, a % b)`, then `lcm = a / gcd(a, b) * b` — divide first so the product can't overflow.
-
----
-
-### E8 · Find First Palindromic String in the Array
-
-**🔗 [LC 2108 — Find First Palindromic String in the Array](https://leetcode.com/problems/find-first-palindromic-string-in-the-array/)** · Easy
-**Pattern:** String Traversal | **Companies:** Amazon, Adobe
-
-**Hint:** Write `isPalindrome(word)` with two indices walking inward, then return the first word for which it is true (or `""`). Practise using `charAt(i)` and comparing `char`s with `==`.
+**Hint:** Sorting gives min and max, but costs O(n log n). One pass tracking min, max and sum is O(n).
 
 ---
 
-### E9 · Determine if String Halves Are Alike
+### E5 · Find Lucky Integer in an Array
 
-**🔗 [LC 1704 — Determine if String Halves Are Alike](https://leetcode.com/problems/determine-if-string-halves-are-alike/)** · Easy
-**Pattern:** Character Counting | **Companies:** Amazon, Microsoft
+**🔗 [LC 1394 — Find Lucky Integer in an Array](https://leetcode.com/problems/find-lucky-integer-in-an-array/)** · Easy
+**Pattern:** Counting vs nested loops | **Companies:** Amazon
 
-**Hint:** Count vowels in the first half and the second half separately. `"aeiouAEIOU".indexOf(c) >= 0` is a quick vowel test. Both halves have length `s.length() / 2`.
-
----
-
-### E10 · Power of Four
-
-**🔗 [LC 342 — Power of Four](https://leetcode.com/problems/power-of-four/)** · Easy
-**Pattern:** Loops & Powers | **Companies:** Amazon, Google
-
-**Hint:** Loop version first: while `n % 4 == 0`, divide by 4; the answer is `n == 1`. Guard `n <= 0` up front. (Lecture 6 shows the O(1) bit-trick version.)
+**Hint:** Counting each value by rescanning the list is O(n²). Values are at most 500 — a tally list of size 501 makes it O(n).
 
 ---
 
-### E11 · Add Digits
+### E6 · Maximum Product of Three Numbers
 
-**🔗 [LC 258 — Add Digits](https://leetcode.com/problems/add-digits/)** · Easy
-**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe
+**🔗 [LC 628 — Maximum Product of Three Numbers](https://leetcode.com/problems/maximum-product-of-three-numbers/)** · Easy
+**Pattern:** Sort vs single pass | **Companies:** Amazon, Google
 
-**Hint:** Simulate: while `num >= 10`, replace it with the sum of its digits. Then find the O(1) formula — the digital root is `1 + (num - 1) % 9` for `num > 0`.
-
----
-
-### E12 · Duplicate Zeros
-
-**🔗 [LC 1089 — Duplicate Zeros](https://leetcode.com/problems/duplicate-zeros/)** · Easy
-**Pattern:** Array Shifting | **Companies:** Google, Amazon
-
-**Hint:** First count how many zeros will be duplicated and still fit. Then fill from the back with a write pointer so you never overwrite a value you still need. Watch the edge case where the last zero only half-fits.
+**Hint:** Sorting makes the answer easy to see: O(n log n). The three largest and two smallest can also be tracked in one O(n) pass.
 
 ---
 
-### E13 · Concatenation of Array
+### E7 · Count of Matches in Tournament
 
-**🔗 [LC 1929 — Concatenation of Array](https://leetcode.com/problems/concatenation-of-array/)** · Easy
-**Pattern:** Array Basics | **Companies:** Amazon, Adobe
+**🔗 [LC 1688 — Count of Matches in Tournament](https://leetcode.com/problems/count-of-matches-in-tournament/)** · Easy
+**Pattern:** Simulation → formula | **Companies:** Amazon, Google
 
-**Hint:** Allocate `ans = new int[2 * n]` and set `ans[i] = ans[i + n] = nums[i]`. A warm-up for index arithmetic and array allocation.
-
----
-
-### E14 · Number of Good Pairs
-
-**🔗 [LC 1512 — Number of Good Pairs](https://leetcode.com/problems/number-of-good-pairs/)** · Easy
-**Pattern:** Counting | **Companies:** Amazon, Microsoft
-
-**Hint:** Brute force is two nested loops. Better: a count array — when you see a value that has already appeared `c` times, it forms `c` new good pairs, so add `c` before incrementing.
+**Hint:** Simulating the rounds is O(log n). Each match eliminates exactly one team — how many teams must be eliminated?
 
 ---
 
-### E15 · Running Sum of 1d Array
+### E8 · Count Operations to Obtain Zero
 
-**🔗 [LC 1480 — Running Sum of 1d Array](https://leetcode.com/problems/running-sum-of-1d-array/)** · Easy
-**Pattern:** Prefix Sum Basics | **Companies:** Amazon, Microsoft
+**🔗 [LC 2169 — Count Operations to Obtain Zero](https://leetcode.com/problems/count-operations-to-obtain-zero/)** · Easy
+**Pattern:** Repeated subtraction → division | **Companies:** Amazon
 
-**Hint:** Return the running (prefix) sum. `result[i] = result[i-1] + nums[i]`. The foundation of all range-query problems.
-
----
-
-### E16 · Plus One
-
-**🔗 [LC 66 — Plus One](https://leetcode.com/problems/plus-one/)** · Easy
-**Pattern:** Carry Propagation | **Companies:** Google, Amazon, Meta
-
-**Hint:** Add one to a number represented as a digit array. Traverse backwards, handle carry. Don't forget the all-9s edge case (e.g., [9,9,9] → [1,0,0,0]).
+**Hint:** Subtracting one at a time can take a billion steps. Division does many subtractions at once: O(log n).
 
 ---
 
-### E17 · Find the Highest Altitude
+### E9 · XOR Operation in an Array
 
-**🔗 [LC 1732 — Find the Highest Altitude](https://leetcode.com/problems/find-the-highest-altitude/)** · Easy
-**Pattern:** Running Sum | **Companies:** Amazon, Microsoft
+**🔗 [LC 1486 — XOR Operation in an Array](https://leetcode.com/problems/xor-operation-in-an-array/)** · Easy
+**Pattern:** Loop vs pattern | **Companies:** Amazon
 
-**Hint:** Start at altitude 0 and add each `gain[i]`, tracking the maximum seen (including the starting 0).
-
----
-
-### E18 · Richest Customer Wealth
-
-**🔗 [LC 1672 — Richest Customer Wealth](https://leetcode.com/problems/richest-customer-wealth/)** · Easy
-**Pattern:** 2D Array Traversal | **Companies:** Amazon, Adobe
-
-**Hint:** Return the maximum row-sum in an m×n matrix. Nested loops are fine — O(m×n).
+**Hint:** The loop is O(n) and completely fine here. Write out the first few XORs by hand and notice how few operations each step really needs.
 
 ---
 
-### E19 · Shuffle the Array
+### E10 · Largest Positive Integer That Exists With Its Negative
 
-**🔗 [LC 1470 — Shuffle the Array](https://leetcode.com/problems/shuffle-the-array/)** · Easy
-**Pattern:** Index Arithmetic | **Companies:** Amazon, Adobe
+**🔗 [LC 2441 — Largest Positive Integer That Exists With Its Negative](https://leetcode.com/problems/largest-positive-integer-that-exists-with-its-negative/)** · Easy
+**Pattern:** Pairs vs lookup | **Companies:** Amazon, Google
 
-**Hint:** Interleave [x1, x2, ..., xn, y1, y2, ..., yn] → [x1, y1, x2, y2, ...]. Access using `nums[i]` and `nums[i+n]`.
-
----
-
-### E20 · Find the Pivot Integer
-
-**🔗 [LC 2485 — Find the Pivot Integer](https://leetcode.com/problems/find-the-pivot-integer/)** · Easy
-**Pattern:** Gauss Sum Formula | **Companies:** Amazon, Google
-
-**Hint:** Total sum is `n(n+1)/2`. The pivot `x` satisfies `x(x+1)/2 = total - x(x-1)/2`, which simplifies to `x² = total`. Check whether `total` is a perfect square.
+**Hint:** Checking every pair is O(n²). If you could ask "is −x in the list?" instantly, it would be O(n) — that is what a hash set does (Lecture 16).
 
 ---
 
-## 🟡 Medium Tier (10 Problems)
+### E11 · Largest Number At Least Twice of Others
 
-_Interview Staples._
+**🔗 [LC 747 — Largest Number At Least Twice of Others](https://leetcode.com/problems/largest-number-at-least-twice-of-others/)** · Easy
+**Pattern:** Single pass, two trackers | **Companies:** Google
 
-### M1 · Third Maximum Number
-
-**🔗 [LC 414 — Third Maximum Number](https://leetcode.com/problems/third-maximum-number/)** · Easy
-**Pattern:** Track Top Values | **Companies:** Amazon, Microsoft
-
-**Hint:** Keep three variables `first > second > third` (use `long` or `Integer` so `Integer.MIN_VALUE` in the input isn't confused with "empty"). Skip duplicates. If `third` was never set, return `first`.
+**Hint:** Track the largest and second largest in one pass: O(n), O(1) space. Sorting would work too, at O(n log n).
 
 ---
 
-### M2 · Find Closest Number to Zero
+### E12 · Self Dividing Numbers
 
-**🔗 [LC 2239 — Find Closest Number to Zero](https://leetcode.com/problems/find-closest-number-to-zero/)** · Easy
-**Pattern:** Linear Scan | **Companies:** Amazon, Google
+**🔗 [LC 728 — Self Dividing Numbers](https://leetcode.com/problems/self-dividing-numbers/)** · Easy
+**Pattern:** Range × digits | **Companies:** Amazon
 
-**Hint:** Track the value with the smallest `Math.abs(x)`; on a tie, prefer the larger value. One pass, O(1) space.
-
----
-
-### M3 · Max Consecutive Ones
-
-**🔗 [LC 485 — Max Consecutive Ones](https://leetcode.com/problems/max-consecutive-ones/)** · Easy
-**Pattern:** Running Count | **Companies:** Amazon, Google
-
-**Hint:** Keep `current` (length of the run of 1s ending here) and `best`. On a 1 increment `current`; on a 0 reset it to 0. This reset-or-extend idea is the seed of Kadane's algorithm in Lecture 8.
+**Hint:** For each number in [left, right], check each digit: O(range · digits). Count exactly how many steps for left=1, right=10,000.
 
 ---
 
-### M4 · How Many Numbers Are Smaller Than the Current Number
+### E13 · Ugly Number
 
-**🔗 [LC 1365 — How Many Numbers Are Smaller Than the Current Number](https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/)** · Easy
-**Pattern:** Counting Array | **Companies:** Amazon, Microsoft
+**🔗 [LC 263 — Ugly Number](https://leetcode.com/problems/ugly-number/)** · Easy
+**Pattern:** Dividing loop | **Companies:** Amazon, Google
 
-**Hint:** Brute force O(n²) is fine for n ≤ 500. Then do it in O(n + 100): count each value in `int[101]`, build prefix counts, and the answer for `x` is `prefix[x - 1]`.
-
----
-
-### M5 · Maximum Ascending Subarray Sum
-
-**🔗 [LC 1800 — Maximum Ascending Subarray Sum](https://leetcode.com/problems/maximum-ascending-subarray-sum/)** · Easy
-**Pattern:** Running Sum with Reset | **Companies:** Amazon, Google
-
-**Hint:** Walk the array keeping `sum` of the current ascending run. If `nums[i] > nums[i-1]` extend it, otherwise restart at `nums[i]`. Track the best sum.
+**Hint:** Keep dividing by 2, 3 and 5. Each division at least halves n, so the loop runs O(log n) times.
 
 ---
 
-### M6 · Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold
+### E14 · Minimum Number of Moves to Seat Everyone
 
-**🔗 [LC 1343 — Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](https://leetcode.com/problems/number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/)** · Medium
-**Pattern:** Fixed-Size Window (Preview) | **Companies:** Amazon, Microsoft
+**🔗 [LC 2037 — Minimum Number of Moves to Seat Everyone](https://leetcode.com/problems/minimum-number-of-moves-to-seat-everyone/)** · Easy
+**Pattern:** Sort, then pair | **Companies:** Amazon
 
-**Hint:** Compare sums, not averages: count windows with `sum >= k * threshold`. Build the first window's sum, then slide — add `arr[i]`, subtract `arr[i - k]`. O(n). Lecture 18 generalises this.
-
----
-
-### M7 · Sort Array By Parity II
-
-**🔗 [LC 922 — Sort Array By Parity II](https://leetcode.com/problems/sort-array-by-parity-ii/)** · Easy
-**Pattern:** Two Index Pointers | **Companies:** Amazon, Google
-
-**Hint:** Keep `even = 0` and `odd = 1`. Walk `even` in steps of 2; when `nums[even]` is odd, advance `odd` (steps of 2) to an even value and swap. O(n), in place.
+**Hint:** Sort both lists and pair them in order: O(n log n). Say why sorting is the expensive part.
 
 ---
 
-### M8 · Element Appearing More Than 25% In Sorted Array
+### E15 · Find N Unique Integers Sum up to Zero
 
-**🔗 [LC 1287 — Element Appearing More Than 25% In Sorted Array](https://leetcode.com/problems/element-appearing-more-than-25-in-sorted-array/)** · Easy
-**Pattern:** Sorted Array Scan | **Companies:** Amazon, Google
+**🔗 [LC 1304 — Find N Unique Integers Sum up to Zero](https://leetcode.com/problems/find-n-unique-integers-sum-up-to-zero/)** · Easy
+**Pattern:** Construct directly | **Companies:** Amazon, Google
 
-**Hint:** Because the array is sorted, the answer appears more than n/4 times, so `arr[i] == arr[i + n/4]` for some `i`. One pass, O(1) space.
-
----
-
-### M9 · Maximum Product of Two Elements in an Array
-
-**🔗 [LC 1464 — Maximum Product of Two Elements in an Array](https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/)** · Easy
-**Pattern:** Track Top Two | **Companies:** Amazon, Microsoft
-
-**Hint:** You need the two largest values — no sort required. Track `max1` and `max2` in one pass and return `(max1 - 1) * (max2 - 1)`.
+**Hint:** No searching at all — write the numbers down in pairs x and −x. O(n) is the best possible, because you must output n numbers.
 
 ---
 
-### M10 · Check if Array Is Sorted and Rotated
+## 🟡 Medium Tier (5 Problems)
 
-**🔗 [LC 1752 — Check if Array Is Sorted and Rotated](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/)** · Easy
-**Pattern:** Count Breaks | **Companies:** Amazon, Google
+_Here the obvious solution is too slow for the constraint. Find the work that repeats, and say what the faster version would cost. The techniques get their own lectures later; spotting the need for them is the skill._
 
-**Hint:** Count positions where `nums[i] > nums[(i + 1) % n]` (note the wrap-around). A sorted-then-rotated array has at most one such drop.
+### M1 · Sum of Absolute Differences in a Sorted Array
 
----
+**🔗 [LC 1685 — Sum of Absolute Differences in a Sorted Array](https://leetcode.com/problems/sum-of-absolute-differences-in-a-sorted-array/)** · Medium
+**Pattern:** Remove repeated work | **Companies:** Amazon, Google
 
-## 🔴 Hard Tier (10 Problems)
-
-_10 Advanced Problems._
-
-### H1 · String to Integer (atoi)
-
-**🔗 [LC 8 — String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/)** · Medium
-**Pattern:** Parsing & Overflow | **Companies:** Amazon, Microsoft, Meta
-
-**Hint:** Four stages in order: skip spaces, read an optional sign, read digits, stop at the first non-digit. Before `result = result * 10 + d`, check `result > (Integer.MAX_VALUE - d) / 10` and clamp.
+**Hint:** Every pair is O(n²) — with n up to 100,000, that is too slow. Keep running totals of the left and right sides instead: O(n).
 
 ---
 
-### H2 · Count and Say
+### M2 · K Radius Subarray Averages
 
-**🔗 [LC 38 — Count and Say](https://leetcode.com/problems/count-and-say/)** · Medium
-**Pattern:** String Building | **Companies:** Amazon, Google, Meta
+**🔗 [LC 2090 — K Radius Subarray Averages](https://leetcode.com/problems/k-radius-subarray-averages/)** · Medium
+**Pattern:** Recomputed windows | **Companies:** Amazon, Google
 
-**Hint:** Build each term from the previous one: scan runs of equal digits and append `count` then `digit` to a `StringBuilder`. Never use `+=` on a `String` inside the loop.
-
----
-
-### H3 · Maximum Product Subarray
-
-**🔗 [LC 152 — Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)** · Medium
-**Pattern:** Track min AND max | **Companies:** Amazon, Google, LinkedIn
-
-**Hint:** Track both the maximum and the minimum product ending at `i` — a negative number turns the smallest product into the largest. At each step `newMax = max(x, x * max, x * min)` (and symmetrically for min), computed before overwriting.
+**Hint:** Recomputing each window from scratch is O(n · k). Each window shares all but two numbers with the last one — reuse the sum.
 
 ---
 
-### H4 · Zigzag Conversion
+### M3 · Count Number of Homogenous Substrings
 
-**🔗 [LC 6 — Zigzag Conversion](https://leetcode.com/problems/zigzag-conversion/)** · Medium
-**Pattern:** Index Simulation | **Companies:** Amazon, Microsoft, Adobe
+**🔗 [LC 1759 — Count Number of Homogenous Substrings](https://leetcode.com/problems/count-number-of-homogenous-substrings/)** · Medium
+**Pattern:** Count runs, not substrings | **Companies:** Amazon, Google
 
-**Hint:** Keep `numRows` `StringBuilder`s and a row pointer that bounces 0 → numRows-1 → 0. Append each character to the current row, then join. Handle `numRows == 1` separately.
-
----
-
-### H5 · Sequential Digits
-
-**🔗 [LC 1291 — Sequential Digits](https://leetcode.com/problems/sequential-digits/)** · Medium
-**Pattern:** Number Generation | **Companies:** Amazon, Google
-
-**Hint:** Don't test every number in `[low, high]`. Generate candidates from the string `"123456789"`: for each length from 2 to 9, take every substring of that length, convert it, and keep those in range.
+**Hint:** Listing every substring is O(n²). A run of L equal characters contains L·(L+1)÷2 homogenous substrings — count runs in O(n).
 
 ---
 
-### H6 · Smallest Integer Divisible by K
+### M4 · Strictly Palindromic Number
 
-**🔗 [LC 1015 — Smallest Integer Divisible by K](https://leetcode.com/problems/smallest-integer-divisible-by-k/)** · Medium
-**Pattern:** Modular Arithmetic | **Companies:** Amazon, Google
+**🔗 [LC 2396 — Strictly Palindromic Number](https://leetcode.com/problems/strictly-palindromic-number/)** · Medium
+**Pattern:** Reason before you loop | **Companies:** Google, Amazon
 
-**Hint:** The number 111…1 overflows fast, so track only `remainder = (remainder * 10 + 1) % k`. If `k` is divisible by 2 or 5 the answer is -1; otherwise a remainder of 0 appears within `k` steps.
-
----
-
-### H7 · Reshape the Matrix
-
-**🔗 [LC 566 — Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/)** · Easy
-**Pattern:** 2D Index Mapping | **Companies:** Amazon, Microsoft
-
-**Hint:** If `m * n != r * c` return the original. Otherwise walk every cell with a single counter `idx` and place it at `[idx / c][idx % c]`.
+**Hint:** Before converting to every base, write n in base n − 2 by hand for n = 5, 6, 7. What do you see?
 
 ---
 
-### H8 · Special Positions in a Binary Matrix
+### M5 · Minimized Maximum of Products Distributed to Any Store
 
-**🔗 [LC 1582 — Special Positions in a Binary Matrix](https://leetcode.com/problems/special-positions-in-a-binary-matrix/)** · Easy
-**Pattern:** 2D Counting | **Companies:** Amazon, Google
+**🔗 [LC 2064 — Minimized Maximum of Products Distributed to Any Store](https://leetcode.com/problems/minimized-maximum-of-products-distributed-to-any-store/)** · Medium
+**Pattern:** Search over the answer | **Companies:** Amazon, Google
 
-**Hint:** Pre-count ones per row and per column. A cell `(i, j)` is special when `mat[i][j] == 1` and `rowCount[i] == 1` and `colCount[j] == 1`. O(m·n).
-
----
-
-### H9 · Jump Game
-
-**🔗 [LC 55 — Jump Game](https://leetcode.com/problems/jump-game/)** · Medium
-**Pattern:** Greedy reach tracking | **Companies:** Amazon, Google, Meta, Microsoft
-
-**Hint:** Greedy: keep `farthest`, the furthest index reachable so far. Walk `i` from 0; if `i > farthest` you're stuck, otherwise update `farthest = max(farthest, i + nums[i])`. Return true once `farthest >= n - 1`.
+**Hint:** Try every possible maximum: too slow. The answer is between 1 and max(quantities) — halve that range each time: O(n log max). (Taught fully in Lecture 13.)
 
 ---
 
-### H10 · Check if Number is a Sum of Powers of Three
+## 🔴 Hard Tier (0 Problems)
 
-**🔗 [LC 1780 — Check if Number is a Sum of Powers of Three](https://leetcode.com/problems/check-if-number-is-a-sum-of-powers-of-three/)** · Medium
-**Pattern:** Base Conversion | **Companies:** Amazon, Google
-
-**Hint:** Write `n` in base 3 by repeatedly taking `n % 3`. It is a sum of distinct powers of three exactly when no base-3 digit equals 2.
-
----
+_No Hard problems here — this lecture is about reading cost, and the Easy and Medium tiers already stretch that skill._
 
 ## 📊 Complexity Analysis Exercises
 
-Determine **Time** and **Space** complexity for each. Answers below.
+Work out the time and space complexity of each snippet before checking the answers.
 
-```java
-// Snippet A
-for (int i = 1; i < n; i *= 2)
-    for (int j = 0; j < n; j++)
-        sum++;
+```pseudocode
+// Snippet 1
+for i from 0 to n - 1:
+    print(i)
+for j from 0 to n - 1:
+    print(j)
 
-// Snippet B
-int fib(int n) {
-    if (n <= 1) return n;
-    return fib(n - 1) + fib(n - 2);
-}
+// Snippet 2
+for i from 0 to n - 1:
+    for j from 0 to n - 1:
+        print(i, j)
 
-// Snippet C
-void merge(int[] arr, int l, int mid, int r) { /* O(n) work */ }
+// Snippet 3
+for i from 0 to n - 1:
+    for j from i + 1 to n - 1:
+        print(i, j)
 
-void mergeSort(int[] arr, int l, int r) {
-    if (l >= r) return;
-    int mid = (l + r) / 2;
-    mergeSort(arr, l, mid);
-    mergeSort(arr, mid + 1, r);
-    merge(arr, l, mid, r);
-}
+// Snippet 4
+i ← 1
+while i < n:
+    i ← i × 2
 
-// Snippet D
-for (int i = 0; i < n; i++)
-    for (int j = i; j < n; j++)
-        for (int k = j; k < n; k++)
-            count++;
+// Snippet 5
+i ← 0
+while i < n:
+    i ← i + 2
 
-// Snippet E
-Map<Integer, Integer> memo = new HashMap<>();
+// Snippet 6
+for i from 0 to n - 1:
+    for j from 0 to m - 1:
+        print(i, j)
 
-int fib(int n) {
-    if (n <= 1) return n;
-    if (memo.containsKey(n)) return memo.get(n);
-    int res = fib(n - 1) + fib(n - 2);
-    memo.put(n, res);
-    return res;
-}
+// Snippet 7
+for i from 0 to n - 1:
+    for c from 'a' to 'z':
+        print(c)
 
-// Snippet F — What is the total number of operations?
-for (int i = n; i > 0; i /= 2)
-    for (int j = 0; j < i; j++)
-        process();
+// Snippet 8
+function f(n):
+    if n ≤ 1: return 1
+    return f(n - 1) + f(n - 1)
 
-// Snippet G
-boolean hasDuplicate(int[] arr) {
-    Set<Integer> seen = new HashSet<>();
-    for (int x : arr) {
-        if (seen.contains(x)) return true;
-        seen.add(x);
-    }
-    return false;
-}
+// Snippet 9
+sort(a)                               // a has n items
+for i from 0 to n - 1:
+    print(a[i])
 
-// Snippet H
-int binarySearch(int[] arr, int target) { /* standard impl */ }
-
-for (int i = 0; i < n; i++)
-    binarySearch(arr, arr[i]);  // arr is sorted
+// Snippet 10
+i ← n
+while i > 0:
+    for j from 0 to i - 1:
+        print(j)
+    i ← i ÷ 2
 ```
 
-**Answers:**
+**Complexity Answers:**
 
-| Snippet       | Time       | Space | Key Insight                                    |
-| ------------- | ---------- | ----- | ---------------------------------------------- |
-| A             | O(n log n) | O(1)  | Outer: log₂n iters; inner: n iters             |
-| B             | O(2ⁿ)      | O(n)  | Two recursive calls: binary tree of height n   |
-| C (mergeSort) | O(n log n) | O(n)  | log n levels × O(n) merge; O(n) aux for merge  |
-| D             | O(n³)      | O(1)  | Triple nested — n(n+1)(n+2)/6 ≈ O(n³)          |
-| E (memo fib)  | O(n)       | O(n)  | Each subproblem computed once; O(n) call stack |
-| F             | O(n)       | O(1)  | Geometric series: n + n/2 + n/4 + ... = 2n     |
-| G             | O(n) avg   | O(n)  | HashMap O(1) per op × n ops; O(n) HashSet      |
-| H             | O(n log n) | O(1)  | n iterations × O(log n) binary search each     |
+1. **O(n)** time, O(1) space — two separate loops add: n + n = 2n.
+2. **O(n²)** time — nested loops multiply.
+3. **O(n²)** time — the inner loop is about half as long on average, but half of n² is still n² growth.
+4. **O(log n)** time — doubling i reaches n after about log₂ n steps.
+5. **O(n)** time — adding 2 each step means n ÷ 2 steps, which is still linear.
+6. **O(n · m)** time — two different inputs keep two different letters.
+7. **O(n)** time — the inner loop always runs 26 times, a constant.
+8. **O(2ⁿ)** time, **O(n)** space — two calls per level, n levels deep.
+9. **O(n log n)** time — the sort dominates; the O(n) pass after it is the smaller term.
+10. **O(n)** time — the inner loop runs n + n/2 + n/4 + … which adds up to at most 2n.
 
 ---
 
 ## 🔍 Self-Assessment — True / False
 
-Answer without running the code:
-
-1. `5 / 2 == 2.5` in Java → **False** (integer division → 2; cast needed)
-2. `"hello" == "hello"` is always true → **False** (string literals CAN be cached, but `new String()` creates new
-   object)
-3. `Arrays.sort(int[])` is O(n log n) → **True** (dual-pivot quicksort)
-4. `ArrayList.get(i)` is O(n) → **False** (O(1) — backed by array)
-5. A recursive factorial (n) uses O(n) stack space → **True** (n frames on call stack)
-6. `HashMap.get()` is always O(1) → **False** (O(1) average, O(n) worst case with collisions)
-7. `(int)(3.99)` evaluates to 4 → **False** (truncates to 3)
-8. Swapping two `int` primitives via a method changes the originals → **False** (pass-by-value)
+1. Big-O measures how many seconds a program takes. → **False** — it measures how the number of steps grows with the input
+2. O(2n) and O(n) describe the same growth. → **True** — constant multipliers are dropped
+3. A loop that runs from i + 1 to n inside another loop is O(n log n). → **False** — it is still O(n²) — about half of n²
+4. Sorting is free if you only do it once. → **False** — one sort is O(n log n), which is often the most expensive step
+5. A recursive function that creates no lists uses O(1) space. → **False** — each unfinished call is held in memory, so depth counts
+6. Adding to a growable list is O(1) every single time. → **False** — it is O(1) amortised; the occasional resize is O(n)
+7. With n ≤ 100,000, an O(n²) solution is usually too slow. → **True** — 10¹⁰ steps is about 100 seconds at 10⁸ per second
+8. O(log n) grows faster than O(n). → **False** — log n grows far slower — 20 for a million, versus a million
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. Why does `swap(int a, int b)` fail in Java but `swap(int[] arr, int i, int j)` works?
-2. What is the difference between `==` and `.equals()` for `String`? Give an example where they differ.
-3. Derive why digit extraction (`while n > 0, n /= 10`) is O(log n).
-4. Kadane's algorithm vs brute force — what is the core performance win?
-5. Why should you use `lo + (hi - lo) / 2` instead of `(lo + hi) / 2` in binary search?
-6. What is the output of `Integer.MIN_VALUE * -1`? Why?
+Answer these out loud, without looking at the notes:
+
+1. **Why not seconds?**: Explain why computer scientists count steps rather than time a program with a stopwatch.
+2. **The ladder**: List the seven common Big-O classes from fastest to slowest and give one everyday example of each.
+3. **Halving**: Explain in your own words why halving something repeatedly takes only about 20 steps to get from a million down to one.
+4. **Two inputs**: A function loops over a list of n names and, inside, over a list of m emails. What is its Big-O, and why is O(n²) wrong?
+5. **Space**: What is the difference between the space an algorithm needs in total and its _auxiliary_ space? Which one do interviewers usually mean?
+6. **Amortised**: Explain amortised O(1) to a friend using the growing-list (or moving-house) example.
+7. **Constraints**: A problem says n ≤ 20. Another says n ≤ 1,000,000. What does each tell you about the solution before you read anything else?
 
 ---
 
@@ -506,27 +321,24 @@ Answer without running the code:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                       |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/), [Count and Say](https://leetcode.com/problems/count-and-say/), [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/), [Zigzag Conversion](https://leetcode.com/problems/zigzag-conversion/)                                 |
-| **Google**    | [Count and Say](https://leetcode.com/problems/count-and-say/), [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/), [Sequential Digits](https://leetcode.com/problems/sequential-digits/), [Smallest Integer Divisible by K](https://leetcode.com/problems/smallest-integer-divisible-by-k/)                 |
-| **Microsoft** | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/), [Zigzag Conversion](https://leetcode.com/problems/zigzag-conversion/), [Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/), [Jump Game](https://leetcode.com/problems/jump-game/)                                                     |
-| **Adobe**     | [Zigzag Conversion](https://leetcode.com/problems/zigzag-conversion/), [Count the Digits That Divide a Number](https://leetcode.com/problems/count-the-digits-that-divide-a-number/), [Palindrome Number](https://leetcode.com/problems/palindrome-number/), [Smallest Even Multiple](https://leetcode.com/problems/smallest-even-multiple/) |
-| **Meta**      | [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/), [Count and Say](https://leetcode.com/problems/count-and-say/), [Jump Game](https://leetcode.com/problems/jump-game/), [Plus One](https://leetcode.com/problems/plus-one/)                                                                                 |
+| Company    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon** | [Count Operations to Obtain Zero](https://leetcode.com/problems/count-operations-to-obtain-zero/), [Find Lucky Integer in an Array](https://leetcode.com/problems/find-lucky-integer-in-an-array/), [Find Numbers with Even Number of Digits](https://leetcode.com/problems/find-numbers-with-even-number-of-digits/), [Minimum Number of Moves to Seat Everyone](https://leetcode.com/problems/minimum-number-of-moves-to-seat-everyone/)                                 |
+| **Google** | [Largest Number At Least Twice of Others](https://leetcode.com/problems/largest-number-at-least-twice-of-others/), [Count Number of Homogenous Substrings](https://leetcode.com/problems/count-number-of-homogenous-substrings/), [K Radius Subarray Averages](https://leetcode.com/problems/k-radius-subarray-averages/), [Minimized Maximum of Products Distributed to Any Store](https://leetcode.com/problems/minimized-maximum-of-products-distributed-to-any-store/) |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 20 Easy problems solved
-- [ ] All 10 Medium problems solved
-- [ ] All 10 Hard problems attempted
+- [ ] All 15 Easy problems solved
+- [ ] All 5 Medium problems solved
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
-- [ ] All 6 conceptual questions answered out loud
-- [ ] I can trace a nested loop and state its Big-O without running it
-- [ ] I can explain why `a / gcd * b` is safer than `a * b / gcd`
+- [ ] All 7 conceptual questions answered out loud
+- [ ] I can find the Big-O of any loop structure in this assignment without help
+- [ ] I can name the target complexity from a constraint in under ten seconds
+- [ ] I have come back after Lecture 4 and coded at least the Easy tier
 
 ---
 
-**← [Study Plan](../study_plan.md)** &nbsp;·&nbsp; **[Lecture 2 · Java Memory Management](../Lecture2/Assignment.md) →**
+**← [Study Plan](../README.md)** &nbsp;·&nbsp; **[Lecture 2 · Attacking an Unseen Problem](../Lecture2/Assignment.md) →**

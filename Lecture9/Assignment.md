@@ -1,10 +1,10 @@
-# 🔀 Assignment 9 — Sorting Algorithms
+# 🔣 Assignment 6 — Bit Manipulation
 
-> **Lecture:** 9 of 38 — Sorting Algorithms
-> **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 4 days · **Total Problems:** 25 (10 Easy · 10 Medium · 5 Hard)
-> **Goal:** Master core comparison sorts ($O(N^2)$ to $O(N \log N)$), non-comparison sorting ($O(N)$), partitioning
-> paradigms, and the **Cyclic Sort** invariant for range-limited domains.
+> **Lecture:** 9 of 45 — Bit Manipulation
+> **Phase:** 1 — Foundations
+> **Estimated Time:** 4 days · **Total Problems:** 30 (16 Easy · 14 Medium · 0 Hard)
+> **Goal:** Develop binary intuition, master O(1) bitwise optimisations, and understand XOR properties for
+> interview-standard puzzles.
 
 ---
 
@@ -12,274 +12,380 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                        | Pattern             | Move                                          |
-| -------------------------------------------- | ------------------- | --------------------------------------------- |
-| "sort" with a small value range              | Counting Sort       | count, then write back in order               |
-| "numbers from 1 to n", "missing / duplicate" | Cyclic Sort         | swap each value to index `value - 1`          |
-| "kth largest / smallest"                     | QuickSelect         | partition around a pivot, recurse on one side |
-| "count pairs where i < j and …"              | Merge Sort Counting | count during the merge step                   |
-| "order by a custom rule"                     | Custom Comparator   | define `compare(a, b)` and sort               |
-| "overlapping intervals"                      | Sort + Sweep        | sort by start, then merge in one pass         |
+| Signal in the Problem                | Pattern             | Move                                       |
+| ------------------------------------ | ------------------- | ------------------------------------------ | ------------- |
+| "appears twice except one"           | XOR Cancellation    | XOR everything; pairs vanish               |
+| "power of two", "lowest set bit"     | `n & (n - 1)`       | clears the lowest set bit                  |
+| "count 1 bits"                       | Kernighan's Loop    | repeat `n &= n - 1`                        |
+| "all subsets" with n ≤ 20            | Bitmask Enumeration | `for mask in 0 .. 2ⁿ - 1`                  |
+| "check / set / clear / toggle bit i" | Bit Masks           | `1 << i` with `&`, `                       | `, `& ~`, `^` |
+| "without + or -"                     | Bitwise Arithmetic  | XOR for the sum, AND + shift for the carry |
 
 ---
 
-## 🟢 Easy Tier (10 Problems)
+## 🟢 Easy Tier (16 Problems)
 
-_Focus on implementing pure logic, counting swaps, and in-place sorting._
+_The Binary Language._
 
-### E1 · Height Checker
+### E1 · Binary to Decimal & Back
 
-**🔗 [LC 1051 — Height Checker](https://leetcode.com/problems/height-checker/)** · Easy
-**Pattern:** Bubble Sort (Implement Yourself) | **Companies:** Amazon, Google
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Basic Bit Operations | **Companies:** Amazon, Google, Apple
 
-**Hint:** Build `expected` by copying the array and sorting it with your own bubble sort (stop early when a pass makes no swaps). Then count the mismatched positions.
-
----
-
-### E2 · Find Target Indices After Sorting Array
-
-**🔗 [LC 2089 — Find Target Indices After Sorting Array](https://leetcode.com/problems/find-target-indices-after-sorting-array/)** · Easy
-**Pattern:** Selection Sort (Implement Yourself) | **Companies:** Amazon, Google
-
-**Hint:** Sort with your own selection sort, then collect the indices equal to `target`. Follow-up: skip sorting — the answer depends only on how many values are `< target` and `== target`.
+**Task:** Write a function `binToDec(String s)` and `decToBin(int n)` manually without using `Integer.parseInt(s, 2)`. This cements the base-2 understanding.
 
 ---
 
-### E3 · Insertion Sort List
+### E2 · Check if Bit is Set
 
-**🔗 [LC 147 — Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)** · Medium
-**Pattern:** Insertion Sort | **Companies:** Microsoft, Amazon
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Basic Bit Operations | **Companies:** Amazon, Google, Apple
 
-**Hint:** Build a sorted list behind a dummy head. For each node, walk from the dummy to find its insertion point and splice it in. The same insertion idea as on arrays, but without shifting.
-
----
-
-### E4 · Merge Sorted Array
-
-**🔗 [LC 88 — Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/)** · Easy
-**Pattern:** Merge from the Back | **Companies:** Amazon, Microsoft, Meta
-
-**Hint:** Fill from the back: pointers `i = m - 1`, `j = n - 1`, `k = m + n - 1`. Write the larger of `nums1[i]` and `nums2[j]` at `k`. Stop when `nums2` is used up — any leftover `nums1` is already in place.
+**Task:** Write `isSet(int n, int i)` which returns true if the i-th bit from right (0-indexed) is 1. (Use: `(n & (1 << i)) != 0` or `(n >> i) & 1 == 1`).
 
 ---
 
-### E5 · Rank Transform of an Array
+### E3 · Set the i-th Bit
 
-**🔗 [LC 1331 — Rank Transform of an Array](https://leetcode.com/problems/rank-transform-of-an-array/)** · Easy
-**Pattern:** Sort + Rank Map | **Companies:** Amazon, Google
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Basic Bit Operations | **Companies:** Amazon, Google, Apple
 
-**Hint:** Copy and sort the array, assign ranks to distinct values in a map (rank increases only on a new value), then map every original element to its rank.
-
----
-
-### E6 · Find All Numbers Disappeared in an Array
-
-**🔗 [LC 448 — Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)** · Easy
-**Pattern:** Cyclic | **Companies:** Amazon, Google, Apple
-
-**Hint:** Cyclic sort: swap each value `v` into index `v - 1` until the spot already holds `v`. Then every index `i` with `nums[i] != i + 1` means `i + 1` is missing. (Negative marking also works in O(1) space.)
+**Task:** `setBit(int n, int i)` which ensures the i-th bit is 1. (Use: `n | (1 << i)`).
 
 ---
 
-### E7 · Set Mismatch
+### E4 · Clear the i-th Bit
 
-**🔗 [LC 645 — Set Mismatch](https://leetcode.com/problems/set-mismatch/)** · Easy
-**Pattern:** Cyclic | **Companies:** Amazon, Google
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Basic Bit Operations | **Companies:** Amazon, Google, Apple
 
-**Hint:** Cyclic sort the array. The index `i` with `nums[i] != i + 1` gives both answers: `nums[i]` is the duplicate and `i + 1` is the missing number.
-
----
-
-### E8 · Can Make Arithmetic Progression From Sequence
-
-**🔗 [LC 1502 — Can Make Arithmetic Progression From Sequence](https://leetcode.com/problems/can-make-arithmetic-progression-from-sequence/)** · Easy
-**Pattern:** Sort Then Verify | **Companies:** Amazon, Google
-
-**Hint:** Sort, then check every adjacent difference equals `arr[1] - arr[0]`. O(n) follow-up: min, max and a set — the step must be `(max - min) / (n - 1)`.
+**Task:** `clearBit(int n, int i)` which ensures the i-th bit is 0. (Use: `n & ~(1 << i)`).
 
 ---
 
-### E9 · Relative Sort Array
+### E5 · Toggle the i-th Bit
 
-**🔗 [LC 1122 — Relative Sort Array](https://leetcode.com/problems/relative-sort-array/)** · Easy
-**Pattern:** Counting Sort | **Companies:** Amazon, Google, Meta
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Basic Bit Operations | **Companies:** Amazon, Google, Apple
 
-**Hint:** Values are ≤ 1000, so count them in `int[1001]`. Emit the values in `arr2`'s order first, then the leftovers in ascending order. O(n + range).
-
----
-
-### E10 · Sort Array By Parity
-
-**🔗 [LC 905 — Sort Array By Parity](https://leetcode.com/problems/sort-array-by-parity/)** · Easy
-**Pattern:** Two-Pointer Partition | **Companies:** Amazon, Google
-
-**Hint:** Two pointers: `lo` from the start, `hi` from the end. If `nums[lo]` is odd, swap it with `nums[hi]` and move `hi` left; otherwise move `lo` right. It's the two-way partition from quicksort.
+**Task:** `toggleBit(int n, int i)` which flips 0 to 1 and vice-versa. (Use: `n ^ (1 << i)`).
 
 ---
 
-## 🟡 Medium Tier (10 Problems)
+### E6 · Power of Two
 
-_Focus on complexity, stable merging, and randomized pivoting._
+**🔗 [LC 231 — Power of Two](https://leetcode.com/problems/power-of-two/)** · Easy
+**Pattern:** n & (n-1) == 0 | **Companies:** Google, Amazon, Apple
 
-### M1 · Sort Colors
-
-**🔗 [LC 75 — Sort Colors](https://leetcode.com/problems/sort-colors/)** · Medium
-**Pattern:** Two Pointers | **Companies:** Microsoft, Amazon, Meta
-
-**Hint:** Dutch National Flag with three pointers `lo`, `mid`, `hi`: a 0 swaps with `lo` (advance both), a 1 just advances `mid`, and a 2 swaps with `hi` (move `hi` left but don't advance `mid` — the swapped-in value is unchecked). One pass.
+**Hint:** A power of 2 has only one set bit. XORing or ANDing with `n-1` clears the only set bit. Result should be 0.
 
 ---
 
-### M2 · Find the Duplicate Number
+### E7 · Number of 1 Bits
 
-**🔗 [LC 287 — Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)** · Medium
-**Pattern:** Cyclic | **Companies:** Amazon, Google, Meta, Microsoft
+**🔗 [LC 191 — Number of 1 Bits](https://leetcode.com/problems/number-of-1-bits/)** · Easy
+**Pattern:** Counting Set Bits | **Companies:** Amazon, Microsoft, Apple
 
-**Hint:** Cyclic sort idea: values are 1..n in n + 1 slots, so place each value at its index; the value that finds its index already occupied is the duplicate. With the read-only constraint, treat `i → nums[i]` as a linked list and use Floyd's cycle entry instead.
-
----
-
-### M3 · Find All Duplicates in an Array
-
-**🔗 [LC 442 — Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)** · Medium
-**Pattern:** Cyclic | **Companies:** Amazon, Google, Meta
-
-**Hint:** Negative marking: for each `v`, look at index `|v| - 1`. If it's already negative, `|v|` is a duplicate; otherwise negate it. O(n) time, O(1) extra space.
+**Hint:** Count bits by shifting and checking one by one. O(log N) where N is bits count.
 
 ---
 
-### M4 · Find the Kth Largest Integer in the Array
+### E8 · Sort Integers by The Number of 1 Bits
 
-**🔗 [LC 1985 — Find the Kth Largest Integer in the Array](https://leetcode.com/problems/find-the-kth-largest-integer-in-the-array/)** · Medium
-**Pattern:** QuickSelect with a Custom Comparator | **Companies:** Amazon, Google
+**🔗 [LC 1356 — Sort Integers by The Number of 1 Bits](https://leetcode.com/problems/sort-integers-by-the-number-of-1-bits/)** · Easy
+**Pattern:** Counting Set Bits (Kernighan's) | **Companies:** Amazon, Adobe
 
-**Hint:** The numbers are strings with up to 100 digits: compare by length first, then lexicographically. Then QuickSelect (random pivot) for the kth largest, or a size-k min-heap.
-
----
-
-### M5 · Largest Number
-
-**🔗 [LC 179 — Largest Number](https://leetcode.com/problems/largest-number/)** · Medium
-**Pattern:** Custom Comparator | **Companies:** Google, Amazon, Microsoft
-
-**Hint:** Sort the numbers as strings with the comparator `(a, b) -> (b + a).compareTo(a + b)`, so `a` goes first when `a + b` is the bigger string. Join them. If the first string is "0", the answer is "0".
+**Hint:** Write `popcount(x)` with Kernighan's loop `x &= x - 1`. Sort `Integer[]` by `(popcount, value)`. Compare the number of loop iterations with the naive bit-by-bit count.
 
 ---
 
-### M6 · Merge Intervals
+### E9 · Single Number
 
-**🔗 [LC 56 — Merge Intervals](https://leetcode.com/problems/merge-intervals/)** · Medium
-**Pattern:** Intervals | **Companies:** Google, Amazon, Meta, Microsoft
+**🔗 [LC 136 — Single Number](https://leetcode.com/problems/single-number/)** · Easy
+**Pattern:** XOR Cancellation | **Companies:** Google, Amazon, Microsoft
 
-**Hint:** Sort by start. Keep the last merged interval; if the next start is ≤ its end, extend the end to `max(end, next end)`, otherwise start a new interval. O(n log n).
-
----
-
-### M7 · Maximum Element After Decreasing and Rearranging
-
-**🔗 [LC 1846 — Maximum Element After Decreasing and Rearranging](https://leetcode.com/problems/maximum-element-after-decreasing-and-rearranging/)** · Medium
-**Pattern:** Sort + Greedy | **Companies:** Amazon
-
-**Hint:** Sort, set `arr[0] = 1`, then clamp each element to `min(arr[i], arr[i-1] + 1)`. The last element is the answer. A counting sort on `min(value, n)` makes it O(n).
+**Hint:** Every number appears twice except one. XOR all numbers. Result is the single number. O(n) time, O(1) space.
 
 ---
 
-### M8 · Wiggle Sort II
+### E10 · Hamming Distance
 
-**🔗 [LC 324 — Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/)** · Medium
-**Pattern:** Partitioning | **Companies:** Google, Amazon, Meta
+**🔗 [LC 461 — Hamming Distance](https://leetcode.com/problems/hamming-distance/)** · Easy
+**Pattern:** XOR + Count Bits | **Companies:** Meta, Amazon, Adobe
 
-**Hint:** Sort, then interleave the two halves from the back (O(N log N)); follow-up: QuickSelect the median + 3-way partition for O(N).
-
----
-
-### M9 · Sort the Matrix Diagonally
-
-**🔗 [LC 1329 — Sort the Matrix Diagonally](https://leetcode.com/problems/sort-the-matrix-diagonally/)** · Medium
-**Pattern:** Sort Each Diagonal | **Companies:** Amazon, Google
-
-**Hint:** Cells on the same diagonal share `i - j`. Collect each diagonal into a list (or a counting array — values ≤ 100), sort it, and write it back in the same walk order.
+**Hint:** Count different bits between two integers. XOR them and count the set bits in the result.
 
 ---
 
-### M10 · Custom Sort String
+### E11 · Decode XORed Array
 
-**🔗 [LC 791 — Custom Sort String](https://leetcode.com/problems/custom-sort-string/)** · Medium
-**Pattern:** Custom Order / Counting | **Companies:** Meta, Amazon, Google
+**🔗 [LC 1720 — Decode XORed Array](https://leetcode.com/problems/decode-xored-array/)** · Easy
+**Pattern:** XOR Inverse | **Companies:** Amazon, Google
 
-**Hint:** Count every character of `s`, emit characters in `order`'s order as many times as they appear, then append whatever is left. That's counting sort with a custom key order: O(n + 26).
-
----
-
-## 🔴 Hard Tier (5 Problems)
-
-_Focus on O(1) space constraints and optimal sorting pivots._
-
-### H1 · First Missing Positive
-
-**🔗 [LC 41 — First Missing Positive](https://leetcode.com/problems/first-missing-positive/)** · Hard
-**Pattern:** Cyclic | **Companies:** Google, Amazon, Meta, Microsoft
-
-**Hint:** Cyclic sort values `1..n` into index `value - 1`, ignoring values that are out of range or would swap with an equal value. The first index `i` with `nums[i] != i + 1` gives the answer `i + 1`; if there is none, it's `n + 1`.
+**Hint:** If `encoded[i] = result[i] ^ result[i+1]`, then `result[i+1] = encoded[i] ^ result[i]`.
 
 ---
 
-### H2 · Maximum Gap
+### E12 · Binary Number with Alternating Bits
 
-**🔗 [LC 164 — Maximum Gap](https://leetcode.com/problems/maximum-gap/)** · Medium
-**Pattern:** Bucket Sort (Pigeonhole) | **Companies:** Apple, Amazon, Google
+**🔗 [LC 693 — Binary Number with Alternating Bits](https://leetcode.com/problems/binary-number-with-alternating-bits/)** · Easy
+**Pattern:** n ^ (n >> 1) | **Companies:** Amazon, Microsoft
 
-**Hint:** Pigeonhole: with `n` numbers between `min` and `max`, the max gap is at least `ceil((max - min) / (n - 1))`. Use buckets of that width, store only each bucket's min and max, and scan the gaps between non-empty buckets. O(n).
-
----
-
-### H3 · Reverse Pairs
-
-**🔗 [LC 493 — Reverse Pairs](https://leetcode.com/problems/reverse-pairs/)** · Hard
-**Pattern:** D&C | **Companies:** Google, Amazon, Meta
-
-**Hint:** Modify merge sort: before merging two sorted halves, count pairs with a second pointer — for each `i` in the left half, advance `j` in the right half while `nums[i] > 2 * nums[j]` (use `long`). Then merge as usual.
+**Hint:** Check `x = n ^ (n >> 1)`: if the bits alternate, `x` is all ones, so `x & (x + 1) == 0`. No loop needed.
 
 ---
 
-### H4 · Count of Smaller Numbers After Self
+### E13 · Number of Steps to Reduce a Number to Zero
 
-**🔗 [LC 315 — Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/)** · Hard
-**Pattern:** Merge Sort Counting | **Companies:** Google, Amazon, Meta
+**🔗 [LC 1342 — Number of Steps to Reduce a Number to Zero](https://leetcode.com/problems/number-of-steps-to-reduce-a-number-to-zero/)** · Easy
+**Pattern:** Even/Odd Logic | **Companies:** Amazon, Adobe
 
-**Hint:** Merge sort on indices. While merging, when you take an element from the left half, every right-half element already placed was smaller and came after it — add that count to the element's answer. Or use a Fenwick tree over compressed values.
+**Hint:** If even, divide by 2 (Right shift); if odd, subtract 1 (Clear rightmost bit).
+
+---
+
+### E14 · Missing Number
+
+**🔗 [LC 268 — Missing Number](https://leetcode.com/problems/missing-number/)** · Easy
+**Pattern:** XOR Cancellation | **Companies:** Amazon, Google, Microsoft
+
+**Hint:** XOR all indices `0..n` together with all values; everything present twice cancels and only the missing number survives. No overflow, unlike the sum formula in some languages.
 
 ---
 
-### H5 · Count of Range Sum
+### E15 · Reverse Bits
 
-**🔗 [LC 327 — Count of Range Sum](https://leetcode.com/problems/count-of-range-sum/)** · Hard
-**Pattern:** Merge Sort Counting | **Companies:** Google, Amazon
+**🔗 [LC 190 — Reverse Bits](https://leetcode.com/problems/reverse-bits/)** · Easy
+**Pattern:** Bit Reversal | **Companies:** Amazon, Apple, Adobe
 
-**Hint:** Work on prefix sums. During merge sort, for each left-half prefix `p`, move two pointers over the sorted right half to count prefixes in `[p + lower, p + upper]`, then merge. O(n log n). Use `long`.
+**Hint:** Loop 32 times: `result = (result << 1) | (n & 1)`, then `n >>>= 1` (the unsigned shift matters in Java). Follow-up: cache byte reversals for repeated calls.
 
 ---
+
+### E16 · Sum of All Subset XOR Totals
+
+**🔗 [LC 1863 — Sum of All Subset XOR Totals](https://leetcode.com/problems/sum-of-all-subset-xor-totals/)** · Easy
+**Pattern:** Bit Contribution / OR Trick | **Companies:** Amazon, Google, Apple
+
+**Hint:** Brute force is 2ⁿ subsets; the bit-frequency insight gives `(OR of all) × 2ⁿ⁻¹` in O(n).
+
+---
+
+## 🟡 Medium Tier (14 Problems)
+
+_XOR & Masking._
+
+### M1 · Single Number II
+
+**🔗 [LC 137 — Single Number II](https://leetcode.com/problems/single-number-ii/)** · Medium
+**Pattern:** Bit Counting / Finite State | **Companies:** Google, Amazon, Meta
+
+**Hint:** Every number appears thrice except one. Solution 1: Count bits in each position and take mod 3. Solution 2: Use two bitmasks `ones` and `twos`.
+
+---
+
+### M2 · Single Number III
+
+**🔗 [LC 260 — Single Number III](https://leetcode.com/problems/single-number-iii/)** · Medium
+**Pattern:** XOR + Partition | **Companies:** Google, Amazon, Meta
+
+**Hint:** Two numbers appear once, all others twice. XOR all (result = A ^ B). Find the rightmost set bit in `A ^ B` and use it to partition numbers into two groups (one where bit is set, one where it isn't). XOR each group.
+
+---
+
+### M3 · Count Number of Maximum Bitwise-OR Subsets
+
+**🔗 [LC 2044 — Count Number of Maximum Bitwise-OR Subsets](https://leetcode.com/problems/count-number-of-maximum-bitwise-or-subsets/)** · Medium
+**Pattern:** Bitmask Enumeration | **Companies:** Google, Amazon
+
+**Hint:** The maximum OR is the OR of the whole array. Enumerate every mask from 1 to `2ⁿ - 1`, OR the chosen elements, and count the masks that reach the maximum.
+
+---
+
+### M4 · Bitwise XOR of All Pairings
+
+**🔗 [LC 2425 — Bitwise XOR of All Pairings](https://leetcode.com/problems/bitwise-xor-of-all-pairings/)** · Medium
+**Pattern:** XOR Parity Counting | **Companies:** Amazon, Google
+
+**Hint:** Each `nums1[i]` appears in `len(nums2)` pairs. If that count is odd it survives the XOR, otherwise it cancels. The same holds for `nums2` with `len(nums1)`. O(n + m).
+
+---
+
+### M5 · Maximum XOR of Two Numbers in an Array
+
+**🔗 [LC 421 — Maximum XOR of Two Numbers in an Array](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)** · Medium
+**Pattern:** Greedy + Prefix Mask | **Companies:** Google, Amazon, Meta
+
+**Hint:** Use a Trie (Lecture 36) or build max XOR bit-by-bit from left.
+
+---
+
+### M6 · Divide Two Integers
+
+**🔗 [LC 29 — Divide Two Integers](https://leetcode.com/problems/divide-two-integers/)** · Medium
+**Pattern:** Exponential Bit Shift | **Companies:** Amazon, Microsoft, Meta
+
+**Hint:** Divide without using `*`, `/`, or `%`. Use left shifts to subtract `divisor * 2ⁿ`.
+
+---
+
+### M7 · Gray Code
+
+**🔗 [LC 89 — Gray Code](https://leetcode.com/problems/gray-code/)** · Medium
+**Pattern:** n ^ (n >> 1) | **Companies:** Amazon, Google, Adobe
+
+**Hint:** The i-th Gray code is `i ^ (i >> 1)`. Generate it for `i` from 0 to `2ⁿ - 1`. Neighbouring values then differ in exactly one bit.
+
+---
+
+### M8 · Bitwise AND of Numbers Range
+
+**🔗 [LC 201 — Bitwise AND of Numbers Range](https://leetcode.com/problems/bitwise-and-of-numbers-range/)** · Medium
+**Pattern:** Common Prefix | **Companies:** Google, Amazon
+
+**Hint:** The AND of a range keeps only the common binary prefix of `left` and `right`. Shift both right until they're equal, counting the shifts, then shift back left by that count.
+
+---
+
+### M9 · Minimum Flips to Make a OR b Equal to c
+
+**🔗 [LC 1318 — Minimum Flips to Make a OR b Equal to c](https://leetcode.com/problems/minimum-flips-to-make-a-or-b-equal-to-c/)** · Medium
+**Pattern:** Bit-by-bit comparison | **Companies:** Amazon, Google
+
+**Hint:** Go bit by bit. If bit `c` is 1 and both `a` and `b` are 0, you need 1 flip. If bit `c` is 0, you need one flip for each of `a` and `b` that is 1. Sum over 32 bits.
+
+---
+
+### M10 · Maximum Product of Word Lengths
+
+**🔗 [LC 318 — Maximum Product of Word Lengths](https://leetcode.com/problems/maximum-product-of-word-lengths/)** · Medium
+**Pattern:** String to Bitmask | **Companies:** Google, Amazon
+
+**Hint:** Map each word to an `int` (bitmask of 26 chars). Two words have no common chars if `(mask1 & mask2) == 0`.
+
+---
+
+### M11 · Swap Two Numbers without Temporary Variable
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** Bit Tricks & Puzzles | **Companies:** Amazon, Google, Apple
+
+**Task:** `a = a ^ b; b = a ^ b; a = a ^ b;`. Explain why this works.
+
+---
+
+### M12 · Total Hamming Distance
+
+**🔗 [LC 477 — Total Hamming Distance](https://leetcode.com/problems/total-hamming-distance/)** · Medium
+**Pattern:** Bit Contribution | **Companies:** Meta, Amazon
+
+**Hint:** Count set bits at each position. If `k` bits are set and `n-k` are not, that bit position contributes `k * (n-k)` to the total.
+
+---
+
+### M13 · UTF-8 Validation
+
+**🔗 [LC 393 — UTF-8 Validation](https://leetcode.com/problems/utf-8-validation/)** · Medium
+**Pattern:** Bit Masking | **Companies:** Google, Amazon, Meta
+
+**Hint:** Read the lead byte's high bits to learn the character length (`0xxxxxxx` = 1, `110xxxxx` = 2, `1110xxxx` = 3, `11110xxx` = 4), then check that the next `len - 1` bytes each start with `10`. Mask with `>> 6 == 0b10`.
+
+---
+
+### M14 · Count Triplets That Can Form Two Arrays of Equal XOR
+
+**🔗 [LC 1442 — Count Triplets That Can Form Two Arrays of Equal XOR](https://leetcode.com/problems/count-triplets-that-can-form-two-arrays-of-equal-xor/)** · Medium
+**Pattern:** Prefix XOR | **Companies:** Google, Amazon
+
+**Hint:** `a == b` means `XOR(i..k) == 0`, which means `prefix[i] == prefix[k + 1]`. Every such pair `(i, k)` gives `k - i` valid `j`s. Count with maps of prefix XOR → count and → sum of indices for O(n).
+
+---
+
+## 🔴 Hard Tier (0 Problems)
+
+_No Hard problems at this stage of the course._
 
 ## 📊 Complexity Analysis Exercises
 
-Complete the table based on the best/worst cases:
+Analyse Time and Space for these Bitwise operations.
 
-| Snippet          | Best Case     | Worst Case    | Space       | Stability |
-| :--------------- | :------------ | :------------ | :---------- | :-------- |
-| `Selection Sort` | $O(N^2)$      | ??            | $O(1)$      | No        |
-| `Merge Sort`     | ??            | $O(N \log N)$ | $O(N)$      | Yes       |
-| `Quick Sort`     | $O(N \log N)$ | $O(N^2)$      | $O(\log N)$ | No        |
-| `Counting Sort`  | $O(N+K)$      | ??            | $O(K)$      | Yes       |
-| `Cyclic Sort`    | $O(N)$        | $O(N)$        | $O(1)$      | No        |
+```pseudocode
+// Snippet 1
+count ← 0
+while n > 0:
+    n ← n AND (n - 1)
+    count ← count + 1
+
+// Snippet 2
+for mask from 0 to 2ⁿ - 1:
+    for j from 0 to n - 1:
+        if mask AND (1 << j) ≠ 0:
+            process(j)
+
+// Snippet 3
+x ← a XOR b          // Time?
+
+// Snippet 4
+while m ≠ n:
+    m ← m >> 1
+    n ← n >> 1
+    count ← count + 1
+
+// Snippet 5 — XOR of all numbers from 1 to N
+function xorN(n):
+    if n mod 4 = 0: return n
+    if n mod 4 = 1: return 1
+    if n mod 4 = 2: return n + 1
+    return 0
+
+// Snippet 6
+function getBit(n, i):
+    return (n >> i) AND 1
+
+// Snippet 7
+for i from 0 to 31:
+    // constant work
+
+// Snippet 8
+list ← [0, 1, 2, …, 999]          // an array-backed list
+remove every even number from list   // each removal shifts the elements after it
+```
+
+**Complexity Answers:**
+
+1. **O(Set Bits)** Time. This is Kernighan's algorithm. Total bits is 32/64, but loop only runs for set bits.
+2. **O(2ⁿ \* n)** Time. Power set generation logic.
+3. **O(1)**. Bitwise operations are hardware-level constant time.
+4. **O(log N)** Time (number of bits).
+5. **O(1)** Time. This is a mathematical constant-time trick!
+6. **O(1)**.
+7. **O(1)** (Technically O(bits) but bits is a constant like 32/64).
+8. **O(n)** Time. List traversal and bitwise check for parity.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. `n ^ n` always equals 0. → **True**.
+2. `n & (n - 1)` always clears the leftmost set bit. → **False** (it clears the **rightmost** set bit).
+3. Right shift `>>` is equivalent to dividing by 2. → **True** (for positive integers).
+4. `~n` is always equal to `-n`. → **False** (`~n = -n - 1`).
+5. Bitwise operations work faster than arithmetic operations like `*` or `/`. → **True**.
+6. XORing all elements in an array cancels everything out. → **False** (only if they appear even times).
+7. `1 << 31` will result in a negative number in Java. → **True** (sign bit set).
+8. Every Even number has the 0-th bit as 0. → **True**.
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. **Stability**: Why is Merge Sort stable while standard Quick Sort is not?
-2. **In-place**: Can Merge Sort be implemented in $O(1)$ extra space? (Research "In-place Merge Sort").
-3. **Pivots**: How does randomized pivoting prevent $O(N^2)$ in Quick Sort?
-4. **Comparison**: Why is $O(N \log N)$ the mathematical lower bound for comparison sorts?
+1. **Why XOR?**: Why is XOR used so frequently in cryptography and checksums? (Hint: Reversibility and bit
+   distribution).
+2. **2's Complement**: Explain how Java stores negative numbers. Why use 2's complement over sign-magnitude?
+3. **Signed vs Unsigned**: What is the difference between `>>` and `>>>` in Java?
+4. **Masking**: When would you use a bitmask over a `Boolean[]` or `HashSet<Integer>`? (Hint: Memory vs Speed).
+5. **Binary Addition**: How would you add two numbers using only bitwise operators? (Hint: XOR for sum, AND-Shift for
+   carry).
 
 ---
 
@@ -287,26 +393,27 @@ Complete the table based on the best/worst cases:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                               |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [First Missing Positive](https://leetcode.com/problems/first-missing-positive/), [Maximum Gap](https://leetcode.com/problems/maximum-gap/), [Reverse Pairs](https://leetcode.com/problems/reverse-pairs/), [Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/) |
-| **Google**    | [First Missing Positive](https://leetcode.com/problems/first-missing-positive/), [Maximum Gap](https://leetcode.com/problems/maximum-gap/), [Reverse Pairs](https://leetcode.com/problems/reverse-pairs/), [Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/) |
-| **Meta**      | [First Missing Positive](https://leetcode.com/problems/first-missing-positive/), [Reverse Pairs](https://leetcode.com/problems/reverse-pairs/), [Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/), [Sort Colors](https://leetcode.com/problems/sort-colors/) |
-| **Microsoft** | [First Missing Positive](https://leetcode.com/problems/first-missing-positive/), [Sort Colors](https://leetcode.com/problems/sort-colors/), [Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/), [Largest Number](https://leetcode.com/problems/largest-number/)                   |
-| **Apple**     | [Maximum Gap](https://leetcode.com/problems/maximum-gap/), [Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)                                                                                                                                       |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Count Triplets That Can Form Two Arrays of Equal XOR](https://leetcode.com/problems/count-triplets-that-can-form-two-arrays-of-equal-xor/), [Reverse Bits](https://leetcode.com/problems/reverse-bits/), [Sum of All Subset XOR Totals](https://leetcode.com/problems/sum-of-all-subset-xor-totals/), [Binary Number with Alternating Bits](https://leetcode.com/problems/binary-number-with-alternating-bits/) |
+| **Google**    | [Bitwise AND of Numbers Range](https://leetcode.com/problems/bitwise-and-of-numbers-range/), [Bitwise XOR of All Pairings](https://leetcode.com/problems/bitwise-xor-of-all-pairings/), [Count Number of Maximum Bitwise-OR Subsets](https://leetcode.com/problems/count-number-of-maximum-bitwise-or-subsets/), [Decode XORed Array](https://leetcode.com/problems/decode-xored-array/)                         |
+| **Meta**      | [Total Hamming Distance](https://leetcode.com/problems/total-hamming-distance/), [UTF-8 Validation](https://leetcode.com/problems/utf-8-validation/), [Divide Two Integers](https://leetcode.com/problems/divide-two-integers/), [Maximum XOR of Two Numbers in an Array](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)                                                                 |
+| **Adobe**     | [Number of Steps to Reduce a Number to Zero](https://leetcode.com/problems/number-of-steps-to-reduce-a-number-to-zero/), [Sort Integers by The Number of 1 Bits](https://leetcode.com/problems/sort-integers-by-the-number-of-1-bits/), [Reverse Bits](https://leetcode.com/problems/reverse-bits/), [Gray Code](https://leetcode.com/problems/gray-code/)                                                       |
+| **Microsoft** | [Number of 1 Bits](https://leetcode.com/problems/number-of-1-bits/), [Binary Number with Alternating Bits](https://leetcode.com/problems/binary-number-with-alternating-bits/), [Missing Number](https://leetcode.com/problems/missing-number/), [Single Number](https://leetcode.com/problems/single-number/)                                                                                                   |
 
 ---
 
 ## ✅ Completion Checklist
 
 - [ ] All 10 Easy problems solved
-- [ ] All 10 Medium problems solved
+- [ ] All 15 Medium problems solved
 - [ ] All 5 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
-- [ ] All 4 conceptual questions answered out loud
-- [ ] I can state the time, space and stability of every sort in the lecture
-- [ ] I can write the Lomuto or Hoare partition from memory
+- [ ] Self-assessment completed without looking at the notes
+- [ ] All 5 conceptual questions answered out loud
+- [ ] I can do set, clear, toggle and check bit i without looking anything up
+- [ ] I can explain why `n & (n - 1)` removes the lowest set bit
 
 ---
 
-**← [Lecture 8 · Arrays & Strings](../Lecture8/Assignment.md)** &nbsp;·&nbsp; **[Lecture 10 · Searching Algorithms](../Lecture10/Assignment.md) →**
+**← [Lecture 8 · Recursion — The Mental Model](../Lecture8/Assignment.md)** &nbsp;·&nbsp; **[Lecture 10 · Mathematics for DSA](../Lecture10/Assignment.md) →**

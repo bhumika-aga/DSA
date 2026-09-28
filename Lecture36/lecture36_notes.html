@@ -1,0 +1,3139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 36 &mdash; Tries (Prefix Trees)</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behaviour: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        flex-shrink: 0;
+        padding-top: 20px;
+      }
+
+      .sb-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 4px 0 12px;
+      }
+
+      .sb-foot {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 10px 0 14px;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 56px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Course-wide additions (cover every class used in any lecture) ── */
+      .footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 8px;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+
+      .stack-vis {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 14px 0;
+      }
+
+      .stack-frame {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: var(--text2);
+      }
+
+      .tag-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .cx-badge.time {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .cx-badge.space {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .gr {
+        color: #22863a;
+      }
+
+      [data-theme="dark"] .gr {
+        color: #7ee787;
+      }
+
+      /* ── Pseudocode blocks — language-neutral algorithm statements ── */
+      .code-block.pseudo {
+        border-color: var(--teal);
+      }
+
+      .code-block.pseudo .code-header {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      .code-block.pseudo pre {
+        font-family: var(--mono);
+      }
+
+      .pc-kw {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .pc-cm {
+        color: var(--text3);
+        font-style: italic;
+      }
+
+      /* ── Learning objectives ── */
+      .objectives {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0 26px;
+      }
+
+      .objectives-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .objectives ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .objectives li {
+        font-size: 14px;
+        color: var(--text2);
+        margin: 5px 0;
+      }
+
+      /* ── Graded hints on practice problems ── */
+      details.hint {
+        border-color: var(--accent-bg);
+        margin: 8px 0;
+      }
+
+      details.hint summary {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        padding: 9px 14px;
+      }
+
+      details.hint[open] summary {
+        border-bottom: 1px solid var(--border);
+      }
+
+      details.hint .details-body {
+        font-size: 13.5px;
+        color: var(--text2);
+      }
+
+      details.hint .details-body p {
+        margin: 0;
+      }
+
+      .tag-concept {
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border2);
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+
+        .breadcrumb {
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .topbar-right {
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .topbar-right > span {
+          display: none;
+        }
+
+        .progress-bar {
+          width: 56px;
+        }
+      }
+
+      /* ── Bottom-of-page navigation ── */
+      .page-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text2);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+
+      .page-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .page-nav a.next {
+        margin-left: auto;
+        text-align: right;
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      @media (max-width: 560px) {
+        .page-nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .page-nav a,
+        .page-nav a.next {
+          margin-left: 0;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Tries (Prefix Trees)</div>
+        <div class="sb-meta">
+          Lecture 36 of 45 &middot; Phase 5 &mdash; Advanced Structures
+        </div>
+      </div>
+      <div class="sb-scroll">
+        <div class="toc-label">On this page</div>
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127757;</span>Introduction</a
+        >
+        <a class="toc-item" href="#node"
+          ><span class="toc-icon">&#128288;</span>The Node</a
+        >
+        <a class="toc-item" href="#ops"
+          ><span class="toc-icon">&#9881;&#65039;</span>Insert, Search,
+          Prefix</a
+        >
+        <a class="toc-item toc-sub" href="#o-dry">A Dry Run</a>
+        <a class="toc-item" href="#memory"
+          ><span class="toc-icon">&#128190;</span>Memory &amp; Trade-offs</a
+        >
+        <a class="toc-item" href="#wildcard"
+          ><span class="toc-icon">&#10067;</span>Wildcard Search</a
+        >
+        <a class="toc-item" href="#grid"
+          ><span class="toc-icon">&#128269;</span>Trie + Grid DFS</a
+        >
+        <a class="toc-item toc-sub" href="#g-prune">Pruning as You Go</a>
+        <a class="toc-item" href="#xor"
+          ><span class="toc-icon">&#9889;</span>Binary (XOR) Tries</a
+        >
+        <a class="toc-item" href="#stream"
+          ><span class="toc-icon">&#127754;</span>Streams &amp; Reversed
+          Tries</a
+        >
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129513;</span>When to Reach for One</a
+        >
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
+        >
+        <a class="toc-item" href="#practice"
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+        >
+        <a class="toc-item" href="#assignment"
+          ><span class="toc-icon">&#128221;</span>Assignment</a
+        >
+        <a class="toc-item" href="#checklist"
+          ><span class="toc-icon">&#9989;</span>Checklist</a
+        >
+      </div>
+      <div class="sb-foot">
+        <div class="toc-label">Navigate</div>
+        <a class="toc-item" href="../Lecture35/lecture35_notes.html"
+          >&larr; Lecture 35 &middot; Dynamic Programming IV</a
+        >
+        <a class="toc-item" href="../Lecture37/lecture37_notes.html"
+          >&rarr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
+          <span>Lecture 36 &mdash; Tries</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#128288;</span>
+          <h1 class="page-title">Tries &mdash; Prefix Trees</h1>
+          <p class="page-sub">
+            &ldquo;A hash set answers <em>is this word here?</em> &mdash; a trie
+            also answers <em>could a word still start like this?</em>&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 36 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 5 &mdash; Advanced Structures</span
+            >
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 18 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Meta &middot; Amazon</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            A hash set stores words as opaque blobs: it can tell you whether
+            <code>"apple"</code> is present, and nothing else. A trie stores
+            them letter by letter along shared paths, so a partial word is a
+            real position in the structure. That one change is what makes
+            autocomplete, wildcard matching, dictionary search on a grid and
+            maximum-XOR queries all fall out of the same twenty lines of code.
+            It is also the structure interviewers reach for when they want to
+            see whether you can design one from scratch rather than import it.
+          </div>
+        </div>
+
+        <div class="objectives">
+          <div class="objectives-title">By the end of this lecture you can</div>
+          <ul>
+            <li>Write insert, search and startsWith from memory in O(L)</li>
+            <li>Explain the memory cost of a trie and when a hash set wins</li>
+            <li>Run a DFS inside a trie to handle wildcards</li>
+            <li>
+              Drive a grid DFS with a trie and prune it as words are found
+            </li>
+            <li>
+              Build a binary trie and answer maximum-XOR queries bit by bit
+            </li>
+          </ul>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: Signposts at every
+              junction.</strong
+            >
+            Picture every word as a road. Words that start the same share the
+            road until they part ways, and at every junction a signpost lists
+            the letters you can take next. Looking up a word means following the
+            signs; autocomplete means driving to where the typed prefix ends and
+            listing every destination further along.
+          </div>
+        </div>
+
+        <h2 class="h1" id="node">&#128288; The Node</h2>
+        <p>
+          A trie is a tree where the <em>edges</em> carry the letters, not the
+          nodes. A node is therefore just two things: where you can go next, and
+          whether the path that reached you spells a complete word.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Whole Structure</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">structure</span> TrieNode:
+    children ← array of 26 empty slots     <span class="pc-cm">// or a map: char → TrieNode</span>
+    isWord   ← false                       <span class="pc-cm">// does a word END here?</span>
+
+root ← new TrieNode()                      <span class="pc-cm">// the root spells the empty string</span>
+
+<span class="pc-cm">// &quot;app&quot; and &quot;apple&quot; share four nodes:
+//   root -a-&gt; -p-&gt; -p-&gt; [isWord] -l-&gt; -e-&gt; [isWord]
+// The shared prefix is stored exactly once. That is the entire idea.</span></pre>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>The <code>isWord</code> flag is not optional.</strong>
+            Without it the trie cannot distinguish &ldquo;<code>app</code> is a
+            stored word&rdquo; from &ldquo;<code>app</code> is only on the way
+            to <code>apple</code>&rdquo;. Every trie bug list starts with
+            someone who returned true for the second case.
+          </div>
+        </div>
+
+        <h2 class="h1" id="ops">&#9881;&#65039; Insert, Search, Prefix</h2>
+        <p>
+          All three operations are the same walk. They differ only in what they
+          do when the walk ends: insert creates missing nodes, search checks the
+          flag, and <code>startsWith</code> simply reports that it arrived.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Three Operations</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> insert(word):
+    node ← root
+    <span class="pc-kw">for</span> ch <span class="pc-kw">in</span> word:
+        i ← ch - &#39;a&#39;
+        <span class="pc-kw">if</span> node.children[i] is empty:
+            node.children[i] ← new TrieNode()
+        node ← node.children[i]
+    node.isWord ← true
+
+<span class="pc-kw">function</span> walk(word):                    <span class="pc-cm">// shared by both lookups</span>
+    node ← root
+    <span class="pc-kw">for</span> ch <span class="pc-kw">in</span> word:
+        i ← ch - &#39;a&#39;
+        <span class="pc-kw">if</span> node.children[i] is empty: <span class="pc-kw">return</span> null
+        node ← node.children[i]
+    <span class="pc-kw">return</span> node
+
+<span class="pc-kw">function</span> search(word):
+    node ← walk(word)
+    <span class="pc-kw">return</span> node ≠ null AND node.isWord
+
+<span class="pc-kw">function</span> startsWith(prefix):
+    <span class="pc-kw">return</span> walk(prefix) ≠ null      <span class="pc-cm">// arriving is enough</span>
+
+<span class="pc-cm">// Every operation is O(L) in the length of the word — independent of how
+// many words the trie holds. A hash set is O(L) too, because hashing reads
+// the whole string; the trie&#39;s win is startsWith, which a hash set cannot do.</span></pre>
+        </div>
+
+        <h3 class="h2" id="o-dry">A Dry Run</h3>
+        <p>
+          Insert <code>"app"</code>, then <code>"apple"</code>, then ask three
+          questions. Follow the flag, not the node.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Call</th>
+                <th>Walk</th>
+                <th>Ends at</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>insert("app")</code></td>
+                <td>creates a &rarr; p &rarr; p</td>
+                <td>node &ldquo;app&rdquo;</td>
+                <td>isWord ← true</td>
+              </tr>
+              <tr>
+                <td><code>insert("apple")</code></td>
+                <td>reuses a &rarr; p &rarr; p, creates l &rarr; e</td>
+                <td>node &ldquo;apple&rdquo;</td>
+                <td>isWord ← true</td>
+              </tr>
+              <tr>
+                <td><code>search("app")</code></td>
+                <td>a &rarr; p &rarr; p</td>
+                <td>node &ldquo;app&rdquo;</td>
+                <td>&#9989; true &mdash; the flag is set</td>
+              </tr>
+              <tr>
+                <td><code>search("appl")</code></td>
+                <td>a &rarr; p &rarr; p &rarr; l</td>
+                <td>node &ldquo;appl&rdquo;</td>
+                <td>&#10060; false &mdash; arrived, flag unset</td>
+              </tr>
+              <tr>
+                <td><code>startsWith("appl")</code></td>
+                <td>a &rarr; p &rarr; p &rarr; l</td>
+                <td>node &ldquo;appl&rdquo;</td>
+                <td>&#9989; true &mdash; arriving is enough</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="h1" id="memory">&#128190; Memory &amp; Trade-offs</h2>
+        <p>
+          The array-of-26 node is fast and simple, and it is also the reason
+          tries are called memory-hungry: every node pays for 26 pointers even
+          if it uses one. A hash map per node pays only for the children that
+          exist, at the cost of a lookup per character.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Choice</th>
+                <th>Per node</th>
+                <th>Use it when</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>TrieNode[26]</code></td>
+                <td>26 references, dense</td>
+                <td>Lowercase letters only &mdash; the interview default</td>
+              </tr>
+              <tr>
+                <td><code>Map&lt;Character, TrieNode&gt;</code></td>
+                <td>One entry per real child</td>
+                <td>Unicode, mixed case, or a sparse alphabet</td>
+              </tr>
+              <tr>
+                <td><code>TrieNode[2]</code></td>
+                <td>2 references</td>
+                <td>Binary tries over the bits of a number</td>
+              </tr>
+              <tr>
+                <td>Hash set of strings</td>
+                <td>One entry per word</td>
+                <td>
+                  You only ever ask for whole words &mdash; then a trie is
+                  overkill
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Say the trade-off out loud in the interview.</strong> Total
+            space is O(total characters inserted) nodes, each with an
+            alphabet-sized array. For 10&#8202;000 words averaging 8 letters
+            that is up to 80&#8202;000 nodes &times; 26 references &mdash;
+            noticeably more than the strings themselves. You take that deal
+            because prefix queries become free.
+          </div>
+        </div>
+
+        <h2 class="h1" id="wildcard">&#10067; Wildcard Search</h2>
+        <p>
+          <code>search("b.d")</code> should match <code>bad</code>,
+          <code>bud</code> and <code>bid</code>. A single walk cannot do it,
+          because a dot has 26 possible next steps &mdash; so the walk becomes a
+          DFS, and the position in the pattern becomes part of the state.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; DFS Inside the Trie</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> search(pattern):
+    <span class="pc-kw">return</span> dfs(pattern, 0, root)
+
+<span class="pc-kw">function</span> dfs(pattern, i, node):
+    <span class="pc-kw">if</span> node is null: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> i = length(pattern): <span class="pc-kw">return</span> node.isWord
+
+    ch ← pattern[i]
+    <span class="pc-kw">if</span> ch = &#39;.&#39;:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 25:          <span class="pc-cm">// try every branch</span>
+            <span class="pc-kw">if</span> dfs(pattern, i + 1, node.children[c]):
+                <span class="pc-kw">return</span> true
+        <span class="pc-kw">return</span> false
+
+    <span class="pc-kw">return</span> dfs(pattern, i + 1, node.children[ch - &#39;a&#39;])
+
+<span class="pc-cm">// Cost: O(L) with no dots, up to O(26^d · L) with d dots. Leading dots are
+// the expensive ones, because nothing has narrowed the search yet.</span></pre>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Why the trie and not 26 regex matches?</strong> Because a
+            missing child ends a whole branch instantly. The trie has already
+            thrown away every word that does not share the prefix you have
+            matched so far, so the DFS explores only paths that really exist in
+            the dictionary.
+          </div>
+        </div>
+
+        <h2 class="h1" id="grid">&#128269; Trie + Grid DFS</h2>
+        <p>
+          Word Search II asks for every dictionary word hidden in a board. The
+          naive plan &mdash; run a grid DFS once per word &mdash; costs
+          <code>words &times; m &times; n &times; 4&#7481;</code>. Reverse the
+          roles: walk the board once, and let the trie tell you when to give up.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; One Walk, All Words</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> findWords(board, words):
+    root ← trie built from words          <span class="pc-cm">// store the word at its end node</span>
+    found ← empty list
+
+    <span class="pc-kw">for</span> each cell (r, c):
+        dfs(r, c, root)
+
+    <span class="pc-kw">function</span> dfs(r, c, node):
+        <span class="pc-kw">if</span> (r, c) outside board: <span class="pc-kw">return</span>
+        ch ← board[r][c]
+        <span class="pc-kw">if</span> ch = &#39;#&#39;: <span class="pc-kw">return</span>              <span class="pc-cm">// already on this path</span>
+
+        next ← node.children[ch - &#39;a&#39;]
+        <span class="pc-kw">if</span> next is null: <span class="pc-kw">return</span>            <span class="pc-cm">// no word continues this way</span>
+
+        <span class="pc-kw">if</span> next.word ≠ null:
+            found.add(next.word)
+            next.word ← null              <span class="pc-cm">// report each word once</span>
+
+        board[r][c] ← &#39;#&#39;                 <span class="pc-cm">// mark visited</span>
+        <span class="pc-kw">for</span> (nr, nc) <span class="pc-kw">in</span> four neighbours of (r, c):
+            dfs(nr, nc, next)
+        board[r][c] ← ch                  <span class="pc-cm">// restore on the way out</span>
+
+    <span class="pc-kw">return</span> found
+
+<span class="pc-cm">// The single line &quot;if next is null: return&quot; replaces the entire word loop.</span></pre>
+        </div>
+
+        <h3 class="h2" id="g-prune">Pruning as You Go</h3>
+        <p>
+          Storing the word on its end node and blanking it after the first find
+          solves duplicates. The stronger trick is to delete exhausted branches:
+          after the recursion returns, if <code>next</code> has no children left
+          and no word, unlink it from its parent. The trie shrinks as the search
+          proceeds, and a board full of the same letter stops being a disaster.
+        </p>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>The classic timeout.</strong> A 12&times;12 board of all
+            <code>a</code>s with the word <code>"aaaaaaaaaaaa"</code> in the
+            dictionary is the test that kills unpruned solutions. Without
+            pruning you re-explore the same dead branch from every cell; with
+            it, the branch disappears the first time it is exhausted.
+          </div>
+        </div>
+
+        <h2 class="h1" id="xor">&#9889; Binary (XOR) Tries</h2>
+        <p>
+          Nothing says the alphabet has to be letters. Insert the 32 bits of a
+          number from the most significant end and you get a two-child trie
+          where &ldquo;go to the opposite bit&rdquo; is exactly the greedy step
+          maximum XOR needs: to make a bit of the answer 1, the two numbers must
+          differ there.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Maximum XOR Against the Trie</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> insert(x):
+    node ← root
+    <span class="pc-kw">for</span> b <span class="pc-kw">from</span> 31 <span class="pc-kw">down to</span> 0:
+        bit ← (x &gt;&gt; b) AND 1
+        <span class="pc-kw">if</span> node.children[bit] is empty:
+            node.children[bit] ← new TrieNode()
+        node ← node.children[bit]
+
+<span class="pc-kw">function</span> maxXorWith(x):
+    node ← root;  best ← 0
+    <span class="pc-kw">for</span> b <span class="pc-kw">from</span> 31 <span class="pc-kw">down to</span> 0:
+        bit  ← (x &gt;&gt; b) AND 1
+        want ← 1 - bit                       <span class="pc-cm">// the opposite bit gives a 1</span>
+        <span class="pc-kw">if</span> node.children[want] ≠ empty:
+            best ← best OR (1 &lt;&lt; b)
+            node ← node.children[want]
+        <span class="pc-kw">else</span>:
+            node ← node.children[bit]        <span class="pc-cm">// forced to match</span>
+    <span class="pc-kw">return</span> best
+
+<span class="pc-cm">// Insert every number, then query every number: O(32n) instead of O(n²).</span></pre>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Greedy is safe here</strong> because the bits are ordered by
+            value: one high bit outweighs every lower bit combined, so taking it
+            whenever it is available can never be a mistake. This is the same
+            argument that justifies the bit-by-bit mask solution you met in
+            Lecture 9 &mdash; the trie just makes the candidate lookup explicit.
+          </div>
+        </div>
+
+        <p>
+          Queries with a ceiling (&ldquo;the partner must be
+          &le;&nbsp;<code>m</code>&rdquo;) look harder, but they are the same
+          trie used <em>offline</em>: sort the numbers, sort the queries by
+          their limit, and insert numbers into the trie only as the limit grows
+          past them. Every query then runs against a trie that contains exactly
+          the legal partners.
+        </p>
+
+        <h2 class="h1" id="stream">&#127754; Streams &amp; Reversed Tries</h2>
+        <p>
+          Some problems ask about <em>endings</em> rather than beginnings:
+          &ldquo;does the last part of everything I have seen so far spell a
+          word?&rdquo; A trie only matches forwards &mdash; so reverse the
+          words, and feed the stream backwards.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Stream of Characters</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> StreamChecker(words):
+    root ← trie of every word REVERSED
+    seen ← empty list                        <span class="pc-cm">// the stream so far</span>
+    maxLen ← length of the longest word
+
+    <span class="pc-kw">function</span> query(ch):
+        seen.append(ch)
+        node ← root
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> length(seen) - 1 <span class="pc-kw">down to</span> max(0, length(seen) - maxLen):
+            node ← node.children[seen[i] - &#39;a&#39;]   <span class="pc-cm">// walking BACKWARDS</span>
+            <span class="pc-kw">if</span> node is null: <span class="pc-kw">return</span> false
+            <span class="pc-kw">if</span> node.isWord: <span class="pc-kw">return</span> true
+        <span class="pc-kw">return</span> false
+
+<span class="pc-cm">// Reversing turns &quot;ends with&quot; into &quot;starts with&quot;. The maxLen bound keeps
+// each query at O(longest word) no matter how long the stream grows.</span></pre>
+        </div>
+
+        <h2 class="h1" id="choose">&#129513; When to Reach for One</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>What the problem asks</th>
+                <th>Structure</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Is this exact word in the set?</td>
+                <td>Hash set</td>
+                <td>O(L) and far less memory &mdash; a trie buys nothing</td>
+              </tr>
+              <tr>
+                <td>Does any word start with this prefix?</td>
+                <td>Trie</td>
+                <td>A prefix is a node; a hash set has no such concept</td>
+              </tr>
+              <tr>
+                <td>All words sharing a prefix, ranked</td>
+                <td>Trie + DFS (or sort + binary search)</td>
+                <td>The prefix node roots the whole answer set</td>
+              </tr>
+              <tr>
+                <td>Match a pattern with wildcards</td>
+                <td>Trie + DFS</td>
+                <td>Dead branches are pruned by construction</td>
+              </tr>
+              <tr>
+                <td>Find many words inside one text or grid</td>
+                <td>Trie driving the search</td>
+                <td>One traversal for the whole dictionary</td>
+              </tr>
+              <tr>
+                <td>Maximum XOR, or bitwise partner queries</td>
+                <td>Binary trie</td>
+                <td>Greedy on bits from the top, O(32) per query</td>
+              </tr>
+              <tr>
+                <td>Does the stream end with a word?</td>
+                <td>Reversed trie</td>
+                <td>Reversal turns a suffix question into a prefix one</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>A sorted array is the poor man&#39;s trie.</strong> If the
+            dictionary is static and you only need prefix queries, sorting it
+            once and binary searching for the prefix range gives the same
+            answers with no extra structure. Mention it &mdash; interviewers
+            like candidates who know when <em>not</em> to build something.
+          </div>
+        </div>
+
+        <h2 class="h1" id="pitfalls">&#9888;&#65039; Complexity &amp; Bugs</h2>
+        <p>
+          <code>L</code> is the length of one word, <code>n</code> the number of
+          words, <code>&Sigma;</code> the alphabet size (26 here).
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Time</th>
+                <th>Space</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>insert / search / startsWith</td>
+                <td>O(L)</td>
+                <td>&mdash;</td>
+                <td>Independent of how many words are stored</td>
+              </tr>
+              <tr>
+                <td>Build the whole trie</td>
+                <td>O(n &middot; L)</td>
+                <td>O(n &middot; L &middot; &Sigma;)</td>
+                <td>Nodes &times; alphabet array</td>
+              </tr>
+              <tr>
+                <td>Wildcard search, d dots</td>
+                <td>O(&Sigma;&#7496; &middot; L)</td>
+                <td>O(L) stack</td>
+                <td>Leading dots cost the most</td>
+              </tr>
+              <tr>
+                <td>All words under a prefix</td>
+                <td>O(size of that subtree)</td>
+                <td>O(L) stack</td>
+                <td>Output-sensitive &mdash; you pay for what you return</td>
+              </tr>
+              <tr>
+                <td>Word Search II</td>
+                <td>
+                  O(m &middot; n &middot; 4 &middot; 3&#7481;&#8315;&#185;)
+                </td>
+                <td>O(total letters)</td>
+                <td>Pruning is what makes it fast in practice</td>
+              </tr>
+              <tr>
+                <td>Binary trie insert / query</td>
+                <td>O(32)</td>
+                <td>O(32n)</td>
+                <td>Fixed bit width, so effectively O(1)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Treating &ldquo;node exists&rdquo; as &ldquo;word&rdquo;
+                </td>
+                <td><code>search("appl")</code> returns true</td>
+                <td>Check <code>isWord</code>, not the node</td>
+              </tr>
+              <tr>
+                <td>Forgetting the empty string</td>
+                <td>Crash or wrong answer on <code>""</code></td>
+                <td>
+                  The root is a valid end node &mdash; decide what it means
+                </td>
+              </tr>
+              <tr>
+                <td>Indexing with the raw character</td>
+                <td>Array out of bounds</td>
+                <td>
+                  Always <code>ch - &#39;a&#39;</code>, and validate the range
+                </td>
+              </tr>
+              <tr>
+                <td>Not un-marking the grid cell</td>
+                <td>Word Search II misses valid words</td>
+                <td>Restore <code>board[r][c]</code> after the recursion</td>
+              </tr>
+              <tr>
+                <td>Duplicate words in the output</td>
+                <td>Same word found from two cells</td>
+                <td>Blank the word on its end node after the first find</td>
+              </tr>
+              <tr>
+                <td>Binary trie built from bit 0 up</td>
+                <td>Greedy picks the wrong partner</td>
+                <td>
+                  Insert from the highest bit down &mdash; value order matters
+                </td>
+              </tr>
+              <tr>
+                <td>Rebuilding the trie inside a loop</td>
+                <td>Passes small tests, times out on large ones</td>
+                <td>Build once, query many times</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it in an interview.</strong> The words
+            <em>prefix</em>, <em>autocomplete</em>, <em>dictionary</em> and
+            <em>starts with</em> are the obvious signals. The quieter ones are
+            &ldquo;given a list of words, for each&nbsp;&hellip;&rdquo; &mdash;
+            which usually means one shared structure rather than n separate
+            searches &mdash; and any XOR question with n up to 10&#8309;, which
+            is a binary trie asking to be built.
+          </div>
+        </div>
+
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Six problems, from writing the structure to bending it into a binary
+          trie. Solve the first one without looking at the notes &mdash;
+          everything after it assumes you can.
+        </p>
+
+        <!-- Problem 01: Implement Trie (Prefix Tree) -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 01 &middot; The Structure Itself
+              </div>
+              <div class="prob-title">Implement Trie (Prefix Tree)</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/implement-trie-prefix-tree/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 208 - Implement Trie (Prefix Tree)</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Trie Fundamentals</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Implement a trie with <code>insert</code>,
+                <code>search</code> and <code>startsWith</code>.
+              </p>
+              <div class="iobox">
+                insert("apple"), search("apple") → true, search("app") → false,
+                startsWith("app") → true
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A node needs exactly two fields. What is the second one, and
+                    what goes wrong without it?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    All three methods are the same walk down the tree. Only the
+                    ending differs: create, check the flag, or just report
+                    arrival.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Write this one until it is muscle memory &mdash; it is the base
+                of every other problem in this lecture. The single design
+                decision is the <code>isWord</code> flag:
+                <code>search</code> requires it, <code>startsWith</code> ignores
+                it. Factoring the shared walk into one private helper is worth
+                saying out loud, because it is what stops the two lookups
+                drifting apart when you extend them later.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Insert, Search,
+                      startsWith</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">structure</span> TrieNode:
+    children ← array of 26 empty slots
+    isWord   ← false
+
+<span class="pc-kw">function</span> Trie():
+    root ← new TrieNode()
+
+<span class="pc-kw">function</span> insert(word):
+    node ← root
+    <span class="pc-kw">for</span> ch <span class="pc-kw">in</span> word:
+        i ← ch - &#39;a&#39;
+        <span class="pc-kw">if</span> node.children[i] is empty:
+            node.children[i] ← new TrieNode()
+        node ← node.children[i]
+    node.isWord ← true
+
+<span class="pc-kw">function</span> walk(s):
+    node ← root
+    <span class="pc-kw">for</span> ch <span class="pc-kw">in</span> s:
+        node ← node.children[ch - &#39;a&#39;]
+        <span class="pc-kw">if</span> node is empty: <span class="pc-kw">return</span> null
+    <span class="pc-kw">return</span> node
+
+<span class="pc-kw">function</span> search(word):     <span class="pc-kw">return</span> walk(word) ≠ null <span class="pc-kw">and</span> walk(word).isWord
+<span class="pc-kw">function</span> startsWith(pre):  <span class="pc-kw">return</span> walk(pre) ≠ null</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(L) per op</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total letters)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Design Add and Search Words Data Structure -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; Wildcards</div>
+              <div class="prob-title">
+                Design Add and Search Words Data Structure
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/design-add-and-search-words-data-structure/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 211 - Design Add and Search Words Data
+                  Structure</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Trie + DFS</span>
+                <span class="tag tag-co"
+                  >Meta &middot; Google &middot; Amazon</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Support <code>addWord</code> and <code>search</code>, where the
+                searched word may contain <code>.</code> as a wildcard matching
+                any single letter.
+              </p>
+              <div class="iobox">
+                addWord("bad"), addWord("dad"), search("b..") → true,
+                search("b.e") → false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    With no dots this is the plain walk. What does a dot force
+                    you to do that a letter does not?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Branch. At a dot, recurse into all 26 children and return
+                    true if any branch succeeds — the pattern index becomes part
+                    of the state.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The walk becomes a DFS, and that is the whole difference. Pass
+                the pattern position and the current node; a letter takes one
+                step, a dot tries every existing child. The trie earns its place
+                here because a missing child kills an entire branch at once
+                &mdash; with a hash set you would have to test every stored
+                word. Note that the cost is worst when the dots come first,
+                before anything has narrowed the search.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Branch at Every Dot</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> addWord(word):
+    <span class="pc-cm">// identical to the plain trie insert</span>
+
+<span class="pc-kw">function</span> search(pattern):
+    <span class="pc-kw">return</span> dfs(pattern, 0, root)
+
+<span class="pc-kw">function</span> dfs(pattern, i, node):
+    <span class="pc-kw">if</span> node is null: <span class="pc-kw">return</span> false
+    <span class="pc-kw">if</span> i = length(pattern): <span class="pc-kw">return</span> node.isWord
+
+    ch ← pattern[i]
+    <span class="pc-kw">if</span> ch ≠ &#39;.&#39;:
+        <span class="pc-kw">return</span> dfs(pattern, i + 1, node.children[ch - &#39;a&#39;])
+
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 25:                  <span class="pc-cm">// wildcard: try them all</span>
+        <span class="pc-kw">if</span> dfs(pattern, i + 1, node.children[c]):
+            <span class="pc-kw">return</span> true
+    <span class="pc-kw">return</span> false</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(26ᵈ · L)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total letters)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Search Suggestions System -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Autocomplete</div>
+              <div class="prob-title">Search Suggestions System</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/search-suggestions-system/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1268 - Search Suggestions System</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Trie + DFS (or sort + binary search)</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                After each character the user types, return up to three
+                lexicographically smallest products that start with what has
+                been typed so far.
+              </p>
+              <div class="iobox">
+                products = ["mobile","mouse","moneypot","monitor","mousepad"],
+                searchWord = "mouse" → suggestions after m, mo, mou, mous, mouse
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Each prefix of the search word is a node. What lives
+                    underneath that node?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Exactly the matching products. Sort the products first, then
+                    a DFS from the prefix node meets them in lexicographic order
+                    — stop after three.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two clean solutions, and you should name both. With a trie:
+                insert the sorted products, walk one character at a time, and
+                DFS the subtree for the first three words &mdash; if the walk
+                falls off the trie, every later prefix is empty too. Without a
+                trie: sort the products and binary search the prefix range,
+                which is shorter to write and often what an interviewer expects
+                when the dictionary is static. The trie version is the one that
+                generalises to a live, changing catalogue.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Walk the Prefix, DFS the
+                      Subtree</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> suggestedProducts(products, searchWord):
+    sort(products)                           <span class="pc-cm">// lexicographic order for free</span>
+    root ← trie built from products
+    result ← empty list
+    node ← root
+
+    <span class="pc-kw">for</span> ch <span class="pc-kw">in</span> searchWord:
+        <span class="pc-kw">if</span> node ≠ null:
+            node ← node.children[ch - &#39;a&#39;]
+        result.add(collect(node, 3))
+
+    <span class="pc-kw">return</span> result
+
+<span class="pc-kw">function</span> collect(node, limit):             <span class="pc-cm">// DFS in a..z order</span>
+    out ← empty list
+    <span class="pc-kw">if</span> node is null: <span class="pc-kw">return</span> out
+    <span class="pc-kw">if</span> node.isWord: out.add(node.word)
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 25:
+        <span class="pc-kw">if</span> size(out) = limit: <span class="pc-kw">break</span>
+        out.addAll(collect(node.children[c], limit - size(out)))
+    <span class="pc-kw">return</span> out</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n·L + L·3)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total letters)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Word Search II -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Dictionary on a Board
+              </div>
+              <div class="prob-title">Word Search II</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/word-search-ii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 212 - Word Search II</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Trie + Grid DFS</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Airbnb</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an <code>m &times; n</code> board of letters and a list of
+                words, return every word that can be formed by a path of
+                adjacent cells without reusing a cell.
+              </p>
+              <div class="iobox">
+                board = [[o,a,a,n],[e,t,a,e],[i,h,k,r],[i,f,l,v]], words =
+                ["oath","pea","eat","rain"] → ["oath","eat"]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Running the single-word Word Search once per word repeats
+                    the same board walks. What could tell you, mid-walk, that no
+                    word continues this way?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A trie of all the words. Walk the board once, carrying a
+                    trie node alongside the cell — when the child is missing,
+                    stop immediately.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the problem the whole lecture builds to. Inverting the
+                loops &mdash; board outside, dictionary inside the trie &mdash;
+                turns a per-word search into one traversal. Three details make
+                it pass: store the word itself on its end node so you can report
+                it without rebuilding the string, blank that field after the
+                first find so duplicates are impossible, and unlink exhausted
+                nodes so a board of identical letters does not explode.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; One Traversal,
+                      Trie-Guided</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> findWords(board, words):
+    root ← trie of words, storing word at its end node
+    found ← empty list
+
+    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> rows - 1:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> cols - 1:
+            dfs(r, c, root)
+    <span class="pc-kw">return</span> found
+
+<span class="pc-kw">function</span> dfs(r, c, node):
+    <span class="pc-kw">if</span> (r, c) off board: <span class="pc-kw">return</span>
+    ch ← board[r][c]
+    <span class="pc-kw">if</span> ch = &#39;#&#39;: <span class="pc-kw">return</span>                  <span class="pc-cm">// on the current path</span>
+
+    next ← node.children[ch - &#39;a&#39;]
+    <span class="pc-kw">if</span> next is null: <span class="pc-kw">return</span>                <span class="pc-cm">// the trie prunes the walk</span>
+
+    <span class="pc-kw">if</span> next.word ≠ null:
+        found.add(next.word)
+        next.word ← null                      <span class="pc-cm">// report once</span>
+
+    board[r][c] ← &#39;#&#39;
+    dfs(r-1, c, next);  dfs(r+1, c, next)
+    dfs(r, c-1, next);  dfs(r, c+1, next)
+    board[r][c] ← ch                          <span class="pc-cm">// restore</span>
+
+    <span class="pc-kw">if</span> next has no children <span class="pc-kw">and</span> next.word = null:
+        unlink next from node                 <span class="pc-cm">// prune the dead branch</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m·n·4·3ᴸ⁻¹)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total letters)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Maximum XOR With an Element From Array -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Binary Trie</div>
+              <div class="prob-title">
+                Maximum XOR With an Element From Array
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/maximum-xor-with-an-element-from-array/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1707 - Maximum XOR With an Element From Array</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Binary Trie + Offline Queries</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For each query <code>(x, m)</code>, return the maximum of
+                <code>x XOR nums[j]</code> over all <code>nums[j] ≤ m</code>, or
+                −1 if no element qualifies.
+              </p>
+              <div class="iobox">
+                nums = [0,1,2,3,4], queries = [[3,1],[1,3],[5,6]] → [3, 3, 7]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Without the ≤ m limit this is the plain maximum-XOR trie.
+                    What does the limit change about <em>which</em> numbers the
+                    trie should contain?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Answer the queries out of order. Sort nums and sort queries
+                    by m, then insert numbers only as m grows past them — every
+                    query sees exactly its legal candidates.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two ideas stacked. The binary trie gives the greedy bit-by-bit
+                maximum, and processing the queries <em>offline</em> &mdash; in
+                an order of your choosing, remembering to restore the original
+                order at the end &mdash; turns the constraint into a simple
+                insertion schedule. Answering queries out of order is a
+                technique worth naming; it reappears with segment trees and with
+                Mo&rsquo;s algorithm later in this phase.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sort Both, Insert
+                      Lazily</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maximizeXor(nums, queries):
+    sort(nums)
+    order ← indices of queries sorted by their limit m
+    ans ← array of -1, length = number of queries
+    root ← empty binary trie
+    i ← 0
+
+    <span class="pc-kw">for</span> q <span class="pc-kw">in</span> order:
+        (x, m) ← queries[q]
+        <span class="pc-kw">while</span> i &lt; length(nums) <span class="pc-kw">and</span> nums[i] ≤ m:   <span class="pc-cm">// now legal</span>
+            insert(nums[i]);  i ← i + 1
+        <span class="pc-kw">if</span> i &gt; 0:
+            ans[q] ← maxXorWith(x)                    <span class="pc-cm">// greedy, bit 31 → 0</span>
+
+    <span class="pc-kw">return</span> ans
+
+<span class="pc-cm">// maxXorWith takes the opposite bit when that child exists, otherwise the
+// matching one — a high bit is worth more than every lower bit together.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O((n + q) log + 32(n + q))</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(32n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Stream of Characters -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 06 &middot; Reversed Trie</div>
+              <div class="prob-title">Stream of Characters</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/stream-of-characters/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1032 - Stream of Characters</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Reversed Trie</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given a list of words, answer for each streamed character
+                whether some word is a suffix of the characters seen so far.
+              </p>
+              <div class="iobox">
+                words = ["cd","f","kl"], then a, b, c, d → false, false, false,
+                true
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A trie matches forwards, but the question is about endings.
+                    What transformation makes those the same problem?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Store the words reversed, and walk the stream backwards from
+                    the newest character. Stop after the longest word&rsquo;s
+                    length.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The reversal is the entire solution, and it is a move worth
+                keeping: any &ldquo;ends with&rdquo; question becomes a
+                &ldquo;starts with&rdquo; question if you flip both sides. The
+                second detail is the bound &mdash; walking back only as far as
+                the longest word keeps each query O(L) however long the stream
+                becomes, which is what stops the obvious solution from degrading
+                over millions of queries. A real production system would use
+                Aho-Corasick; say so, then write this.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Reverse the Words, Walk
+                      Backwards</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> StreamChecker(words):
+    root ← empty trie
+    <span class="pc-kw">for</span> w <span class="pc-kw">in</span> words: insert(reverse(w))
+    maxLen ← length of the longest word
+    seen ← empty list
+
+<span class="pc-kw">function</span> query(letter):
+    seen.append(letter)
+    node ← root
+    lo ← max(0, length(seen) - maxLen)
+
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> length(seen) - 1 <span class="pc-kw">down to</span> lo:
+        node ← node.children[seen[i] - &#39;a&#39;]
+        <span class="pc-kw">if</span> node is null: <span class="pc-kw">return</span> false      <span class="pc-cm">// no suffix can match</span>
+        <span class="pc-kw">if</span> node.isWord: <span class="pc-kw">return</span> true
+
+    <span class="pc-kw">return</span> false</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(L) per query</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total letters)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Lecture 36 Assignment &mdash; 18 Problems (5 Easy &middot; 9
+              Medium &middot; 4 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by the
+            kind of trie it needs. Complete it before moving to Lecture 37.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture36/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 37.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can write a TrieNode and all three operations from memory
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain why <code>isWord</code> exists and what breaks without
+            it
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can state the memory cost of a trie and when a hash set is the
+            better answer
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can turn the walk into a DFS to support wildcards
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can drive a grid DFS with a trie, report each word once, and prune
+            dead branches
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can build a binary trie and justify the greedy bit choice
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can answer a suffix question by reversing the words
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I completed all 18 assignment problems and can name the trie variant
+            each one needs
+          </div>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#127881;</span>
+          <div class="callout-body">
+            <strong
+              >Next up &mdash; Lecture 37: Segment Trees &amp; Fenwick
+              Trees</strong
+            ><br />
+            A trie answers questions about prefixes of strings. Lecture 37
+            answers questions about ranges of numbers that keep changing &mdash;
+            sums, minimums and counts over an array you are still updating, in
+            logarithmic time per operation.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="page-nav">
+          <a href="../Lecture35/lecture35_notes.html"
+            >&larr; Lecture 35 &middot; Dynamic Programming IV</a
+          >
+          <a class="next" href="../Lecture37/lecture37_notes.html"
+            >Lecture 37 &middot; Segment Trees &amp; Fenwick Trees &rarr;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Theme toggle — remembered across pages of the course
+      function applyTheme(theme) {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (theme === "dark") html.setAttribute("data-theme", "dark");
+        else html.removeAttribute("data-theme");
+        if (btn)
+          btn.innerText =
+            theme === "dark" ? "\u2600\ufe0f Light" : "\ud83c\udf19 Dark";
+      }
+
+      function toggleDark() {
+        const next =
+          document.documentElement.getAttribute("data-theme") === "dark"
+            ? "light"
+            : "dark";
+        applyTheme(next);
+        try {
+          localStorage.setItem("dsa-notes-theme", next);
+        } catch (e) {
+          /* private browsing — the toggle still works for this page */
+        }
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("dsa-notes-theme");
+        } catch (e) {
+          /* ignore */
+        }
+        applyTheme(saved === "dark" ? "dark" : "light");
+      })();
+
+      // 2. Reading progress + active table-of-contents entry
+      (function initScrollSync() {
+        const main = document.getElementById("main");
+        if (!main) return;
+        const fill = document.getElementById("progressFill");
+        const headings = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const tocItems = document.querySelectorAll(".toc-item");
+
+        main.addEventListener("scroll", function () {
+          const range = main.scrollHeight - main.clientHeight;
+          if (fill && range > 0) {
+            const pct = (main.scrollTop / range) * 100;
+            fill.style.width = (pct > 98.5 ? 100 : pct) + "%";
+          }
+          let current = "";
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top < 150) current = h.id;
+          });
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              item.getAttribute("href") === "#" + current,
+            );
+          });
+        });
+      })();
+
+      // 3. Practice-problem cards expand and collapse
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy a code block
+      function copyCode(btn) {
+        const block = btn.closest(".code-block");
+        const pre = block && block.querySelector("pre");
+        if (!pre) return;
+        const done = () => {
+          const original = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(done, () => {
+            btn.innerText = "Press Ctrl+C";
+          });
+        } else {
+          btn.innerText = "Press Ctrl+C";
+        }
+      }
+
+      // 5. Disclosure arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

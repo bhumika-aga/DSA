@@ -1,275 +1,296 @@
-# 📚 Assignment 12 — Stacks & Queues
+# 🔀 Assignment 9 — Sorting Algorithms
 
-> **Lecture:** 12 of 38 — Stacks & Queues
+> **Lecture:** 12 of 45 — Sorting Algorithms
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 5 days · **Total Problems:** 25 (8 Easy · 12 Medium · 5 Hard)
-> **Goal:** Master LIFO/FIFO fundamentals, the Monotonic Stack template, Deque-based sliding window, and stack-driven expression evaluation.
+> **Estimated Time:** 4 days · **Total Problems:** 25 (9 Easy · 12 Medium · 4 Hard)
+> **Goal:** Master core comparison sorts (O(n²) to O(n log n)), non-comparison sorting (O(n)), partitioning
+> paradigms, and the **Cyclic Sort** invariant for range-limited domains.
 
 ---
 
 ## 🗺️ Pattern Recognition — Read Before Starting
 
-Stacks and Queues are the most universally applicable data structures in algorithm problem-solving. Every OS call stack is a stack. Every BFS is a queue. Every Next-Greater-Element variant is a Monotonic Stack. Mastering these structures means you can solve an entire class of interview problems by **recognising the pattern** rather than brute-forcing each problem.
-
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem            | Pattern                   | Move                                        |
-| -------------------------------- | ------------------------- | ------------------------------------------- |
-| "matching brackets", "undo"      | Plain Stack               | push opens, pop on close                    |
-| "next greater / smaller element" | Monotonic Stack           | pop while the new value beats the top       |
-| "largest rectangle", "span"      | Increasing Stack          | pop computes the area that just ended       |
-| "max / min of every window"      | Monotonic Deque           | front is the answer, back is pruned         |
-| "evaluate an expression"         | Operand / Operator Stacks | push numbers, apply on operators            |
-| "process in arrival order"       | Queue                     | enqueue at the back, dequeue from the front |
+| Signal in the Problem                        | Pattern             | Move                                          |
+| -------------------------------------------- | ------------------- | --------------------------------------------- |
+| "sort" with a small value range              | Counting Sort       | count, then write back in order               |
+| "numbers from 1 to n", "missing / duplicate" | Cyclic Sort         | swap each value to index `value - 1`          |
+| "kth largest / smallest"                     | QuickSelect         | partition around a pivot, recurse on one side |
+| "count pairs where i < j and …"              | Merge Sort Counting | count during the merge step                   |
+| "order by a custom rule"                     | Custom Comparator   | define `compare(a, b)` and sort               |
+| "overlapping intervals"                      | Sort + Sweep        | sort by start, then merge in one pass         |
 
 ---
 
-## 🟢 Easy Tier (8 Problems)
+## 🟢 Easy Tier (9 Problems)
 
-_Focus on stack and queue mechanics — push, pop, LIFO/FIFO invariants, and basic design._
+_Focus on implementing pure logic, counting swaps, and in-place sorting._
 
-### E1 · Valid Parentheses
+### E1 · Height Checker
 
-**🔗 [LC 20 — Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)** · Easy
-**Pattern:** Stack | **Companies:** Google, Amazon, Meta, Microsoft
+**🔗 [LC 1051 — Height Checker](https://leetcode.com/problems/height-checker/)** · Easy
+**Pattern:** Bubble Sort (Implement Yourself) | **Companies:** Amazon, Google
 
-**Hint:** Push every opening bracket. On a closing bracket, the stack must be non-empty and its top must be the matching opener, which you pop. At the end the stack must be empty.
-
----
-
-### E2 · Implement Stack using Queues
-
-**🔗 [LC 225 — Implement Stack using Queues](https://leetcode.com/problems/implement-stack-using-queues/)** · Easy
-**Pattern:** OOP Design | **Companies:** Amazon, Microsoft, Adobe
-
-**Hint:** Push costs O(n): add the new element to the queue, then rotate the queue `size - 1` times so the new element is at the front. Pop and top are then O(1) — the front is the stack's top.
+**Hint:** Build `expected` by copying the array and sorting it with your own bubble sort (stop early when a pass makes no swaps). Then count the mismatched positions.
 
 ---
 
-### E3 · Implement Queue using Stacks
+### E2 · Find Target Indices After Sorting Array
 
-**🔗 [LC 232 — Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)** · Easy
-**Pattern:** OOP Design | **Companies:** Amazon, Microsoft, Bloomberg
+**🔗 [LC 2089 — Find Target Indices After Sorting Array](https://leetcode.com/problems/find-target-indices-after-sorting-array/)** · Easy
+**Pattern:** Selection Sort (Implement Yourself) | **Companies:** Amazon, Google
 
-**Hint:** Push onto `in`. For pop or peek, if `out` is empty, move everything from `in` to `out` (reversing the order), then use `out`'s top. Each element moves at most once, so operations are amortised O(1).
-
----
-
-### E4 · Baseball Game
-
-**🔗 [LC 682 — Baseball Game](https://leetcode.com/problems/baseball-game/)** · Easy
-**Pattern:** Stack Simulation | **Companies:** Amazon, Adobe
-
-**Hint:** Walk the operations with a stack of scores: a number is pushed, `+` pushes the sum of the top two, `D` pushes double the top, and `C` pops. Return the sum of the stack.
+**Hint:** Sort with your own selection sort, then collect the indices equal to `target`. Follow-up: skip sorting — the answer depends only on how many values are `< target` and `== target`.
 
 ---
 
-### E5 · Remove All Adjacent Duplicates In String
+### E3 · Merge Sorted Array
 
-**🔗 [LC 1047 — Remove All Adjacent Duplicates In String](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/)** · Easy
-**Pattern:** Stack | **Companies:** Amazon, Google, Meta
+**🔗 [LC 88 — Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/)** · Easy
+**Pattern:** Merge from the Back | **Companies:** Amazon, Microsoft, Meta
 
-**Hint:** Use a `StringBuilder` as the stack. For each char, if it equals the last char, delete that char; otherwise append. What's left is the answer.
-
----
-
-### E6 · Number of Recent Calls
-
-**🔗 [LC 933 — Number of Recent Calls](https://leetcode.com/problems/number-of-recent-calls/)** · Easy
-**Pattern:** Queue | **Companies:** Amazon, Google
-
-**Hint:** Keep a queue of timestamps. On `ping(t)`, add `t`, then remove timestamps `< t - 3000` from the front. Return the queue's size.
+**Hint:** Fill from the back: pointers `i = m - 1`, `j = n - 1`, `k = m + n - 1`. Write the larger of `nums1[i]` and `nums2[j]` at `k`. Stop when `nums2` is used up — any leftover `nums1` is already in place.
 
 ---
 
-### E7 · Time Needed to Buy Tickets
+### E4 · Rank Transform of an Array
 
-**🔗 [LC 2073 — Time Needed to Buy Tickets](https://leetcode.com/problems/time-needed-to-buy-tickets/)** · Easy
-**Pattern:** Queue Simulation | **Companies:** Amazon, Google
+**🔗 [LC 1331 — Rank Transform of an Array](https://leetcode.com/problems/rank-transform-of-an-array/)** · Easy
+**Pattern:** Sort + Rank Map | **Companies:** Amazon, Google
 
-**Hint:** Simulate with a queue of indices, or use the O(n) formula: a person `i <= k` waits `min(tickets[i], tickets[k])` rounds, and a person `i > k` waits `min(tickets[i], tickets[k] - 1)`.
+**Hint:** Copy and sort the array, assign ranks to distinct values in a map (rank increases only on a new value), then map every original element to its rank.
 
 ---
 
-### E8 · Make The String Great
+### E5 · Find All Numbers Disappeared in an Array
 
-**🔗 [LC 1544 — Make The String Great](https://leetcode.com/problems/make-the-string-great/)** · Easy
-**Pattern:** Stack | **Companies:** Amazon, Google
+**🔗 [LC 448 — Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)** · Easy
+**Pattern:** Cyclic | **Companies:** Amazon, Google, Apple
 
-**Hint:** Stack of chars (a `StringBuilder` works): if the top and the current char are the same letter in opposite cases (`abs(a - b) == 32`), pop; otherwise push.
+**Hint:** Cyclic sort: swap each value `v` into index `v - 1` until the spot already holds `v`. Then every index `i` with `nums[i] != i + 1` means `i + 1` is missing. (Negative marking also works in O(1) space.)
+
+---
+
+### E6 · Set Mismatch
+
+**🔗 [LC 645 — Set Mismatch](https://leetcode.com/problems/set-mismatch/)** · Easy
+**Pattern:** Cyclic | **Companies:** Amazon, Google
+
+**Hint:** Cyclic sort the array. The index `i` with `nums[i] != i + 1` gives both answers: `nums[i]` is the duplicate and `i + 1` is the missing number.
+
+---
+
+### E7 · Can Make Arithmetic Progression From Sequence
+
+**🔗 [LC 1502 — Can Make Arithmetic Progression From Sequence](https://leetcode.com/problems/can-make-arithmetic-progression-from-sequence/)** · Easy
+**Pattern:** Sort Then Verify | **Companies:** Amazon, Google
+
+**Hint:** Sort, then check every adjacent difference equals `arr[1] - arr[0]`. O(n) follow-up: min, max and a set — the step must be `(max - min) / (n - 1)`.
+
+---
+
+### E8 · Relative Sort Array
+
+**🔗 [LC 1122 — Relative Sort Array](https://leetcode.com/problems/relative-sort-array/)** · Easy
+**Pattern:** Counting Sort | **Companies:** Amazon, Google, Meta
+
+**Hint:** Values are ≤ 1000, so count them in `int[1001]`. Emit the values in `arr2`'s order first, then the leftovers in ascending order. O(n + range).
+
+---
+
+### E9 · Sort Array By Parity
+
+**🔗 [LC 905 — Sort Array By Parity](https://leetcode.com/problems/sort-array-by-parity/)** · Easy
+**Pattern:** Two-Pointer Partition | **Companies:** Amazon, Google
+
+**Hint:** Two pointers: `lo` from the start, `hi` from the end. If `nums[lo]` is odd, swap it with `nums[hi]` and move `hi` left; otherwise move `lo` right. It's the two-way partition from quicksort.
 
 ---
 
 ## 🟡 Medium Tier (12 Problems)
 
-_Focus on Monotonic Stack, Deque, Min-Stack design, and expression parsing._
+_Focus on complexity, stable merging, and randomized pivoting._
 
-### M1 · Min Stack
+### M1 · Insertion Sort List
 
-**🔗 [LC 155 — Min Stack](https://leetcode.com/problems/min-stack/)** · Medium
-**Pattern:** Stack Design | **Companies:** Amazon, Google, Bloomberg
+**🔗 [LC 147 — Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)** · Medium
+**Pattern:** Insertion Sort | **Companies:** Microsoft, Amazon
 
-**Hint:** Push `(value, min so far)` pairs — or keep a second stack of minimums. `getMin` reads the top's stored min in O(1), and popping restores the previous min automatically.
-
----
-
-### M2 · Daily Temperatures
-
-**🔗 [LC 739 — Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)** · Medium
-**Pattern:** Monotonic Stack | **Companies:** Amazon, Google, Meta
-
-**Hint:** Keep a stack of indices with decreasing temperatures. For each day, pop every index with a lower temperature and set `answer[popped] = i - popped`, then push `i`.
+**Hint:** Build a sorted list behind a dummy head. For each node, walk from the dummy to find its insertion point and splice it in. The same insertion idea as on arrays, but without shifting.
 
 ---
 
-### M3 · Next Greater Element I
+### M2 · Sort Colors
 
-**🔗 [LC 496 — Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)** · Easy
-**Pattern:** Mono Stack + HashMap | **Companies:** Amazon, Microsoft, Adobe
+**🔗 [LC 75 — Sort Colors](https://leetcode.com/problems/sort-colors/)** · Medium
+**Pattern:** Two Pointers | **Companies:** Microsoft, Amazon, Meta
 
-**Hint:** Run a monotonic decreasing stack over `nums2`: when a value `x` pops smaller values, record `nge[popped] = x`. Then answer each `nums1` value with `nge.getOrDefault(v, -1)`.
-
----
-
-### M4 · Next Greater Element II
-
-**🔗 [LC 503 — Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)** · Medium
-**Pattern:** Monotonic Stack | **Companies:** Amazon, Google, Meta
-
-**Hint:** Loop over indices `0..2n-1`, using `nums[i % n]`, with a decreasing stack of indices. Pop and assign answers while the current value is larger; only push during the first pass.
+**Hint:** Dutch National Flag with three pointers `lo`, `mid`, `hi`: a 0 swaps with `lo` (advance both), a 1 just advances `mid`, and a 2 swaps with `hi` (move `hi` left but don't advance `mid` — the swapped-in value is unchecked). One pass.
 
 ---
 
-### M5 · Online Stock Span
+### M3 · Find the Duplicate Number
 
-**🔗 [LC 901 — Online Stock Span](https://leetcode.com/problems/online-stock-span/)** · Medium
-**Pattern:** Monotonic Decreasing Stack | **Companies:** Amazon, Google, Bloomberg
+**🔗 [LC 287 — Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)** · Medium
+**Pattern:** Cyclic | **Companies:** Amazon, Google, Meta, Microsoft
 
-**Hint:** Keep a stack of `(price, span)`. For a new price, pop every entry with price `<=` it and add its span to the current span (starting at 1), then push. Amortised O(1).
-
----
-
-### M6 · Evaluate Reverse Polish Notation
-
-**🔗 [LC 150 — Evaluate Reverse Polish Notation](https://leetcode.com/problems/evaluate-reverse-polish-notation/)** · Medium
-**Pattern:** Stack | **Companies:** Amazon, LinkedIn, Meta
-
-**Hint:** Push numbers. On an operator, pop `b` first, then `a`, and push `a op b` — order matters for `-` and `/`. Integer division truncates toward zero.
+**Hint:** Cyclic sort idea: values are 1..n in n + 1 slots, so place each value at its index; the value that finds its index already occupied is the duplicate. With the read-only constraint, treat `i → nums[i]` as a linked list and use Floyd's cycle entry instead.
 
 ---
 
-### M7 · Decode String
+### M4 · Find All Duplicates in an Array
 
-**🔗 [LC 394 — Decode String](https://leetcode.com/problems/decode-string/)** · Medium
-**Pattern:** Stack of (count, string) | **Companies:** Google, Amazon, Meta, Bloomberg
+**🔗 [LC 442 — Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)** · Medium
+**Pattern:** Cyclic | **Companies:** Amazon, Google, Meta
 
-**Hint:** Two stacks: counts and string builders. Digits build a number; `[` pushes the count and the current string and starts a new one; `]` pops them and appends the current string repeated `count` times to the popped string.
-
----
-
-### M8 · Remove K Digits
-
-**🔗 [LC 402 — Remove K Digits](https://leetcode.com/problems/remove-k-digits/)** · Medium
-**Pattern:** Greedy + Stack | **Companies:** Google, Amazon, Meta
-
-**Hint:** Build an increasing stack of digits: while `k > 0` and the top is greater than the current digit, pop and decrement `k`. Push the digit. Remove any remaining `k` from the end, strip leading zeros, and return "0" if nothing is left.
+**Hint:** Negative marking: for each `v`, look at index `|v| - 1`. If it's already negative, `|v|` is a duplicate; otherwise negate it. O(n) time, O(1) extra space.
 
 ---
 
-### M9 · Design Circular Queue
+### M5 · Find the Kth Largest Integer in the Array
 
-**🔗 [LC 622 — Design Circular Queue](https://leetcode.com/problems/design-circular-queue/)** · Medium
-**Pattern:** Design | **Companies:** Microsoft, Amazon, Google
+**🔗 [LC 1985 — Find the Kth Largest Integer in the Array](https://leetcode.com/problems/find-the-kth-largest-integer-in-the-array/)** · Medium
+**Pattern:** QuickSelect with a Custom Comparator | **Companies:** Amazon, Google
 
-**Hint:** An array of capacity `k` with `head`, `tail` and `size`. `enQueue` writes at `tail` and moves it with `(tail + 1) % k`; `deQueue` moves `head` the same way. `size` tells full from empty.
-
----
-
-### M10 · Design Circular Deque
-
-**🔗 [LC 641 — Design Circular Deque](https://leetcode.com/problems/design-circular-deque/)** · Medium
-**Pattern:** Design | **Companies:** Amazon, Google
-
-**Hint:** A ring buffer with `front` and `rear` moving both ways: insert at the front with `front = (front - 1 + k) % k`, and at the rear by writing then `rear = (rear + 1) % k`. Track `size`.
+**Hint:** The numbers are strings with up to 100 digits: compare by length first, then lexicographically. Then QuickSelect (random pivot) for the kth largest, or a size-k min-heap.
 
 ---
 
-### M11 · Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
+### M6 · Largest Number
 
-**🔗 [LC 1438 — Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/)** · Medium
-**Pattern:** Two Monotonic Deques | **Companies:** Google, Amazon, Uber
+**🔗 [LC 179 — Largest Number](https://leetcode.com/problems/largest-number/)** · Medium
+**Pattern:** Custom Comparator | **Companies:** Google, Amazon, Microsoft
 
-**Hint:** Keep a decreasing deque for the window max and an increasing deque for the window min. Expand right; while `max - min > limit`, move left and pop expired fronts. O(n).
-
----
-
-### M12 · Jump Game VI
-
-**🔗 [LC 1696 — Jump Game VI](https://leetcode.com/problems/jump-game-vi/)** · Medium
-**Pattern:** Deque DP | **Companies:** Amazon, Google
-
-**Hint:** `dp[i] = nums[i] + max(dp[i-k .. i-1])`. Keep a deque of indices with decreasing `dp` values; pop the front when it's out of the window, read the max from the front, and pop smaller values from the back before pushing `i`.
+**Hint:** Sort the numbers as strings with the comparator `(a, b) -> (b + a).compareTo(a + b)`, so `a` goes first when `a + b` is the bigger string. Join them. If the first string is "0", the answer is "0".
 
 ---
 
-## 🔴 Hard Tier (5 Problems)
+### M7 · Merge Intervals
 
-_Focus on Hard monotonic problems and advanced stack-driven simulations._
+**🔗 [LC 56 — Merge Intervals](https://leetcode.com/problems/merge-intervals/)** · Medium
+**Pattern:** Intervals | **Companies:** Google, Amazon, Meta, Microsoft
 
-### H1 · Largest Rectangle in Histogram
-
-**🔗 [LC 84 — Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)** · Hard
-**Pattern:** Monotonic Increasing Stack | **Companies:** Amazon, Google, Meta, Microsoft
-
-**Hint:** Keep an increasing stack of indices. When a shorter bar arrives, pop: the popped bar's height times the width between the new top and `i` is a candidate area. Append a height-0 bar at the end to flush the stack.
+**Hint:** Sort by start. Keep the last merged interval; if the next start is ≤ its end, extend the end to `max(end, next end)`, otherwise start a new interval. O(n log n).
 
 ---
 
-### H2 · Car Fleet II
+### M8 · Maximum Element After Decreasing and Rearranging
 
-**🔗 [LC 1776 — Car Fleet II](https://leetcode.com/problems/car-fleet-ii/)** · Hard
-**Pattern:** Monotonic Stack from the Right | **Companies:** Google
+**🔗 [LC 1846 — Maximum Element After Decreasing and Rearranging](https://leetcode.com/problems/maximum-element-after-decreasing-and-rearranging/)** · Medium
+**Pattern:** Sort + Greedy | **Companies:** Amazon
 
-**Hint:** Process cars from right to left with a stack of cars ahead. Pop any car that is at least as fast (you never catch it), or that collides before you would reach it. The top is the car you hit; compute the time from the gap and speed difference.
-
----
-
-### H3 · Sliding Window Maximum
-
-**🔗 [LC 239 — Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)** · Hard
-**Pattern:** Monotonic Deque | **Companies:** Google, Amazon, Meta, Uber
-
-**Hint:** Keep a deque of indices with decreasing values. Pop the front if it has left the window, pop smaller values from the back before pushing `i`, and read the front as the window max once `i >= k - 1`.
+**Hint:** Sort, set `arr[0] = 1`, then clamp each element to `min(arr[i], arr[i-1] + 1)`. The last element is the answer. A counting sort on `min(value, n)` makes it O(n).
 
 ---
 
-### H4 · Basic Calculator
+### M9 · Wiggle Sort II
 
-**🔗 [LC 224 — Basic Calculator](https://leetcode.com/problems/basic-calculator/)** · Hard
-**Pattern:** Sign Stack + Operand Stack | **Companies:** Google, Amazon, Meta
+**🔗 [LC 324 — Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/)** · Medium
+**Pattern:** Partitioning | **Companies:** Google, Amazon, Meta
 
-**Hint:** Scan with `result`, `number` and `sign`. On `(`, push `result` and `sign`, then reset both. On `)`, finish the current number and set `result = popped result + popped sign × result`. Unary minus is handled because `sign` starts at +1.
+**Hint:** Sort, then interleave the two halves from the back (O(N log N)); follow-up: QuickSelect the median + 3-way partition for O(N).
 
 ---
 
-### H5 · Maximal Rectangle
+### M10 · Sort the Matrix Diagonally
 
-**🔗 [LC 85 — Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)** · Hard
-**Pattern:** Histogram per Row + Monotonic Stack | **Companies:** Google, Amazon, Meta
+**🔗 [LC 1329 — Sort the Matrix Diagonally](https://leetcode.com/problems/sort-the-matrix-diagonally/)** · Medium
+**Pattern:** Sort Each Diagonal | **Companies:** Amazon, Google
 
-**Hint:** Turn each row into a histogram: `height[j] = matrix[i][j] == '1' ? height[j] + 1 : 0`. Run Largest Rectangle in Histogram (LC 84) on it and keep the best area over all rows.
+**Hint:** Cells on the same diagonal share `i - j`. Collect each diagonal into a list (or a counting array — values ≤ 100), sort it, and write it back in the same walk order.
+
+---
+
+### M11 · Custom Sort String
+
+**🔗 [LC 791 — Custom Sort String](https://leetcode.com/problems/custom-sort-string/)** · Medium
+**Pattern:** Custom Order / Counting | **Companies:** Meta, Amazon, Google
+
+**Hint:** Count every character of `s`, emit characters in `order`'s order as many times as they appear, then append whatever is left. That's counting sort with a custom key order: O(n + 26).
+
+---
+
+### M12 · Maximum Gap
+
+**🔗 [LC 164 — Maximum Gap](https://leetcode.com/problems/maximum-gap/)** · Medium
+**Pattern:** Bucket Sort (Pigeonhole) | **Companies:** Apple, Amazon, Google
+
+**Hint:** Pigeonhole: with `n` numbers between `min` and `max`, the max gap is at least `ceil((max - min) / (n - 1))`. Use buckets of that width, store only each bucket's min and max, and scan the gaps between non-empty buckets. O(n).
+
+---
+
+## 🔴 Hard Tier (4 Problems)
+
+_Focus on O(1) space constraints and optimal sorting pivots._
+
+### H1 · First Missing Positive
+
+**🔗 [LC 41 — First Missing Positive](https://leetcode.com/problems/first-missing-positive/)** · Hard
+**Pattern:** Cyclic | **Companies:** Google, Amazon, Meta, Microsoft
+
+**Hint:** Cyclic sort values `1..n` into index `value - 1`, ignoring values that are out of range or would swap with an equal value. The first index `i` with `nums[i] != i + 1` gives the answer `i + 1`; if there is none, it's `n + 1`.
+
+---
+
+### H2 · Reverse Pairs
+
+**🔗 [LC 493 — Reverse Pairs](https://leetcode.com/problems/reverse-pairs/)** · Hard
+**Pattern:** D&C | **Companies:** Google, Amazon, Meta
+
+**Hint:** Modify merge sort: before merging two sorted halves, count pairs with a second pointer — for each `i` in the left half, advance `j` in the right half while `nums[i] > 2 * nums[j]` (use `long`). Then merge as usual.
+
+---
+
+### H3 · Count of Smaller Numbers After Self
+
+**🔗 [LC 315 — Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/)** · Hard
+**Pattern:** Merge Sort Counting | **Companies:** Google, Amazon, Meta
+
+**Hint:** Merge sort on indices. While merging, when you take an element from the left half, every right-half element already placed was smaller and came after it — add that count to the element's answer. Or use a Fenwick tree over compressed values.
+
+---
+
+### H4 · Count of Range Sum
+
+**🔗 [LC 327 — Count of Range Sum](https://leetcode.com/problems/count-of-range-sum/)** · Hard
+**Pattern:** Merge Sort Counting | **Companies:** Google, Amazon
+
+**Hint:** Work on prefix sums. During merge sort, for each left-half prefix `p`, move two pointers over the sorted right half to count prefixes in `[p + lower, p + upper]`, then merge. O(n log n). Use `long`.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Complete the table based on the best/worst cases:
+
+| Snippet          | Best Case  | Worst Case | Space    | Stability |
+| :--------------- | :--------- | :--------- | :------- | :-------- |
+| `Selection Sort` | O(n²)      | ??         | O(1)     | No        |
+| `Merge Sort`     | ??         | O(n log n) | O(n)     | Yes       |
+| `Quick Sort`     | O(n log n) | O(n²)      | O(log n) | No        |
+| `Counting Sort`  | O(n + k)   | ??         | O(k)     | Yes       |
+| `Cyclic Sort`    | O(n)       | O(n)       | O(1)     | No        |
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. Quick sort is always faster than merge sort. → **False** — its worst case is O(n²); merge sort is O(n log n) always
+2. A stable sort keeps equal elements in their original order. → **True** — that is the definition
+3. Any comparison sort needs at least on the order of n log n comparisons in the worst case. → **True** — there are n! orderings, and each comparison halves the possibilities at best
+4. Counting sort beats n log n for any input. → **False** — only when values lie in a small known range
+5. Insertion sort is O(n) on already-sorted input. → **True** — each element compares once with its left neighbour and stops
+6. Java's Arrays.sort on an int[] is stable. → **False** — it uses quicksort for primitives; stability only matters — and is only guaranteed — for objects
 
 ---
 
 ## 🧠 Conceptual Check
 
-Answer these without looking at code:
-
-1. **LIFO vs FIFO**: Give two real-world examples of each (not from lectures).
-2. **Monotonic Stack Invariant**: What exactly is violated when you pop from the stack during a Monotonic Decreasing Stack traversal?
-3. **Amortised O(1)**: In the two-stack Queue design, a single `pop()` can be O(N). Why is the _amortised_ cost still O(1)?
-4. **Deque vs Heap**: When would you use a Monotonic Deque instead of a Min/Max Heap for sliding window problems? What is the complexity advantage?
-5. **Stack vs Recursion**: Every recursive algorithm uses an implicit call stack. When is it better to use an explicit stack instead?
+1. **Stability**: Why is Merge Sort stable while standard Quick Sort is not?
+2. **In-place**: Can Merge Sort be implemented in O(1) extra space? (Research "In-place Merge Sort").
+3. **Pivots**: How does randomized pivoting prevent O(n²) in Quick Sort?
+4. **Comparison**: Why is O(n log n) the mathematical lower bound for comparison sorts?
 
 ---
 
@@ -277,25 +298,27 @@ Answer these without looking at code:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                 |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/), [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/), [Basic Calculator](https://leetcode.com/problems/basic-calculator/), [Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)           |
-| **Google**    | [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/), [Car Fleet II](https://leetcode.com/problems/car-fleet-ii/), [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/), [Basic Calculator](https://leetcode.com/problems/basic-calculator/)                     |
-| **Meta**      | [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/), [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/), [Basic Calculator](https://leetcode.com/problems/basic-calculator/), [Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)           |
-| **Microsoft** | [Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/), [Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/), [Design Circular Queue](https://leetcode.com/problems/design-circular-queue/), [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) |
-| **Bloomberg** | [Min Stack](https://leetcode.com/problems/min-stack/), [Online Stock Span](https://leetcode.com/problems/online-stock-span/), [Decode String](https://leetcode.com/problems/decode-string/), [Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)                                               |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Maximum Element After Decreasing and Rearranging](https://leetcode.com/problems/maximum-element-after-decreasing-and-rearranging/), [Count of Range Sum](https://leetcode.com/problems/count-of-range-sum/), [Find the Kth Largest Integer in the Array](https://leetcode.com/problems/find-the-kth-largest-integer-in-the-array/), [Sort the Matrix Diagonally](https://leetcode.com/problems/sort-the-matrix-diagonally/) |
+| **Google**    | [Can Make Arithmetic Progression From Sequence](https://leetcode.com/problems/can-make-arithmetic-progression-from-sequence/), [Find Target Indices After Sorting Array](https://leetcode.com/problems/find-target-indices-after-sorting-array/), [Height Checker](https://leetcode.com/problems/height-checker/), [Rank Transform of an Array](https://leetcode.com/problems/rank-transform-of-an-array/)                   |
+| **Meta**      | [Count of Smaller Numbers After Self](https://leetcode.com/problems/count-of-smaller-numbers-after-self/), [Reverse Pairs](https://leetcode.com/problems/reverse-pairs/), [Custom Sort String](https://leetcode.com/problems/custom-sort-string/), [Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)                                                                         |
+| **Microsoft** | [Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/), [Largest Number](https://leetcode.com/problems/largest-number/), [Sort Colors](https://leetcode.com/problems/sort-colors/), [Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/)                                                                                                                                               |
+| **Apple**     | [Maximum Gap](https://leetcode.com/problems/maximum-gap/), [Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)                                                                                                                                                                                                                                               |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 8 Easy problems solved
-- [ ] All 12 Medium problems solved
+- [ ] All 10 Easy problems solved
+- [ ] All 10 Medium problems solved
 - [ ] All 5 Hard problems attempted
-- [ ] All 5 conceptual questions answered out loud
-- [ ] I can explain the invariant a monotonic stack keeps
-- [ ] I can say why two-stack queue operations are amortised O(1)
+- [ ] Self-assessment completed without looking at the notes
+- [ ] Every complexity exercise answered before checking
+- [ ] All 4 conceptual questions answered out loud
+- [ ] I can state the time, space and stability of every sort in the lecture
+- [ ] I can write the Lomuto or Hoare partition from memory
 
 ---
 
-**← [Lecture 11 · Linked Lists](../Lecture11/Assignment.md)** &nbsp;·&nbsp; **[Lecture 13 · HashMap & HashSet](../Lecture13/Assignment.md) →**
+**← [Lecture 11 · Arrays & Strings](../Lecture11/Assignment.md)** &nbsp;·&nbsp; **[Lecture 13 · Searching Algorithms](../Lecture13/Assignment.md) →**

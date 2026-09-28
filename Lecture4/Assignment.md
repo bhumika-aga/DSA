@@ -1,10 +1,9 @@
-# ⚡ Assignment 4 — Java 8+ Modern Features
+# ⚙️ Assignment 1 — Java & Programming Fundamentals
 
-> **Lecture:** 4 of 38 — Java 8+ Modern Features
+> **Lecture:** 4 of 45 — Java & Programming Fundamentals
 > **Phase:** 1 — Foundations
-> **Estimated Time:** 3 days · **Total Problems:** 25 (10 Easy · 10 Medium · 5 Hard)
-> **Goal:** Leverage the power of Lambdas, Streams, and Optional to write cleaner, more declarative, and FAANG-ready
-> Java code.
+> **Estimated Time:** 5 days · **Total Problems:** 40 (30 Easy · 10 Medium · 0 Hard)
+> **Goal:** Cement control flow, array manipulation, type system mastery, and complexity analysis.
 
 ---
 
@@ -12,317 +11,494 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem               | Pattern               | Move                                    |
-| ----------------------------------- | --------------------- | --------------------------------------- |
-| "transform every element"           | map                   | `stream().map(f)`                       |
-| "keep only elements that …"         | filter                | `filter(predicate)`                     |
-| "group by / count by"               | Collectors.groupingBy | `groupingBy(key, counting())`           |
-| "list of lists"                     | flatMap               | `flatMap(List::stream)`                 |
-| "combine everything into one value" | reduce                | identity + associative accumulator      |
-| "value might be missing"            | Optional              | `map` / `orElse` instead of null checks |
+| Signal in the Problem                | Pattern                 | Move                                              |
+| ------------------------------------ | ----------------------- | ------------------------------------------------- |
+| "digits of a number"                 | Digit Extraction        | `n % 10` reads a digit, `n / 10` drops it         |
+| "sum / count / max over an array"    | Single Pass Accumulator | one loop, one or two running variables            |
+| "is it sorted / rotated / monotonic" | Adjacent Comparison     | compare `a[i]` with `a[i+1]`, count breaks        |
+| "how many pairs" with small values   | Counting Array          | count first, then combine counts — no nested loop |
+| "grid", "row", "column"              | 2D Index Mapping        | `idx = r * cols + c` and back with `/` and `%`    |
+| "might not fit in an int"            | Overflow Guard          | check before multiplying, or switch to `long`     |
 
 ---
 
-## 🟢 Easy Tier (10 Problems)
+## 🟢 Easy Tier (30 Problems)
 
-_Syntax & Basics._
+_Build the Foundation._
 
-### E1 · Lambda One-Liner
+### E1 · Fizz Buzz
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 412 — Fizz Buzz](https://leetcode.com/problems/fizz-buzz/)** · Easy
+**Pattern:** Conditionals | **Companies:** Amazon, Google
 
-**Task:** Rewrite an anonymous inner class for `Runnable` into a concise Lambda. Also rewrite `Comparator<Integer> comp = (a, b) -> a - b;` into a method reference `Integer::compare`.
-
----
-
-### E2 · Sorting a List of Strings
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Create a `List<String> names = Arrays.asList("Apple", "Banana", "Cherry");` and use `names.sort(...)` with a Lambda to sort by **string length** instead of alphabetical order.
+**Hint:** For numbers 1 to n: print "FizzBuzz" if divisible by both 3 and 5, "Fizz" if by 3, "Buzz" if by 5, else the number itself. **Check the combined case first.**
 
 ---
 
-### E3 · List to UpperCase
+### E2 · Count the Digits That Divide a Number
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Lambda Basics | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 2520 — Count the Digits That Divide a Number](https://leetcode.com/problems/count-the-digits-that-divide-a-number/)** · Easy
+**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe
 
-**Task:** Given a list of strings, use `list.replaceAll(...)` with a Lambda to convert all elements to uppercase.
-
----
-
-### E4 · Custom Functional Interface
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Create a `@FunctionalInterface` called `MathOp` with one method `double operate(double a, double b)`. Implement `Add`, `Subtract`, `Multiply`, and `Divide` using only Lambda variables.
+**Hint:** Peel digits with `n % 10` and `n / 10`, but keep the original `n` in a separate variable — you need it to test `original % digit == 0`. Digits of the input are never 0 here, so no divide-by-zero guard is needed.
 
 ---
 
-### E5 · Predicate Filtering
+### E3 · Subtract the Product and Sum of Digits of an Integer
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1281 — Subtract the Product and Sum of Digits of an Integer](https://leetcode.com/problems/subtract-the-product-and-sum-of-digits-of-an-integer/)** · Easy
+**Pattern:** Digit Extraction | **Companies:** Amazon, Google
 
-**Task:** Use `Predicate<Integer> isEven = n -> n % 2 == 0;` and use `list.removeIf(isEven)` to filter a list of numbers.
-
----
-
-### E6 · Supplier & Consumer
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Functional Interfaces | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Write a `Supplier<Double>` that returns a random number and a `Consumer<Double>` that prints "Random: " followed by that number. Execute them 5 times.
+**Hint:** One loop, two accumulators: `product *= n % 10` and `sum += n % 10`, then `n /= 10`. Start `product` at 1, not 0. Follow-up: the same loop checks an Armstrong number — sum each digit raised to the digit count and compare with the original.
 
 ---
 
-### E7 · IntStream Ranges
+### E4 · Palindrome Number
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Stream Sources | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 9 — Palindrome Number](https://leetcode.com/problems/palindrome-number/)** · Easy
+**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe, Apple
 
-**Task:** Use `IntStream.rangeClosed(1, 100)` to find the sum of all odd numbers between 1 and 100.
-
----
-
-### E8 · Array to Stream
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Stream Sources | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Convert `int[] nums = {1, 2, 3, 4, 5}` into a stream. Use `.map(n -> n * n)` to square each number and collect it into a `List<Integer>`.
+**Hint:** Check if a number reads the same backward without string conversion. Negative numbers are never palindromes.
 
 ---
 
-### E9 · AnyMatch / AllMatch
+### E5 · N-th Tribonacci Number
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1137 — N-th Tribonacci Number](https://leetcode.com/problems/n-th-tribonacci-number/)** · Easy
+**Pattern:** Iteration — Rolling Variables | **Companies:** Amazon, Google
 
-**Task:** Given a list of students, check if **all** students have `gpa > 2.0` and if **any** student has `gpa == 4.0` using Streams.
+**Hint:** Don't recurse — keep only the last three values `a, b, c` and slide them forward `n - 2` times (`next = a + b + c`). Handle `n = 0, 1, 2` first. O(n) time, O(1) space.
 
 ---
 
-### E10 · Distinct & Sort
+### E6 · Smallest Even Multiple
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 2413 — Smallest Even Multiple](https://leetcode.com/problems/smallest-even-multiple/)** · Easy
+**Pattern:** GCD & LCM | **Companies:** Amazon, Adobe
 
-**Task:** Join unique names from a list, sorted alphabetically, into a single comma-separated string using `.distinct().sorted().collect(Collectors.joining(", "))`.
+**Hint:** The answer is `lcm(n, 2)`. Write `gcd(a, b)` with Euclid's rule `gcd(b, a % b)`, then `lcm = a / gcd(a, b) * b` — divide first so the product can't overflow.
+
+---
+
+### E7 · Find First Palindromic String in the Array
+
+**🔗 [LC 2108 — Find First Palindromic String in the Array](https://leetcode.com/problems/find-first-palindromic-string-in-the-array/)** · Easy
+**Pattern:** String Traversal | **Companies:** Amazon, Adobe
+
+**Hint:** Write `isPalindrome(word)` with two indices walking inward, then return the first word for which it is true (or `""`). Practise using `charAt(i)` and comparing `char`s with `==`.
+
+---
+
+### E8 · Determine if String Halves Are Alike
+
+**🔗 [LC 1704 — Determine if String Halves Are Alike](https://leetcode.com/problems/determine-if-string-halves-are-alike/)** · Easy
+**Pattern:** Character Counting | **Companies:** Amazon, Microsoft
+
+**Hint:** Count vowels in the first half and the second half separately. `"aeiouAEIOU".indexOf(c) >= 0` is a quick vowel test. Both halves have length `s.length() / 2`.
+
+---
+
+### E9 · Power of Four
+
+**🔗 [LC 342 — Power of Four](https://leetcode.com/problems/power-of-four/)** · Easy
+**Pattern:** Loops & Powers | **Companies:** Amazon, Google
+
+**Hint:** Loop version first: while `n % 4 == 0`, divide by 4; the answer is `n == 1`. Guard `n <= 0` up front. (Lecture 9 shows the O(1) bit-trick version.)
+
+---
+
+### E10 · Add Digits
+
+**🔗 [LC 258 — Add Digits](https://leetcode.com/problems/add-digits/)** · Easy
+**Pattern:** Digit Extraction | **Companies:** Amazon, Adobe
+
+**Hint:** Simulate: while `num >= 10`, replace it with the sum of its digits. Then find the O(1) formula — the digital root is `1 + (num - 1) % 9` for `num > 0`.
+
+---
+
+### E11 · Duplicate Zeros
+
+**🔗 [LC 1089 — Duplicate Zeros](https://leetcode.com/problems/duplicate-zeros/)** · Easy
+**Pattern:** Array Shifting | **Companies:** Google, Amazon
+
+**Hint:** First count how many zeros will be duplicated and still fit. Then fill from the back with a write pointer so you never overwrite a value you still need. Watch the edge case where the last zero only half-fits.
+
+---
+
+### E12 · Concatenation of Array
+
+**🔗 [LC 1929 — Concatenation of Array](https://leetcode.com/problems/concatenation-of-array/)** · Easy
+**Pattern:** Array Basics | **Companies:** Amazon, Adobe
+
+**Hint:** Allocate `ans = new int[2 * n]` and set `ans[i] = ans[i + n] = nums[i]`. A warm-up for index arithmetic and array allocation.
+
+---
+
+### E13 · Number of Good Pairs
+
+**🔗 [LC 1512 — Number of Good Pairs](https://leetcode.com/problems/number-of-good-pairs/)** · Easy
+**Pattern:** Counting | **Companies:** Amazon, Microsoft
+
+**Hint:** Brute force is two nested loops. Better: a count array — when you see a value that has already appeared `c` times, it forms `c` new good pairs, so add `c` before incrementing.
+
+---
+
+### E14 · Running Sum of 1d Array
+
+**🔗 [LC 1480 — Running Sum of 1d Array](https://leetcode.com/problems/running-sum-of-1d-array/)** · Easy
+**Pattern:** Prefix Sum Basics | **Companies:** Amazon, Microsoft
+
+**Hint:** Return the running (prefix) sum. `result[i] = result[i-1] + nums[i]`. The foundation of all range-query problems.
+
+---
+
+### E15 · Plus One
+
+**🔗 [LC 66 — Plus One](https://leetcode.com/problems/plus-one/)** · Easy
+**Pattern:** Carry Propagation | **Companies:** Google, Amazon, Meta
+
+**Hint:** Add one to a number represented as a digit array. Traverse backwards, handle carry. Don't forget the all-9s edge case (e.g., [9,9,9] → [1,0,0,0]).
+
+---
+
+### E16 · Find the Highest Altitude
+
+**🔗 [LC 1732 — Find the Highest Altitude](https://leetcode.com/problems/find-the-highest-altitude/)** · Easy
+**Pattern:** Running Sum | **Companies:** Amazon, Microsoft
+
+**Hint:** Start at altitude 0 and add each `gain[i]`, tracking the maximum seen (including the starting 0).
+
+---
+
+### E17 · Richest Customer Wealth
+
+**🔗 [LC 1672 — Richest Customer Wealth](https://leetcode.com/problems/richest-customer-wealth/)** · Easy
+**Pattern:** 2D Array Traversal | **Companies:** Amazon, Adobe
+
+**Hint:** Return the maximum row-sum in an m×n matrix. Nested loops are fine — O(m×n).
+
+---
+
+### E18 · Shuffle the Array
+
+**🔗 [LC 1470 — Shuffle the Array](https://leetcode.com/problems/shuffle-the-array/)** · Easy
+**Pattern:** Index Arithmetic | **Companies:** Amazon, Adobe
+
+**Hint:** Interleave [x1, x2, ..., xn, y1, y2, ..., yn] → [x1, y1, x2, y2, ...]. Access using `nums[i]` and `nums[i+n]`.
+
+---
+
+### E19 · Find the Pivot Integer
+
+**🔗 [LC 2485 — Find the Pivot Integer](https://leetcode.com/problems/find-the-pivot-integer/)** · Easy
+**Pattern:** Gauss Sum Formula | **Companies:** Amazon, Google
+
+**Hint:** Total sum is `n(n+1)/2`. The pivot `x` satisfies `x(x+1)/2 = total - x(x-1)/2`, which simplifies to `x² = total`. Check whether `total` is a perfect square.
+
+---
+
+### E20 · Third Maximum Number
+
+**🔗 [LC 414 — Third Maximum Number](https://leetcode.com/problems/third-maximum-number/)** · Easy
+**Pattern:** Track Top Values | **Companies:** Amazon, Microsoft
+
+**Hint:** Keep three variables `first > second > third` (use `long` or `Integer` so `Integer.MIN_VALUE` in the input isn't confused with "empty"). Skip duplicates. If `third` was never set, return `first`.
+
+---
+
+### E21 · Find Closest Number to Zero
+
+**🔗 [LC 2239 — Find Closest Number to Zero](https://leetcode.com/problems/find-closest-number-to-zero/)** · Easy
+**Pattern:** Linear Scan | **Companies:** Amazon, Google
+
+**Hint:** Track the value with the smallest `Math.abs(x)`; on a tie, prefer the larger value. One pass, O(1) space.
+
+---
+
+### E22 · Max Consecutive Ones
+
+**🔗 [LC 485 — Max Consecutive Ones](https://leetcode.com/problems/max-consecutive-ones/)** · Easy
+**Pattern:** Running Count | **Companies:** Amazon, Google
+
+**Hint:** Keep `current` (length of the run of 1s ending here) and `best`. On a 1 increment `current`; on a 0 reset it to 0. This reset-or-extend idea is the seed of Kadane's algorithm in Lecture 11.
+
+---
+
+### E23 · How Many Numbers Are Smaller Than the Current Number
+
+**🔗 [LC 1365 — How Many Numbers Are Smaller Than the Current Number](https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/)** · Easy
+**Pattern:** Counting Array | **Companies:** Amazon, Microsoft
+
+**Hint:** Brute force O(n²) is fine for n ≤ 500. Then do it in O(n + 100): count each value in `int[101]`, build prefix counts, and the answer for `x` is `prefix[x - 1]`.
+
+---
+
+### E24 · Maximum Ascending Subarray Sum
+
+**🔗 [LC 1800 — Maximum Ascending Subarray Sum](https://leetcode.com/problems/maximum-ascending-subarray-sum/)** · Easy
+**Pattern:** Running Sum with Reset | **Companies:** Amazon, Google
+
+**Hint:** Walk the array keeping `sum` of the current ascending run. If `nums[i] > nums[i-1]` extend it, otherwise restart at `nums[i]`. Track the best sum.
+
+---
+
+### E25 · Sort Array By Parity II
+
+**🔗 [LC 922 — Sort Array By Parity II](https://leetcode.com/problems/sort-array-by-parity-ii/)** · Easy
+**Pattern:** Two Index Pointers | **Companies:** Amazon, Google
+
+**Hint:** Keep `even = 0` and `odd = 1`. Walk `even` in steps of 2; when `nums[even]` is odd, advance `odd` (steps of 2) to an even value and swap. O(n), in place.
+
+---
+
+### E26 · Element Appearing More Than 25% In Sorted Array
+
+**🔗 [LC 1287 — Element Appearing More Than 25% In Sorted Array](https://leetcode.com/problems/element-appearing-more-than-25-in-sorted-array/)** · Easy
+**Pattern:** Sorted Array Scan | **Companies:** Amazon, Google
+
+**Hint:** Because the array is sorted, the answer appears more than n/4 times, so `arr[i] == arr[i + n/4]` for some `i`. One pass, O(1) space.
+
+---
+
+### E27 · Maximum Product of Two Elements in an Array
+
+**🔗 [LC 1464 — Maximum Product of Two Elements in an Array](https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/)** · Easy
+**Pattern:** Track Top Two | **Companies:** Amazon, Microsoft
+
+**Hint:** You need the two largest values — no sort required. Track `max1` and `max2` in one pass and return `(max1 - 1) * (max2 - 1)`.
+
+---
+
+### E28 · Check if Array Is Sorted and Rotated
+
+**🔗 [LC 1752 — Check if Array Is Sorted and Rotated](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/)** · Easy
+**Pattern:** Count Breaks | **Companies:** Amazon, Google
+
+**Hint:** Count positions where `nums[i] > nums[(i + 1) % n]` (note the wrap-around). A sorted-then-rotated array has at most one such drop.
+
+---
+
+### E29 · Reshape the Matrix
+
+**🔗 [LC 566 — Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/)** · Easy
+**Pattern:** 2D Index Mapping | **Companies:** Amazon, Microsoft
+
+**Hint:** If `m * n != r * c` return the original. Otherwise walk every cell with a single counter `idx` and place it at `[idx / c][idx % c]`.
+
+---
+
+### E30 · Special Positions in a Binary Matrix
+
+**🔗 [LC 1582 — Special Positions in a Binary Matrix](https://leetcode.com/problems/special-positions-in-a-binary-matrix/)** · Easy
+**Pattern:** 2D Counting | **Companies:** Amazon, Google
+
+**Hint:** Pre-count ones per row and per column. A cell `(i, j)` is special when `mat[i][j] == 1` and `rowCount[i] == 1` and `colCount[j] == 1`. O(m·n).
 
 ---
 
 ## 🟡 Medium Tier (10 Problems)
 
-_Pipeline Mastery._
+_Interview Staples._
 
-### M1 · The `Optional` Rescue
+### M1 · Reverse Integer
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Optional | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 7 — Reverse Integer](https://leetcode.com/problems/reverse-integer/)** · Medium
+**Pattern:** Digit Extraction | **Companies:** Amazon, Apple, Bloomberg
 
-**Task:** Create a method `String getUpperName(Employee e)` that returns `Optional.ofNullable(e.getName()).map(String::toUpperCase).orElse("UNKNOWN")`. Test it with a null employee name.
-
----
-
-### M2 · Mapping to Object
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Filter, Match & Map | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Given a `List<String> titles`, use a Stream to convert them into a `List<Book>` objects where the title is passed to the constructor.
+**Hint:** Given an integer `n`, return its digits reversed. If the reversed number overflows a 32-bit integer, return 0. **Use `long` to detect overflow.**
 
 ---
 
-### M3 · Grouping By Category
+### M2 · Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Grouping & Partitioning | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1343 — Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](https://leetcode.com/problems/number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/)** · Medium
+**Pattern:** Fixed-Size Window (Preview) | **Companies:** Amazon, Microsoft
 
-**Task:** Given `List<Item>` (each with `name` and `category`), create a `Map<String, List<Item>>` grouped by category using `Collectors.groupingBy`.
-
----
-
-### M4 · Partitioning By Predicate
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Grouping & Partitioning | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Partition a list of integers into two lists: `primes` and `non-primes` using `Collectors.partitioningBy(n -> isPrime(n))`.
+**Hint:** Compare sums, not averages: count windows with `sum >= k * threshold`. Build the first window's sum, then slide — add `arr[i]`, subtract `arr[i - k]`. O(n). Lecture 25 generalises this.
 
 ---
 
-### M5 · FlatMap (List of Lists)
+### M3 · String to Integer (atoi)
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 8 — String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/)** · Medium
+**Pattern:** Parsing & Overflow | **Companies:** Amazon, Microsoft, Meta
 
-**Task:** Given `List<List<Integer>>`, use `.flatMap(List::stream)` to flatten it into a single `List<Integer>` of all numbers.
-
----
-
-### M6 · Uncommon Words from Two Sentences
-
-**🔗 [LC 884 — Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/)** · Easy
-**Pattern:** Collectors.groupingBy + counting | **Companies:** Amazon, Microsoft
-
-**Hint:** Stream the words of both sentences: `Arrays.stream((s1 + " " + s2).split(" "))`, group with `Collectors.groupingBy(Function.identity(), Collectors.counting())`, then filter entries with count 1 and map to keys.
+**Hint:** Four stages in order: skip spaces, read an optional sign, read digits, stop at the first non-digit. Before `result = result * 10 + d`, check `result > (Integer.MAX_VALUE - d) / 10` and clamp.
 
 ---
 
-### M7 · Max/Min with Streams
+### M4 · Count and Say
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 38 — Count and Say](https://leetcode.com/problems/count-and-say/)** · Medium
+**Pattern:** String Building | **Companies:** Amazon, Google, Meta
 
-**Task:** Find the oldest `User` in a list using `.max(Comparator.comparingInt(User::getAge))`. Return as an `Optional<User>`.
-
----
-
-### M8 · Parallel Stream Performance
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Parallel Streams | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Perform a complex calculation (e.g., sum of prime factors) on a list of 1,000,000 numbers. Compare the time taken by `.stream()` vs `.parallelStream()`.
+**Hint:** Build each term from the previous one: scan runs of equal digits and append `count` then `digit` to a `StringBuilder`. Never use `+=` on a `String` inside the loop.
 
 ---
 
-### M9 · Reduce (Custom Accumulation)
+### M5 · Maximum Product Subarray
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** FlatMap & Reduction | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 152 — Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)** · Medium
+**Pattern:** Track min AND max | **Companies:** Amazon, Google, LinkedIn
 
-**Task:** Use `.reduce(1, (a, b) -> a * b)` to find the factorial of a small number list. Explain the "Identity" parameter.
-
----
-
-### M10 · Find Resultant Array After Removing Anagrams
-
-**🔗 [LC 2273 — Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/)** · Easy
-**Pattern:** Stream Filtering with State | **Companies:** Amazon, Google
-
-**Hint:** Two words are anagrams when their sorted characters match. A plain `filter` has no memory of the previous word, so compare against the last kept word — use `IntStream.range` over indices, or a loop, and explain why stateful lambdas are unsafe in parallel streams.
+**Hint:** Track both the maximum and the minimum product ending at `i` — a negative number turns the smallest product into the largest. At each step `newMax = max(x, x * max, x * min)` (and symmetrically for min), computed before overwriting.
 
 ---
 
-## 🔴 Hard Tier (5 Problems)
+### M6 · Zigzag Conversion
 
-_5 Advanced Problems._
+**🔗 [LC 6 — Zigzag Conversion](https://leetcode.com/problems/zigzag-conversion/)** · Medium
+**Pattern:** Index Simulation | **Companies:** Amazon, Microsoft, Adobe
 
-### H1 · Top K Frequent Words
-
-**🔗 [LC 692 — Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)** · Medium
-**Pattern:** groupingBy + Custom Comparator | **Companies:** Amazon, Google, Uber
-
-**Hint:** Use `Collectors.groupingBy` and then sort by `Entry.getValue()` DESC and `Entry.getKey()` ASC.
+**Hint:** Keep `numRows` `StringBuilder`s and a row pointer that bounces 0 → numRows-1 → 0. Append each character to the current row, then join. Handle `numRows == 1` separately.
 
 ---
 
-### H2 · Custom Collector
+### M7 · Sequential Digits
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Custom Collector | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1291 — Sequential Digits](https://leetcode.com/problems/sequential-digits/)** · Medium
+**Pattern:** Number Generation | **Companies:** Amazon, Google
 
-**Task:** Implement a custom collector that computes the **standard deviation** of a stream of doubles.
-
----
-
-### H3 · Stream of Files
-
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Lazy Streams over Files | **Companies:** Amazon, LinkedIn, Goldman Sachs
-
-**Task:** Use `Files.lines(Path)` to process a 100MB log file. Filter lines starting with "ERROR" and count them without loading the whole file into RAM.
+**Hint:** Don't test every number in `[low, high]`. Generate candidates from the string `"123456789"`: for each length from 2 to 9, take every substring of that length, convert it, and keep those in range.
 
 ---
 
-### H4 · Optionals in Serialization
+### M8 · Smallest Integer Divisible by K
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Optional Best Practices | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1015 — Smallest Integer Divisible by K](https://leetcode.com/problems/smallest-integer-divisible-by-k/)** · Medium
+**Pattern:** Modular Arithmetic | **Companies:** Amazon, Google
 
-**Task:** Explain why putting `Optional<T>` as a field in a class is considered "bad practice" (it's not Serializable).
+**Hint:** The number 111…1 overflows fast, so track only `remainder = (remainder * 10 + 1) % k`. If `k` is divisible by 2 or 5 the answer is -1; otherwise a remainder of 0 appears within `k` steps.
+
+---
+
+### M9 · Jump Game
+
+**🔗 [LC 55 — Jump Game](https://leetcode.com/problems/jump-game/)** · Medium
+**Pattern:** Greedy reach tracking | **Companies:** Amazon, Google, Meta, Microsoft
+
+**Hint:** Greedy: keep `farthest`, the furthest index reachable so far. Walk `i` from 0; if `i > farthest` you're stuck, otherwise update `farthest = max(farthest, i + nums[i])`. Return true once `farthest >= n - 1`.
 
 ---
 
-### H5 · Infinite Stream
+### M10 · Check if Number is a Sum of Powers of Three
 
-**🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Infinite Streams + limit | **Companies:** Amazon, LinkedIn, Goldman Sachs
+**🔗 [LC 1780 — Check if Number is a Sum of Powers of Three](https://leetcode.com/problems/check-if-number-is-a-sum-of-powers-of-three/)** · Medium
+**Pattern:** Base Conversion | **Companies:** Amazon, Google
 
-**Task:** Use `Stream.generate(Math::random).limit(10)` to produce random numbers.
+**Hint:** Write `n` in base 3 by repeatedly taking `n % 3`. It is a sum of distinct powers of three exactly when no base-3 digit equals 2.
 
 ---
+
+## 🔴 Hard Tier (0 Problems)
+
+_No Hard problems at this stage of the course._
 
 ## 📊 Complexity Analysis Exercises
 
-Wait, are Streams efficient? Let's check.
+Determine **Time** and **Space** complexity for each. Answers below.
 
 ```java
-// Snippet 1
-long count = IntStream.range(0, n).filter(x -> x % 2 == 0).count();
+// Snippet A
+for (int i = 1; i < n; i *= 2)
+    for (int j = 0; j < n; j++)
+        sum++;
 
-// Snippet 2
-List<Integer> sorted = list.stream().sorted().collect(Collectors.toList());
+// Snippet B
+int fib(int n) {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+}
 
-// Snippet 3
-Map<Integer, List<String>> byLength = words.stream().collect(Collectors.groupingBy(String::length));
+// Snippet C
+void merge(int[] arr, int l, int mid, int r) { /* O(n) work */ }
 
-// Snippet 4
-Optional<String> first = words.parallelStream().filter(s -> s.startsWith("A")).findAny();
+void mergeSort(int[] arr, int l, int r) {
+    if (l >= r) return;
+    int mid = (l + r) / 2;
+    mergeSort(arr, l, mid);
+    mergeSort(arr, mid + 1, r);
+    merge(arr, l, mid, r);
+}
 
-// Snippet 5
-int result = list.stream().reduce(0, Integer::sum);
+// Snippet D
+for (int i = 0; i < n; i++)
+    for (int j = i; j < n; j++)
+        for (int k = j; k < n; k++)
+            count++;
 
-// Snippet 6
-long distinct = lists.stream()
-        .flatMap(sublist -> sublist.stream())
-        .distinct()
-        .count();
+// Snippet E
+Map<Integer, Integer> memo = new HashMap<>();
+
+int fib(int n) {
+    if (n <= 1) return n;
+    if (memo.containsKey(n)) return memo.get(n);
+    int res = fib(n - 1) + fib(n - 2);
+    memo.put(n, res);
+    return res;
+}
+
+// Snippet F — What is the total number of operations?
+for (int i = n; i > 0; i /= 2)
+    for (int j = 0; j < i; j++)
+        process();
+
+// Snippet G
+boolean hasDuplicate(int[] arr) {
+    Set<Integer> seen = new HashSet<>();
+    for (int x : arr) {
+        if (seen.contains(x)) return true;
+        seen.add(x);
+    }
+    return false;
+}
+
+// Snippet H
+int binarySearch(int[] arr, int target) { /* standard impl */ }
+
+for (int i = 0; i < n; i++)
+    binarySearch(arr, arr[i]);  // arr is sorted
 ```
 
-**Complexity Answers:**
+**Answers:**
 
-1. **O(n)** Time, O(1) Space. Pipeline lazy evaluation.
-2. **O(n log n)** Time, O(n) Space for sorting result.
-3. **O(n)** Time, O(n) Space for the HashMap.
-4. **O(n/k)** Time where k is CPU cores, O(log n) overhead.
-5. **O(n)** Time, O(1) Space.
-6. **O(Total Elements)** Time, O(Distinct Elements) Space.
+| Snippet       | Time       | Space | Key Insight                                    |
+| ------------- | ---------- | ----- | ---------------------------------------------- |
+| A             | O(n log n) | O(1)  | Outer: log₂n iters; inner: n iters             |
+| B             | O(2ⁿ)      | O(n)  | Two recursive calls: binary tree of height n   |
+| C (mergeSort) | O(n log n) | O(n)  | log n levels × O(n) merge; O(n) aux for merge  |
+| D             | O(n³)      | O(1)  | Triple nested — n(n+1)(n+2)/6 ≈ O(n³)          |
+| E (memo fib)  | O(n)       | O(n)  | Each subproblem computed once; O(n) call stack |
+| F             | O(n)       | O(1)  | Geometric series: n + n/2 + n/4 + ... = 2n     |
+| G             | O(n) avg   | O(n)  | HashMap O(1) per op × n ops; O(n) HashSet      |
+| H             | O(n log n) | O(1)  | n iterations × O(log n) binary search each     |
 
 ---
 
 ## 🔍 Self-Assessment — True / False
 
-1. Lambdas can modify local variables from the outer scope if they are not `final`. → **False** (must be effectively
-   final).
-2. `stream().map()` is a terminal operation. → **False** (intermediate operation).
-3. `optional.get()` will throw an exception if the value is null. → **True** (Always use `orElse` or `isPresent` first).
-4. `Collectors.toMap()` throws an exception if keys collide. → **True** (unless a merge function is provided).
-5. A Stream can be reused multiple times once closed. → **False**.
-6. `filter()` reduces the elements in a stream, but `map()` keeps the count same. → **True**.
-7. Method references like `String::toUpperCase` are faster than Lambdas. → **False** (compiled to same bytecode).
-8. Functional Interfaces can have multiple default methods. → **True** (only ONE abstract method allowed).
+Answer without running the code:
+
+1. `5 / 2 == 2.5` in Java → **False** (integer division → 2; cast needed)
+2. `"hello" == "hello"` is always true → **False** (string literals CAN be cached, but `new String()` creates new
+   object)
+3. `Arrays.sort(int[])` is O(n log n) → **True** (dual-pivot quicksort)
+4. `ArrayList.get(i)` is O(n) → **False** (O(1) — backed by array)
+5. A recursive factorial (n) uses O(n) stack space → **True** (n frames on call stack)
+6. `HashMap.get()` is always O(1) → **False** (O(1) average, O(n) worst case with collisions)
+7. `(int)(3.99)` evaluates to 4 → **False** (truncates to 3)
+8. Swapping two `int` primitives via a method changes the originals → **False** (pass-by-value)
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. **Lazy Evaluation**: Explain what it means that Java Streams are "lazy". How does it affect performance in a
-   `.filter().map().findFirst()` pipeline?
-2. **Lambda Internals**: How are Lambdas represented in memory? Are they just anonymous inner classes under the hood?
-   (Hint: `invokedynamic`).
-3. **Optional Choice**: Why was `Optional` added to Java if we already had null? (Hint: API intent vs pointer safety).
-4. **Intermediate vs Terminal**: What happens if you call `.filter().map()` but never call a terminal operation like
-   `.toList()` or `.count()`?
-5. **Parallel Streams Trap**: When is `parallelStream()` actually SLOWER than a serial stream? (Hint: Small datasets,
-   expensive merge steps).
+1. Why does `swap(int a, int b)` fail in Java but `swap(int[] arr, int i, int j)` works?
+2. What is the difference between `==` and `.equals()` for `String`? Give an example where they differ.
+3. Derive why digit extraction (`while n > 0, n /= 10`) is O(log n).
+4. Kadane's algorithm vs brute force — what is the core performance win?
+5. Why should you use `lo + (hi - lo) / 2` instead of `(lo + hi) / 2` in binary search?
+6. What is the output of `Integer.MIN_VALUE * -1`? Why?
 
 ---
 
@@ -330,26 +506,27 @@ long distinct = lists.stream()
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                          |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/), [Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/), [Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/) |
-| **Google**    | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/), [Find Resultant Array After Removing Anagrams](https://leetcode.com/problems/find-resultant-array-after-removing-anagrams/)                                                                                                        |
-| **Microsoft** | [Uncommon Words from Two Sentences](https://leetcode.com/problems/uncommon-words-from-two-sentences/)                                                                                                                                                                                                           |
-| **Uber**      | [Top K Frequent Words](https://leetcode.com/problems/top-k-frequent-words/)                                                                                                                                                                                                                                     |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Reverse Integer](https://leetcode.com/problems/reverse-integer/), [Check if Number is a Sum of Powers of Three](https://leetcode.com/problems/check-if-number-is-a-sum-of-powers-of-three/), [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/), [Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/)                                                                                                                                                                                         |
+| **Google**    | [Sequential Digits](https://leetcode.com/problems/sequential-digits/), [Smallest Integer Divisible by K](https://leetcode.com/problems/smallest-integer-divisible-by-k/), [Special Positions in a Binary Matrix](https://leetcode.com/problems/special-positions-in-a-binary-matrix/), [Check if Array Is Sorted and Rotated](https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/)                                                                                                                                                 |
+| **Microsoft** | [How Many Numbers Are Smaller Than the Current Number](https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/), [Maximum Product of Two Elements in an Array](https://leetcode.com/problems/maximum-product-of-two-elements-in-an-array/), [Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](https://leetcode.com/problems/number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/), [Third Maximum Number](https://leetcode.com/problems/third-maximum-number/) |
+| **Adobe**     | [Add Digits](https://leetcode.com/problems/add-digits/), [Concatenation of Array](https://leetcode.com/problems/concatenation-of-array/), [Count the Digits That Divide a Number](https://leetcode.com/problems/count-the-digits-that-divide-a-number/), [Find First Palindromic String in the Array](https://leetcode.com/problems/find-first-palindromic-string-in-the-array/)                                                                                                                                                                   |
+| **Meta**      | [Count and Say](https://leetcode.com/problems/count-and-say/), [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/), [Plus One](https://leetcode.com/problems/plus-one/), [Jump Game](https://leetcode.com/problems/jump-game/)                                                                                                                                                                                                                                                                                       |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
+- [ ] All 20 Easy problems solved
 - [ ] All 10 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 10 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
-- [ ] All 5 conceptual questions answered out loud
-- [ ] I can rewrite an anonymous class as a lambda or method reference
-- [ ] I can explain when a parallel stream is slower than a sequential one
+- [ ] All 6 conceptual questions answered out loud
+- [ ] I can trace a nested loop and state its Big-O without running it
+- [ ] I can explain why `a / gcd * b` is safer than `a * b / gcd`
 
 ---
 
-**← [Lecture 3 · OOP & Java Collections Deep Dive](../Lecture3/Assignment.md)** &nbsp;·&nbsp; **[Lecture 5 · Recursion & Backtracking](../Lecture5/Assignment.md) →**
+**← [Lecture 3 · Testing & Debugging Your Own Code](../Lecture3/Assignment.md)** &nbsp;·&nbsp; **[Lecture 5 · Java Memory Management](../Lecture5/Assignment.md) →**

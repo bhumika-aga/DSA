@@ -3,11 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 24 &mdash; Union-Find (Disjoint Set Union)</title>
-    <meta
-      name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
-    />
+    <title>Lecture 24 &mdash; Backtracking</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
@@ -86,7 +82,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1391,42 +1387,32 @@
       }
     </style>
   </head>
+
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Union-Find (Disjoint Set Union)</div>
+        <div class="sb-title">Backtracking</div>
         <div class="sb-meta">
-          Lecture 24 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 24 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
         <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127757;</span>Introduction</a
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#idea"
-          ><span class="toc-icon">&#128101;</span>Forests of Groups</a
+        <a class="toc-item" href="#shapes"
+          ><span class="toc-icon">&#127795;</span>The Two Shapes</a
         >
-        <a class="toc-item" href="#optim"
-          ><span class="toc-icon">&#9889;</span>The Two Optimisations</a
+        <a class="toc-item toc-sub" href="#p-subset">Include or Exclude</a>
+        <a class="toc-item toc-sub" href="#p-permutation">Arrange Everything</a>
+        <a class="toc-item" href="#backtracking"
+          ><span class="toc-icon">&#8617;&#65039;</span>Backtracking</a
         >
-        <a class="toc-item toc-sub" href="#op-compress">Path Compression</a>
-        <a class="toc-item toc-sub" href="#op-rank">Union by Size</a>
-        <a class="toc-item" href="#uses"
-          ><span class="toc-icon">&#129513;</span>What It Is For</a
-        >
-        <a class="toc-item toc-sub" href="#u-cycle">Cycle Detection</a>
-        <a class="toc-item toc-sub" href="#u-keys"
-          >Uniting Things That Are Not Numbers</a
-        >
-        <a class="toc-item" href="#weighted"
-          ><span class="toc-icon">&#9878;&#65039;</span>Weighted Union-Find</a
-        >
-        <a class="toc-item" href="#vs"
-          ><span class="toc-icon">&#128202;</span>DSU vs BFS/DFS</a
-        >
+        <a class="toc-item toc-sub" href="#bt-framework">The Framework</a>
+        <a class="toc-item toc-sub" href="#bt-pruning">Pruning</a>
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
@@ -1443,15 +1429,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture23/lecture23_notes.html"
-          >&larr; Lecture 23 &middot; Divide &amp; Conquer</a
+          >&larr; Lecture 23 &middot; Graphs III</a
         >
         <a class="toc-item" href="../Lecture25/lecture25_notes.html"
-          >&rarr; Lecture 25 &middot; Dynamic Programming I — Foundations &amp;
-          1D</a
+          >&rarr; Lecture 25 &middot; Two Pointers &amp; Sliding Window</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1459,10 +1443,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 24 &mdash; Union-Find (Disjoint Set Union)</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 24 &mdash; Backtracking</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1480,476 +1463,570 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128279;</span>
-          <h1 class="page-title">Union-Find (Disjoint Set Union)</h1>
+          <span class="page-emoji">&#8617;&#65039;</span>
+          <h1 class="page-title">Backtracking &mdash; Systematic Search</h1>
           <p class="page-sub">
-            &ldquo;Two arrays and ten lines of code that answer &lsquo;are these
-            two in the same group?&rsquo; faster than you can ask.&rdquo;
+            &ldquo;Choose, explore, un-choose. The third step is the one
+            everyone forgets.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 24 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip accent">&#128218; Lecture 24 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
             <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 20 problems</span>
+            <span class="meta-chip green">&#127919; 19 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
             >
           </div>
         </div>
+        <!-- /.page-header -->
 
         <!-- WHY THIS MATTERS -->
-        <div class="callout blue" id="intro">
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 17 counted connected components with DFS, and Kruskal&#39;s
-            algorithm quietly borrowed a structure it never explained. This is
-            that structure. DFS answers connectivity for a graph that has
-            stopped changing; Union-Find answers it while edges are still
-            arriving, in near-constant time per query &mdash; and it is short
-            enough to write from memory under interview pressure.
+            Some questions ask for <em>every</em> answer rather than one: all
+            the subsets, every valid arrangement of queens, each way to split a
+            string. Nobody hands you a list to loop over &mdash; you build each
+            candidate one decision at a time. Think of exploring a maze with a
+            piece of chalk: at every fork you pick a path and mark it, and when
+            you hit a dead end you walk back to the last fork, rub out the mark,
+            and try the next path. That walk-back-and-erase step is the whole
+            technique, and it is the part people forget.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Write find and union with both optimisations, from memory</li>
             <li>
-              Explain path compression and union by size, and what each one
-              fixes
+              Recognise the two decision trees: include/exclude and arrange-all
             </li>
             <li>
-              Detect a cycle in an undirected graph with one pass of unions
+              Write the choose &rarr; explore &rarr; un-choose template from
+              memory
             </li>
             <li>
-              Union things that are not integers &mdash; strings, emails,
-              coordinates
+              Handle duplicates and reuse rules without generating repeats
             </li>
-            <li>Choose between Union-Find and DFS for a given problem</li>
+            <li>
+              Prune a branch before exploring it, and say how much that saves
+            </li>
+            <li>Tell a backtracking problem from a dynamic programming one</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="idea">&#128101; A Forest of Groups</h2>
+        <hr />
+
+        <!-- THE TWO SHAPES -->
+        <h2 class="h1" id="shapes">
+          &#127795; The Two Shapes Every Search Takes
+        </h2>
         <p>
-          Every element starts alone. Each group is a tree, and the group is
-          identified by its root &mdash; not by anything meaningful, just
-          &ldquo;whoever is at the top&rdquo;. Two elements are in the same
-          group exactly when they reach the same root.
+          Almost every backtracking problem is one of two decision trees. In the
+          first, you walk the items once and ask of each one &ldquo;is it in or
+          out?&rdquo; &mdash; two branches per item, 2&#8319; leaves. In the
+          second, you fill positions one at a time and ask &ldquo;which unused
+          item goes here?&rdquo; &mdash; n branches, then n&minus;1, then
+          n&minus;2, for n! leaves. You met both briefly in Lecture 8 as
+          examples of tree recursion; here they become the skeleton for
+          everything else.
         </p>
+
+        <h3 class="h2" id="p-subset">
+          Shape 1 — Include or Exclude (Subsets) (include or exclude)
+        </h3>
+
+        <div class="pattern-banner">
+          <h4>⭐ The Include/Exclude Pattern</h4>
+          <p>
+            At each element, make a binary decision: <strong>include</strong> it
+            or <strong>exclude</strong> it.<br />
+            This generates all 2ⁿ subsets of an n-element array.<br />
+            <strong>Template:</strong> solve(index, currentList) → two calls:
+            include arr[index] or skip it.
+          </p>
+        </div>
 
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Naive Version</span
+              >&#128208; Pseudocode &middot; Subsets / Power Set</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>parent ← array where parent[i] = i      <span class="pc-cm">// everyone is their own root</span>
+          <pre><span class="pc-kw">function</span> subsets(a, idx, current, result):
+    <span class="pc-cm">// BASE CASE: every element decided → record this subset</span>
+    <span class="pc-kw">if</span> idx = length(a):
+        result.append(copy of current)       <span class="pc-cm">// ⚠️ a COPY, not the list itself</span>
+        <span class="pc-kw">return</span>
 
-<span class="pc-kw">function</span> find(x):
-    <span class="pc-kw">while</span> parent[x] ≠ x: x ← parent[x]   <span class="pc-cm">// walk up to the root</span>
-    <span class="pc-kw">return</span> x
+    <span class="pc-cm">// CHOICE 1: INCLUDE a[idx]</span>
+    current.append(a[idx])
+    subsets(a, idx + 1, current, result)
 
-<span class="pc-kw">function</span> union(a, b):
-    ra ← find(a);  rb ← find(b)
-    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false          <span class="pc-cm">// already together</span>
-    parent[ra] ← rb                      <span class="pc-cm">// hang one root under the other</span>
-    <span class="pc-kw">return</span> true
+    <span class="pc-cm">// CHOICE 2: EXCLUDE a[idx] — undo the append first</span>
+    current.removeLast()                     <span class="pc-cm">// ← THIS is backtracking</span>
+    subsets(a, idx + 1, current, result)
 
-<span class="pc-cm">// Correct, but a long chain makes find() O(n) — one union at a time can
-// build 1 → 2 → 3 → ... → n. The next section fixes exactly that.</span></pre>
+<span class="pc-cm">// a = [1,2,3] → [1,2,3], [1,2], [1,3], [1], [2,3], [2], [3], []</span>
+<span class="pc-cm">// 2³ = 8 subsets. Time O(2ⁿ × n), space O(n) for the call stack</span></pre>
         </div>
 
         <div class="ascii-tree">
-          union(1,2) union(3,4) union(2,4) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; 1
-          &rarr; 2 &rarr; 4 &nbsp;&nbsp; 3 &rarr; 4 &nbsp;&nbsp;&nbsp; root of
-          everything = 4 &nbsp;|&nbsp; find(1) walks 1 &rarr; 2 &rarr; 4
+          <span class="hl">subsets([1,2], idx=0, [])</span>
+          ├── Include 1: ([1], idx=1) │ ├── Include 2: ([1,2], idx=2) →
+          <span class="ret">ADD [1,2]</span> │ └── Exclude 2: ([1], idx=2) →
+          <span class="ret">ADD [1]</span> └── Exclude 1: ([], idx=1) ├──
+          Include 2: ([2], idx=2) → <span class="ret">ADD [2]</span> └── Exclude
+          2: ([], idx=2) → <span class="ret">ADD []</span>
         </div>
 
-        <h2 class="h1" id="optim">&#9889; The Two Optimisations</h2>
-        <p>
-          Both are one line each, and together they take the cost of an
-          operation from O(n) to almost O(1). Write both, always &mdash; there
-          is no reason not to.
-        </p>
+        <h3 class="h2" id="p-permutation">
+          Shape 2 — Arrange Everything (Permutations) (arrange all elements)
+        </h3>
 
-        <h3 class="h2" id="op-compress">Path Compression</h3>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; find, with Compression</span
+              >&#128208; Pseudocode &middot; Permutations</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> find(x):
-    <span class="pc-kw">if</span> parent[x] ≠ x:
-        parent[x] ← find(parent[x])      <span class="pc-cm">// point straight at the root on the way back</span>
-    <span class="pc-kw">return</span> parent[x]
+          <pre><span class="pc-kw">function</span> permutations(remaining, chosen, result):
+    <span class="pc-kw">if</span> remaining <span class="pc-kw">is empty</span>:
+        result.append(chosen)                <span class="pc-cm">// base case: every char placed</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(remaining) - 1:
+        c ← remaining[i]
+        <span class="pc-cm">// pick c, then permute what is left</span>
+        permutations(remaining without index i, chosen + c, result)
+<span class="pc-cm">// "ABC" → 3! = 6: ABC, ACB, BAC, BCA, CAB, CBA</span>
+<span class="pc-cm">// Time O(n!), space O(n)</span>
 
-<span class="pc-cm">// Iterative version, if recursion depth is a worry:
-// root ← x; while parent[root] ≠ root: root ← parent[root]
-// while parent[x] ≠ root: parent[x], x ← root, parent[x]</span></pre>
+<span class="pc-cm">// ─── In-place version: swap instead of building new strings ───</span>
+<span class="pc-kw">function</span> permuteSwap(a, start, result):
+    <span class="pc-kw">if</span> start = length(a):
+        result.append(copy of a)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> start <span class="pc-kw">to</span> length(a) - 1:
+        swap(a, start, i)                    <span class="pc-cm">// put a[i] at position start</span>
+        permuteSwap(a, start + 1, result)    <span class="pc-cm">// fix it, permute the rest</span>
+        swap(a, start, i)                    <span class="pc-cm">// BACKTRACK: restore order</span></pre>
         </div>
-        <p>
-          Every node touched by a lookup is re-pointed at the root, so the same
-          walk is never paid for twice. The tree flattens as you use it.
-        </p>
 
-        <h3 class="h2" id="op-rank">Union by Size (or Rank)</h3>
+        <hr />
+
+        <hr />
+
+        <!-- ═══ SECTION 5: BACKTRACKING ══════════════════════════════ -->
+        <h2 class="h1" id="backtracking">↩️ Backtracking</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Technique</th>
+                <th>What it does</th>
+                <th>Undo step?</th>
+                <th>Typical use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pure DFS</strong></td>
+                <td>Explore every path to completion</td>
+                <td>No</td>
+                <td>Reachability, path existence</td>
+              </tr>
+              <tr>
+                <td><strong>Backtracking</strong></td>
+                <td>Explore a choice, then undo it before trying the next</td>
+                <td><strong>Yes</strong></td>
+                <td>Generate all solutions (subsets, perms, combos)</td>
+              </tr>
+              <tr>
+                <td><strong>Pruned Backtracking</strong></td>
+                <td>Same + skip branches that can’t lead to a valid answer</td>
+                <td><strong>Yes</strong></td>
+                <td>N-Queens, Sudoku, Combination Sum with target</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout blue">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body">
+            <strong>Backtracking = Recursion + Undo</strong><br />
+            It is a systematic way to try all possibilities by making a choice,
+            exploring, then <em>undoing</em>
+            that choice before trying the next one. Think of it as a depth-first
+            search over a decision tree, pruning branches that can't lead to a
+            valid solution.
+          </div>
+        </div>
+
+        <h3 class="h2" id="bt-framework">
+          The Universal Backtracking Framework
+        </h3>
+
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; union, by Size</span
+              >&#128208; Pseudocode &middot; The Backtracking Template</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>size ← array of 1s                       <span class="pc-cm">// how many nodes each root owns</span>
-components ← n                           <span class="pc-cm">// handy free statistic</span>
+          <pre><span class="pc-cm">// Every backtracking problem is this shape. Only the three</span>
+<span class="pc-cm">// marked lines change from problem to problem.</span>
+<span class="pc-kw">function</span> backtrack(state, choices):
+    <span class="pc-kw">if</span> isComplete(state):        <span class="pc-cm">// &lt;-- goal test</span>
+        record(copy of state)
+        <span class="pc-kw">return</span>
 
-<span class="pc-kw">function</span> union(a, b):
-    ra ← find(a);  rb ← find(b)
-    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false
+    <span class="pc-kw">for</span> choice <span class="pc-kw">in</span> choices:      <span class="pc-cm">// &lt;-- choice set</span>
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> isValid(state, choice): <span class="pc-kw">continue</span>   <span class="pc-cm">// &lt;-- pruning</span>
 
-    <span class="pc-kw">if</span> size[ra] &lt; size[rb]: swap ra, rb    <span class="pc-cm">// always attach the smaller tree</span>
-    parent[rb] ← ra
-    size[ra] ← size[ra] + size[rb]
-    components ← components - 1
+        apply(state, choice)          <span class="pc-cm">// take</span>
+        backtrack(state, nextChoices(choices, choice))
+        undo(state, choice)           <span class="pc-cm">// put back — this is the 'back' in backtracking</span>
+
+<span class="pc-cm">// Copy the state when you record it. Recording a reference means</span>
+<span class="pc-cm">// every answer you collect ends up empty once undo() has run.</span></pre>
+        </div>
+
+        <h3 class="h2" id="bt-pruning">Pruning — The Key to Efficiency</h3>
+        <p>
+          Without pruning, backtracking explores every branch.
+          <strong>Pruning</strong> cuts off branches that cannot possibly lead
+          to a valid solution, often making the algorithm orders of magnitude
+          faster in practice.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>Pruning Condition</th>
+                <th>Effect</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>N-Queens</td>
+                <td>Skip columns/diagonals already attacked</td>
+                <td>Drastically reduces tree size</td>
+              </tr>
+              <tr>
+                <td>Combination Sum</td>
+                <td>Skip if remaining sum &lt; 0</td>
+                <td>No point going deeper</td>
+              </tr>
+              <tr>
+                <td>Sudoku</td>
+                <td>Skip if digit already in row/col/box</td>
+                <td>99%+ of branches pruned</td>
+              </tr>
+              <tr>
+                <td>Word Search</td>
+                <td>Skip if grid cell visited or out of bounds</td>
+                <td>Prevents revisiting cells</td>
+              </tr>
+              <tr>
+                <td>Subsets (no dup)</td>
+                <td>Sort + skip duplicate elements at same level</td>
+                <td>Avoids duplicate subsets</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <details>
+          <summary>
+            <span class="toggle-arrow">&#9654;</span>Full solution
+          </summary>
+          <div class="details-body">
+            <p>
+              Place N queens on an N×N chessboard so no two queens attack each
+              other. A queen attacks any piece in the same row, column, or
+              diagonal.
+            </p>
+            <div class="code-block pseudo">
+              <div class="code-header">
+                <span class="code-lang"
+                  >&#128208; Pseudocode &middot; N-Queens</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><span class="pc-kw">function</span> nQueens(row, n, board, result):
+    <span class="pc-kw">if</span> row = n:
+        result.append(copy of board)         <span class="pc-cm">// every row has a queen ✓</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> col <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> isSafe(row, col, board, n):       <span class="pc-cm">// PRUNE unsafe cells</span>
+            board[row][col] ← 'Q'            <span class="pc-cm">// place</span>
+            nQueens(row + 1, n, board, result)
+            board[row][col] ← '.'            <span class="pc-cm">// remove (backtrack)</span>
+
+<span class="pc-cm">// Queens are placed top-down, so only rows ABOVE need checking.</span>
+<span class="pc-kw">function</span> isSafe(row, col, board, n):
+    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> row - 1:                              <span class="pc-cm">// column above</span>
+        <span class="pc-kw">if</span> board[r][col] = 'Q': <span class="pc-kw">return</span> false
+    r ← row - 1;  c ← col - 1
+    <span class="pc-kw">while</span> r ≥ 0 <span class="pc-kw">and</span> c ≥ 0:                                <span class="pc-cm">// upper-left diagonal</span>
+        <span class="pc-kw">if</span> board[r][c] = 'Q': <span class="pc-kw">return</span> false
+        r ← r - 1;  c ← c - 1
+    r ← row - 1;  c ← col + 1
+    <span class="pc-kw">while</span> r ≥ 0 <span class="pc-kw">and</span> c &lt; n:                                <span class="pc-cm">// upper-right diagonal</span>
+        <span class="pc-kw">if</span> board[r][c] = 'Q': <span class="pc-kw">return</span> false
+        r ← r - 1;  c ← c + 1
+    <span class="pc-kw">return</span> true
+<span class="pc-cm">// Time O(n!) worst case — pruning makes it far faster in practice</span>
+<span class="pc-cm">// 4-Queens: 2 solutions | 8-Queens: 92 solutions</span></pre>
+            </div>
+            <div class="callout green">
+              <span class="callout-icon">✅</span>
+              <div class="callout-body">
+                <strong>Optimisation:</strong> Use three boolean arrays
+                <code>cols[]</code>, <code>diag1[]</code>,
+                <code>diag2[]</code> to check safety in O(1) instead of O(n).
+                <code>diag1[row-col+n]</code> and
+                <code>diag2[row+col]</code> uniquely identify diagonals.
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="toggle-arrow">&#9654;</span>Full solution
+          </summary>
+          <div class="details-body">
+            <div class="code-block pseudo">
+              <div class="code-header">
+                <span class="code-lang"
+                  >&#128208; Pseudocode &middot; Sudoku Solver</span
+                ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><span class="pc-kw">function</span> solveSudoku(board):
+    <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+            <span class="pc-kw">if</span> board[r][c] ≠ '.': <span class="pc-kw">continue</span>                <span class="pc-cm">// skip filled cells</span>
+            <span class="pc-kw">for</span> d <span class="pc-kw">from</span> '1' <span class="pc-kw">to</span> '9':
+                <span class="pc-kw">if</span> isValid(board, r, c, d):
+                    board[r][c] ← d                         <span class="pc-cm">// place</span>
+                    <span class="pc-kw">if</span> solveSudoku(board): <span class="pc-kw">return</span> true      <span class="pc-cm">// solved!</span>
+                    board[r][c] ← '.'                       <span class="pc-cm">// backtrack</span>
+            <span class="pc-kw">return</span> false        <span class="pc-cm">// no digit fits here → report failure upward</span>
+    <span class="pc-kw">return</span> true                 <span class="pc-cm">// no empty cell left → solved</span>
+
+<span class="pc-kw">function</span> isValid(board, row, col, d):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 8:
+        <span class="pc-kw">if</span> board[row][i] = d: <span class="pc-kw">return</span> false                  <span class="pc-cm">// row</span>
+        <span class="pc-kw">if</span> board[i][col] = d: <span class="pc-kw">return</span> false                  <span class="pc-cm">// column</span>
+        br ← 3 × (row ÷ 3) + i ÷ 3                          <span class="pc-cm">// walk the 3×3 box</span>
+        bc ← 3 × (col ÷ 3) + i mod 3
+        <span class="pc-kw">if</span> board[br][bc] = d: <span class="pc-kw">return</span> false
     <span class="pc-kw">return</span> true</pre>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Why &ldquo;smaller under larger&rdquo;?</strong> A
-            node&#39;s depth only grows when its tree is the one being attached.
-            Attaching the smaller tree means a node&#39;s depth can increase
-            only when its group at least doubles in size &mdash; so no node is
-            ever deeper than log&#8322;n, even before compression.
+            </div>
           </div>
-        </div>
+        </details>
 
-        <div class="callout yellow">
-          <span class="callout-icon">&#128207;</span>
-          <div class="callout-body">
-            <strong>The complexity, honestly.</strong> With both optimisations,
-            m operations on n elements cost O(m &middot; &alpha;(n)), where
-            &alpha; is the inverse Ackermann function. For any n you can write
-            down &mdash; including the number of atoms in the universe &mdash;
-            &alpha;(n) &le; 4. Treat it as constant, and say &ldquo;amortised
-            near-constant, inverse Ackermann&rdquo; when asked.
-          </div>
-        </div>
-
-        <h2 class="h1" id="uses">&#129513; What It Is Actually For</h2>
-        <p>
-          Three questions, all answered by the same ten lines: how many groups
-          are there, are these two together, and does this new edge close a
-          cycle.
-        </p>
-
-        <h3 class="h2" id="u-cycle">Cycle Detection</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Redundant Edge</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// In an undirected graph, an edge whose endpoints are ALREADY connected
-// must close a cycle.</span>
-dsu ← new DSU(n)
-<span class="pc-kw">for</span> (a, b) <span class="pc-kw">in</span> edges:
-    <span class="pc-kw">if</span> <span class="pc-kw">not</span> dsu.union(a, b):
-        <span class="pc-kw">return</span> (a, b)                  <span class="pc-cm">// the first edge that connects two connected nodes</span>
-
-<span class="pc-cm">// This is also the whole of Kruskal's MST from Lecture 17: sort the edges
-// by weight and keep the ones whose union succeeds.</span></pre>
-        </div>
-
-        <h3 class="h2" id="u-keys">Uniting Things That Are Not Numbers</h3>
-        <p>
-          DSU indexes an array, so anything else needs a mapping first. That
-          mapping is usually the interesting half of the problem.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Problem</th>
-              <th>What gets united</th>
-              <th>The mapping trick</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Accounts Merge</td>
-              <td>email addresses</td>
-              <td>map each email to an id; union all emails of one account</td>
-            </tr>
-            <tr>
-              <td>Equality Equations</td>
-              <td>lowercase letters</td>
-              <td>
-                26 slots; union on <code>==</code>, then check every
-                <code>!=</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Most Stones Removed</td>
-              <td>rows and columns</td>
-              <td>
-                union row <code>r</code> with column <code>~c</code>, so the two
-                spaces never collide
-              </td>
-            </tr>
-            <tr>
-              <td>Regions Cut By Slashes</td>
-              <td>quarters of a cell</td>
-              <td>
-                split each cell into 4 triangles, union across the borders
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Two id spaces, one array.</strong> When you union two kinds
-            of thing (rows and columns, people and groups), give each kind its
-            own range of indices &mdash; <code>row r</code> at
-            <code>r</code> and <code>column c</code> at <code>n + c</code>, for
-            example. Overlapping the ranges silently merges unrelated things,
-            and the answer comes out too small.
-          </div>
-        </div>
-
-        <h2 class="h1" id="weighted">&#9878;&#65039; Weighted Union-Find</h2>
-        <p>
-          A variation worth knowing: store a value on each edge to the parent,
-          so the structure answers <em>relations</em> rather than just
-          membership. Evaluate Division is the classic &mdash; if a/b = 2 and
-          b/c = 3, then a/c = 6.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; DSU with Ratios</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>parent ← map from name to name
-ratio ← map from name to number          <span class="pc-cm">// value of this node ÷ value of its parent</span>
-
-<span class="pc-kw">function</span> find(x):                       <span class="pc-cm">// returns (root, x ÷ root)</span>
-    <span class="pc-kw">if</span> parent[x] = x: <span class="pc-kw">return</span> (x, 1)
-    (root, r) ← find(parent[x])
-    parent[x] ← root                     <span class="pc-cm">// compress</span>
-    ratio[x] ← ratio[x] × r              <span class="pc-cm">// and fix the stored ratio to match</span>
-    <span class="pc-kw">return</span> (root, ratio[x])
-
-<span class="pc-kw">function</span> union(a, b, value):             <span class="pc-cm">// a ÷ b = value</span>
-    (ra, va) ← find(a);  (rb, vb) ← find(b)
-    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span>
-    parent[ra] ← rb
-    ratio[ra] ← value × vb ÷ va
-
-<span class="pc-cm">// query(a, b): same root → ratio[a] ÷ ratio[b]; different roots → unknown</span></pre>
-        </div>
-
-        <h2 class="h1" id="vs">&#128202; DSU vs BFS / DFS</h2>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Union-Find</th>
-              <th>BFS / DFS</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Edges arrive over time</td>
-              <td>&#9989; natural &mdash; union as they come</td>
-              <td>&#10060; rebuild the traversal each time</td>
-            </tr>
-            <tr>
-              <td>&ldquo;Are these two connected?&rdquo; queries</td>
-              <td>&#9989; near O(1) each</td>
-              <td>O(V + E) per query</td>
-            </tr>
-            <tr>
-              <td>Shortest path</td>
-              <td>&#10060; knows groups, not distances</td>
-              <td>&#9989; BFS</td>
-            </tr>
-            <tr>
-              <td>Which nodes are in my component</td>
-              <td>needs a second pass to list them</td>
-              <td>&#9989; the traversal visits them</td>
-            </tr>
-            <tr>
-              <td>Directed graphs</td>
-              <td>&#10060; union is symmetric</td>
-              <td>&#9989; DFS with colours</td>
-            </tr>
-            <tr>
-              <td>Removing edges</td>
-              <td>&#10060; &mdash; process in reverse instead</td>
-              <td>&#9989; rebuild</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>When edges disappear, run time backwards.</strong> DSU
-            cannot split a group. Problems that remove things &mdash; bricks
-            falling, islands sinking &mdash; are solved by processing the
-            removals in reverse, so every step becomes an addition. That trick
-            turns several Hard problems into ordinary ones.
-          </div>
-        </div>
+        <hr />
 
         <h2 class="h1" id="pitfalls">
-          &#9888;&#65039; Complexity &amp; The Classic Bugs
+          &#9888;&#65039; Complexity &amp; Classic Bugs
         </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Version</th>
-              <th>find</th>
-              <th>union</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Naive parent array</td>
-              <td>O(n)</td>
-              <td>O(n)</td>
-              <td>a chain of unions degenerates to a linked list</td>
-            </tr>
-            <tr>
-              <td>Union by size only</td>
-              <td>O(log n)</td>
-              <td>O(log n)</td>
-              <td>depth is bounded by doubling</td>
-            </tr>
-            <tr>
-              <td>Path compression only</td>
-              <td>O(log n) amortised</td>
-              <td>O(log n)</td>
-              <td>flattens as it is used</td>
-            </tr>
-            <tr>
-              <td><strong>Both</strong></td>
-              <td><strong>O(&alpha;(n))</strong></td>
-              <td><strong>O(&alpha;(n))</strong></td>
-              <td>at most 4 for any real input</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Bug</th>
-              <th>Symptom</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                Comparing <code>parent[a]</code> with <code>parent[b]</code>
-              </td>
-              <td>Elements in one group look separate</td>
-              <td>
-                Always compare <code>find(a)</code> with <code>find(b)</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Attaching a node instead of its root</td>
-              <td>The structure stops being a forest</td>
-              <td>Union works on roots only</td>
-            </tr>
-            <tr>
-              <td>Overlapping id ranges</td>
-              <td>Unrelated things merge; count too low</td>
-              <td>Offset the second kind of id</td>
-            </tr>
-            <tr>
-              <td>
-                Counting components by scanning
-                <code>parent[i] == i</code> mid-run
-              </td>
-              <td>Wrong count if compression has not run</td>
-              <td>Keep a counter, decremented on each successful union</td>
-            </tr>
-            <tr>
-              <td>Expecting a group to split</td>
-              <td>Deletions give nonsense</td>
-              <td>Process the operations in reverse</td>
-            </tr>
-            <tr>
-              <td>Recursive find on a deep chain</td>
-              <td>Stack overflow before compression kicks in</td>
-              <td>Use the iterative find, or union by size</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout green">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> &ldquo;Are these
-            two connected?&rdquo;, &ldquo;how many groups?&rdquo;, &ldquo;merge
-            these accounts&rdquo;, &ldquo;which edge creates a cycle?&rdquo;, or
-            edges that arrive one at a time. If the question also needs paths or
-            distances, it is BFS instead &mdash; and if things get removed,
-            reverse the timeline and use DSU anyway.
-          </div>
-        </div>
-
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Six problems: the same ten lines each time. What changes is what you
-          decide to union &mdash; nodes, letters, emails, rows, or ratios.
+          Backtracking is exponential by nature &mdash; the goal is never to
+          make it polynomial, only to stop exploring branches that cannot
+          possibly succeed. The numbers below are the size of the tree
+          <em>before</em> pruning; good pruning is what makes the real running
+          time tolerable.
         </p>
 
-        <!-- Problem 01: Redundant Connection -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Problem shape</th>
+                <th>Leaves in the tree</th>
+                <th>Time</th>
+                <th>Extra space</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>All subsets</td>
+                <td>2&#8319;</td>
+                <td>O(n &middot; 2&#8319;)</td>
+                <td>O(n) stack</td>
+              </tr>
+              <tr>
+                <td>All permutations</td>
+                <td>n!</td>
+                <td>O(n &middot; n!)</td>
+                <td>O(n) stack + used[]</td>
+              </tr>
+              <tr>
+                <td>Combinations of size k</td>
+                <td>C(n, k)</td>
+                <td>O(k &middot; C(n, k))</td>
+                <td>O(k)</td>
+              </tr>
+              <tr>
+                <td>Word search on an m &times; n grid</td>
+                <td>m &middot; n &middot; 3&#7480;</td>
+                <td>O(m &middot; n &middot; 3&#7480;)</td>
+                <td>O(L) stack</td>
+              </tr>
+              <tr>
+                <td>N-Queens</td>
+                <td>&le; n!</td>
+                <td>O(n!) before pruning</td>
+                <td>O(n)</td>
+              </tr>
+              <tr>
+                <td>Sudoku</td>
+                <td>9&#7497; for e empty cells</td>
+                <td>Tiny in practice with constraint checks</td>
+                <td>O(81)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The extra factor of <em>n</em> in the first two rows is the cost of
+          <em>copying</em> each finished answer into the result list. It is easy
+          to forget, and interviewers notice.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Forgetting to un-choose</td>
+                <td>Later answers contain leftovers from earlier branches</td>
+                <td>
+                  Every <code>add</code> before the recursive call needs a
+                  matching <code>remove</code> after it
+                </td>
+              </tr>
+              <tr>
+                <td>Saving the list, not a copy</td>
+                <td>Every answer in the result is identical, often empty</td>
+                <td>
+                  Add <code>copy(path)</code>, never <code>path</code> itself
+                </td>
+              </tr>
+              <tr>
+                <td>Skipping duplicates without sorting</td>
+                <td>Subsets II returns duplicate subsets</td>
+                <td>
+                  Sort first, then skip when <code>i &gt; start</code> and
+                  <code>a[i] = a[i&minus;1]</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Passing <code>i + 1</code> when reuse is allowed</td>
+                <td>Combination Sum misses answers like [2, 2, 3]</td>
+                <td>
+                  Pass <code>i</code> to allow reuse, <code>i + 1</code> to
+                  forbid it
+                </td>
+              </tr>
+              <tr>
+                <td>Not restoring a grid cell</td>
+                <td>Word Search misses words that reuse a path</td>
+                <td>
+                  Restore <code>board[r][c]</code> as the last line of the call
+                </td>
+              </tr>
+              <tr>
+                <td>Checking constraints too late</td>
+                <td>Correct answers, but time limit exceeded</td>
+                <td>
+                  Prune <em>before</em> recursing, not after the answer is built
+                </td>
+              </tr>
+              <tr>
+                <td>Base case that does not return</td>
+                <td>
+                  Answers are recorded, then the search keeps growing them
+                </td>
+                <td>Record the answer <em>and</em> return</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it in an interview.</strong> The words
+            <em>all</em>, <em>every</em> and <em>generate</em> &mdash;
+            &ldquo;return all subsets&rdquo;, &ldquo;every valid
+            arrangement&rdquo; &mdash; plus a tiny input limit like
+            <code>n &le; 10</code> or <code>n &le; 15</code>. If the problem
+            asks only for a <em>count</em> or a <em>best</em> value instead of
+            the full list, stop and ask whether overlapping subproblems make it
+            dynamic programming instead.
+          </div>
+        </div>
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Seven problems in rising order: the two base shapes, then variations
+          with reuse, counting constraints, a mapping, a grid, and finally a
+          board with real constraints to prune against.
+        </p>
+
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Cycle Detection</div>
-              <div class="prob-title">Redundant Connection</div>
+              <div class="prob-num">Problem 01 · Subsets Pattern</div>
+              <div class="prob-title">Generate All Subsets (Power Set)</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/redundant-connection/"
+                  href="https://leetcode.com/problems/subsets/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 684 - Redundant Connection</a
+                  >🔗 LC 78 - Subsets</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Union-Find</span>
                 <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
+                  >Google · Amazon · Meta · Microsoft</span
                 >
+                <span class="tag tag-pat">Include/Exclude</span>
+                <span class="tag tag-lc">LC #78</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
+              >›</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                A tree with <code>n</code> nodes had one extra edge added.
-                Return the edge that can be removed so the graph is a tree
-                again; if several work, return the last one in the input.
+                Given an integer array with distinct elements, return all
+                possible subsets (the power set). The solution set must not
+                contain duplicate subsets.
               </p>
-              <div class="iobox">edges = [[1,2],[1,3],[2,3]] → [2,3]</div>
+              <div class="iobox">
+                Input: [1,2,3] Output:
+                [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+              </div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -1960,8 +2037,7 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    What is special about an edge whose two endpoints are
-                    already connected?
+                    Every element faces the same binary decision, independently.
                   </p>
                 </div>
               </details>
@@ -1972,21 +2048,257 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Union the edges in order. The first union that fails &mdash;
-                    both endpoints already share a root &mdash; is the redundant
-                    edge.
+                    Include it or exclude it, recurse on the rest. Copy the
+                    current list when you record it &mdash; recording the
+                    reference gives you n empty lists.
                   </p>
                 </div>
               </details>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
+
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Include/Exclude</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> subsets(nums):
+    result ← empty list
+    backtrack(nums, 0, empty list, result)
+    <span class="pc-kw">return</span> result
+
+<span class="pc-kw">function</span> backtrack(nums, idx, cur, result):
+    result.append(copy of cur)           <span class="pc-cm">// every partial choice is a subset</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> idx <span class="pc-kw">to</span> length(nums) - 1:
+        cur.append(nums[i])              <span class="pc-cm">// include nums[i]</span>
+        backtrack(nums, i + 1, cur, result)
+        cur.removeLast()                 <span class="pc-cm">// backtrack (exclude it)</span>
+<span class="pc-cm">// Time O(2ⁿ × n) — 2ⁿ subsets, each copied in O(n)</span>
+<span class="pc-cm">// Space O(n) — maximum recursion depth</span></pre>
+                  </div>
+                  <div class="ascii-tree">
+                    start=[], idx=0 → ADD [] ├── include 1: [1], idx=1 → ADD [1]
+                    │ ├── include 2: [1,2], idx=2 → ADD [1,2] │ │ └── include 3:
+                    [1,2,3] → ADD [1,2,3] │ └── include 3: [1,3] → ADD [1,3] ├──
+                    include 2: [2], idx=2 → ADD [2] │ └── include 3: [2,3] → ADD
+                    [2,3] └── include 3: [3] → ADD [3]
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- P4 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 · Combination Sum</div>
+              <div class="prob-title">Combination Sum (reuse allowed)</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/combination-sum/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 39 - Combination Sum</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co">Google · Amazon · Meta</span>
+                <span class="tag tag-pat">Backtracking + Pruning</span>
+                <span class="tag tag-lc">LC #39</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >›</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
               <p>
-                The canonical first Union-Find problem. Processing edges in
-                order means the first failing union is also the last edge of the
-                cycle in input order, which is exactly what the problem asks
-                for. No graph is ever built: the DSU alone answers it in one
-                pass, at near-constant cost per edge.
+                Given an array of distinct integers <code>candidates</code> and
+                a target integer, return all unique combinations where the
+                candidates sum to target. You may reuse the same number.
+              </p>
+              <div class="iobox">
+                Input: candidates = [2,3,6,7], target = 7 Output: [[2,2,3],[7]]
+                Input: candidates = [2,3,5], target = 8 Output:
+                [[2,2,2,2],[2,3,3],[3,5]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Numbers may be reused, so the recursive call should not
+                    always move past the current index.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Recurse with the <em>same</em> index i to allow reuse; move
+                    to i+1 only when you choose to stop using that number. Sort
+                    first so you can prune once the remainder goes negative.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Backtracking +
+                        Pruning</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> combinationSum(candidates, target):
+    sort(candidates)                     <span class="pc-cm">// ← makes early termination possible</span>
+    result ← empty list
+    backtrack(candidates, 0, target, empty list, result)
+    <span class="pc-kw">return</span> result
+
+<span class="pc-kw">function</span> backtrack(cands, start, remaining, cur, result):
+    <span class="pc-kw">if</span> remaining = 0:
+        result.append(copy of cur)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> start <span class="pc-kw">to</span> length(cands) - 1:
+        <span class="pc-cm">// sorted → once one candidate is too big, every later one is too</span>
+        <span class="pc-kw">if</span> cands[i] &gt; remaining: <span class="pc-kw">break</span>               <span class="pc-cm">// ← prune the whole branch</span>
+        cur.append(cands[i])
+        backtrack(cands, i, remaining - cands[i], cur, result)   <span class="pc-cm">// i, not i+1: reuse allowed</span>
+        cur.removeLast()</pre>
+                  </div>
+                  <div class="callout green">
+                    <span class="callout-icon">🔑</span>
+                    <div class="callout-body">
+                      <strong>Key Difference from Subsets:</strong> We pass
+                      <code>i</code> (not <code>i+1</code>) to allow reusing the
+                      same element. The pruning
+                      <code>if (cands[i] &gt; remaining) break</code> is only
+                      valid because the array is sorted.
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- P5 -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 · Permutation Pattern</div>
+              <div class="prob-title">Permutations of an Array</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/permutations/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >🔗 LC 46 - Permutations</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-co"
+                  >Google · Amazon · Microsoft · Meta</span
+                >
+                <span class="tag tag-pat">Backtracking · Swap</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >›</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an array of <strong>distinct</strong> integers, return all
+                possible permutations. Return them in any order.
+              </p>
+              <div class="iobox">
+                Input: [1, 2, 3] Output:
+                [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]] Input: [0, 1]
+                Output: [[0,1],[1,0]]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Each position picks an unused element. How do you track
+                    'unused' cheaply?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Either a boolean used[] array, or swap the chosen element
+                    into place and recurse on the remainder &mdash; the swap
+                    version needs no extra space.
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                <strong>Approach 1 (Pick from remaining):</strong> Maintain a
+                list of available numbers. Pick one → add to current → recurse →
+                remove (backtrack).
+              </p>
+              <p>
+                <strong>Approach 2 (Swap — more efficient):</strong> Fix
+                position <code>idx</code>. Swap each element from
+                <code>idx</code> to end into position <code>idx</code>. Recurse
+                on <code>idx+1</code>. Swap back.
+              </p>
+              <p>
+                <mark>The swap approach uses no extra data structure</mark> — it
+                generates permutations in-place.
               </p>
             </div>
             <details>
@@ -1997,82 +2309,103 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Union Until One Fails</span
+                      >&#128208; Pseudocode &middot; Swap-based (in-place)</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> findRedundantConnection(edges):
-    n ← length(edges)
-    parent ← array 0..n where parent[i] = i
-    size ← array of 1s
+                  <pre><span class="pc-kw">function</span> permute(nums):
+    result ← empty list
+    backtrack(nums, 0, result)
+    <span class="pc-kw">return</span> result
 
-    <span class="pc-kw">for</span> (a, b) <span class="pc-kw">in</span> edges:
-        <span class="pc-kw">if</span> <span class="pc-kw">not</span> union(a, b): <span class="pc-kw">return</span> (a, b)   <span class="pc-cm">// already connected → closes a cycle</span>
+<span class="pc-kw">function</span> backtrack(nums, idx, result):
+    <span class="pc-kw">if</span> idx = length(nums):                <span class="pc-cm">// every position fixed</span>
+        result.append(copy of nums)       <span class="pc-cm">// add a COPY</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> idx <span class="pc-kw">to</span> length(nums) - 1:
+        swap(nums, idx, i)                <span class="pc-cm">// choose</span>
+        backtrack(nums, idx + 1, result)  <span class="pc-cm">// explore</span>
+        swap(nums, idx, i)                <span class="pc-cm">// unchoose</span>
 
-<span class="pc-kw">function</span> find(x):
-    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent[x])
-    <span class="pc-kw">return</span> parent[x]
-
-<span class="pc-kw">function</span> union(a, b):
-    ra ← find(a);  rb ← find(b)
-    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span> false
-    <span class="pc-kw">if</span> size[ra] &lt; size[rb]: swap ra, rb
-    parent[rb] ← ra;  size[ra] ← size[ra] + size[rb]
-    <span class="pc-kw">return</span> true</pre>
+<span class="pc-cm">// Dry run: [1, 2, 3], idx = 0</span>
+<span class="pc-cm">// i=0: swap(0,0) → [1,2,3], recurse idx=1</span>
+<span class="pc-cm">//   i=1: swap(1,1) → [1,2,3], recurse idx=2</span>
+<span class="pc-cm">//     i=2: swap(2,2) → [1,2,3] → ADD [1,2,3] ✓</span>
+<span class="pc-cm">//   i=2: swap(1,2) → [1,3,2], recurse idx=2</span>
+<span class="pc-cm">//     → ADD [1,3,2] ✓, swap back → [1,2,3]</span>
+<span class="pc-cm">// i=1: swap(0,1) → [2,1,3], recurse idx=1</span>
+<span class="pc-cm">//   → generates [2,1,3] and [2,3,1]</span>
+<span class="pc-cm">// i=2: swap(0,2) → [3,2,1], recurse idx=1</span>
+<span class="pc-cm">//   → generates [3,2,1] and [3,1,2]</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n α(n))</span>
+                    ><span class="cx-val yellow">O(n! × n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
                     ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
+                <div class="callout yellow" style="margin-top: 10px">
+                  <span class="callout-icon">⚠️</span>
+                  <div class="callout-body">
+                    <strong>Subsets vs Permutations:</strong><br />
+                    • <strong>Subsets:</strong> Include/Exclude each element →
+                    2ⁿ results. Order doesn't matter: {1,2} = {2,1}.<br />
+                    • <strong>Permutations:</strong> Arrange all elements → n!
+                    results. Order matters: [1,2] ≠ [2,1].<br />
+                    With duplicates? →
+                    <a href="https://leetcode.com/problems/permutations-ii/"
+                      >LC 47 Permutations II</a
+                    >
+                    (sort + skip).
+                  </div>
+                </div>
               </div>
             </details>
           </div>
         </div>
 
-        <!-- Problem 02: Satisfiability of Equality Equations -->
+        <!-- P9: N-Queens -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Union on Letters</div>
-              <div class="prob-title">Satisfiability of Equality Equations</div>
+              <div class="prob-num">
+                Problem 04 · Constraint-Based Backtracking
+              </div>
+              <div class="prob-title">Generate Parentheses</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/satisfiability-of-equality-equations/"
+                  href="https://leetcode.com/problems/generate-parentheses/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 990 - Satisfiability of Equality Equations</a
+                  >🔗 LC 22 - Generate Parentheses</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Union, Then Verify</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-co">Google · Amazon · Meta · Uber</span>
+                <span class="tag tag-pat">Backtracking · Pruning</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
+              >›</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given equations like <code>"a==b"</code> and
-                <code>"b!=c"</code> over single lowercase letters, return true
-                if some assignment satisfies all of them.
+                Given <code>n</code> pairs of parentheses, generate all
+                combinations of well-formed parentheses.
               </p>
               <div class="iobox">
-                ["a==b","b!=a"] → false &nbsp;&nbsp;|&nbsp;&nbsp;
-                ["a==b","b==c","a==c"] → true
+                Input: n = 3 Output:
+                ["((()))","(()())","(())()","()(())","()()()"] Input: n = 1
+                Output: ["()"]
               </div>
             </div>
             <div class="prob-section">
@@ -2084,8 +2417,8 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Equality is transitive; inequality is not. Which one should
-                    build the groups?
+                    Not every string of brackets is valid. What rule keeps a
+                    partial string still fixable?
                   </p>
                 </div>
               </details>
@@ -2096,22 +2429,34 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Two passes. First union every <code>==</code> pair. Then
-                    check every <code>!=</code> pair: if both sides share a
-                    root, the constraints contradict each other.
+                    Track counts of open and close used. Add '(' while open &lt;
+                    n; add ')' only while close &lt; open. That invariant means
+                    you never build an invalid string at all.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The order matters and the reason is worth saying out loud:
-                equality is an equivalence relation, so it can be merged
-                incrementally, while <code>!=</code> is only a test. Doing both
-                in one pass would let a later equality invalidate an inequality
-                you already accepted. Only 26 slots are needed, so the DSU is an
-                array of 26.
+                At each position, you have two choices: add <code>(</code> or
+                add <code>)</code>. But not all choices are valid:
+              </p>
+              <ul>
+                <li>
+                  You can add <code>(</code> only if
+                  <code>openCount &lt; n</code>
+                </li>
+                <li>
+                  You can add <code>)</code> only if
+                  <code>closeCount &lt; openCount</code> (can't close what you
+                  haven't opened)
+                </li>
+              </ul>
+              <p>
+                These two rules ARE the pruning.
+                <mark>Constraints → pruning rules → valid solutions only.</mark>
               </p>
             </div>
             <details>
@@ -2122,203 +2467,103 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Merge Equalities
-                      First</span
+                      >&#128208; Pseudocode &middot; Backtracking</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> equationsPossible(equations):
-    dsu ← new DSU(26)
+                  <pre><span class="pc-kw">function</span> generateParenthesis(n):
+    result ← empty list
+    backtrack(result, "", 0, 0, n)
+    <span class="pc-kw">return</span> result
 
-    <span class="pc-kw">for</span> eq <span class="pc-kw">in</span> equations:                    <span class="pc-cm">// pass 1: build the groups</span>
-        <span class="pc-kw">if</span> eq[1] = &#39;=&#39;:
-            dsu.union(index(eq[0]), index(eq[3]))
+<span class="pc-kw">function</span> backtrack(result, s, open, close, n):
+    <span class="pc-kw">if</span> length(s) = 2 × n:                 <span class="pc-cm">// all n pairs used</span>
+        result.append(s)
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">if</span> open &lt; n:                          <span class="pc-cm">// can still open one</span>
+        backtrack(result, s + "(", open + 1, close, n)
+    <span class="pc-kw">if</span> close &lt; open:                      <span class="pc-cm">// can only close what is open</span>
+        backtrack(result, s + ")", open, close + 1, n)
 
-    <span class="pc-kw">for</span> eq <span class="pc-kw">in</span> equations:                    <span class="pc-cm">// pass 2: test the rest</span>
-        <span class="pc-kw">if</span> eq[1] = &#39;!&#39;:
-            <span class="pc-kw">if</span> dsu.find(index(eq[0])) = dsu.find(index(eq[3])):
-                <span class="pc-kw">return</span> false
-    <span class="pc-kw">return</span> true</pre>
+<span class="pc-cm">// Passing s + "(" builds a new string each call, so nothing needs undoing.</span>
+<span class="pc-cm">// With a mutable buffer: append, recurse, then remove the last char.</span>
+
+<span class="pc-cm">// Recursion tree for n = 2:</span>
+<span class="pc-cm">//              ""</span>
+<span class="pc-cm">//             /</span>
+<span class="pc-cm">//           "("</span>
+<span class="pc-cm">//          /      \</span>
+<span class="pc-cm">//       "(("      "()"</span>
+<span class="pc-cm">//       /           \</span>
+<span class="pc-cm">//     "(()"        "()("</span>
+<span class="pc-cm">//      /              \</span>
+<span class="pc-cm">//    "(())"         "()()"</span>
+<span class="pc-cm">//  [VALID]         [VALID]</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n α(26))</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 03: Accounts Merge -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Union on Strings</div>
-              <div class="prob-title">Accounts Merge</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/accounts-merge/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 721 - Accounts Merge</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Map to Ids, Then Union</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each account is a name plus a list of emails. Two accounts
-                belong to the same person if they share any email. Merge them
-                and return each person&rsquo;s sorted email list.
-              </p>
-              <div class="iobox">
-                [["John","a@x","b@x"],["John","b@x","c@x"],["Mary","m@x"]] →
-                John: [a@x, b@x, c@x]; Mary: [m@x]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Union-Find works on integers. What has to happen to the
-                    emails first?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Give every distinct email an id, and remember which name it
-                    belongs to. Within one account, union the first email with
-                    each of the others; then group the emails by root.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two maps carry the problem: email to id, and email to owner
-                name. Uniting each account&rsquo;s emails to its first email
-                links every account that shares any address, however long the
-                chain. Grouping by root and sorting each list gives the output;
-                the name comes from any member, since all of them agree.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Emails to Ids</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> accountsMerge(accounts):
-    id ← empty map;  owner ← empty map
-    <span class="pc-kw">for</span> account <span class="pc-kw">in</span> accounts:
-        <span class="pc-kw">for</span> email <span class="pc-kw">in</span> account.emails:
-            <span class="pc-kw">if</span> email <span class="pc-kw">not</span> <span class="pc-kw">in</span> id: id[email] ← size(id)
-            owner[email] ← account.name
-
-    dsu ← new DSU(size(id))
-    <span class="pc-kw">for</span> account <span class="pc-kw">in</span> accounts:
-        first ← id[account.emails[0]]
-        <span class="pc-kw">for</span> email <span class="pc-kw">in</span> account.emails:
-            dsu.union(first, id[email])          <span class="pc-cm">// one account = one group</span>
-
-    groups ← empty map                            <span class="pc-cm">// root → emails</span>
-    <span class="pc-kw">for</span> email <span class="pc-kw">in</span> id:
-        groups[dsu.find(id[email])].append(email)
-
-    <span class="pc-kw">return</span> for each group: [owner of any member] + sorted(emails)</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
+                    ><span class="cx-val yellow">O(4ⁿ/√n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
                     ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
+                <div class="callout purple" style="margin-top: 10px">
+                  <span class="callout-icon">🔮</span>
+                  <div class="callout-body">
+                    <strong>Why StringBuilder + deleteCharAt?</strong> This is
+                    the backtracking pattern:
+                    <strong>choose → explore → unchoose</strong>. We append a
+                    character (choose), recurse (explore), then remove it
+                    (unchoose). Using StringBuilder is faster than String
+                    concatenation.
+                  </div>
+                </div>
               </div>
             </details>
           </div>
         </div>
 
-        <!-- Problem 04: Most Stones Removed with Same Row or Column -->
+        <!-- P8: Permutations -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Two Id Spaces</div>
+              <div class="prob-num">Problem 05 · State-Space Backtracking</div>
               <div class="prob-title">
-                Most Stones Removed with Same Row or Column
+                Letter Combinations of a Phone Number
               </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/"
+                  href="https://leetcode.com/problems/letter-combinations-of-a-phone-number/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 947 - Most Stones Removed with Same Row or
-                  Column</a
+                  >🔗 LC 17 - Letter Combinations</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Union Rows with Columns</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-co">Google · Amazon · Meta · Uber</span>
+                <span class="tag tag-pat">Backtracking · Mapping</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
+              >›</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Stones sit on a grid. A stone may be removed if it shares a row
-                or column with another remaining stone. Return the largest
-                number of stones that can be removed.
+                Given a string containing digits 2-9, return all possible letter
+                combinations the number could represent (phone keypad mapping).
               </p>
               <div class="iobox">
-                stones = [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]] → 5
+                Input: digits = "23" Output:
+                ["ad","ae","af","bd","be","bf","cd","ce","cf"] Map: 2→abc,
+                3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz
               </div>
             </div>
             <div class="prob-section">
@@ -2330,8 +2575,8 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Think about one connected group of stones. How many of them
-                    can you remove?
+                    This is a product of choices &mdash; one digit at a time,
+                    one letter at a time.
                   </p>
                 </div>
               </details>
@@ -2342,23 +2587,25 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    All but one &mdash; so the answer is
-                    <code>stones − components</code>. Build the components by
-                    uniting each stone&rsquo;s row with its column.
+                    Recurse on the digit index, looping the 3-4 letters that
+                    digit maps to. Depth is the number of digits; the path is
+                    your current string.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Two ideas. The counting argument (a group of size k loses k−1
-                stones, because removals can always be ordered to leave one
-                behind) turns the problem into counting components. Then the
-                modelling trick: union row <code>r</code> with column
-                <code>c</code>, keeping the two kinds of id in separate ranges
-                &mdash; <code>10000 + c</code>, or <code>~c</code> &mdash; so a
-                row never collides with a column.
+                For each digit, we have 3-4 letter choices. At each level of
+                recursion, we pick a letter for the current digit and recurse on
+                the next digit. This is like a
+                <mark>multi-branching tree</mark> — each node has 3-4 children.
+              </p>
+              <p>
+                <strong>Base case:</strong> When we've processed all digits →
+                add the current combination to result.
               </p>
             </div>
             <details>
@@ -2369,30 +2616,38 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Rows and Columns as
-                      Nodes</span
+                      >&#128208; Pseudocode &middot; Backtracking</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> removeStones(stones):
-    dsu ← new DSU over a map of ids            <span class="pc-cm">// ids created on demand</span>
+                  <pre>keys ← ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]
 
-    <span class="pc-kw">for</span> (r, c) <span class="pc-kw">in</span> stones:
-        dsu.union(rowId(r), colId(c))          <span class="pc-cm">// colId offset so the spaces never overlap</span>
+<span class="pc-kw">function</span> letterCombinations(digits):
+    result ← empty list
+    <span class="pc-kw">if</span> digits <span class="pc-kw">is empty</span>: <span class="pc-kw">return</span> result
+    backtrack(digits, 0, "", result)
+    <span class="pc-kw">return</span> result
 
-    roots ← empty set
-    <span class="pc-kw">for</span> (r, c) <span class="pc-kw">in</span> stones:
-        roots.add(dsu.find(rowId(r)))          <span class="pc-cm">// one root per component of stones</span>
+<span class="pc-kw">function</span> backtrack(digits, idx, combo, result):
+    <span class="pc-kw">if</span> idx = length(digits):
+        result.append(combo)                 <span class="pc-cm">// one letter per digit → complete</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> c <span class="pc-kw">in</span> keys[digits[idx]]:
+        backtrack(digits, idx + 1, combo + c, result)
 
-    <span class="pc-kw">return</span> length(stones) - size(roots)
-
-<span class="pc-cm">// 6 stones forming 1 component → 6 − 1 = 5 removable ✓</span></pre>
+<span class="pc-cm">// Dry run: digits = "23"</span>
+<span class="pc-cm">// idx=0, digit '2' → "abc"</span>
+<span class="pc-cm">//   'a': idx=1, digit '3' → "def"</span>
+<span class="pc-cm">//        "ad" ✓  "ae" ✓  "af" ✓</span>
+<span class="pc-cm">//   'b': → "bd", "be", "bf"</span>
+<span class="pc-cm">//   'c': → "cd", "ce", "cf"</span>
+<span class="pc-cm">// Total: 9 combinations ✓</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n α(n))</span>
+                    ><span class="cx-val yellow">O(4ⁿ × n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2404,43 +2659,49 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
           </div>
         </div>
 
-        <!-- Problem 05: Evaluate Division -->
+        <hr />
+
+        <!-- ═══ ASSIGNMENT ═════════════════════════════════════════ -->
+
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Weighted DSU</div>
-              <div class="prob-title">Evaluate Division</div>
+              <div class="prob-num">Problem 06 · Grid Backtracking</div>
+              <div class="prob-title">Word Search in a Grid</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/evaluate-division/"
+                  href="https://leetcode.com/problems/word-search/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 399 - Evaluate Division</a
+                  >🔗 LC 79 - Word Search</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Union-Find with Ratios</span>
                 <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
+                  >Google · Amazon · Microsoft · Meta</span
                 >
+                <span class="tag tag-pat">Grid DFS + Backtracking</span>
+                <span class="tag tag-lc">LC #79</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
+              >›</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given equations like <code>a / b = 2.0</code>, answer queries
-                such as <code>a / c</code>. Return &minus;1 when the answer
-                cannot be determined.
+                Given a 2D board of characters and a word, return true if the
+                word exists in the grid. The word can be formed from
+                sequentially adjacent cells (horizontal or vertical). Each cell
+                may be used at most once.
               </p>
               <div class="iobox">
-                equations a/b = 2, b/c = 3 · queries a/c → 6.0, c/a → 0.333, x/x
-                → -1.0
+                Board: [["A","B","C","E"], ["S","F","C","S"], ["A","D","E","E"]]
+                Word: "ABCCED" → true Word: "SEE" → true Word: "ABCB" → false
+                (can't reuse B)
               </div>
             </div>
             <div class="prob-section">
@@ -2451,10 +2712,7 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>
-                    Variables in the same group have a fixed ratio to each
-                    other. Where can that ratio be stored?
-                  </p>
+                  <p>This is DFS from every cell, with the ability to undo.</p>
                 </div>
               </details>
               <details class="hint">
@@ -2464,114 +2722,107 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    On the edge to the parent: <code>ratio[x]</code> is the
-                    value of <code>x</code> divided by the value of its root.
-                    Multiply the ratios as <code>find</code> compresses the
-                    path.
+                    Mark the cell visited before recursing and restore it after
+                    &mdash; that restore is the backtracking step. A temporary
+                    '#' in the grid avoids a separate visited array.
                   </p>
                 </div>
               </details>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
-              <p>
-                This is Union-Find carrying data. Each node stores its value
-                relative to the root; when path compression re-points a node at
-                the root, the stored ratio must be multiplied by its old
-                parent&rsquo;s ratio to stay correct. A query on two variables
-                with the same root is a division of their stored ratios, and
-                different roots (or an unknown variable) means &minus;1. Build
-                with a DFS over an explicit graph if the weighted version feels
-                risky under pressure.
-              </p>
+
+              <details>
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Full solution
+                </summary>
+                <div class="details-body">
+                  <div class="code-block pseudo">
+                    <div class="code-header">
+                      <span class="code-lang"
+                        >&#128208; Pseudocode &middot; Grid DFS
+                        Backtracking</span
+                      ><button class="copy-btn" onclick="copyCode(this)">
+                        Copy
+                      </button>
+                    </div>
+                    <pre><span class="pc-kw">function</span> exist(board, word):
+    <span class="pc-kw">for each</span> cell (r, c) <span class="pc-kw">in</span> board:
+        <span class="pc-kw">if</span> dfs(board, word, r, c, 0): <span class="pc-kw">return</span> true    <span class="pc-cm">// try every start</span>
+    <span class="pc-kw">return</span> false
+
+<span class="pc-kw">function</span> dfs(board, word, r, c, idx):
+    <span class="pc-kw">if</span> idx = length(word): <span class="pc-kw">return</span> true               <span class="pc-cm">// every char matched</span>
+
+    <span class="pc-cm">// PRUNE: off the grid, wrong letter, or already on the path</span>
+    <span class="pc-kw">if</span> r <span class="pc-kw">or</span> c is outside the grid <span class="pc-kw">or</span> board[r][c] ≠ word[idx]:
+        <span class="pc-kw">return</span> false
+
+    saved ← board[r][c]
+    board[r][c] ← '#'                <span class="pc-cm">// mark visited in place — no visited array</span>
+
+    found ← dfs(board, word, r+1, c, idx+1)      <span class="pc-cm">// down</span>
+         <span class="pc-kw">or</span> dfs(board, word, r-1, c, idx+1)      <span class="pc-cm">// up</span>
+         <span class="pc-kw">or</span> dfs(board, word, r, c+1, idx+1)      <span class="pc-cm">// right</span>
+         <span class="pc-kw">or</span> dfs(board, word, r, c-1, idx+1)      <span class="pc-cm">// left</span>
+
+    board[r][c] ← saved              <span class="pc-cm">// BACKTRACK: restore the cell</span>
+    <span class="pc-kw">return</span> found
+<span class="pc-cm">// Time O(m × n × 4^L) where L = word length</span>
+<span class="pc-cm">// Space O(L) — recursion depth</span></pre>
+                  </div>
+                  <div class="callout orange">
+                    <span class="callout-icon">🔑</span>
+                    <div class="callout-body">
+                      <strong>Key Trick:</strong> Marking the cell as
+                      <code>'#'</code> (in-place) avoids a separate
+                      <code>visited[][]</code> array. Restoring it in the
+                      backtrack step is essential — it allows other paths to use
+                      this cell.
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Ratios on the Edges</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre>parent ← map name → name;  ratio ← map name → number
-
-<span class="pc-kw">function</span> find(x):                      <span class="pc-cm">// returns (root, x ÷ root)</span>
-    <span class="pc-kw">if</span> parent[x] = x: <span class="pc-kw">return</span> (x, 1)
-    (root, r) ← find(parent[x])
-    parent[x] ← root
-    ratio[x] ← ratio[x] × r             <span class="pc-cm">// keep the stored ratio consistent</span>
-    <span class="pc-kw">return</span> (root, ratio[x])
-
-<span class="pc-kw">function</span> union(a, b, value):            <span class="pc-cm">// a ÷ b = value</span>
-    (ra, va) ← find(a);  (rb, vb) ← find(b)
-    <span class="pc-kw">if</span> ra = rb: <span class="pc-kw">return</span>
-    parent[ra] ← rb
-    ratio[ra] ← value × vb ÷ va
-
-<span class="pc-kw">function</span> query(a, b):
-    <span class="pc-kw">if</span> a <span class="pc-kw">not</span> <span class="pc-kw">in</span> parent <span class="pc-kw">or</span> b <span class="pc-kw">not</span> <span class="pc-kw">in</span> parent: <span class="pc-kw">return</span> -1
-    (ra, va) ← find(a);  (rb, vb) ← find(b)
-    <span class="pc-kw">if</span> ra ≠ rb: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> va ÷ vb</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O((n + q) α(n))</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
           </div>
         </div>
 
-        <!-- Problem 06: Checking Existence of Edge Length Limited Paths -->
+        <!-- P6: Climbing Stairs -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Offline Queries</div>
-              <div class="prob-title">
-                Checking Existence of Edge Length Limited Paths
-              </div>
+              <div class="prob-num">Problem 07 · Classic Backtracking</div>
+              <div class="prob-title">N-Queens Problem</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/"
+                  href="https://leetcode.com/problems/n-queens/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 1697 - Checking Existence of Edge Length Limited
-                  Paths</a
+                  >🔗 LC 51 - N-Queens</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Sort Edges + Sort Queries</span>
-                <span class="tag tag-co">Google &middot; Amazon</span>
+                <span class="tag tag-co">Google · Amazon · Meta</span>
+                <span class="tag tag-pat">Backtracking · O(1) Pruning</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
+              >›</span
             >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                For each query <code>[p, q, limit]</code>, answer whether a path
-                exists between <code>p</code> and <code>q</code> using only
-                edges strictly shorter than <code>limit</code>.
+                Place <code>n</code> queens on an <code>n×n</code> chessboard
+                such that no two queens attack each other (same row, column, or
+                diagonal). Return all distinct solutions.
               </p>
               <div class="iobox">
-                n = 3, edges = [[0,1,2],[1,2,4],[2,0,8]], queries =
-                [[0,1,2],[0,2,5]] → [false, true]
+                Input: n = 4 Output:
+                [[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+                (Two valid 4-Queens arrangements exist)
               </div>
             </div>
             <div class="prob-section">
@@ -2583,9 +2834,8 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Answering each query on its own means rebuilding the graph
-                    every time. What if the queries did not have to be answered
-                    in order?
+                    Place one queen per row, so you only ever check columns and
+                    diagonals.
                   </p>
                 </div>
               </details>
@@ -2596,22 +2846,34 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 </summary>
                 <div class="details-body">
                   <p>
-                    Sort the edges by weight and the queries by limit. Sweep
-                    both: add every edge below the current limit, then answer
-                    the query with a single connectivity check.
+                    A cell (r,c) is attacked if column c, diagonal r-c, or
+                    anti-diagonal r+c is taken. Three HashSets make each check
+                    O(1).
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The <em>offline</em> trick: nothing says you must answer queries
-                in the order given. Keep each query&rsquo;s original index, sort
-                everything by weight, and let the DSU grow monotonically as the
-                limit rises &mdash; each edge is added once across all queries.
-                Union-Find is the right structure precisely because edges only
-                ever get added, never removed.
+                Naive safety check scans all placed queens → O(n) per check. The
+                <strong>optimised approach</strong> uses three sets:
+              </p>
+              <ul>
+                <li><code>cols</code> — tracks which columns have queens</li>
+                <li>
+                  <code>diag1</code> — tracks occupied \ diagonals (row - col is
+                  constant on each)
+                </li>
+                <li>
+                  <code>diag2</code> — tracks occupied / diagonals (row + col is
+                  constant on each)
+                </li>
+              </ul>
+              <p>
+                With these sets, checking if a position is safe becomes
+                <mark>O(1) lookup</mark>.
               </p>
             </div>
             <details>
@@ -2622,37 +2884,55 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sweep Both Sorted
-                      Lists</span
+                      >&#128208; Pseudocode &middot; Optimised O(1) Check</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> distanceLimitedPathsExist(n, edges, queries):
-    sort edges by weight ascending
-    tagged ← queries, each remembering its original index
-    sort tagged by limit ascending
+                  <pre><span class="pc-kw">function</span> solveNQueens(n):
+    result ← empty list
+    board ← n × n grid filled with '.'
+    cols ← empty set
+    diag1 ← empty set            <span class="pc-cm">// cells on one diagonal share row - col</span>
+    diag2 ← empty set            <span class="pc-cm">// cells on the other share row + col</span>
+    solve(board, 0, cols, diag1, diag2, result)
+    <span class="pc-kw">return</span> result
 
-    dsu ← new DSU(n)
-    answer ← array of length(queries)
-    i ← 0
+<span class="pc-kw">function</span> solve(board, row, cols, d1, d2, result):
+    <span class="pc-kw">if</span> row = n:
+        result.append(copy of board)         <span class="pc-cm">// valid placement found</span>
+        <span class="pc-kw">return</span>
+    <span class="pc-kw">for</span> col <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> col <span class="pc-kw">in</span> cols <span class="pc-kw">or</span> (row - col) <span class="pc-kw">in</span> d1 <span class="pc-kw">or</span> (row + col) <span class="pc-kw">in</span> d2:
+            <span class="pc-kw">continue</span>                         <span class="pc-cm">// attacked — pruned in O(1)</span>
 
-    <span class="pc-kw">for</span> (p, q, limit, index) <span class="pc-kw">in</span> tagged:
-        <span class="pc-kw">while</span> i &lt; length(edges) <span class="pc-kw">and</span> edges[i].weight &lt; limit:
-            dsu.union(edges[i].a, edges[i].b)      <span class="pc-cm">// every edge added once, ever</span>
-            i ← i + 1
-        answer[index] ← (dsu.find(p) = dsu.find(q))
+        board[row][col] ← 'Q'                <span class="pc-cm">// choose</span>
+        add col <span class="pc-kw">to</span> cols;  add row-col <span class="pc-kw">to</span> d1;  add row+col <span class="pc-kw">to</span> d2
 
-    <span class="pc-kw">return</span> answer</pre>
+        solve(board, row + 1, cols, d1, d2, result)   <span class="pc-cm">// explore</span>
+
+        board[row][col] ← '.'                <span class="pc-cm">// unchoose</span>
+        remove col <span class="pc-kw">from</span> cols;  remove row-col <span class="pc-kw">from</span> d1;  remove row+col <span class="pc-kw">from</span> d2</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(E log E + Q log Q)</span>
+                    ><span class="cx-val red">O(n!)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n + Q)</span>
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+                <div class="callout green" style="margin-top: 10px">
+                  <span class="callout-icon">🧠</span>
+                  <div class="callout-body">
+                    <strong>Why diagonals use r-c and r+c:</strong> On a
+                    <code>\</code> diagonal, every cell shares the same
+                    <code>row-col</code> value. On a <code>/</code> diagonal,
+                    every cell shares the same <code>row+col</code> value. Draw
+                    it on paper to convince yourself — this is a beautiful
+                    mathematical insight!
                   </div>
                 </div>
               </div>
@@ -2660,17 +2940,18 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
           </div>
         </div>
 
+        <!-- P10: Letter Combinations of Phone Number -->
         <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
         <div class="callout orange" style="margin: 14px 0">
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 24 Assignment &mdash; 20 Problems (6 Easy &middot; 10
-              Medium &middot; 4 Hard)</strong
+              >Lecture 24 Assignment &mdash; 19 Problems (1 Easy &middot; 13
+              Medium &middot; 5 Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by what
-            gets united. Complete it before moving to Phase 4.<br /><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 25.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture24/Assignment.md"
               style="
@@ -2693,84 +2974,75 @@ ratio ← map from name to number          <span class="pc-cm">// value of this 
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write find and union with both optimisations from memory
+            I can draw the decision tree for subsets and for permutations of [1,
+            2, 3]
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain path compression and union by size, and what each one
-            fixes
+            I can write choose &rarr; explore &rarr; un-choose without looking
+            it up
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say what &alpha;(n) means and why it behaves like a constant
+            I always add a <em>copy</em> of the path to the results, and can say
+            why
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I detect a cycle with a failed union, and recognise Kruskal's
-            algorithm as the same loop
+            I can skip duplicate answers by sorting and comparing with the
+            previous element
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can map non-integer things &mdash; emails, letters, rows and
-            columns &mdash; onto DSU indices without collisions
+            I can explain the difference between passing <code>i</code> and
+            <code>i + 1</code>
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can choose between Union-Find and BFS/DFS and justify it
+            I can prune before recursing and estimate the size of the tree
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I know to reverse the timeline when things are removed rather than
-            added
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I completed all 20 assignment problems and can say what each one
-            unites
-          </div>
+          <div class="cb-text">I completed all 19 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
             <strong
-              >Phase 3 complete &mdash; next up, Phase 4: Dynamic
-              Programming</strong
+              >Phase 2 complete &mdash; next up, Phase 3: Core Patterns</strong
             ><br />
-            Seven lectures of reusable techniques are behind you. Phase 4 starts
-            with the one topic that decides most interviews: recognising
-            overlapping subproblems, and turning recursion into a table.
+            You now have every core data structure and both kinds of exhaustive
+            search. Phase 3 is about the opposite instinct &mdash; spotting the
+            patterns that let you <em>avoid</em> exhaustive search, starting
+            with two pointers and sliding windows in Lecture 25.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture23/lecture23_notes.html"
-            >&larr; Lecture 23 &middot; Divide &amp; Conquer</a
+            >&larr; Lecture 23 &middot; Graphs III</a
           >
           <a class="next" href="../Lecture25/lecture25_notes.html"
-            >Lecture 25 &middot; Dynamic Programming I — Foundations &amp; 1D
-            &rarr;</a
+            >Lecture 25 &middot; Two Pointers &amp; Sliding Window &rarr;</a
           >
         </div>
       </div>
-      <!-- /content -->
+      <!-- #content -->
     </div>
-    <!-- /main -->
+    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

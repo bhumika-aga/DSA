@@ -1,0 +1,2915 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 34 &mdash; Dynamic Programming III</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #ffffff;
+        --bg2: #f7f6f3;
+        --bg3: #efede9;
+        --bg4: #e8e5df;
+        --border: #e3e0d9;
+        --border2: #d0ccc4;
+        --text: #37352f;
+        --text2: #6b6860;
+        --text3: #9b9790;
+        --accent: #2383e2;
+        --accent-bg: #e8f1fc;
+        --green: #0f7b6c;
+        --green-bg: #e9f5f3;
+        --red: #c0392b;
+        --red-bg: #fdf0ee;
+        --yellow: #8a6d00;
+        --yellow-bg: #fdf6e3;
+        --purple: #6940a5;
+        --purple-bg: #f0ecf9;
+        --orange: #c75b0e;
+        --orange-bg: #fef0e7;
+        --pink: #ad1a72;
+        --pink-bg: #fce8f3;
+        --teal: #0d7d6e;
+        --teal-bg: #e4f4f1;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+        --serif: "Merriweather", serif;
+        --sidebar-w: 260px;
+      }
+
+      [data-theme="dark"] {
+        --bg: #191919;
+        --bg2: #212121;
+        --bg3: #2d2d2d;
+        --bg4: #383838;
+        --border: #333;
+        --border2: #444;
+        --text: #e8e6e1;
+        --text2: #9b9790;
+        --text3: #6b6860;
+        --accent: #5ba4f5;
+        --accent-bg: #1a2d42;
+        --green: #4db6a8;
+        --green-bg: #0e2420;
+        --red: #e07070;
+        --red-bg: #2e1414;
+        --yellow: #d4a42a;
+        --yellow-bg: #2a1f06;
+        --purple: #a07dd4;
+        --purple-bg: #1e1530;
+        --orange: #e0893a;
+        --orange-bg: #2a1608;
+        --pink: #e06aac;
+        --pink-bg: #2a1020;
+        --teal: #38c9b8;
+        --teal-bg: #0d2420;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        scroll-behaviour: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 15px;
+        line-height: 1.7;
+        display: flex;
+        flex-direction: row;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      /* ── Sidebar ── */
+      #sidebar {
+        width: var(--sidebar-w);
+        min-width: var(--sidebar-w);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+
+      .sb-header {
+        flex-shrink: 0;
+        padding-top: 20px;
+      }
+
+      .sb-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 4px 0 12px;
+      }
+
+      .sb-foot {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 10px 0 14px;
+      }
+
+      .sb-header {
+        padding: 0 16px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+
+      .sb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+      }
+
+      .sb-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .sb-meta {
+        color: var(--text3);
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .toc-label {
+        padding: 0 16px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--text3);
+      }
+
+      .toc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 16px;
+        cursor: pointer;
+        color: var(--text2);
+        transition:
+          background 0.12s,
+          color 0.12s;
+        text-decoration: none;
+      }
+
+      .toc-item:hover,
+      .toc-item.active {
+        background: var(--bg3);
+        color: var(--text);
+      }
+
+      .toc-item.active {
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      .toc-icon {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toc-sub {
+        padding-left: 36px;
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .toc-sub:hover {
+        color: var(--text2);
+      }
+
+      .sb-div {
+        height: 1px;
+        background: var(--border);
+        margin: 10px 16px;
+      }
+
+      /* ── Main ── */
+      #main {
+        flex: 1;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #content {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 64px 56px;
+      }
+
+      /* ── Topbar ── */
+      #topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 28px;
+        font-size: 13px;
+        color: var(--text2);
+        gap: 12px;
+        backdrop-filter: blur(8px);
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .breadcrumb a {
+        color: var(--text3);
+        text-decoration: none;
+      }
+
+      .breadcrumb a:hover {
+        color: var(--text);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        width: 120px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+
+      #darkToggle {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      #darkToggle:hover {
+        background: var(--bg3);
+      }
+
+      /* ── Page Header ── */
+      .page-header {
+        margin-bottom: 40px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .page-emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .page-title {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+        margin-bottom: 10px;
+      }
+
+      .page-sub {
+        font-size: 16px;
+        color: var(--text2);
+        font-style: italic;
+        margin-bottom: 16px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        color: var(--text2);
+        background: var(--bg2);
+      }
+
+      .meta-chip.accent {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      .meta-chip.green {
+        background: var(--green-bg);
+        color: var(--green);
+        border-color: var(--green-bg);
+      }
+
+      .meta-chip.yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border-color: var(--yellow-bg);
+      }
+
+      /* ── Headings ── */
+      .h1 {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 40px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 20px;
+      }
+
+      .h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        scroll-margin-top: 20px;
+      }
+
+      .h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 20px 0 6px;
+      }
+
+      p {
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.75;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 32px 0;
+      }
+
+      /* ── Callouts ── */
+      .callout {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .callout-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .callout-body {
+        flex: 1;
+      }
+
+      .callout-body strong {
+        font-weight: 600;
+      }
+
+      .callout.blue {
+        background: var(--accent-bg);
+        color: var(--text);
+      }
+
+      .callout.green {
+        background: var(--green-bg);
+        color: var(--text);
+      }
+
+      .callout.yellow {
+        background: var(--yellow-bg);
+        color: var(--text);
+      }
+
+      .callout.red {
+        background: var(--red-bg);
+        color: var(--text);
+      }
+
+      .callout.purple {
+        background: var(--purple-bg);
+        color: var(--text);
+      }
+
+      .callout.orange {
+        background: var(--orange-bg);
+        color: var(--text);
+      }
+
+      .callout.teal {
+        background: var(--teal-bg);
+        color: var(--text);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text2);
+        gap: 10px;
+      }
+
+      .code-lang {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: var(--text2);
+        font-family: var(--sans);
+        transition: background 0.12s;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+
+      pre {
+        padding: 16px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.75;
+        tab-size: 4;
+      }
+
+      .kw {
+        color: #0550ae;
+        font-weight: 500;
+      }
+
+      .cm {
+        color: #6a737d;
+        font-style: italic;
+      }
+
+      .str {
+        color: #0a8043;
+      }
+
+      .num {
+        color: #953800;
+      }
+
+      .fn {
+        color: #8250df;
+      }
+
+      .cls {
+        color: #1a7f37;
+      }
+
+      .ret {
+        color: #0550ae;
+      }
+
+      [data-theme="dark"] .kw {
+        color: #79c0ff;
+      }
+
+      [data-theme="dark"] .cm {
+        color: #8b949e;
+      }
+
+      [data-theme="dark"] .str {
+        color: #a5d6ff;
+      }
+
+      [data-theme="dark"] .num {
+        color: #ff9150;
+      }
+
+      [data-theme="dark"] .fn {
+        color: #d2a8ff;
+      }
+
+      [data-theme="dark"] .cls {
+        color: #7ee787;
+      }
+
+      [data-theme="dark"] .ret {
+        color: #79c0ff;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: var(--red);
+      }
+
+      [data-theme="dark"] code {
+        color: var(--orange);
+      }
+
+      /* ── Tables ── */
+      .table-wrap {
+        overflow-x: auto;
+        margin: 14px 0;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+
+      thead th {
+        background: var(--bg2);
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.03em;
+        color: var(--text2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      tbody td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      tbody tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 24px;
+        margin: 8px 0 12px;
+      }
+
+      li {
+        margin: 4px 0;
+        line-height: 1.7;
+      }
+
+      li::marker {
+        color: var(--text3);
+      }
+
+      /* ── Toggles ── */
+      details {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text);
+        background: var(--bg2);
+        list-style: none;
+        transition: background 0.12s;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: var(--bg3);
+      }
+
+      .toggle-arrow {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+        color: var(--text3);
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      details[open] summary .toggle-arrow {
+        transform: rotate(90deg);
+      }
+
+      .details-body {
+        padding: 14px 16px;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── Practice problem cards ── */
+      .prob-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .prob-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .prob-header:hover {
+        background: var(--bg3);
+      }
+
+      .prob-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prob-num {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 4px;
+      }
+
+      .prob-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .prob-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .tag-easy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+
+      .tag-med {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .tag-hard {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .tag-co {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+
+      .tag-pat {
+        background: var(--purple-bg);
+        color: var(--purple);
+      }
+
+      .tag-lc {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+
+      .prob-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .prob-body {
+        padding: 16px;
+        background: var(--bg);
+      }
+
+      .prob-section {
+        margin-bottom: 14px;
+      }
+
+      .prob-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        margin-bottom: 6px;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border-left: 3px solid var(--border2);
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        margin: 8px 0;
+        white-space: pre-wrap;
+      }
+
+      /* ── Progress Bar ── */
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ── Checklist Component ── */
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .checklist-item:hover {
+        background: var(--bg2);
+        border-color: var(--border);
+      }
+
+      .cb-box {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border2);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: transparent;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: var(--bg);
+      }
+
+      .cb-text {
+        font-size: 14.5px;
+        color: var(--text);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+        transform: scale(1.05);
+      }
+
+      .checklist-item.done .cb-text {
+        color: var(--text3);
+        text-decoration: line-through;
+      }
+
+      /* ── ASCII Tree Dry Runs ── */
+      .ascii-tree {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text2);
+        margin: 14px 0;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      .ascii-tree .hl {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .ascii-tree .nd {
+        color: var(--orange);
+        font-weight: 600;
+      }
+
+      .ascii-tree .ret {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .iobox {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text2);
+        white-space: pre-wrap;
+      }
+
+      /* ── Complexity ── */
+      .complexity-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+
+      .cx-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: var(--mono);
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+
+      .cx-badge .cx-label {
+        font-size: 11px;
+        font-family: var(--sans);
+        color: var(--text3);
+      }
+
+      .cx-badge .cx-val {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cx-badge.green {
+        background: var(--green-bg);
+        border-color: var(--green);
+      }
+
+      .cx-badge.yellow {
+        background: var(--yellow-bg);
+        border-color: var(--yellow);
+      }
+
+      .cx-badge.red {
+        background: var(--red-bg);
+        border-color: var(--red);
+      }
+
+      .cx-badge .cx-val.green {
+        color: var(--green);
+      }
+
+      .cx-badge .cx-val.yellow {
+        color: var(--yellow);
+      }
+
+      .cx-badge .cx-val.red {
+        color: var(--red);
+      }
+
+      /* ── Pattern banner ── */
+      .pattern-banner {
+        background: linear-gradient(
+          135deg,
+          var(--purple-bg) 0%,
+          var(--accent-bg) 100%
+        );
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 20px 0;
+      }
+
+      .pattern-banner h4 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--purple);
+        margin-bottom: 8px;
+      }
+
+      .pattern-banner p {
+        font-size: 14px;
+        font-family: var(--mono);
+        color: var(--text);
+        margin: 0;
+        line-height: 1.8;
+      }
+
+      /* ── Big-O chart ── */
+      .bigo-chart-wrap {
+        margin: 14px 0 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg2);
+        padding: 16px;
+      }
+
+      /* ── Checklist ── */
+      .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checklist-item:last-child {
+        border-bottom: none;
+      }
+
+      .cb-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border2);
+        border-radius: 4px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 11px;
+      }
+
+      .checklist-item.done .cb-box {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      .checklist-item.done .cb-text {
+        text-decoration: line-through;
+        color: var(--text3);
+      }
+
+      /* ── Inline highlight ── */
+      mark {
+        background: var(--yellow-bg);
+        color: var(--text);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        #sidebar {
+          display: none;
+        }
+
+        #content {
+          padding: 24px 20px 80px;
+        }
+      }
+
+      /* ── Course-wide additions (cover every class used in any lecture) ── */
+      .footer {
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text3);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 8px;
+      }
+
+      .sidebar-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
+      }
+
+      .stack-vis {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 14px 0;
+      }
+
+      .stack-frame {
+        font-family: var(--mono);
+        font-size: 13px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: var(--text2);
+      }
+
+      .tag-medium {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+
+      .cx-badge.time {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+      }
+
+      .cx-badge.space {
+        background: var(--teal-bg);
+        border-color: var(--teal);
+      }
+
+      .gr {
+        color: #22863a;
+      }
+
+      [data-theme="dark"] .gr {
+        color: #7ee787;
+      }
+
+      /* ── Pseudocode blocks — language-neutral algorithm statements ── */
+      .code-block.pseudo {
+        border-color: var(--teal);
+      }
+
+      .code-block.pseudo .code-header {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      .code-block.pseudo pre {
+        font-family: var(--mono);
+      }
+
+      .pc-kw {
+        color: var(--purple);
+        font-weight: 600;
+      }
+
+      .pc-cm {
+        color: var(--text3);
+        font-style: italic;
+      }
+
+      /* ── Learning objectives ── */
+      .objectives {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0 26px;
+      }
+
+      .objectives-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      .objectives ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .objectives li {
+        font-size: 14px;
+        color: var(--text2);
+        margin: 5px 0;
+      }
+
+      /* ── Graded hints on practice problems ── */
+      details.hint {
+        border-color: var(--accent-bg);
+        margin: 8px 0;
+      }
+
+      details.hint summary {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        padding: 9px 14px;
+      }
+
+      details.hint[open] summary {
+        border-bottom: 1px solid var(--border);
+      }
+
+      details.hint .details-body {
+        font-size: 13.5px;
+        color: var(--text2);
+      }
+
+      details.hint .details-body p {
+        margin: 0;
+      }
+
+      .tag-concept {
+        background: var(--bg4);
+        color: var(--text3);
+        border: 1px solid var(--border2);
+      }
+
+      @media (max-width: 640px) {
+        #topbar {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+
+        .breadcrumb {
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .topbar-right {
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .topbar-right > span {
+          display: none;
+        }
+
+        .progress-bar {
+          width: 56px;
+        }
+      }
+
+      /* ── Bottom-of-page navigation ── */
+      .page-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text2);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+
+      .page-nav a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .page-nav a.next {
+        margin-left: auto;
+        text-align: right;
+        color: var(--accent);
+        border-color: var(--accent-bg);
+      }
+
+      @media (max-width: 560px) {
+        .page-nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .page-nav a,
+        .page-nav a.next {
+          margin-left: 0;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      /* Contents links scroll #main, so every target must clear the sticky topbar. */
+      #content [id] {
+        scroll-margin-top: 72px;
+      }
+
+      /* A flex item won't shrink below its content by default, so wide
+         diagrams inside a callout used to widen the whole page on phones. */
+      .callout-body {
+        min-width: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sb-header">
+        <div class="sb-badge">&#128218; DSA Course</div>
+        <div class="sb-title">Dynamic Programming III</div>
+        <div class="sb-meta">
+          Lecture 34 of 45 &middot; Phase 4 &mdash; Dynamic Programming
+        </div>
+      </div>
+      <div class="sb-scroll">
+        <div class="toc-label">On this page</div>
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127757;</span>Introduction</a
+        >
+        <a class="toc-item" href="#skeleton"
+          ><span class="toc-icon">&#127890;</span>The Knapsack Skeleton</a
+        >
+        <a class="toc-item" href="#three"
+          ><span class="toc-icon">&#128290;</span>The Three Knapsacks</a
+        >
+        <a class="toc-item toc-sub" href="#k01">0/1 &mdash; Each Item Once</a>
+        <a class="toc-item toc-sub" href="#kunb"
+          >Unbounded &mdash; Reuse Freely</a
+        >
+        <a class="toc-item toc-sub" href="#kbound"
+          >Bounded &mdash; A Fixed Supply</a
+        >
+        <a class="toc-item" href="#compress"
+          ><span class="toc-icon">&#128207;</span>Compressing to 1D</a
+        >
+        <a class="toc-item" href="#subsets"
+          ><span class="toc-icon">&#129513;</span>Subsets in Disguise</a
+        >
+        <a class="toc-item toc-sub" href="#s-count">Counting vs Optimising</a>
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
+        >
+        <a class="toc-item" href="#practice"
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
+        >
+        <a class="toc-item" href="#assignment"
+          ><span class="toc-icon">&#128221;</span>Assignment</a
+        >
+        <a class="toc-item" href="#checklist"
+          ><span class="toc-icon">&#9989;</span>Checklist</a
+        >
+      </div>
+      <div class="sb-foot">
+        <div class="toc-label">Navigate</div>
+        <a class="toc-item" href="../Lecture33/lecture33_notes.html"
+          >&larr; Lecture 33 &middot; Dynamic Programming II</a
+        >
+        <a class="toc-item" href="../Lecture35/lecture35_notes.html"
+          >&rarr; Lecture 35 &middot; Dynamic Programming IV</a
+        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div id="main">
+      <div id="topbar">
+        <div class="breadcrumb">
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase4">Phase 4</a><span>&rsaquo;</span>
+          <span>Lecture 34 &mdash; Dynamic Programming III</span>
+        </div>
+        <div class="topbar-right">
+          <span style="font-size: 12px; color: var(--text3)">Progress</span>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 0%"
+            ></div>
+          </div>
+          <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <span class="page-emoji">&#127890;</span>
+          <h1 class="page-title">
+            Dynamic Programming III &mdash; Knapsack &amp; Subsets
+          </h1>
+          <p class="page-sub">
+            &ldquo;One table, three loop orders. Getting the order wrong does
+            not crash &mdash; it silently answers a different question.&rdquo;
+          </p>
+          <div class="meta-row">
+            <span class="meta-chip accent">&#128218; Lecture 34 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 4 &mdash; Dynamic Programming</span
+            >
+            <span class="meta-chip yellow">&#9201; 6 days</span>
+            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              Microsoft</span
+            >
+          </div>
+        </div>
+
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" id="intro">
+          <span class="callout-icon">&#127757;</span>
+          <div class="callout-body">
+            <strong>Why does this topic matter?</strong><br />
+            Interview problems almost never say &ldquo;knapsack&rdquo;. They say
+            partition these stones, hit this target, fit these strings inside
+            these limits. All of them are the same table, and once you can see
+            the skeleton through the wording, a whole family of Medium and Hard
+            problems becomes one solved problem with different labels.
+          </div>
+        </div>
+
+        <div class="objectives">
+          <div class="objectives-title">By the end of this lecture you can</div>
+          <ul>
+            <li>Recognise the knapsack skeleton inside a word problem</li>
+            <li>
+              Tell 0/1, unbounded and bounded apart &mdash; and write each loop
+              order correctly
+            </li>
+            <li>
+              Turn subset-sum, partition and target-sum questions into knapsack
+              form
+            </li>
+            <li>Use the same table to count ways or to optimise value</li>
+            <li>
+              Compress a 2D table to 1D without letting an item be used twice
+            </li>
+          </ul>
+        </div>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: Packing a suitcase.</strong
+            >
+            You have a weight limit and a pile of things you would like to
+            bring. For each item you decide: pack it or leave it. The DP table
+            answers one question per cell &mdash; &ldquo;using only the first
+            few items, what is the most value I can carry in this much
+            weight?&rdquo; &mdash; and each answer is built from two smaller
+            ones.
+          </div>
+        </div>
+
+        <h2 class="h1" id="skeleton">&#127890; The Knapsack Skeleton</h2>
+        <p>
+          Every problem in this lecture has the same three pieces. Name them
+          before writing anything.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Piece</th>
+              <th>In the classic problem</th>
+              <th>In a disguised one</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Items</strong></td>
+              <td>things you may pack</td>
+              <td>numbers, coins, words, dice</td>
+            </tr>
+            <tr>
+              <td><strong>Capacity</strong></td>
+              <td>the bag&#39;s weight limit</td>
+              <td>a target sum, a letter budget, a number of rolls</td>
+            </tr>
+            <tr>
+              <td><strong>Objective</strong></td>
+              <td>maximise value</td>
+              <td>count ways, decide feasibility, minimise waste</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; 0/1 Knapsack, the 2D Version</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dp[i][c] = best value using the first i items with capacity c</span>
+dp ← (n+1) × (capacity+1) table of zeros
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> capacity:
+        dp[i][c] ← dp[i-1][c]                     <span class="pc-cm">// skip item i</span>
+        <span class="pc-kw">if</span> weight[i-1] ≤ c:
+            take ← dp[i-1][c - weight[i-1]] + value[i-1]   <span class="pc-cm">// ← note i-1</span>
+            dp[i][c] ← max(dp[i][c], take)
+
+<span class="pc-kw">return</span> dp[n][capacity]
+
+<span class="pc-cm">// "Take" reads the PREVIOUS row, which is what stops item i from being
+// used twice. Everything else in this lecture is a variation on that line.</span></pre>
+        </div>
+
+        <h2 class="h1" id="three">&#128290; The Three Knapsacks</h2>
+        <p>
+          Same table, three rules about how often an item may be used. The rule
+          lives entirely in the loop order.
+        </p>
+
+        <h3 class="h2" id="k01">0/1 &mdash; Each Item at Most Once</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; 0/1, Compressed to 1D</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>dp ← array of capacity + 1 zeros
+
+<span class="pc-kw">for</span> each item:
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> capacity <span class="pc-kw">down to</span> item.weight:      <span class="pc-cm">// ← BACKWARDS</span>
+        dp[c] ← max(dp[c], dp[c - item.weight] + item.value)
+
+<span class="pc-cm">// Going backwards, dp[c - weight] has not been touched yet in this
+// item's pass, so it still means "without this item". Going forwards
+// would read a value that already includes it — that is unbounded.</span></pre>
+        </div>
+
+        <h3 class="h2" id="kunb">
+          Unbounded &mdash; Reuse as Often as You Like
+        </h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Unbounded</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>dp ← array of capacity + 1 zeros
+
+<span class="pc-kw">for</span> each item:
+    <span class="pc-kw">for</span> c <span class="pc-kw">from</span> item.weight <span class="pc-kw">to</span> capacity:        <span class="pc-cm">// ← FORWARDS</span>
+        dp[c] ← max(dp[c], dp[c - item.weight] + item.value)
+
+<span class="pc-cm">// Coin Change from Lecture 32 is exactly this, with min() and a count.</span></pre>
+        </div>
+
+        <h3 class="h2" id="kbound">Bounded &mdash; A Limited Supply</h3>
+        <p>
+          Each item exists <code>k</code> times. The lazy fix is to duplicate
+          the item <code>k</code> times and run 0/1; the interview answer is
+          binary splitting.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Bounded via Binary Splitting</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// 13 copies → bundles of 1, 2, 4, and the remainder 6.
+// Any count from 0 to 13 is some subset of those bundles.</span>
+<span class="pc-kw">for</span> each item with count k:
+    power ← 1
+    <span class="pc-kw">while</span> k &gt; 0:
+        take ← min(power, k)
+        add a virtual item of weight take × item.weight
+                       <span class="pc-kw">and</span> value take × item.value
+        k ← k - take
+        power ← power × 2
+
+run 0/1 knapsack over the virtual items      <span class="pc-cm">// O(capacity × Σ log kᵢ)</span></pre>
+        </div>
+
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
+          <div class="callout-body">
+            <strong>The loop direction is the entire difference.</strong>
+            Backwards means each item is used at most once; forwards means it
+            may repeat. Neither version crashes on the wrong input &mdash; you
+            simply get the answer to the other problem. When a knapsack solution
+            is &ldquo;almost right&rdquo;, check this first.
+          </div>
+        </div>
+
+        <h2 class="h1" id="compress">&#128207; Compressing to 1D, Safely</h2>
+        <p>
+          The 2D table is easier to reason about; the 1D array is what you write
+          once you trust yourself. The compression is safe only when the loop
+          direction preserves the meaning of the cell you are reading.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>Reads</th>
+              <th>Loop over capacity</th>
+              <th>Because</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0/1</td>
+              <td>previous row</td>
+              <td><strong>backwards</strong></td>
+              <td>lower cells must still exclude this item</td>
+            </tr>
+            <tr>
+              <td>Unbounded</td>
+              <td>current row</td>
+              <td><strong>forwards</strong></td>
+              <td>lower cells should already include it</td>
+            </tr>
+            <tr>
+              <td>Two capacities (e.g. 0s and 1s)</td>
+              <td>previous row</td>
+              <td>both dimensions backwards</td>
+              <td>same argument, twice</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>Sanity check with two items.</strong> Take weights [2] and
+            capacity 4 with value 3. Backwards gives 3; forwards gives 6,
+            because the single item was packed twice. Running that tiny case by
+            hand is faster than re-reading the loop.
+          </div>
+        </div>
+
+        <h2 class="h1" id="subsets">&#129513; Subsets in Disguise</h2>
+        <p>
+          Most interview knapsacks never mention a bag. Here is the translation
+          table &mdash; learn to perform it in the first minute.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Problem says</th>
+              <th>Items</th>
+              <th>Capacity</th>
+              <th>Objective</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>&ldquo;split into two equal halves&rdquo;</td>
+              <td>the numbers</td>
+              <td><code>total / 2</code></td>
+              <td>feasibility (boolean)</td>
+            </tr>
+            <tr>
+              <td>&ldquo;+ or &minus; each number to reach target&rdquo;</td>
+              <td>the numbers</td>
+              <td><code>(total + target) / 2</code></td>
+              <td>count subsets</td>
+            </tr>
+            <tr>
+              <td>&ldquo;smash stones together&rdquo;</td>
+              <td>the stones</td>
+              <td><code>total / 2</code></td>
+              <td>maximise one pile, answer is the gap</td>
+            </tr>
+            <tr>
+              <td>&ldquo;at most m zeros and n ones&rdquo;</td>
+              <td>the strings</td>
+              <td>two capacities</td>
+              <td>maximise the count taken</td>
+            </tr>
+            <tr>
+              <td>&ldquo;how many ways to make change&rdquo;</td>
+              <td>the coins</td>
+              <td>the amount</td>
+              <td>count, unbounded</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Partition Equal Subset Sum</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> canPartition(nums):
+    total ← sum(nums)
+    <span class="pc-kw">if</span> total is odd: <span class="pc-kw">return</span> false      <span class="pc-cm">// a cheap, decisive check</span>
+    target ← total ÷ 2
+
+    dp ← array of target + 1, all false
+    dp[0] ← true                            <span class="pc-cm">// the empty subset makes 0</span>
+
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> target <span class="pc-kw">down to</span> x:   <span class="pc-cm">// backwards: each number used once</span>
+            dp[c] ← dp[c] <span class="pc-kw">or</span> dp[c - x]
+
+    <span class="pc-kw">return</span> dp[target]</pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Target Sum needs one line of algebra.</strong> Let
+            <code>P</code> be the numbers you make positive and
+            <code>N</code> the rest. Then <code>P &minus; N = target</code> and
+            <code>P + N = total</code>, so
+            <code>P = (total + target) / 2</code>. If that is not a whole number
+            &mdash; or is negative &mdash; there are no solutions. Otherwise it
+            is a plain count-the-subsets knapsack.
+          </div>
+        </div>
+
+        <h3 class="h2" id="s-count">Counting vs Optimising</h3>
+        <p>
+          The same table answers both kinds of question. Only the combine step
+          changes.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Cell holds</th>
+              <th>Combine</th>
+              <th>Base case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Is it possible?</td>
+              <td>boolean</td>
+              <td><code>or</code></td>
+              <td><code>dp[0] = true</code></td>
+            </tr>
+            <tr>
+              <td>How many ways?</td>
+              <td>count</td>
+              <td><code>+</code></td>
+              <td><code>dp[0] = 1</code></td>
+            </tr>
+            <tr>
+              <td>Best value?</td>
+              <td>number</td>
+              <td><code>max</code></td>
+              <td><code>dp[0] = 0</code></td>
+            </tr>
+            <tr>
+              <td>Fewest items?</td>
+              <td>number</td>
+              <td><code>min</code></td>
+              <td><code>dp[0] = 0</code>, rest infinity</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout red">
+          <span class="callout-icon">&#128721;</span>
+          <div class="callout-body">
+            <strong>Combinations or permutations?</strong> When counting, the
+            nesting decides. <em>Items outside, capacity inside</em> counts
+            combinations &mdash; {1,2} and {2,1} are the same (Coin Change II).
+            <em>Capacity outside, items inside</em> counts permutations &mdash;
+            they are different (Combination Sum IV). Swapping the loops changes
+            the answer without changing a single line inside them.
+          </div>
+        </div>
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; The Classic Bugs
+        </h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Variant</th>
+              <th>Time</th>
+              <th>Space</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0/1 knapsack</td>
+              <td>O(n &middot; capacity)</td>
+              <td>O(capacity)</td>
+              <td>pseudo-polynomial: capacity is a value, not a length</td>
+            </tr>
+            <tr>
+              <td>Unbounded</td>
+              <td>O(n &middot; capacity)</td>
+              <td>O(capacity)</td>
+              <td>same table, forward loop</td>
+            </tr>
+            <tr>
+              <td>Bounded (binary split)</td>
+              <td>O(capacity &middot; &Sigma; log k)</td>
+              <td>O(capacity)</td>
+              <td>beats duplicating every copy</td>
+            </tr>
+            <tr>
+              <td>Two capacities</td>
+              <td>O(n &middot; m &middot; n)</td>
+              <td>O(m &middot; n)</td>
+              <td>Ones and Zeroes</td>
+            </tr>
+            <tr>
+              <td>Partition into k subsets</td>
+              <td>O(k &middot; 2&#8319;)</td>
+              <td>O(2&#8319;)</td>
+              <td>bitmask search &mdash; not a knapsack</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Bug</th>
+              <th>Symptom</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Forward loop in a 0/1 knapsack</td>
+              <td>Items get used more than once; answers too large</td>
+              <td>Loop capacity backwards</td>
+            </tr>
+            <tr>
+              <td>Loops nested the wrong way round when counting</td>
+              <td>Permutations counted as combinations, or vice versa</td>
+              <td>
+                Items outside for combinations, capacity outside for
+                permutations
+              </td>
+            </tr>
+            <tr>
+              <td>Wrong base case</td>
+              <td>Every answer is 0, or off by one way</td>
+              <td>
+                <code>dp[0]</code> is true / 1 / 0 depending on the question
+              </td>
+            </tr>
+            <tr>
+              <td>Odd total in a partition problem</td>
+              <td>Wasted work, or a wrong true</td>
+              <td>Return false immediately &mdash; halves must be whole</td>
+            </tr>
+            <tr>
+              <td>Negative or non-integer derived target</td>
+              <td>Index error in Target Sum</td>
+              <td>
+                Check <code>(total + target)</code> is even and non-negative
+              </td>
+            </tr>
+            <tr>
+              <td>Huge capacity</td>
+              <td>Memory blows up despite &ldquo;polynomial&rdquo; time</td>
+              <td>
+                Capacity is exponential in its digits &mdash; look for meet in
+                the middle instead
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>How to spot it in an interview.</strong> A set of items,
+            each with a cost, and a budget that must not be exceeded &mdash;
+            then either &ldquo;can we hit exactly&rdquo;, &ldquo;how many
+            ways&rdquo; or &ldquo;what is the best value&rdquo;. Name the items,
+            the capacity and the objective out loud; the loop order follows from
+            whether items repeat.
+          </div>
+        </div>
+
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Six problems. For each one, name the items, the capacity and the
+          objective before writing a loop &mdash; then decide the direction.
+        </p>
+
+        <!-- Problem 01: Partition Equal Subset Sum -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 01 &middot; Subset Sum</div>
+              <div class="prob-title">Partition Equal Subset Sum</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/partition-equal-subset-sum/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 416 - Partition Equal Subset Sum</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">0/1 Knapsack (Feasibility)</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return true if the array can be split into two subsets with
+                equal sums.
+              </p>
+              <div class="iobox">
+                nums = [1, 5, 11, 5] → true &nbsp;([1,5,5] and
+                [11])&nbsp;&nbsp;|&nbsp;&nbsp; nums = [1, 2, 3, 5] → false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    You do not need to build both halves. If one subset sums to
+                    half the total, the rest does too.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    So: can any subset reach <code>total / 2</code>? That is 0/1
+                    knapsack with a boolean table &mdash; and the capacity loop
+                    must run backwards.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The reduction is the interview answer: two-way partition becomes
+                one subset-sum question. An odd total is an instant false, which
+                also protects the integer division. The backwards loop is what
+                keeps each number to a single use &mdash; run it forwards and
+                <code>[5]</code> alone would appear to reach 10.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Boolean Knapsack</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> canPartition(nums):
+    total ← sum(nums)
+    <span class="pc-kw">if</span> total mod 2 ≠ 0: <span class="pc-kw">return</span> false
+    target ← total ÷ 2
+
+    dp ← array of target + 1, all false
+    dp[0] ← true                             <span class="pc-cm">// empty subset sums to 0</span>
+
+    <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> target <span class="pc-kw">down to</span> x:    <span class="pc-cm">// backwards = use x at most once</span>
+            dp[c] ← dp[c] <span class="pc-kw">or</span> dp[c - x]
+
+    <span class="pc-kw">return</span> dp[target]
+
+<span class="pc-cm">// [1,5,11,5]: total 22, target 11 → 11 reachable (11, or 1+5+5) → true ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n × total)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 02: Coin Change II -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Counting Combinations
+              </div>
+              <div class="prob-title">Coin Change II</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/coin-change-ii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 518 - Coin Change II</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Unbounded Knapsack (Count)</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return the number of coin combinations that add up to
+                <code>amount</code>. Coins may be reused, and order does not
+                matter.
+              </p>
+              <div class="iobox">
+                amount = 5, coins = [1, 2, 5] → 4 &nbsp;(5; 2+2+1; 2+1+1+1; 1×5)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Start from Coin Change in Lecture 32 and change
+                    <code>min</code> to <code>+</code>. What else has to be
+                    right?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The nesting. Coins on the outside and amounts on the inside
+                    counts each <em>combination</em> once; swapping them would
+                    count orderings.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two decisions, both invisible in the code.
+                <code>dp[0] = 1</code> says there is exactly one way to make
+                nothing &mdash; take no coins &mdash; and without it every count
+                is zero. The loop order is the real lesson: with coins
+                outermost, a combination is only ever built in non-decreasing
+                coin order, so {1,2} and {2,1} are the same path. The inner loop
+                runs forwards because a coin may repeat.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Coins Outside, Amounts
+                      Inside</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> change(amount, coins):
+    dp ← array of amount + 1 zeros
+    dp[0] ← 1                                <span class="pc-cm">// one way to make nothing</span>
+
+    <span class="pc-kw">for</span> coin <span class="pc-kw">in</span> coins:                    <span class="pc-cm">// ← combinations: coins outermost</span>
+        <span class="pc-kw">for</span> a <span class="pc-kw">from</span> coin <span class="pc-kw">to</span> amount:      <span class="pc-cm">// forwards: reuse allowed</span>
+            dp[a] ← dp[a] + dp[a - coin]
+
+    <span class="pc-kw">return</span> dp[amount]
+
+<span class="pc-cm">// Swap the two loops and you count permutations instead — that is
+// Combination Sum IV, a different problem with identical arithmetic.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(coins × amount)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(amount)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 03: Ones and Zeroes -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Two Capacities</div>
+              <div class="prob-title">Ones and Zeroes</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/ones-and-zeroes/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 474 - Ones and Zeroes</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">0/1 Knapsack, 2D Capacity</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given binary strings and budgets of <code>m</code> zeros and
+                <code>n</code> ones, return the largest number of strings you
+                can select without exceeding either budget.
+              </p>
+              <div class="iobox">
+                strs = ["10","0001","111001","1","0"], m = 5, n = 3 → 4
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Each string costs something. What exactly does it cost, and
+                    what is the bag?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    It costs its count of zeros and its count of ones — two
+                    capacities at once. The table becomes
+                    <code>dp[zeros][ones]</code>, and both loops run backwards.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Nothing new except a second dimension. Each string is an item
+                whose weight is a pair, so the table is two-dimensional and the
+                objective is a plain count. Both capacity loops must run
+                backwards for the same reason as the 1D case: the cells being
+                read have to still mean &ldquo;before this string&rdquo;. Count
+                the zeros and ones once per string rather than inside the loops.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Backwards in Both
+                      Dimensions</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> findMaxForm(strs, m, n):
+    dp ← (m+1) × (n+1) table of zeros
+
+    <span class="pc-kw">for</span> s <span class="pc-kw">in</span> strs:
+        zeros ← count of &#39;0&#39; in s;  ones ← length(s) - zeros
+        <span class="pc-kw">for</span> i <span class="pc-kw">from</span> m <span class="pc-kw">down to</span> zeros:      <span class="pc-cm">// both backwards</span>
+            <span class="pc-kw">for</span> j <span class="pc-kw">from</span> n <span class="pc-kw">down to</span> ones:
+                dp[i][j] ← max(dp[i][j], dp[i - zeros][j - ones] + 1)
+
+    <span class="pc-kw">return</span> dp[m][n]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(L × m × n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m × n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 04: Last Stone Weight II -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Disguised Subset Sum
+              </div>
+              <div class="prob-title">Last Stone Weight II</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/last-stone-weight-ii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1049 - Last Stone Weight II</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">0/1 Knapsack (Minimise Gap)</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Repeatedly smash two stones together; the difference survives.
+                Return the smallest possible weight of the final stone.
+              </p>
+              <div class="iobox">stones = [2, 7, 4, 1, 8, 1] → 1</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Every smash assigns a stone a plus or a minus sign. What
+                    does the final weight equal, in terms of two groups?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The gap between the two groups:
+                    <code>total − 2 × oneGroup</code>. Minimise that by making
+                    one group as close to <code>total / 2</code> as possible — a
+                    subset-sum maximisation.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The simulation is a red herring; the algebra is the problem. Any
+                sequence of smashes is equivalent to splitting the stones into
+                two piles, and the survivor is the difference between the pile
+                sums. So fill a boolean (or max-value) knapsack up to
+                <code>total / 2</code>, take the largest reachable sum, and
+                return <code>total − 2 × best</code>. The same reduction solves
+                Partition Array to Minimise Sum Difference.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Minimise the Gap</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> lastStoneWeightII(stones):
+    total ← sum(stones)
+    half ← total ÷ 2
+
+    dp ← array of half + 1 zeros             <span class="pc-cm">// dp[c] = best sum ≤ c that is reachable</span>
+    <span class="pc-kw">for</span> s <span class="pc-kw">in</span> stones:
+        <span class="pc-kw">for</span> c <span class="pc-kw">from</span> half <span class="pc-kw">down to</span> s:
+            dp[c] ← max(dp[c], dp[c - s] + s)
+
+    <span class="pc-kw">return</span> total - 2 × dp[half]
+
+<span class="pc-cm">// [2,7,4,1,8,1]: total 23, best pile ≤ 11 is 11 → 23 − 22 = 1 ✓</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n × total)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 05: Combination Sum IV -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Order Matters</div>
+              <div class="prob-title">Combination Sum IV</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/combination-sum-iv/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 377 - Combination Sum IV</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Unbounded (Permutations)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Count the number of ordered sequences of the given numbers that
+                add up to <code>target</code>. Different orders count
+                separately, despite the title.
+              </p>
+              <div class="iobox">nums = [1, 2, 3], target = 4 → 7</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    This looks identical to Coin Change II. Read the examples:
+                    is (1,2,1) the same as (1,1,2)?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    No — order counts. So the target must be the outer loop and
+                    the numbers the inner one, which lets every ordering be
+                    built independently.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                A deliberate trap, paired with the previous card. With the
+                target outside, <code>dp[t]</code> is reached by appending
+                <em>any</em> number last, so each ordering is counted once. With
+                numbers outside, orderings collapse into combinations. Nothing
+                else differs &mdash; same array, same addition, same base case
+                of 1. The follow-up about negative numbers has no answer under
+                this model, since sequences could then be infinite.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Target Outside, Numbers
+                      Inside</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> combinationSum4(nums, target):
+    dp ← array of target + 1 zeros
+    dp[0] ← 1
+
+    <span class="pc-kw">for</span> t <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> target:            <span class="pc-cm">// ← permutations: target outermost</span>
+        <span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
+            <span class="pc-kw">if</span> x ≤ t: dp[t] ← dp[t] + dp[t - x]
+
+    <span class="pc-kw">return</span> dp[target]
+
+<span class="pc-cm">// nums [1,2,3], target 4 → 7 sequences, including (1,2,1) and (2,1,1)</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(target × n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(target)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Problem 06: Tallest Billboard -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 06 &middot; State as a Difference
+              </div>
+              <div class="prob-title">Tallest Billboard</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/tallest-billboard/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 956 - Tallest Billboard</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Knapsack Keyed on Difference</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Split the rods into two disjoint groups of equal total height
+                (some rods may go unused) and return the largest such height.
+              </p>
+              <div class="iobox">
+                rods = [1, 2, 3, 6] → 6 &nbsp;(1+2+3 against 6)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Two piles, and only their <em>difference</em> matters while
+                    you are building them. Can the difference be the state?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Let <code>dp[d]</code> be the tallest shorter pile
+                    achievable when the piles differ by <code>d</code>. Each rod
+                    goes on the taller pile, the shorter pile, or neither.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                A capacity-free knapsack: the state is not a budget but a
+                difference, and the value stored is the shorter pile&rsquo;s
+                height. Each rod gives three transitions, and adding it to the
+                shorter pile may flip which pile is taller &mdash; that is the
+                fiddly case. The answer is <code>dp[0]</code>, the tallest pair
+                of equal piles. Differences are bounded by the total, so the
+                table stays small.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; dp[difference] = shorter
+                      pile</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> tallestBillboard(rods):
+    dp ← map {0: 0}                    <span class="pc-cm">// difference → tallest shorter pile</span>
+
+    <span class="pc-kw">for</span> rod <span class="pc-kw">in</span> rods:
+        next ← copy of dp              <span class="pc-cm">// "use this rod nowhere"</span>
+        <span class="pc-kw">for</span> (d, shorter) <span class="pc-kw">in</span> dp:
+            <span class="pc-cm">// add to the taller pile: difference grows</span>
+            next[d + rod] ← max(next[d + rod], shorter)
+
+            <span class="pc-cm">// add to the shorter pile: it may overtake</span>
+            newDiff ← |d - rod|
+            newShorter ← shorter + min(d, rod)
+            next[newDiff] ← max(next[newDiff], newShorter)
+        dp ← next
+
+    <span class="pc-kw">return</span> dp[0]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n × total)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(total)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- ASSIGNMENT -->
+        <h2 class="h1" id="assignment">&#128221; Assignment</h2>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
+          <div class="callout-body">
+            <strong
+              >Lecture 34 Assignment &mdash; 25 Problems (8 Easy &middot; 13
+              Medium &middot; 4 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged, grouped by the
+            knapsack variant it hides. Complete it before moving to Lecture
+            28.<br /><br />
+            <a
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture34/Assignment.md"
+              style="
+                background: var(--accent);
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >&#128196; Open Assignment &rarr;</a
+            >
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
+        <p>Check each item before advancing to Lecture 35.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can name the items, the capacity and the objective in any
+            disguised problem
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know which loop direction means "use once" and which means "reuse"
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can explain why the 0/1 capacity loop must run backwards
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can count combinations or permutations by choosing the nesting
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can derive the Target Sum reduction with the algebra, not from
+            memory
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can pick the base case from the question type: true, 1, 0 or
+            infinity
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I know why knapsack is called pseudo-polynomial, and when capacity
+            makes it impractical
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I completed all 25 assignment problems and can name the variant for
+            each
+          </div>
+        </div>
+
+        <div class="callout green">
+          <span class="callout-icon">&#128640;</span>
+          <div class="callout-body">
+            <strong
+              >You're ready for Lecture 35: Dynamic Programming IV &mdash;
+              Interval, Tree, Bitmask &amp; Digit</strong
+            ><br />
+            So far every state has been an index or a budget. The last DP
+            lecture uses stranger states: a range of the array, a node of a
+            tree, a set encoded in bits, and a position in a number.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="page-nav">
+          <a href="../Lecture33/lecture33_notes.html"
+            >&larr; Lecture 33 &middot; Dynamic Programming II</a
+          >
+          <a class="next" href="../Lecture35/lecture35_notes.html"
+            >Lecture 35 &middot; Dynamic Programming IV &rarr;</a
+          >
+        </div>
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // 1. Theme toggle — remembered across pages of the course
+      function applyTheme(theme) {
+        const html = document.documentElement;
+        const btn = document.getElementById("darkToggle");
+        if (theme === "dark") html.setAttribute("data-theme", "dark");
+        else html.removeAttribute("data-theme");
+        if (btn)
+          btn.innerText =
+            theme === "dark" ? "\u2600\ufe0f Light" : "\ud83c\udf19 Dark";
+      }
+
+      function toggleDark() {
+        const next =
+          document.documentElement.getAttribute("data-theme") === "dark"
+            ? "light"
+            : "dark";
+        applyTheme(next);
+        try {
+          localStorage.setItem("dsa-notes-theme", next);
+        } catch (e) {
+          /* private browsing — the toggle still works for this page */
+        }
+      }
+
+      (function initTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem("dsa-notes-theme");
+        } catch (e) {
+          /* ignore */
+        }
+        applyTheme(saved === "dark" ? "dark" : "light");
+      })();
+
+      // 2. Reading progress + active table-of-contents entry
+      (function initScrollSync() {
+        const main = document.getElementById("main");
+        if (!main) return;
+        const fill = document.getElementById("progressFill");
+        const headings = document.querySelectorAll("h1[id], h2[id], h3[id]");
+        const tocItems = document.querySelectorAll(".toc-item");
+
+        main.addEventListener("scroll", function () {
+          const range = main.scrollHeight - main.clientHeight;
+          if (fill && range > 0) {
+            const pct = (main.scrollTop / range) * 100;
+            fill.style.width = (pct > 98.5 ? 100 : pct) + "%";
+          }
+          let current = "";
+          headings.forEach((h) => {
+            if (h.getBoundingClientRect().top < 150) current = h.id;
+          });
+          tocItems.forEach((item) => {
+            item.classList.toggle(
+              "active",
+              item.getAttribute("href") === "#" + current,
+            );
+          });
+        });
+      })();
+
+      // 3. Practice-problem cards expand and collapse
+      function toggleProb(headerEl) {
+        const body = headerEl.nextElementSibling;
+        if (!body) return;
+        const isOpen = body.style.display === "block";
+        body.style.display = isOpen ? "none" : "block";
+        headerEl.classList.toggle("active", !isOpen);
+      }
+
+      // 4. Copy a code block
+      function copyCode(btn) {
+        const block = btn.closest(".code-block");
+        const pre = block && block.querySelector("pre");
+        if (!pre) return;
+        const done = () => {
+          const original = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "var(--green-bg)";
+          btn.style.color = "var(--green)";
+          btn.style.borderColor = "var(--green)";
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(pre.innerText).then(done, () => {
+            btn.innerText = "Press Ctrl+C";
+          });
+        } else {
+          btn.innerText = "Press Ctrl+C";
+        }
+      }
+
+      // 5. Disclosure arrows
+      document.querySelectorAll("details").forEach((det) => {
+        det.addEventListener("toggle", () => {
+          const arrow = det.querySelector(".toggle-arrow");
+          if (arrow)
+            arrow.style.transform = det.open ? "rotate(90deg)" : "rotate(0deg)";
+        });
+      });
+    </script>
+  </body>
+</html>

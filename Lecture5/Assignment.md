@@ -1,10 +1,9 @@
-# 🔁 Assignment 5 — Recursion & Backtracking
+# 🧠 Assignment 2 — Java Memory Management
 
-> **Lecture:** 5 of 38 — Recursion & Backtracking
+> **Lecture:** 5 of 45 — Java Memory Management
 > **Phase:** 1 — Foundations
-> **Estimated Time:** 7 days · **Total Problems:** 35 (15 Easy · 15 Medium · 5 Hard)
-> **Goal:** Master the "Divide & Conquer" thinking, recursive call-stack visualizing, and backtracking state-space
-> pruning.
+> **Estimated Time:** 4 days · **Total Problems:** 35 (20 Easy · 14 Medium · 1 Hard)
+> **Goal:** Build a rock-solid mental model of JVM memory and master the trade-offs of the Collections Framework.
 
 ---
 
@@ -12,429 +11,475 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                      | Pattern           | Move                                     |
-| ------------------------------------------ | ----------------- | ---------------------------------------- |
-| "all subsets / subsequences"               | Include / Exclude | two branches per element                 |
-| "all arrangements"                         | Permutations      | swap or use a `used[]` array, undo after |
-| "choose k", "sum to target"                | Combinations      | start index + prune when over target     |
-| "split the string into valid pieces"       | Partitioning      | try every cut, recurse on the rest       |
-| "paths in a grid / maze"                   | Grid Backtracking | mark, recurse in 4 directions, unmark    |
-| "solve a smaller copy of the same problem" | Divide & Conquer  | split, recurse, combine                  |
+| Signal in the Problem                   | Pattern              | Move                                                  |
+| --------------------------------------- | -------------------- | ----------------------------------------------------- |
+| "have I seen this before?"              | HashSet              | `add` / `contains` in O(1) average                    |
+| "how many times does x appear"          | HashMap Counting     | `map.merge(x, 1, Integer::sum)`                       |
+| "same group / same key"                 | HashMap Grouping     | build a canonical key, map it to a list               |
+| "closest smaller / larger key", "range" | TreeMap / TreeSet    | `floorKey`, `ceilingKey`, `subMap` in O(log n)        |
+| "predict the output" with objects       | Stack vs Heap Model  | primitives copy the value, objects copy the reference |
+| "why is this slow?"                     | Collection Internals | ArrayList shifts, LinkedList walks, HashMap hashes    |
 
 ---
 
-## 🟢 Easy Tier (15 Problems)
+## 🟢 Easy Tier (20 Problems)
 
-_Build the Recursion Tree._
+_Memory & Collection Basics._
 
-### E1 · Sum of First N Numbers
+### E1 · Stack vs Heap Logic
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Write `sum(n)` recursively. Draw the call stack for `n=4`. Use `return n + sum(n-1)`. State the space complexity (O is NOT 1 here!).
+**Task:** Explain which memory area (Stack or Heap) stores the following variables in a method call:
+
+- An `int` primitive locally declared.
+- An `int[]` array reference.
+- The actual integers inside the `int[]` array.
+- A `String` object.
 
 ---
 
-### E2 · Factorial & GCD
+### E2 · String Literal vs Object
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Implement `factorial(n)` and `gcd(a, b)` recursively. Why is recursion better than loops for Euclid's GCD?
+**Task:** Predict the output and explain **WHY**:
+
+```java
+String s1 = "DSA";
+String s2 = "DSA";
+String s3 = new String("DSA");
+System.out.println(s1 == s2);
+System.out.println(s1 == s3);
+System.out.println(s1.equals(s3));
+```
 
 ---
 
-### E3 · Power Function (O(n))
+### E3 · Memory Leak 101
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Implement `pow(x, n)` as `x * pow(x, n-1)`. Then look at Lecture 7 for how to do this in O(log n).
+**Task:** Identify why this code might lead to an `OutOfMemoryError` over time:
+
+```java
+List<byte[]> data = new ArrayList<>();
+while (true) {
+    data.add(new byte[1024 * 1024]); // Adds 1MB every loop
+}
+```
 
 ---
 
-### E4 · Reverse an Array (Two Pointers)
+### E4 · StackOverflow Simulation
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Use recursion to swap `arr[l]` and `arr[r]`, then call `reverse(l+1, r-1)`. Base case: `l >= r`.
-
----
-
-### E5 · Valid Palindrome II
-
-**🔗 [LC 680 — Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/)** · Easy
-**Pattern:** Recursion — Branch Once | **Companies:** Meta, Amazon, Microsoft
-
-**Hint:** Write `isPal(s, l, r)` recursively. At the first mismatch you get exactly one deletion, so return `isPal(l + 1, r) || isPal(l, r - 1)` with no deletions left.
+**Task:** Write the simplest recursive function that triggers a `StackOverflowError`. What is the default stack size in a standard JVM?
 
 ---
 
-### E6 · Kth Missing Positive Number
-
-**🔗 [LC 1539 — Kth Missing Positive Number](https://leetcode.com/problems/kth-missing-positive-number/)** · Easy
-**Pattern:** Recursive Binary Search | **Companies:** Meta, Amazon, Microsoft
-
-**Hint:** The count of missing numbers before index `i` is `arr[i] - (i + 1)`. Binary search — recursively — for the first index where that count is at least `k`; the answer is `lo + k`.
-
----
-
-### E7 · Sort an Array
-
-**🔗 [LC 912 — Sort an Array](https://leetcode.com/problems/sort-an-array/)** · Medium
-**Pattern:** Merge Sort (Divide & Conquer) | **Companies:** Amazon, Microsoft, Google
-
-**Hint:** Recursively sort the left and right halves, then merge with two pointers into a temporary array. Base case: size ≤ 1. Guaranteed O(n log n), which LeetCode requires here.
-
----
-
-### E8 · Partition Array According to Given Pivot
-
-**🔗 [LC 2161 — Partition Array According to Given Pivot](https://leetcode.com/problems/partition-array-according-to-given-pivot/)** · Medium
-**Pattern:** Partition Logic | **Companies:** Amazon, Google
-
-**Hint:** This is quicksort's partition step, done stably: collect elements `< pivot`, then `== pivot`, then `> pivot`. Then try it in one pass that writes smaller elements from the front and larger ones from the back.
-
----
-
-### E9 · Print Subsequences ("Pick/Don't Pick")
+### E5 · Pass-by-Value "Trap"
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Include / Exclude (Subsets) | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Given "abc", print all 2³ = 8 subsequences. This is the **most important pattern** for backtracking.
+**Task:** Predict the output of `a` after `modify(a)`:
+
+```java
+void modify(int x) {
+    x = 100;
+}
+
+int a = 5;
+modify(a);
+System.out.println(a);
+```
 
 ---
 
-### E10 · Count Digits Recursively
+### E6 · Reference Modification
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** JVM Memory & References | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** `1 + countDigits(n/10)` if `n > 0`.
+**Task:** Predict the output of `arr[0]` after `modify(arr)`:
+
+```java
+void modify(int[] x) {
+    x[0] = 100;
+}
+
+int[] arr = {5, 10};
+modify(arr);
+System.out.println(arr[0]);
+```
 
 ---
 
-### E11 · Check if Array is Sorted
+### E7 · ArrayList: Insert at Front
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** List Internals | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** `return (arr[0] <= arr[1]) && isSorted(rest of array)`.
+**Task:** Write a function to insert 10,000 elements at index 0 of an `ArrayList`. Measure time. Why is it slow? What is the Time Complexity of `add(0, val)`?
 
 ---
 
-### E12 · Linear Search (Recursive)
+### E8 · ArrayList vs LinkedList Lookup
 
 **🔗 Concept exercise — no LeetCode equivalent**
-**Pattern:** Linear Recursion | **Companies:** Amazon, Google, Adobe
+**Pattern:** List Internals | **Companies:** Amazon, Oracle, Goldman Sachs
 
-**Task:** Search index 0, then recurse.
-
----
-
-### E13 · Fibonacci Number
-
-**🔗 [LC 509 — Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)** · Easy
-**Pattern:** Multiple Recursion | **Companies:** Amazon, Google, Adobe
-
-**Hint:** Implement `fib(n) = fib(n-1) + fib(n-2)` and draw the recursion tree for `n = 5`. Count the repeated calls, then add a memo array and count again.
+**Task:** Initialise both with 10⁵ elements. Compare `list.get(50000)` performance. State the complexity for each.
 
 ---
 
-### E14 · Sum of Digits in Base K
+### E9 · Unique Morse Code Words
 
-**🔗 [LC 1837 — Sum of Digits in Base K](https://leetcode.com/problems/sum-of-digits-in-base-k/)** · Easy
-**Pattern:** Linear Recursion on Digits | **Companies:** Amazon, Adobe
+**🔗 [LC 804 — Unique Morse Code Words](https://leetcode.com/problems/unique-morse-code-words/)** · Easy
+**Pattern:** HashSet — Uniqueness | **Companies:** Amazon, Google
 
-**Hint:** Recursive rule: `sumBase(n, k) = n % k + sumBase(n / k, k)`, with base case `n == 0`.
-
----
-
-### E15 · Find the Winner of the Circular Game
-
-**🔗 [LC 1823 — Find the Winner of the Circular Game](https://leetcode.com/problems/find-the-winner-of-the-circular-game/)** · Medium
-**Pattern:** Recurrence | **Companies:** Amazon, Google, Adobe
-
-**Hint:** `n` people in a circle, every `k`-th is removed. Return the survivor. (Hint: 0-indexed, `f(1, k) = 0` and `f(n, k) = (f(n-1, k) + k) % n`; LeetCode numbers people from 1, so return `f(n, k) + 1`).
+**Hint:** Translate each word into its Morse string with a `StringBuilder`, add it to a `HashSet<String>`, and return the set's size. `String` works as a key because its `equals`/`hashCode` compare content.
 
 ---
 
-## 🟡 Medium Tier (15 Problems)
+### E10 · Sum of Unique Elements
 
-_The Backtracking Template._
+**🔗 [LC 1748 — Sum of Unique Elements](https://leetcode.com/problems/sum-of-unique-elements/)** · Easy
+**Pattern:** HashMap — Counting | **Companies:** Amazon, Microsoft
 
-### M1 · Subsets
-
-**🔗 [LC 78 — Subsets](https://leetcode.com/problems/subsets/)** · Medium
-**Pattern:** Include / Exclude | **Companies:** Google, Amazon, Meta, Microsoft
-
-**Hint:** Build all power sets. Use the template: `helper(index, currentList)`.
+**Hint:** Count with `map.merge(x, 1, Integer::sum)`, then sum the keys whose count is 1. Note how `Integer` values are boxed on the heap.
 
 ---
 
-### M2 · Subsets II
+### E11 · Intersection of Two Arrays
 
-**🔗 [LC 90 — Subsets II](https://leetcode.com/problems/subsets-ii/)** · Medium
-**Pattern:** Sort + Skip Duplicates | **Companies:** Amazon, Google, Meta
+**🔗 [LC 349 — Intersection of Two Arrays](https://leetcode.com/problems/intersection-of-two-arrays/)** · Easy
+**Pattern:** Two Sets | **Companies:** Amazon, Google, Meta
 
-**Hint:** Same as above, but with duplicate numbers. Sort first, then skip `nums[i]` if `nums[i] == nums[i-1]`.
-
----
-
-### M3 · Permutations
-
-**🔗 [LC 46 — Permutations](https://leetcode.com/problems/permutations/)** · Medium
-**Pattern:** Swapping / Visited Array | **Companies:** Google, Amazon, Microsoft, Meta
-
-**Hint:** Find all possible orderings of N distinct elements. O(n!).
+**Hint:** Return an array of unique elements present in both arrays. Use two `HashSet`s.
 
 ---
 
-### M4 · Combinations
+### E12 · Find Words That Can Be Formed by Characters
 
-**🔗 [LC 77 — Combinations](https://leetcode.com/problems/combinations/)** · Medium
-**Pattern:** Range Recursion | **Companies:** Google, Amazon, Microsoft
+**🔗 [LC 1160 — Find Words That Can Be Formed by Characters](https://leetcode.com/problems/find-words-that-can-be-formed-by-characters/)** · Easy
+**Pattern:** Frequency Array | **Companies:** Amazon, Microsoft
 
-**Hint:** Backtrack with a start index: at each level try numbers from `start` to `n`, add one, recurse with `start = i + 1`, then remove it. Prune when there aren't enough numbers left to reach size `k` (`i <= n - (k - path.size()) + 1`).
-
----
-
-### M5 · Combination Sum
-
-**🔗 [LC 39 — Combination Sum](https://leetcode.com/problems/combination-sum/)** · Medium
-**Pattern:** Unlimited Reuse | **Companies:** Google, Amazon, Meta, Uber
-
-**Hint:** Find all unique combinations that sum to target. You can reuse the same element.
+**Hint:** Count the letters of `chars` once in `int[26]`. For each word, count its letters and check every count fits. Copying the base array per word is O(26) — cheap.
 
 ---
 
-### M6 · Combination Sum II
+### E13 · Check if All Characters Have Equal Number of Occurrences
 
-**🔗 [LC 40 — Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)** · Medium
-**Pattern:** Single Use + Duplicates | **Companies:** Amazon, Google, Meta
+**🔗 [LC 1941 — Check if All Characters Have Equal Number of Occurrences](https://leetcode.com/problems/check-if-all-characters-have-equal-number-of-occurrences/)** · Easy
+**Pattern:** HashMap — Counting | **Companies:** Amazon, Adobe
 
-**Hint:** Each element used only once. Skip duplicates logic applied.
-
----
-
-### M7 · Palindrome Partitioning
-
-**🔗 [LC 131 — Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)** · Medium
-**Pattern:** Cut / Validation | **Companies:** Google, Amazon, Meta
-
-**Hint:** Partition string so every substring is a palindrome.
+**Hint:** Count characters, then put all the counts into a `HashSet<Integer>`; the answer is `set.size() == 1`.
 
 ---
 
-### M8 · Word Search
+### E14 · Unique Number of Occurrences
 
-**🔗 [LC 79 — Word Search](https://leetcode.com/problems/word-search/)** · Medium
-**Pattern:** Grid Backtracking (DFS) | **Companies:** Google, Amazon, Microsoft, Meta
+**🔗 [LC 1207 — Unique Number of Occurrences](https://leetcode.com/problems/unique-number-of-occurrences/)** · Easy
+**Pattern:** HashMap + HashSet | **Companies:** Amazon, Google
 
-**Hint:** Find if word exists in a 2D grid. Mark visited cell (e.g., set to '#'), search neighbors, then **unmark** (Backtrack).
-
----
-
-### M9 · Letter Combinations of a Phone Number
-
-**🔗 [LC 17 — Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)** · Medium
-**Pattern:** Mapping + Recursion | **Companies:** Google, Amazon, Meta, Uber
-
-**Hint:** E.g., 2="abc", 3="def". Return all strings "ad", "ae", "af"...
+**Hint:** Count occurrences in a `HashMap`, then check that `new HashSet<>(map.values()).size() == map.size()`.
 
 ---
 
-### M10 · Binary Tree Paths
+### E15 · Intersection of Multiple Arrays
 
-**🔗 [LC 257 — Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)** · Easy
-**Pattern:** Tree Traversal | **Companies:** Google, Amazon, Meta
+**🔗 [LC 2248 — Intersection of Multiple Arrays](https://leetcode.com/problems/intersection-of-multiple-arrays/)** · Easy
+**Pattern:** Counting Across Lists | **Companies:** Amazon, Google
 
-**Hint:** Return all paths from root to leaf. Pre-order traversal with a path tracker.
-
----
-
-### M11 · Target Sum
-
-**🔗 [LC 494 — Target Sum](https://leetcode.com/problems/target-sum/)** · Medium
-**Pattern:** +/- Choices | **Companies:** Meta, Amazon, Google
-
-**Hint:** Every number gets a `+` or a `-`: recurse `(i + 1, sum ± nums[i])` and count paths that end at `target`. Then memoise on `(i, sum)`. The DP trick (a subset with sum `(total + target) / 2`) comes in Lecture 27.
+**Hint:** Each inner array has distinct values, so a value is in every array exactly when its total count equals `nums.length`. Count, collect, sort.
 
 ---
 
-### M12 · Generate Parentheses
+### E16 · Contains Duplicate II
 
-**🔗 [LC 22 — Generate Parentheses](https://leetcode.com/problems/generate-parentheses/)** · Medium
-**Pattern:** Count-based Backtracking | **Companies:** Google, Amazon, Meta, Uber
+**🔗 [LC 219 — Contains Duplicate II](https://leetcode.com/problems/contains-duplicate-ii/)** · Easy
+**Pattern:** HashMap — Last Index | **Companies:** Amazon, Google, Meta
 
-**Hint:** Keep track of open and close counts. Only add `)` if `close < open`.
-
----
-
-### M13 · Path with Maximum Gold
-
-**🔗 [LC 1219 — Path with Maximum Gold](https://leetcode.com/problems/path-with-maximum-gold/)** · Medium
-**Pattern:** Grid DFS + Max result | **Companies:** Amazon, Google
-
-**Hint:** From every cell with gold, DFS in 4 directions, temporarily setting the cell to 0 so a path can't revisit it and restoring it on the way back. Return `cell + best neighbour result` and take the maximum over all starts.
+**Hint:** Store `value → last index seen`. At index `i`, if the value is already in the map and `i - map.get(v) <= k`, return true; either way update the stored index to `i`.
 
 ---
 
-### M14 · All Paths From Source to Target
+### E17 · Sort Array by Increasing Frequency
 
-**🔗 [LC 797 — All Paths From Source to Target](https://leetcode.com/problems/all-paths-from-source-to-target/)** · Medium
-**Pattern:** Graph DFS | **Companies:** Amazon, Google
+**🔗 [LC 1636 — Sort Array by Increasing Frequency](https://leetcode.com/problems/sort-array-by-increasing-frequency/)** · Easy
+**Pattern:** Map + Custom Comparator | **Companies:** Amazon, Google, eBay
 
-**Hint:** The graph is a DAG, so no visited set is needed. DFS from node 0 with a path list; when you reach `n - 1`, copy the path into the results. Add a node before recursing and remove it after.
-
----
-
-### M15 · Restore IP Addresses
-
-**🔗 [LC 93 — Restore IP Addresses](https://leetcode.com/problems/restore-ip-addresses/)** · Medium
-**Pattern:** String Segmenting | **Companies:** Amazon, Google, Meta
-
-**Hint:** Place 3 dots with backtracking: at each step take the next 1–3 digits as a segment. A segment is valid if it's ≤ 255 and has no leading zero (unless it is exactly "0"). Stop when you have 4 segments and have used every digit.
+**Hint:** Count frequencies, box the array into `Integer[]`, and sort with a comparator: lower frequency first, and for equal frequency, larger value first.
 
 ---
 
-## 🔴 Hard Tier (5 Problems)
+### E18 · Sort the People
 
-_5 Advanced Problems._
+**🔗 [LC 2418 — Sort the People](https://leetcode.com/problems/sort-the-people/)** · Easy
+**Pattern:** Sort by Key | **Companies:** Amazon, Microsoft
 
-### H1 · N-Queens
-
-**🔗 [LC 51 — N-Queens](https://leetcode.com/problems/n-queens/)** · Hard
-**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Meta
-
-**Hint:** The classic backtracking problem. Use sets for columns, row-sum, and row-diff diagonals.
+**Hint:** Heights are distinct, so pair each name with its height (a `TreeMap<Integer, String>` with reverse order, or an index array sorted by height) and read the names in descending height.
 
 ---
 
-### H2 · Sudoku Solver
+### E19 · Check If N and Its Double Exist
 
-**🔗 [LC 37 — Sudoku Solver](https://leetcode.com/problems/sudoku-solver/)** · Hard
-**Pattern:** Constraint Backtracking | **Companies:** Google, Amazon, Uber
+**🔗 [LC 1346 — Check If N and Its Double Exist](https://leetcode.com/problems/check-if-n-and-its-double-exist/)** · Easy
+**Pattern:** HashSet Lookup | **Companies:** Amazon, Google
 
-**Hint:** Find the next empty cell, try digits 1–9 that don't clash with the row, column or 3×3 box (track these with boolean arrays for O(1) checks), recurse, and undo on failure. Return `true` as soon as the board is full so the solved state isn't undone.
-
----
-
-### H3 · Word Break II
-
-**🔗 [LC 140 — Word Break II](https://leetcode.com/problems/word-break-ii/)** · Hard
-**Pattern:** Backtracking + Memoization | **Companies:** Google, Amazon, Meta, Uber
-
-**Hint:** Recurse on the suffix starting at `i`: for every dictionary word that is a prefix, combine it with each sentence of the rest. Memoise `i → list of sentences` so each suffix is solved once.
+**Hint:** Walk the array once. Before adding `x` to a `HashSet`, check whether `2 * x` is in it, or (for even `x`) whether `x / 2` is. The zero case is handled because you check before adding.
 
 ---
 
-### H4 · Expression Add Operators
+### E20 · Find the Difference of Two Arrays
 
-**🔗 [LC 282 — Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)** · Hard
-**Pattern:** Expression Backtracking | **Companies:** Google, Meta, Amazon
+**🔗 [LC 2215 — Find the Difference of Two Arrays](https://leetcode.com/problems/find-the-difference-of-two-arrays/)** · Easy
+**Pattern:** Set Difference | **Companies:** Amazon, Microsoft
 
-**Hint:** Backtrack over every split of the digit string, carrying `value` and `prev` (the last operand). For `*`, undo the last operand: `value - prev + prev * cur`. Skip operands with a leading zero and use `long` for the running value.
+**Hint:** Load both arrays into `HashSet`s, then keep the values of set1 not in set2 and vice versa. `removeAll` on copies works too — understand why its cost depends on the set type.
 
 ---
 
-### H5 · Unique Paths III
+## 🟡 Medium Tier (14 Problems)
 
-**🔗 [LC 980 — Unique Paths III](https://leetcode.com/problems/unique-paths-iii/)** · Hard
-**Pattern:** Grid Backtracking | **Companies:** Amazon, Google, Adobe
+_Interview Staples._
 
-**Hint:** Count the empty cells first. DFS from the start, marking cells visited and unmarking on the way back. A path counts only if it reaches the end having visited every non-obstacle cell. The same template solves Rat in a Maze.
+### M1 · Find Duplicate File in System
+
+**🔗 [LC 609 — Find Duplicate File in System](https://leetcode.com/problems/find-duplicate-file-in-system/)** · Medium
+**Pattern:** HashMap — Group by Key | **Companies:** Amazon, Google, Dropbox
+
+**Hint:** Parse each path string, split out `name(content)`, and group full paths in `Map<String, List<String>>` keyed by content. Return only the groups with 2 or more files.
+
+---
+
+### M2 · Count Number of Nice Subarrays
+
+**🔗 [LC 1248 — Count Number of Nice Subarrays](https://leetcode.com/problems/count-number-of-nice-subarrays/)** · Medium
+**Pattern:** Prefix Count + HashMap | **Companies:** Amazon, Google, Meta
+
+**Hint:** Turn each number into 1 if odd and 0 if even; now you need subarrays with sum exactly `k`. Keep a running count of odds and a map of how many prefixes had each count; add `map.get(count - k)` at every step.
+
+---
+
+### M3 · Pairs of Songs With Total Durations Divisible by 60
+
+**🔗 [LC 1010 — Pairs of Songs With Total Durations Divisible by 60](https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/)** · Medium
+**Pattern:** Complement Counting | **Companies:** Amazon, Google
+
+**Hint:** Only `time % 60` matters. For remainder `r`, its partner is `(60 - r) % 60`. Keep `int[60]` counts and add `count[partner]` before recording `r`.
+
+---
+
+### M4 · Equal Row and Column Pairs
+
+**🔗 [LC 2352 — Equal Row and Column Pairs](https://leetcode.com/problems/equal-row-and-column-pairs/)** · Medium
+**Pattern:** HashMap — Row as Key | **Companies:** Amazon, Google
+
+**Hint:** Turn each row into a key (e.g. `Arrays.toString(row)` or a `List<Integer>`) and count it in a map. Then build each column's key and add the map's count for it.
+
+---
+
+### M5 · Design Authentication Manager
+
+**🔗 [LC 1797 — Design Authentication Manager](https://leetcode.com/problems/design-authentication-manager/)** · Medium
+**Pattern:** HashMap with Expiry | **Companies:** Twitter, Amazon
+
+**Hint:** Store `tokenId → expiryTime`. `renew` only works if the token exists and hasn't expired. `countUnexpiredTokens` counts entries with `expiry > currentTime` — or prune expired entries as you go.
+
+---
+
+### M6 · My Calendar I
+
+**🔗 [LC 729 — My Calendar I](https://leetcode.com/problems/my-calendar-i/)** · Medium
+**Pattern:** TreeMap — floor / ceiling | **Companies:** Google, Amazon, Uber
+
+**Hint:** Keep booked intervals in a `TreeMap<start, end>`. A new `[s, e)` conflicts if `floorEntry(s)` ends after `s`, or `ceilingKey(s)` starts before `e`. Otherwise insert. Each booking is O(log n).
+
+---
+
+### M7 · Custom Class as HashMap Key
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** hashCode / equals & Set Checks | **Companies:** Amazon, Oracle, Goldman Sachs
+
+**Task:** Implement a `Student` class with `id` and `name`. Override `hashCode()` and `equals()`. Explain why `equals()` must be consistent with `hashCode()`. What happens if you modify the `name` of a Student already inside a `HashSet`?
+
+---
+
+### M8 · Valid Sudoku
+
+**🔗 [LC 36 — Valid Sudoku](https://leetcode.com/problems/valid-sudoku/)** · Medium
+**Pattern:** HashSet / Grid Logic | **Companies:** Amazon, Google, Uber, Apple
+
+**Hint:** Check if a 9x9 board is valid. Use one HashSet with string keys: `"row"+i+val`, `"col"+j+val`, `"box"+(i/3)+"-"+(j/3)+val`.
+
+---
+
+### M9 · Continuous Subarray Sum
+
+**🔗 [LC 523 — Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)** · Medium
+**Pattern:** Prefix Sum Modulo | **Companies:** Meta, Amazon, Google
+
+**Hint:** Find a subarray of at least size 2 summing to a multiple of k. Store `sum % k → firstIndex` in a HashMap.
+
+---
+
+### M10 · Find and Replace Pattern
+
+**🔗 [LC 890 — Find and Replace Pattern](https://leetcode.com/problems/find-and-replace-pattern/)** · Medium
+**Pattern:** Bijection — Two Maps | **Companies:** Amazon, Google
+
+**Hint:** A word matches when there is a one-to-one mapping between pattern letters and word letters. Use two maps (pattern→word and word→pattern) and reject on any conflict.
+
+---
+
+### M11 · Insert Delete GetRandom O(1)
+
+**🔗 [LC 380 — Insert Delete GetRandom O(1)](https://leetcode.com/problems/insert-delete-getrandom-o1/)** · Medium
+**Pattern:** HashMap + Dynamic Array | **Companies:** Amazon, Google, Meta, Bloomberg
+
+**Hint:** Add, remove, and get a random element, all in O(1). (Hint: HashMap of value → index + a dynamic array; delete by swapping with the last element.)
+
+---
+
+### M12 · Smallest Number in Infinite Set
+
+**🔗 [LC 2336 — Smallest Number in Infinite Set](https://leetcode.com/problems/smallest-number-in-infinite-set/)** · Medium
+**Pattern:** TreeSet + Counter | **Companies:** Amazon, Google
+
+**Hint:** Everything at or above a pointer `next` is still present. Numbers added back below `next` go into a `TreeSet`. `popSmallest` takes the set's first element if there is one, otherwise returns `next++`.
+
+---
+
+### M13 · Time Based Key-Value Store
+
+**🔗 [LC 981 — Time Based Key-Value Store](https://leetcode.com/problems/time-based-key-value-store/)** · Medium
+**Pattern:** TreeMap — floorKey | **Companies:** Google, Amazon, Netflix
+
+**Hint:** Store `key → TreeMap<timestamp, value>`. `get(key, t)` is `floorEntry(t)` on that inner map. (Timestamps arrive increasing, so binary search on a list works too.)
+
+---
+
+### M14 · Smallest String With Swaps
+
+**🔗 [LC 1202 — Smallest String With Swaps](https://leetcode.com/problems/smallest-string-with-swaps/)** · Medium
+**Pattern:** Union-Find / DFS + Sorting per Group | **Companies:** Amazon, Google, Meta
+
+**Hint:** Swaps are transitive, so indices in the same connected component can be arranged in any order. Group indices with DFS or Union-Find, sort each group's characters, and write them back into the group's sorted indices.
+
+---
+
+## 🔴 Hard Tier (1 Problem)
+
+_Final Prep._
+
+### H1 · Custom Object Collision
+
+**🔗 Concept exercise — no LeetCode equivalent**
+**Pattern:** hashCode Collisions | **Companies:** Amazon, Oracle, Goldman Sachs
+
+**Task:** Write a `BadHashCode` object where `hashCode()` always returns `1`. Measure `HashMap.put()` performance as N grows. See the degradation from O(1) to O(N).
 
 ---
 
 ## 📊 Complexity Analysis Exercises
 
-Trace the recursion tree and find Time & Space complexity.
+Determine **Time** and **Space** complexity.
 
-```psuedocode
+```java
 // Snippet 1
-function recur(n):
-    if n ≤ 1: return
-    for i from 0 to n - 1: print(i)
-    recur(n ÷ 2)
+List<Integer> list = new ArrayList<>();
+for (int i = 0; i < n; i++) list.add(0, i);
 
 // Snippet 2
-function solve(n):
-    if n ≤ 0: return
-    solve(n - 1)
-    solve(n - 1)
+Map<Integer, Integer> map = new HashMap<>();
+for (int x : nums) map.put(x, map.getOrDefault(x, 0) + 1);
 
 // Snippet 3
-// Generating all subsets of an array of size N
+PriorityQueue<Integer> pq = new PriorityQueue<>();
+for (int x : nums) {
+    pq.add(x);
+    if (pq.size() > k) pq.poll();
+}
 
 // Snippet 4
-// Generating all permutations of an array of size N
+Set<Integer> set = new TreeSet<>();
+for (int x : nums) set.add(x);
 
 // Snippet 5
-function factorial(n):
-    if n = 0: return 1
-    return n × factorial(n - 1)
+int[][] matrix = new int[n][n]; // Space?
 
 // Snippet 6
-// N-Queens on an N×N board
+String s = "";
+for (int i = 0; i < n; i++) s += i; // Time? (Warning: String is immutable)
 
 // Snippet 7
-// Sudoku Solver (worst case vs average case)
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < n; i++) sb.append(i); // Time?
 
 // Snippet 8
-// Fibonacci with memoization
+List<List<Integer>> result = new ArrayList<>();
+// Result of generating all subsets of size n... (Space?)
 
 // Snippet 9
-function work(n):
-    if n ≤ 1: return
-    for i from 0 to n - 1: work(n - 1)
+// Binary search on TreeMap entrySet (O?)
 
 // Snippet 10
-// Traversing a perfectly balanced binary tree of height H
+void recurse(int n) {
+    if (n <= 0) return;
+    int[] arr = new int[n]; // Space?
+    recurse(n - 1);
+}
 ```
 
 **Complexity Answers:**
 
-1. **O(n)** Time (n + n/2 + n/4... = 2n), O(log n) Space (Stack depth).
-2. **O(2ⁿ)** Time, O(n) Space.
-3. **O(2ⁿ \* n)** Time. 2ⁿ subsets, n work per subset.
-4. **O(n! \* n)** Time. n! permutations, n work per result.
-5. **O(n)** Time, O(n) Space.
-6. **O(n!)** Time. Each queen limits the column for the next.
-7. **O(9^D)** where D is empty cells.
-8. **O(n)** Time, O(n) Space.
-9. **O(n!)** Time.
-10. **O(2ᴴ)** Time, O(H) Space.
+1. **O(n²)** Time, O(n) Space. Shifting array for every insert.
+2. **O(n)** Time, O(n) Space. Standard hash map counting.
+3. **O(n log k)** Time, O(k) Space. The "Top-K" heap pattern.
+4. **O(n log n)** Time, O(n) Space. Balanced BST insertion.
+5. **O(n²)** Space.
+6. **O(n²)** Time. Each `+=` creates a new String, copying all previous chars.
+7. **O(n)** Time. Amortised O(1) per append.
+8. **O(2ⁿ \* n)** Space. There are 2ⁿ subsets, each of size up to n.
+9. **O(log n)** Time. It's a Red-Black tree.
+10. **O(n²)** Space. Total space = n + (n-1) + (n-2)... = n (n+1)/2.
 
 ---
 
 ## 🔍 Self-Assessment — True / False
 
-1. Base case is optional in recursion if the input is always positive. → **False** (leads to infinite recursion).
-2. Recursion always uses more memory than iteration due to stack frames. → **True** (unless Tail Call Optimization
-   exists).
-3. Backtracking is essentially systematic "trial and error". → **True**.
-4. Memoization converts a recursive problem to O(n) space always. → **False** (Depends on state variables).
-5. In backtracking, "unvisiting" a node is the core step that makes it different from simple DFS. → **True**.
-6. Recursion stack limit can be changed in JVM flags. → **True**.
-7. Divide and Conquer and Dynamic Programming mean the same thing. → **False** (DP has overlapping subproblems).
-8. Every recursive solution can be written iteratively. → **True** (Church-Turing thesis).
+1. `HashMap` order is guaranteed to be same as insertion order. → **False** (Use `LinkedHashMap`).
+2. `HashSet` uses a `HashMap` internally with a dummy value. → **True**.
+3. Primitives like `int` are stored on the Heap if they are part of an Object. → **True**.
+4. Garbage Collection collects objects immediately when their reference count hits 0. → **False** (Non-deterministic
+   timing).
+5. `Arrays.asList(arr)` creates a deep copy of the array. → **False** (Fixed-size view of the original).
+6. Recursive calls never use Heap space. → **False** (Local variables go to Stack, but `new` objects go to Heap).
+7. `TreeMap` operations take O(1) constant time. → **False** (O(log n)).
+8. `ArrayList` growth factor is typically 1.5x. → **True**.
 
 ---
 
 ## 🧠 Conceptual Check
 
-1. **State Space Tree**: What is a state space tree in the context of N-Queens? How does "pruning" change the number of
-   visited nodes?
-2. **Stack Overflow**: Why does `int[] a = new int[1000000]` inside a recursive method not cause `StackOverflowError`
-   immediately, while nesting 1 million depth does? (Hint: Stack stores reference, Heap stores array).
-3. **Memoization vs Tabulation**: Explain Top-Down vs Bottom-Up. Which one is closer to pure recursion?
-4. **Permutation vs Subset**: What is the structural difference in the recursion tree between a Permutation generator
-   (swapping) and a Subset generator (pick/don't pick)?
-5. **Tail Recursion**: What is Tail Call Optimization (TCO)? Does Java support it natively?
+1. **The "Why" of Hashing**: Why must `hashCode()` be overridden if `equals()` is overridden? Explain the "lost element"
+   problem if it's not.
+2. **Collection Selection**: You need to store 1 billion elements, but only care about the last 100 inserted. Which
+   collection? Why?
+3. **String Pool Rationale**: Why did Java designers introduce the String Pool? What are the trade-offs regarding memory
+   vs computation?
+4. **Resizing Cost**: If `ArrayList` doubles its size, isn't that `O(n)` move operation bad? Prove that it's `O(1)`
+   amortised.
+5. **Memory Leak Protection**: How can you prevent a `Static Map` from causing a memory leak in a long-running server?
 
 ---
 
@@ -442,13 +487,13 @@ function work(n):
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [N-Queens](https://leetcode.com/problems/n-queens/), [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)                                         |
-| **Google**    | [N-Queens](https://leetcode.com/problems/n-queens/), [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)                                         |
-| **Meta**      | [N-Queens](https://leetcode.com/problems/n-queens/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Expression Add Operators](https://leetcode.com/problems/expression-add-operators/), [Subsets](https://leetcode.com/problems/subsets/)                                                     |
-| **Microsoft** | [Subsets](https://leetcode.com/problems/subsets/), [Permutations](https://leetcode.com/problems/permutations/), [Combinations](https://leetcode.com/problems/combinations/), [Word Search](https://leetcode.com/problems/word-search/)                                                                         |
-| **Uber**      | [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), [Word Break II](https://leetcode.com/problems/word-break-ii/), [Combination Sum](https://leetcode.com/problems/combination-sum/), [Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) |
+| Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon**    | [Design Authentication Manager](https://leetcode.com/problems/design-authentication-manager/), [Check if All Characters Have Equal Number of Occurrences](https://leetcode.com/problems/check-if-all-characters-have-equal-number-of-occurrences/), [Smallest Number in Infinite Set](https://leetcode.com/problems/smallest-number-in-infinite-set/), [Time Based Key-Value Store](https://leetcode.com/problems/time-based-key-value-store/) |
+| **Google**    | [Check If N and Its Double Exist](https://leetcode.com/problems/check-if-n-and-its-double-exist/), [Equal Row and Column Pairs](https://leetcode.com/problems/equal-row-and-column-pairs/), [Find Duplicate File in System](https://leetcode.com/problems/find-duplicate-file-in-system/), [Find and Replace Pattern](https://leetcode.com/problems/find-and-replace-pattern/)                                                                 |
+| **Meta**      | [Insert Delete GetRandom O(1)](https://leetcode.com/problems/insert-delete-getrandom-o1/), [Smallest String With Swaps](https://leetcode.com/problems/smallest-string-with-swaps/), [Contains Duplicate II](https://leetcode.com/problems/contains-duplicate-ii/), [Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)                                                                                           |
+| **Microsoft** | [Find the Difference of Two Arrays](https://leetcode.com/problems/find-the-difference-of-two-arrays/), [Sort the People](https://leetcode.com/problems/sort-the-people/), [Find Words That Can Be Formed by Characters](https://leetcode.com/problems/find-words-that-can-be-formed-by-characters/), [Sum of Unique Elements](https://leetcode.com/problems/sum-of-unique-elements/)                                                           |
+| **Uber**      | [My Calendar I](https://leetcode.com/problems/my-calendar-i/), [Valid Sudoku](https://leetcode.com/problems/valid-sudoku/)                                                                                                                                                                                                                                                                                                                     |
 
 ---
 
@@ -460,9 +505,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud
-- [ ] I can draw the recursion tree for a small input before coding
-- [ ] I can write the choose → explore → un-choose backtracking template from memory
+- [ ] I can draw the stack and heap for a method call that creates objects
+- [ ] I can pick HashMap vs TreeMap vs LinkedHashMap from the requirements alone
 
 ---
 
-**← [Lecture 4 · Java 8+ Modern Features](../Lecture4/Assignment.md)** &nbsp;·&nbsp; **[Lecture 6 · Bit Manipulation](../Lecture6/Assignment.md) →**
+**← [Lecture 4 · Java & Programming Fundamentals](../Lecture4/Assignment.md)** &nbsp;·&nbsp; **[Lecture 6 · OOP & Java Collections Deep Dive](../Lecture6/Assignment.md) →**

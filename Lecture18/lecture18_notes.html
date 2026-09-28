@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 18 — Two Pointers &amp; Sliding Window</title>
+    <title>Lecture 18 &mdash; Trees I (Traversals &amp; Recursion)</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Master binary trees and BSTs: DFS traversals, BFS level-order, height recursion, diameter, BST property, and LCA — with full dry runs and Java code."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -86,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1391,45 +1391,33 @@
       }
     </style>
   </head>
+
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Two Pointers &amp; Sliding Window</div>
+        <div class="sb-title">Trees I &mdash; Traversals</div>
         <div class="sb-meta">
-          Lecture 18 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 18 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
         <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127757;</span>Introduction</a
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#decide"
-          ><span class="toc-icon">&#129517;</span>Decision Guide</a
+        <a class="toc-item toc-sub" href="#anatomy">Tree Anatomy</a>
+        <a class="toc-item toc-sub" href="#node-class">TreeNode Class</a>
+        <a class="toc-item" href="#patterns"
+          ><span class="toc-icon">&#127919;</span>The Core Patterns</a
         >
-        <a class="toc-item" href="#opposite"
-          ><span class="toc-icon">&#8596;&#65039;</span>Opposite Ends</a
-        >
-        <a class="toc-item toc-sub" href="#os-3sum">3Sum &amp; 4Sum</a>
-        <a class="toc-item toc-sub" href="#os-water">Both Ends Decide</a>
-        <a class="toc-item" href="#fixed"
-          ><span class="toc-icon">&#129695;</span>Fixed Window</a
-        >
-        <a class="toc-item" href="#variable"
-          ><span class="toc-icon">&#127898;&#65039;</span>Variable Window</a
-        >
-        <a class="toc-item toc-sub" href="#var-longest">Longest</a>
-        <a class="toc-item toc-sub" href="#var-shortest">Shortest</a>
-        <a class="toc-item" href="#same-dir"
-          ><span class="toc-icon">&#128034;</span>Same Direction</a
-        >
-        <a class="toc-item" href="#atmost"
-          ><span class="toc-icon">&#127919;</span>At-Most Trick</a
-        >
-        <a class="toc-item" href="#complexity"
-          ><span class="toc-icon">&#9201;</span>Complexity &amp; Bugs</a
+        <a class="toc-item toc-sub" href="#p1">1. DFS Traversals</a>
+        <a class="toc-item toc-sub" href="#p2">2. BFS Level-Order</a>
+        <a class="toc-item toc-sub" href="#p3">3. Height Recursion</a>
+        <a class="toc-item toc-sub" href="#p4">4. Global via Local</a>
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
           ><span class="toc-icon">&#128170;</span>Practice Problems</a
@@ -1444,14 +1432,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture17/lecture17_notes.html"
-          >&larr; Lecture 17 &middot; Graphs</a
+          >&larr; Lecture 17 &middot; Matrix Problems</a
         >
         <a class="toc-item" href="../Lecture19/lecture19_notes.html"
-          >&rarr; Lecture 19 &middot; Prefix Sums &amp; Difference Arrays</a
+          >&rarr; Lecture 19 &middot; Trees II</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1459,10 +1446,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 18 &mdash; Two Pointers &amp; Sliding Window</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 18 &mdash; Trees I &mdash; Traversals</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1480,575 +1466,620 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#127919;</span>
-          <h1 class="page-title">Two Pointers &amp; Sliding Window</h1>
+          <span class="page-emoji">&#127807;</span>
+          <h1 class="page-title">Trees I &mdash; Traversals &amp; Recursion</h1>
           <p class="page-sub">
-            &ldquo;Stop re-reading the same elements. Every pattern here is one
-            idea &mdash; touch each item a constant number of times, and
-            O(n&sup2;) collapses to O(n).&rdquo;
+            &ldquo;Everything is just recursion on a node. Trust the function
+            for the subtrees, combine at the root.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 18 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip accent">&#128218; Lecture 18 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
             <span class="meta-chip yellow">&#9201; 6 days</span>
-            <span class="meta-chip green">&#127919; 30 problems</span>
+            <span class="meta-chip green">&#127919; 29 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
-              Uber</span
+              Microsoft</span
             >
           </div>
         </div>
+        <!-- /.page-header -->
 
         <!-- WHY THIS MATTERS -->
-        <div class="callout blue" id="intro">
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            You have already met these pointers piecemeal &mdash; in Arrays, in
-            Searching, in Linked Lists. This lecture puts them in one place so
-            they stop being five tricks and become one decision. Between them,
-            two pointers and sliding windows cover a very large slice of the
-            array and string questions asked at every company on this page, and
-            they are the difference between a solution that passes and one that
-            times out.
+            A tree is the first structure where the shape of the data and the
+            shape of your code are the same thing. That is the whole lesson: you
+            almost never write a loop over a tree, you write a function that
+            handles <em>one node</em> and trusts itself for the two subtrees.
+            Once that clicks, a dozen interview questions collapse into the same
+            four lines. Think of it like asking each person in a company how
+            many people report to them, directly or indirectly: nobody counts
+            the whole company, each manager just adds up the answers their
+            reports give back.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
+            <li>Name every part of a tree and read a TreeNode definition</li>
+            <li>Write pre-order, in-order and post-order from memory</li>
+            <li>Walk a tree level by level with a queue</li>
             <li>
-              Consolidate every two-pointer and sliding-window pattern into one
-              mental model
+              Return a height from a post-order walk and use it at the parent
             </li>
             <li>
-              Recognise which shape a problem needs within twenty seconds of
-              reading it
-            </li>
-            <li>
-              Write the expand/shrink template from memory, for both longest and
-              shortest
-            </li>
-            <li>
-              Handle multi-pointer problems: 3Sum, 4Sum and beyond, including
-              deduplication
-            </li>
-            <li>
-              Use the at-most trick to count &ldquo;exactly k&rdquo; without a
-              second algorithm
+              Keep a running answer in a field while the recursion does the
+              walking
             </li>
           </ul>
         </div>
 
-        <h2 class="h1" id="decide">&#129517; The Decision Guide</h2>
+        <hr />
+
+        <h2 class="h1" id="anatomy">&#129520; Tree Anatomy</h2>
+        <p>Build the mental model before writing a single line of code:</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang"
+              >Tree Vocabulary &mdash; Memorise These</span
+            >
+          </div>
+          <pre>
+          1          &#x2190; Root (no parent)
+        /   &#92;
+       2     3       &#x2190; Internal nodes (have children)
+      / &#92;     &#92;
+     4   5     6    &#x2190; Leaf nodes (no children)
+
+ Node 1: depth = 0, height = 2
+ Node 2: depth = 1, height = 1
+ Node 4: depth = 2, height = 0  (leaf)
+
+ Tree height   = longest root-to-leaf path = 2
+ Subtree of 2  = the entire tree rooted at node 2
+
+ Full BT    : every node has 0 or 2 children
+ Complete BT: all levels full except last (left-filled)
+ Perfect BT : all internal nodes 2 children, all leaves same depth
+ Balanced BT: |height(left) - height(right)| &lt;= 1 at EVERY node
+ BST        : left &lt; root &lt; right at EVERY node</pre
+          >
+        </div>
+
+        <h2 class="h1" id="node-class">&#129518; The TreeNode Class</h2>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang">&#128208; Pseudocode &middot; TreeNode</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">record</span> TreeNode:
+    val
+    left      <span class="pc-cm">// null when there is no left child</span>
+    right     <span class="pc-cm">// null when there is no right child</span>
+
+<span class="pc-cm">// This is ALL you need. Every LeetCode tree problem uses exactly this shape.</span>
+<span class="pc-cm">// A new node starts as a leaf: TreeNode(val, left = null, right = null)</span></pre>
+        </div>
+
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>The Recursive Leap of Faith:</strong> When solving any tree
+            function, assume <code>solve(node.left)</code> and
+            <code>solve(node.right)</code> already return the correct answer.
+            Your job is only to combine those answers with the current node.
+            Trust the recursion. This insight is the core of every single tree
+            solution.
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- PATTERNS TABLE -->
+        <h2 class="h1" id="patterns">&#127919; The Four Core Patterns</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pattern</th>
+                <th>When to Use</th>
+                <th>Core Tool</th>
+                <th>Canonical Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>DFS Traversals</td>
+                <td>Visit nodes in a specific order</td>
+                <td>Recursion / Stack</td>
+                <td>Inorder traversal, flatten BT to LL</td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>BFS Level-Order</td>
+                <td>Process one level at a time</td>
+                <td>Queue</td>
+                <td>Right side view, zigzag, avg of levels</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>Height Recursion</td>
+                <td>Answer depends on height of subtrees</td>
+                <td>Return int from DFS</td>
+                <td>Max depth, balanced check, diameter</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td>Global via Local</td>
+                <td>Global answer updated inside DFS</td>
+                <td>Instance variable</td>
+                <td>Diameter, max path sum</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Two more patterns live in Lecture 19.</strong> The
+            <em>BST property</em> and <em>lowest common ancestor</em> both need
+            the ordering rules and the two-node reasoning introduced there, so
+            they are taught in the next lecture rather than this one.
+          </div>
+        </div>
+        <hr />
+
+        <!-- P1: DFS -->
+        <h2 class="h1" id="p1">
+          &#128970; Pattern 1 &mdash; DFS Traversals (Pre / In / Post)
+        </h2>
         <p>
-          Everything in this lecture is one idea:
-          <strong>stop re-reading the same elements</strong>. A brute-force pair
-          loop reads every element n times. Two pointers and sliding windows
-          read each element a constant number of times, which turns O(n&sup2;)
-          into O(n). The only skill worth drilling is picking the right shape in
-          the first twenty seconds.
+          The foundational tree pattern. Everything else builds on top of this.
+          The three orders all use the same recursive skeleton &mdash; only the
+          position of the &ldquo;process root&rdquo; step changes:
+        </p>
+        <div class="pattern-banner">
+          <h4>Pattern Skeleton</h4>
+          <p>
+            Base case: if node is null &rarr; return<br />
+            Preorder : process root &rarr; left &rarr; right<br />
+            Inorder : left &rarr; process root &rarr; right<br />
+            Postorder : left &rarr; right &rarr; process root
+          </p>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Three DFS Orders</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Same walk, three different moments to do the work.</span>
+<span class="pc-kw">function</span> dfs(node):
+    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span>
+
+    visit(node)        <span class="pc-cm">// PRE-order  — root, left, right</span>
+    dfs(node.left)
+    visit(node)        <span class="pc-cm">// IN-order   — left, root, right  (sorted, for a BST)</span>
+    dfs(node.right)
+    visit(node)        <span class="pc-cm">// POST-order — left, right, root  (children first)</span>
+
+<span class="pc-cm">// Keep exactly ONE visit() line. Which one you keep is the whole choice:</span>
+<span class="pc-cm">//   pre  -> you need the root before its children (clone, serialise)</span>
+<span class="pc-cm">//   in   -> you need sorted order (BST validation, kth smallest)</span>
+<span class="pc-cm">//   post -> you need child answers before the root (height, delete, sizes)</span></pre>
+        </div>
+        <h3 class="h3">Iterative Traversals (No Recursion)</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Iterative Preorder + Inorder</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Iterative Preorder — push RIGHT first, then LEFT (so left is processed first)</span>
+<span class="pc-kw">function</span> preorderIterative(root):
+    res ← empty list
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
+    stack ← [root]
+    <span class="pc-kw">while</span> stack <span class="pc-kw">is not empty</span>:
+        n ← stack.pop()
+        append n.val <span class="pc-kw">to</span> res                      <span class="pc-cm">// visit ROOT immediately</span>
+        <span class="pc-kw">if</span> n.right ≠ null: stack.push(n.right)   <span class="pc-cm">// right first → processed last</span>
+        <span class="pc-kw">if</span> n.left ≠ null: stack.push(n.left)
+    <span class="pc-kw">return</span> res
+
+<span class="pc-cm">// Iterative Inorder — go left until null, pop and visit, then go right</span>
+<span class="pc-kw">function</span> inorderIterative(root):
+    res ← empty list
+    stack ← empty stack
+    curr ← root
+    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">while</span> curr ≠ null:
+            stack.push(curr)
+            curr ← curr.left
+        curr ← stack.pop()
+        append curr.val <span class="pc-kw">to</span> res
+        curr ← curr.right
+    <span class="pc-kw">return</span> res
+
+<span class="pc-cm">// Time O(n), Space O(h). Key trick for preorder: push RIGHT before LEFT.</span></pre>
+        </div>
+
+        <!-- P1 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; All 3 orders on this tree:</strong>
+            <div class="ascii-tree" style="margin-top: 8px">
+              <span class="hl">1</span>
+              / \
+              <span class="nd">2</span> <span class="nd">3</span>
+              /
+              <span class="nd">4</span>
+
+              Preorder (Root→L→R) : <span class="hl">1</span>
+              <span class="nd">2</span> <span class="nd">4</span>
+              <span class="nd">3</span> ← use for: clone tree, serialize, prefix
+              Inorder (L→Root→R) : <span class="nd">4</span>
+              <span class="nd">2</span> <span class="hl">1</span>
+              <span class="nd">3</span> ← use for: BST sorted output, kth
+              smallest Postorder (L→R→Root) : <span class="nd">4</span>
+              <span class="nd">2</span> <span class="nd">3</span>
+              <span class="hl">1</span> ← use for: delete tree, height, evaluate
+              expression Iterative inorder — stack state trace: curr=1 → push 1,
+              go left curr=2 → push 2, go left curr=4 → push 4, go left
+              curr=null → pop 4, visit <span class="nd">4</span>,
+              curr=4.right=null curr=null → pop 2, visit
+              <span class="nd">2</span>, curr=2.right=null curr=null → pop 1,
+              visit <span class="hl">1</span>, curr=1.right=3 curr=3 → push 3,
+              go left curr=null → pop 3, visit <span class="nd">3</span>,
+              curr=3.right=null ✓ Result: [4, 2, 1, 3]
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- P2: BFS -->
+        <h2 class="h1" id="p2">&#127775; Pattern 2 &mdash; BFS Level-Order</h2>
+        <p>
+          Use a queue. Process the tree one level at a time. Any problem
+          mentioning &ldquo;by level,&rdquo; &ldquo;row,&rdquo; or &ldquo;right
+          side view&rdquo; is Pattern 2.
+        </p>
+        <div class="callout orange">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>The Critical Trick:</strong> Snapshot
+            <code>int size = q.size()</code> <em>before</em> the inner loop.
+            This locks in how many nodes are in the current level. As you add
+            children mid-loop, the queue grows, but you only process
+            <code>size</code> nodes per level.
+          </div>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; BFS Level-Order</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Fixing the level size before the inner loop is what separates</span>
+<span class="pc-cm">// one level from the next.</span>
+<span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> empty
+queue <span class="pc-kw">&larr;</span> [root]
+levels <span class="pc-kw">&larr;</span> empty list
+
+<span class="pc-kw">while</span> queue not empty:
+    size <span class="pc-kw">&larr;</span> length(queue)      <span class="pc-cm">// &lt;-- snapshot THIS level</span>
+    level <span class="pc-kw">&larr;</span> empty list
+
+    <span class="pc-kw">repeat</span> size <span class="pc-kw">times</span>:
+        node <span class="pc-kw">&larr;</span> queue.popFront()
+        level.append(node.value)
+        <span class="pc-kw">if</span> node.left  &ne; null: queue.pushBack(node.left)
+        <span class="pc-kw">if</span> node.right &ne; null: queue.pushBack(node.right)
+
+    levels.append(level)
+
+<span class="pc-kw">return</span> levels
+
+<span class="pc-cm">// Variants built on this template:</span>
+<span class="pc-cm">//   Right side view   → last element of each level</span>
+<span class="pc-cm">//   Zigzag traversal  → alternate direction per level (add to front on odd levels)</span>
+<span class="pc-cm">//   Average of levels → sum ÷ size per level</span></pre>
+        </div>
+
+        <!-- P2 DRY RUN -->
+        <div class="callout orange">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; Level-Order on tree [1, 2, 3, 4]:</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
+   / \
+  <span class="nd">2</span>   <span class="nd">3</span>
+ /
+<span class="nd">4</span>
+
+Queue=[<span class="hl">1</span>]      size=1 &rarr; visit 1, enqueue 2,3   Level 0: [<span class="hl">1</span>]
+Queue=[<span class="nd">2</span>,<span class="nd">3</span>]   size=2 &rarr; visit 2 (enqueue 4), visit 3  Level 1: [<span class="nd">2</span>,<span class="nd">3</span>]
+Queue=[<span class="nd">4</span>]      size=1 &rarr; visit 4, no children   Level 2: [<span class="nd">4</span>]
+Queue=[]  done &#10003;
+
+Result: [[<span class="hl">1</span>], [<span class="nd">2</span>,<span class="nd">3</span>], [<span class="nd">4</span>]]
+Right side view = last of each level = [<span class="hl">1</span>, <span class="nd">3</span>, <span class="nd">4</span>]</div>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- P3: HEIGHT -->
+        <h2 class="h1" id="p3">
+          &#127918; Pattern 3 &mdash; Height Recursion (Bottom-Up)
+        </h2>
+        <p>
+          The function <em>returns</em> a number to its caller. Root combines
+          left &amp; right results. This is postorder DFS where each call
+          computes something useful for its parent.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Max Depth + Balanced Check</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Height recursion — children compute FIRST (postorder), the parent uses both results.</span>
+<span class="pc-kw">function</span> maxDepth(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← maxDepth(n.left)
+    rh ← maxDepth(n.right)
+    <span class="pc-kw">return</span> 1 + max(lh, rh)
+
+<span class="pc-cm">// Balanced tree — use -1 as a sentinel for "unbalanced", O(n) single pass:</span>
+<span class="pc-kw">function</span> isBalanced(root):
+    <span class="pc-kw">return</span> check(root) ≠ -1
+
+<span class="pc-kw">function</span> check(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← check(n.left);   <span class="pc-kw">if</span> lh = -1: <span class="pc-kw">return</span> -1
+    rh ← check(n.right);  <span class="pc-kw">if</span> rh = -1: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">if</span> |lh - rh| &gt; 1: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">return</span> 1 + max(lh, rh)</pre>
+        </div>
+        <div class="callout green">
+          <span class="callout-icon">&#128218;</span>
+          <div class="callout-body">
+            <strong
+              >Dry Run &mdash; maxDepth on [3, 9, 20, null, null, 15,
+              7]:</strong
+            ><br />
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">       <span class="hl">3</span>
+      / \
+     <span class="nd">9</span>   <span class="nd">20</span>
+         / \
+       <span class="nd">15</span>   <span class="nd">7</span>
+
+Call-stack unwind (children resolve before parent):
+  maxDepth(<span class="nd">9</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">15</span>) &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">7</span>)  &rarr; lh=0, rh=0 &rarr; 1+max(0,0) = <span class="ret">1</span>
+  maxDepth(<span class="nd">20</span>) &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">1</span> &rarr; 1+max(1,1) = <span class="ret">2</span>
+  maxDepth(<span class="hl">3</span>)  &rarr; lh=<span class="ret">1</span>, rh=<span class="ret">2</span> &rarr; 1+max(1,2) = <span class="hl">3</span> &#10003;</div>
+          </div>
+        </div>
+        <hr />
+
+        <!-- P4: GLOBAL -->
+        <h2 class="h1" id="p4">
+          &#127942; Pattern 4 &mdash; Global State via Local Traversal
+        </h2>
+        <p>
+          The answer lives in a class-level variable updated during DFS. The
+          function&apos;s return value is a <em>helper</em> value, not the final
+          answer. This trips up beginners the most.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Diameter of Binary Tree (LC
+              543)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Global state pattern: the recursion RETURNS a helper value (height)</span>
+<span class="pc-cm">// but UPDATES a global answer (diameter) at every node.</span>
+maxD ← 0                               <span class="pc-cm">// global answer</span>
+
+<span class="pc-kw">function</span> diameterOfBinaryTree(root):
+    dfs(root)
+    <span class="pc-kw">return</span> maxD
+
+<span class="pc-kw">function</span> dfs(n):                       <span class="pc-cm">// returns HEIGHT, not diameter</span>
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lh ← dfs(n.left)
+    rh ← dfs(n.right)
+    maxD ← max(maxD, lh + rh)          <span class="pc-cm">// diameter through THIS node</span>
+    <span class="pc-kw">return</span> 1 + max(lh, rh)             <span class="pc-cm">// height handed back to the parent</span>
+
+<span class="pc-cm">// Diameter at a node = leftHeight + rightHeight (edges through it)</span>
+<span class="pc-cm">// We check EVERY node as a potential "peak" of the diameter path</span></pre>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong
+              >Same pattern solves Binary Tree Maximum Path Sum (LC
+              124).</strong
+            >
+            Return the max gain from one branch; update global with
+            <code>leftGain + node.val + rightGain</code>. Once you understand
+            Pattern 4, LC 124 is a 10-line solution.
+          </div>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Binary Tree Maximum Path Sum (LC
+              124) — Hard</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>maxSum ← -∞                           <span class="pc-cm">// global: reset per problem instance</span>
+
+<span class="pc-kw">function</span> maxPathSum(root):
+    gain(root)
+    <span class="pc-kw">return</span> maxSum
+
+<span class="pc-cm">// gain(n) = the most this subtree can add to a path going UP to its parent</span>
+<span class="pc-kw">function</span> gain(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    lGain ← max(0, gain(n.left))         <span class="pc-cm">// ignore negative branches</span>
+    rGain ← max(0, gain(n.right))
+    maxSum ← max(maxSum, lGain + n.val + rGain)   <span class="pc-cm">// path THROUGH this node</span>
+    <span class="pc-kw">return</span> n.val + max(lGain, rGain)     <span class="pc-cm">// can only go ONE direction up</span>
+
+<span class="pc-cm">// Why max(0, gain)? A negative subtree hurts the path — better to skip it.</span>
+<span class="pc-cm">// Why return only ONE side? A path going up can't branch — the parent picks one.</span></pre>
+        </div>
+
+        <!-- P4 DRY RUN -->
+        <div class="callout purple">
+          <span class="callout-icon">&#128202;</span>
+          <div class="callout-body">
+            <strong>Dry Run &mdash; Diameter of [1,2,3,4,5] (answer=3):</strong>
+            <!-- prettier-ignore -->
+            <div class="ascii-tree" style="margin-top:8px">    <span class="hl">1</span>
+   / \
+  <span class="nd">2</span>   <span class="nd">3</span>
+ / \
+<span class="nd">4</span>   <span class="nd">5</span>
+
+&#9888; dfs() returns HEIGHT; global maxD stores DIAMETER
+
+Call-stack unwind (postorder):
+  dfs(<span class="nd">4</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
+  dfs(<span class="nd">5</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(0,0+0)=0 &rarr; return <span class="ret">1</span>
+  dfs(<span class="nd">2</span>) &rarr; lh=<span class="ret">1</span>,rh=<span class="ret">1</span> &rarr; maxD=max(0,<span class="nd">2</span>) &rarr; return <span class="ret">2</span>
+  dfs(<span class="nd">3</span>) &rarr; lh=0,rh=0 &rarr; maxD=max(2,0)=<span class="nd">2</span> &rarr; return <span class="ret">1</span>
+  dfs(<span class="hl">1</span>) &rarr; lh=<span class="ret">2</span>,rh=<span class="ret">1</span> &rarr; maxD=max(2,<span class="hl">3</span>) &rarr; return <span class="ret">3</span>
+
+Answer: maxD=<span class="hl">3</span> &#10003;  (path: 4&rarr;2&rarr;1&rarr;3)</div>
+          </div>
+        </div>
+
+        <hr />
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
+        <p>
+          The costs worth quoting in an interview first, then the mistakes that
+          most often break code that looks correct. Every row in the second
+          table is a bug someone has shipped.
         </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>What the problem says</th>
-                <th>Shape to reach for</th>
-                <th>Signature move</th>
+                <th>Operation</th>
+                <th>Cost</th>
+                <th>Note</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>&ldquo;sorted array&rdquo; + find a pair / triple</td>
-                <td><strong>Opposite ends</strong></td>
-                <td>lo = 0, hi = n-1, move the one that helps</td>
+                <td>Any traversal (pre, in, post, level)</td>
+                <td>O(n) time</td>
+                <td></td>
               </tr>
               <tr>
-                <td>&ldquo;subarray of size exactly k&rdquo;</td>
-                <td><strong>Fixed window</strong></td>
-                <td>add right, remove left, every step</td>
+                <td>Recursive DFS</td>
+                <td>O(h) space</td>
+                <td>log n when balanced, n when skewed</td>
               </tr>
               <tr>
-                <td>
-                  &ldquo;longest / shortest subarray such that &hellip;&rdquo;
-                </td>
-                <td><strong>Variable window</strong></td>
-                <td>expand right, shrink left while invalid</td>
+                <td>BFS</td>
+                <td>O(width) space</td>
+                <td>Up to n / 2 on the last level</td>
               </tr>
               <tr>
-                <td>&ldquo;in-place, keep order, drop some&rdquo;</td>
-                <td><strong>Same direction</strong></td>
-                <td>slow writes, fast reads</td>
-              </tr>
-              <tr>
-                <td>&ldquo;exactly k distinct / exactly k odds&rdquo;</td>
-                <td><strong>At-most trick</strong></td>
-                <td>atMost(k) &minus; atMost(k&minus;1)</td>
+                <td>Height or diameter</td>
+                <td>O(n)</td>
+                <td>One post-order pass</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>The one precondition people forget</strong><br />Sliding
-            windows need the answer to be <em>monotonic</em> as the window grows
-            &mdash; adding an element must never make an invalid window valid
-            again. That holds for positive numbers, distinct-character counts
-            and frequency caps. It <strong>breaks</strong> the moment negatives
-            enter, which is why <em>Subarray Sum Equals K</em> is a prefix-sum
-            problem, not a window problem.
-          </div>
-        </div>
-        <h2 class="h1" id="opposite">
-          &#8596;&#65039; Opposite Ends &mdash; Converging Pointers
-        </h2>
-        <p>
-          Start wide, walk inwards. Each step throws away a candidate you can
-          prove is useless, so n steps settle the whole problem. This only works
-          when the array is <strong>sorted</strong>, or when the quantity you
-          are optimising depends on the two ends alone.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Converging Pointers</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// The array is sorted, so the sum moves predictably:</span>
-<span class="pc-cm">//   move lo right  -> sum increases</span>
-<span class="pc-cm">//   move hi left   -> sum decreases</span>
-lo <span class="pc-kw">&larr;</span> 0
-hi <span class="pc-kw">&larr;</span> length(a) - 1
-
-<span class="pc-kw">while</span> lo &lt; hi:
-    sum <span class="pc-kw">&larr;</span> a[lo] + a[hi]
-    <span class="pc-kw">if</span> sum = target: <span class="pc-kw">return</span> (lo, hi)
-    <span class="pc-kw">if</span> sum &lt; target: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// need more</span>
-    <span class="pc-kw">else</span>:              hi <span class="pc-kw">&larr;</span> hi - 1     <span class="pc-cm">// need less</span>
-
-<span class="pc-kw">return</span> NOT_FOUND</pre>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green"
-              >O(n) &mdash; each index visited once</span
-            >
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1)</span>
-          </div>
-        </div>
-        <h3 class="h3" id="os-3sum">Scaling Up: 3Sum and 4Sum</h3>
-        <p>
-          A k-sum problem is a (k&minus;1)-sum problem with one number pinned.
-          Sort once, fix the outer index, then run the converging pair inside.
-          Each extra level costs one more loop: 3Sum is O(n&sup2;), 4Sum is
-          O(n&sup3;).
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; 3Sum &mdash; anchor + converging
-              pair</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>sort(a)
-result <span class="pc-kw">&larr;</span> empty list
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 3:
-    <span class="pc-kw">if</span> i > 0 <span class="pc-kw">and</span> a[i] = a[i-1]: <span class="pc-kw">continue</span>   <span class="pc-cm">// skip duplicate anchors</span>
-
-    lo <span class="pc-kw">&larr;</span> i + 1;  hi <span class="pc-kw">&larr;</span> n - 1
-    <span class="pc-kw">while</span> lo &lt; hi:
-        s <span class="pc-kw">&larr;</span> a[i] + a[lo] + a[hi]
-        <span class="pc-kw">if</span> s = 0:
-            record (a[i], a[lo], a[hi])
-            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[lo] = a[lo+1]: lo <span class="pc-kw">&larr;</span> lo + 1
-            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[hi] = a[hi-1]: hi <span class="pc-kw">&larr;</span> hi - 1
-            lo <span class="pc-kw">&larr;</span> lo + 1;  hi <span class="pc-kw">&larr;</span> hi - 1
-        <span class="pc-kw">else if</span> s &lt; 0: lo <span class="pc-kw">&larr;</span> lo + 1
-        <span class="pc-kw">else</span>:          hi <span class="pc-kw">&larr;</span> hi - 1
-
-<span class="pc-kw">return</span> result</pre>
-        </div>
-        <div class="callout purple">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Duplicates are the whole difficulty</strong><br />3Sum is
-            not hard because of the pointers &mdash; it is hard because the
-            answer must contain no repeated triple. Skip a duplicate
-            <em>anchor</em> before the inner loop, and skip duplicate
-            <em>lo</em>/<em>hi</em> values only after recording a hit. Sorting
-            first is what makes both skips a single comparison.
-          </div>
-        </div>
-        <h3 class="h3" id="os-water">When Both Ends Decide the Answer</h3>
-        <p>
-          Container With Most Water and Trapping Rain Water are not sorted, yet
-          converging pointers still work &mdash; because the quantity being
-          measured (width &times; shorter wall) depends only on the two ends.
-          Always move the pointer at the <em>shorter</em> wall: the width
-          shrinks either way, so moving the taller one can never improve the
-          answer.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Container With Most Water</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Area is width x the SHORTER wall, so the short side is the bottleneck.</span>
-lo <span class="pc-kw">&larr;</span> 0;  hi <span class="pc-kw">&larr;</span> n - 1;  best <span class="pc-kw">&larr;</span> 0
-
-<span class="pc-kw">while</span> lo &lt; hi:
-    best <span class="pc-kw">&larr;</span> max(best, (hi - lo) &times; min(h[lo], h[hi]))
-    <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// only raising the short wall can help</span>
-    <span class="pc-kw">else</span>:               hi <span class="pc-kw">&larr;</span> hi - 1
-
-<span class="pc-kw">return</span> best</pre>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green">O(n)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1)</span>
-          </div>
-        </div>
-        <h2 class="h1" id="fixed">&#129695; Fixed-Size Window</h2>
-        <p>
-          The simplest window: size never changes. Build the first k elements,
-          then for every step add one on the right and drop one on the left. The
-          work per step is O(1), so the whole scan is O(n) no matter how big k
-          is.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Fixed Window &mdash; roll, don't
-              rebuild</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Build the first window, then roll it along.</span>
-sum <span class="pc-kw">&larr;</span> sum of a[0 .. k-1]
-best <span class="pc-kw">&larr;</span> sum
-
-<span class="pc-kw">for</span> right <span class="pc-kw">from</span> k <span class="pc-kw">to</span> n - 1:
-    sum <span class="pc-kw">&larr;</span> sum + a[right] - a[right - k]   <span class="pc-cm">// add new, drop old</span>
-    best <span class="pc-kw">&larr;</span> max(best, sum)
-
-<span class="pc-kw">return</span> best</pre>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green">O(n)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1)</span>
-          </div>
-        </div>
-
-        <h2 class="h1" id="variable">
-          &#127898;&#65039; Variable-Size Window &mdash; Expand and Shrink
-        </h2>
-        <p>
-          This is the one to memorise. Nearly every &ldquo;longest / shortest
-          subarray such that&hellip;&rdquo; question is the same eight lines:
-          the right pointer always moves forward, and the left pointer only
-          catches up when the window breaks the rule. Each index enters once and
-          leaves once, so it is O(n) even though there are two loops.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Universal Sliding-Window
-              Template</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// The universal template. Only the three marked lines change.</span>
-left <span class="pc-kw">&larr;</span> 0
-best <span class="pc-kw">&larr;</span> 0
-state <span class="pc-kw">&larr;</span> empty        <span class="pc-cm">// counts, a sum, a frequency map ...</span>
-
-<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    add a[right] to state              <span class="pc-cm">// &lt;-- 1. grow</span>
-
-    <span class="pc-kw">while</span> state is invalid:               <span class="pc-cm">// &lt;-- 2. the rule</span>
-        remove a[left] from state
-        left <span class="pc-kw">&larr;</span> left + 1
-
-    best <span class="pc-kw">&larr;</span> max(best, right - left + 1)   <span class="pc-cm">// &lt;-- 3. what you want</span>
-
-<span class="pc-kw">return</span> best
-
-<span class="pc-cm">// Longest valid window  -> record AFTER the while loop (as above).</span>
-<span class="pc-cm">// Shortest valid window -> record INSIDE the while loop, before shrinking,</span>
-<span class="pc-cm">//                          and invert the condition to 'while state is VALID'.</span></pre>
-        </div>
-        <h3 class="h3" id="var-longest">Longest: Record After Shrinking</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Longest Substring Without Repeating
-              Characters (LC 3)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> lengthOfLongestSubstring(s):
-    last ← map <span class="pc-kw">from</span> character → (last index where it appeared) + 1, default 0
-    left ← 0;  best ← 0
-
-    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
-        c ← s[right]
-        left ← max(left, last[c])          <span class="pc-cm">// jump past the previous copy (never move back)</span>
-        best ← max(best, right - left + 1)
-        last[c] ← right + 1
-    <span class="pc-kw">return</span> best</pre>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green"
-              >O(n) &mdash; right advances n times, left never rewinds</span
-            >
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1) &mdash; fixed alphabet</span>
-          </div>
-        </div>
-        <h3 class="h3" id="var-shortest">Shortest: Record Before Shrinking</h3>
-        <p>
-          Flip the template and the same machinery finds the <em>smallest</em>
-          window instead. Minimum Window Substring is the canonical hard
-          version: keep a
-          <code>need</code> map and a counter of how many required characters
-          are still missing. The window is valid the moment that counter hits
-          zero.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Minimum Window Substring (LC
-              76)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>need <span class="pc-kw">&larr;</span> frequency map of t
-missing <span class="pc-kw">&larr;</span> length(t)
-left <span class="pc-kw">&larr;</span> 0;  bestLen <span class="pc-kw">&larr;</span> infinity
-
-<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    <span class="pc-kw">if</span> need[s[right]] > 0: missing <span class="pc-kw">&larr;</span> missing - 1
-    need[s[right]] <span class="pc-kw">&larr;</span> need[s[right]] - 1
-
-    <span class="pc-kw">while</span> missing = 0:                  <span class="pc-cm">// window is VALID -> try to shrink</span>
-        <span class="pc-kw">if</span> right - left + 1 &lt; bestLen:
-            bestLen <span class="pc-kw">&larr;</span> right - left + 1;  bestStart <span class="pc-kw">&larr;</span> left
-        need[s[left]] <span class="pc-kw">&larr;</span> need[s[left]] + 1
-        <span class="pc-kw">if</span> need[s[left]] > 0: missing <span class="pc-kw">&larr;</span> missing + 1
-        left <span class="pc-kw">&larr;</span> left + 1
-
-<span class="pc-kw">return</span> substring at bestStart of length bestLen</pre>
-        </div>
-        <div class="callout purple">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Why one counter beats comparing two maps</strong
-            ><br />Re-checking &ldquo;does the window contain every character of
-            t?&rdquo; costs O(52) per step. Tracking a single
-            <code>missing</code> integer makes the validity test O(1).
-            Characters not in t go negative in the map and are simply never
-            counted &mdash; that is what the <code>&gt; 0</code> guards are
-            doing.
-          </div>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green">O(|s| + |t|)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(|t|)</span>
-          </div>
-        </div>
-        <h2 class="h1" id="same-dir">
-          &#128034; Same Direction &mdash; Slow Writes, Fast Reads
-        </h2>
-        <p>
-          When a problem says &ldquo;in place, keep the relative order, remove
-          the ones that don't qualify&rdquo;, use two pointers moving the same
-          way. The fast pointer reads every element; the slow pointer marks
-          where the next keeper belongs. Everything before <code>slow</code> is
-          finished and correct.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Read/Write Two Pointers</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// slow = write cursor, fast = read cursor</span>
-slow <span class="pc-kw">&larr;</span> 0
-
-<span class="pc-kw">for</span> fast <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    <span class="pc-kw">if</span> keep(a[fast]):
-        a[slow] <span class="pc-kw">&larr;</span> a[fast]
-        slow <span class="pc-kw">&larr;</span> slow + 1
-
-<span class="pc-kw">return</span> slow                 <span class="pc-cm">// length of the cleaned prefix</span></pre>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green">O(n)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(1)</span>
-          </div>
-        </div>
-        <h2 class="h1" id="atmost">&#127919; The At-Most Trick</h2>
-        <p>
-          A sliding window can count subarrays with <em>at most</em> k of
-          something, because that property is monotonic &mdash; shrink the
-          window and it stays true. It cannot directly count <em>exactly</em> k,
-          because that is not monotonic. The fix is arithmetic, not algorithmic:
-        </p>
-        <div class="callout green">
-          <span class="callout-icon">&#129518;</span>
-          <div class="callout-body">
-            <strong>exactly(k) = atMost(k) &minus; atMost(k&minus;1)</strong
-            ><br />Every subarray with at most k distinct values is either one
-            with at most k&minus;1, or one with exactly k. Subtract and only the
-            exact ones survive. You write the window <em>once</em> and call it
-            twice.
-          </div>
-        </div>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Subarrays with K Different Integers
-              (LC 992)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> exactly(k):
-    <span class="pc-kw">return</span> atMost(k) - atMost(k - 1)
-
-<span class="pc-kw">function</span> atMost(k):
-    count <span class="pc-kw">&larr;</span> 0;  left <span class="pc-kw">&larr;</span> 0;  freq <span class="pc-kw">&larr;</span> empty map
-
-    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> freq[a[right]] = 0: k <span class="pc-kw">&larr;</span> k - 1
-        freq[a[right]] <span class="pc-kw">&larr;</span> freq[a[right]] + 1
-
-        <span class="pc-kw">while</span> k &lt; 0:                     <span class="pc-cm">// too many distinct -> shrink</span>
-            freq[a[left]] <span class="pc-kw">&larr;</span> freq[a[left]] - 1
-            <span class="pc-kw">if</span> freq[a[left]] = 0: k <span class="pc-kw">&larr;</span> k + 1
-            left <span class="pc-kw">&larr;</span> left + 1
-
-        count <span class="pc-kw">&larr;</span> count + (right - left + 1)   <span class="pc-cm">// every window ending at right</span>
-
-    <span class="pc-kw">return</span> count</pre>
-        </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>Why <code>right - left + 1</code>?</strong><br />When the
-            window [left, right] is valid, every subarray that <em>ends</em> at
-            <code>right</code> and starts anywhere from
-            <code>left</code> onwards is also valid. That is exactly
-            <code>right - left + 1</code> subarrays &mdash; so you count them
-            all in O(1) instead of enumerating them.
-          </div>
-        </div>
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val green"
-              >O(n) &mdash; two passes of the same window</span
-            >
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span
-            ><span class="cx-val green">O(k)</span>
-          </div>
-        </div>
-        <h2 class="h1" id="complexity">
-          &#9201; Complexity &amp; The Four Classic Bugs
-        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Bug</th>
-                <th>What you see</th>
+                <th>Symptom</th>
                 <th>Fix</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Recording in the wrong place</td>
-                <td>Off-by-one on every answer</td>
-                <td>
-                  Longest &rarr; record after the while; shortest &rarr; inside
-                  it
-                </td>
+                <td>No <code>null</code> base case</td>
+                <td><code>NullPointerException</code></td>
+                <td>Start every function with the null check</td>
               </tr>
               <tr>
                 <td>
-                  Shrinking with <code>if</code> instead of <code>while</code>
+                  Height of <code>null</code> as 0 in one place and −1 in
+                  another
                 </td>
-                <td>Passes small tests, fails big ones</td>
-                <td>
-                  One step may not restore validity &mdash; loop until it does
-                </td>
+                <td>Off-by-one depths</td>
+                <td>Pick one convention and check it on a leaf</td>
               </tr>
               <tr>
-                <td>Forgetting to undo state on shrink</td>
-                <td>Counts drift, window never reopens</td>
                 <td>
-                  Every add on the right needs a matching remove on the left
+                  Calling <code>height()</code> inside a walk over every node
                 </td>
+                <td>O(n&sup2;) balance check</td>
+                <td>Return the height and the answer together</td>
               </tr>
               <tr>
-                <td>Using a window with negative numbers</td>
-                <td>Wrong answers, no crash</td>
-                <td>
-                  Not monotonic &mdash; switch to prefix sums (Lecture 19)
-                </td>
+                <td>A global answer not reset between runs</td>
+                <td>The second test case is wrong</td>
+                <td>Reset it in the main function</td>
+              </tr>
+              <tr>
+                <td>Reading <code>queue.size()</code> inside the level loop</td>
+                <td>Levels run together</td>
+                <td>Capture the size before the loop starts</td>
+              </tr>
+              <tr>
+                <td>Path sum ending at a non-leaf</td>
+                <td>Counts paths that stop halfway</td>
+                <td>Check that both children are <code>null</code></td>
+              </tr>
+              <tr>
+                <td>Recursing on a very deep, skewed tree</td>
+                <td><code>StackOverflowError</code></td>
+                <td>Use an iterative traversal</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="callout blue">
-          <span class="callout-icon">&#128200;</span>
-          <div class="callout-body">
-            <strong>Why two nested loops are still O(n)</strong><br />The inner
-            <code>while</code> looks like it makes this quadratic. It doesn't:
-            <code>left</code> only ever moves forward and can advance at most n
-            times <em>in total</em> across the whole run. Amortised, every index
-            is added once and removed once &mdash; 2n operations.
-          </div>
-        </div>
 
-        <!-- PRACTICE -->
+        <hr />
+
+        <!-- P5: BST -->
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-        <div class="callout blue">
-          <span class="callout-icon">&#128218;</span>
-          <div class="callout-body">
-            <strong>Eight problems, one per shape.</strong> Try each yourself
-            before opening a hint. The goal: within thirty seconds of reading a
-            new problem, name the shape it needs.
-          </div>
-        </div>
+        <p>
+          Four problems, one per pattern. Solve each one by asking &ldquo;what
+          does one node need to do, and what do I trust the children to
+          return?&rdquo;
+        </p>
 
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
@@ -2056,18 +2087,18 @@ slow <span class="pc-kw">&larr;</span> 0
               <div class="prob-num">
                 Problem 01 &middot;
                 <a
-                  href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
+                  href="https://leetcode.com/problems/binary-tree-inorder-traversal/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 167</a
+                  >LC 94</a
                 >
               </div>
-              <div class="prob-title">Two Sum II — Input Array Is Sorted</div>
+              <div class="prob-title">Binary Tree Inorder Traversal</div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Opposite Ends</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Pattern 1: DFS Traversal</span>
                 <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Adobe</span
+                  >Amazon · Microsoft · Google · Meta</span
                 >
               </div>
             </div>
@@ -2079,12 +2110,12 @@ slow <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given a <strong>1-indexed sorted</strong> array and a target,
-                return the indices of the two numbers that add up to it. Exactly
-                one solution exists, and you may not use extra space.
+                Given the root of a binary tree, return the
+                <em>inorder traversal</em> of its node values (left &rarr; root
+                &rarr; right).
               </p>
               <div class="iobox">
-                Input: [2,7,11,15], target=9 → Output: [1,2]
+                Input: [1,null,2,3] Output: [1,3,2] Input: [] Output: []
               </div>
             </div>
             <div class="prob-section">
@@ -2096,9 +2127,8 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    The array is sorted &mdash; that is the whole gift. What
-                    happens to the sum if you move the left pointer right? What
-                    about moving the right pointer left?
+                    Recursion is three lines. The interview follow-up is always
+                    'now without recursion'.
                   </p>
                 </div>
               </details>
@@ -2109,20 +2139,26 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Start at both ends. If the sum is too small the only way to
-                    grow it is <code>lo++</code>; if it is too big the only way
-                    to shrink it is <code>hi--</code>. Neither move can skip the
-                    answer.
+                    Iterative: push left as far as you can, pop and visit, then
+                    move right. The loop condition is curr != null ||
+                    !stack.isEmpty() &mdash; the second half matters when the
+                    left spine runs out.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                A HashMap would work but costs O(n) space, and the sorted input
-                makes it unnecessary. Converging pointers solve it in constant
-                space.
+                Pattern 1 &mdash; recursive inorder is trivial (3 lines). The
+                real interview ask:
+                <strong>can you do it iteratively?</strong> Use an explicit
+                stack. Keep going left until null, pop, visit, then move right.
+                The outer <code>while</code> condition
+                <code>curr != null || !stack.isEmpty()</code> covers the case
+                where all left nodes are exhausted but the stack still has nodes
+                to return to.
               </p>
             </div>
             <details>
@@ -2133,19 +2169,36 @@ slow <span class="pc-kw">&larr;</span> 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Sum II</span
+                      >&#128208; Pseudocode &middot; LC 94 — Both
+                      Approaches</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> twoSum(a, target):
-      lo ← 0;  hi ← length(a) - 1
-      <span class="pc-kw">while</span> lo &lt; hi:
-          sum ← a[lo] + a[hi]
-          <span class="pc-kw">if</span> sum = target: <span class="pc-kw">return</span> [lo + 1, hi + 1]     <span class="pc-cm">// 1-indexed answer</span>
-          <span class="pc-kw">if</span> sum &lt; target: lo ← lo + 1                 <span class="pc-cm">// need bigger</span>
-          <span class="pc-kw">else</span>: hi ← hi - 1                            <span class="pc-cm">// need smaller</span>
-      <span class="pc-kw">return</span> []</pre>
+                  <pre><span class="pc-cm">// Recursive — Pattern 1 in its purest form:</span>
+<span class="pc-kw">function</span> inorderRecursive(root):
+    res ← empty list
+    dfs(root, res)
+    <span class="pc-kw">return</span> res
+
+<span class="pc-kw">function</span> dfs(n, res):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span>
+    dfs(n.left, res)
+    append n.val <span class="pc-kw">to</span> res       <span class="pc-cm">// ROOT (after left)</span>
+    dfs(n.right, res)
+
+<span class="pc-cm">// Iterative — the classic interview follow-up:</span>
+<span class="pc-kw">function</span> inorderIterative(root):
+    res ← empty list;  stack ← empty stack;  curr ← root
+    <span class="pc-kw">while</span> curr ≠ null <span class="pc-kw">or</span> stack <span class="pc-kw">is not empty</span>:
+        <span class="pc-kw">while</span> curr ≠ null:
+            stack.push(curr);  curr ← curr.left
+        curr ← stack.pop()
+        append curr.val <span class="pc-kw">to</span> res
+        curr ← curr.right
+    <span class="pc-kw">return</span> res
+
+<span class="pc-cm">// Both: Time O(n), Space O(h) where h = tree height</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2154,32 +2207,31 @@ slow <span class="pc-kw">&larr;</span> 0
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
+                    ><span class="cx-val green">O(h) stack</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
+        <!-- PROB 02: Max Depth (Pattern 3) -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
                 Problem 02 &middot;
                 <a
-                  href="https://leetcode.com/problems/container-with-most-water/"
+                  href="https://leetcode.com/problems/maximum-depth-of-binary-tree/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 11</a
+                  >LC 104</a
                 >
               </div>
-              <div class="prob-title">Container With Most Water</div>
+              <div class="prob-title">Maximum Depth of Binary Tree</div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Opposite Ends</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta &middot; Bloomberg</span
-                >
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Pattern 3: Height Recursion</span>
+                <span class="tag tag-co">Amazon · Google · LinkedIn</span>
               </div>
             </div>
             <div class="prob-right">
@@ -2190,10 +2242,10 @@ slow <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given heights of vertical lines, find two that together with the
-                x-axis hold the most water.
+                Given the root of a binary tree, return its maximum depth (nodes
+                along the longest root-to-leaf path).
               </p>
-              <div class="iobox">Input: [1,8,6,2,5,4,8,3,7] → Output: 49</div>
+              <div class="iobox">Input: [3,9,20,null,null,15,7] Output: 3</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2203,11 +2255,7 @@ slow <span class="pc-kw">&larr;</span> 0
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>
-                    Area is width &times; the <em>shorter</em> of the two walls.
-                    Start as wide as possible &mdash; then every move you make
-                    loses width.
-                  </p>
+                  <p>A node's depth depends only on its children's depths.</p>
                 </div>
               </details>
               <details class="hint">
@@ -2217,19 +2265,20 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Since width only shrinks, the only way to win is a taller
-                    wall. Always move the pointer at the shorter wall; moving
-                    the taller one can never help.
+                    Post-order: depth(node) = 1 + max(depth(left),
+                    depth(right)), with null returning 0.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Greedy converging pointers. The proof: whichever wall is shorter
-                caps the area, so keeping it and moving the tall one strictly
-                loses.
+                Pattern 3.
+                <code>depth(node) = 1 + max(depth(left), depth(right))</code>.
+                Empty tree returns 0. Trust the recursion for both subtrees,
+                just combine.
               </p>
             </div>
             <details>
@@ -2240,19 +2289,15 @@ slow <span class="pc-kw">&larr;</span> 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Container With Most
-                      Water</span
+                      >&#128208; Pseudocode &middot; LC 104</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> maxArea(h):
-      lo ← 0;  hi ← length(h) - 1;  best ← 0
-      <span class="pc-kw">while</span> lo &lt; hi:
-          best ← max(best, (hi - lo) × min(h[lo], h[hi]))
-          <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo ← lo + 1       <span class="pc-cm">// move the shorter wall — it caps the area</span>
-          <span class="pc-kw">else</span>: hi ← hi - 1
-      <span class="pc-kw">return</span> best</pre>
+                  <pre><span class="pc-kw">function</span> maxDepth(root):
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">return</span> 1 + max(maxDepth(root.left), maxDepth(root.right))
+<span class="pc-cm">// 3 lines. This is the beauty of pattern recognition.</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2261,32 +2306,35 @@ slow <span class="pc-kw">&larr;</span> 0
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
+                    ><span class="cx-val green">O(h) stack</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
+
+        <!-- PROB 03: Level Order (Pattern 2) -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
                 Problem 03 &middot;
                 <a
-                  href="https://leetcode.com/problems/3sum/"
+                  href="https://leetcode.com/problems/binary-tree-level-order-traversal/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 15</a
+                  >LC 102</a
                 >
               </div>
-              <div class="prob-title">3Sum</div>
+              <div class="prob-title">Binary Tree Level Order Traversal</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Anchor + Converging Pair</span>
+                <span class="tag tag-pat">Pattern 2: BFS Level-Order</span>
                 <span class="tag tag-co"
-                  >Amazon &middot; Meta &middot; Google &middot; Adobe</span
+                  >Amazon · Microsoft · Google · Meta</span
                 >
+                <span class="tag tag-lc">LC 102</span>
               </div>
             </div>
             <div class="prob-right">
@@ -2296,12 +2344,9 @@ slow <span class="pc-kw">&larr;</span> 0
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
-              <p>
-                Return all unique triplets that sum to zero. The answer must
-                contain no duplicate triplets.
-              </p>
+              <p>Return the level-order traversal as a list of lists.</p>
               <div class="iobox">
-                Input: [-1,0,1,2,-1,-4] → Output: [[-1,-1,2],[-1,0,1]]
+                Input: [3,9,20,null,null,15,7] Output: [[3],[9,20],[15,7]]
               </div>
             </div>
             <div class="prob-section">
@@ -2313,8 +2358,8 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Fix one number and the problem collapses to Two Sum on the
-                    rest. What must you do first to make that inner search O(n)?
+                    A plain queue mixes the levels together. How do you know
+                    where one level ends?
                   </p>
                 </div>
               </details>
@@ -2325,19 +2370,20 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Sort, then for each anchor <code>i</code> run converging
-                    pointers on <code>i+1 .. n-1</code>. The hard part is
-                    duplicates: skip repeated anchors, and after recording a hit
-                    skip repeated <code>lo</code>/<code>hi</code> values.
+                    Snapshot queue.size() before the inner loop &mdash; that is
+                    exactly this level's node count. Process that many, then
+                    move to the next level.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Sorting costs O(n log n) but buys both the pointer walk and
-                cheap deduplication. Total O(n²).
+                Pattern 2. Queue + snapshot
+                <code>int size = q.size()</code> before inner loop separates
+                levels.
               </p>
             </div>
             <details>
@@ -2348,63 +2394,60 @@ slow <span class="pc-kw">&larr;</span> 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; 3Sum</span
+                      >&#128208; Pseudocode &middot; LC 102</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> threeSum(a):
-      sort a
-      out ← empty list
-      <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 3:
-          <span class="pc-kw">if</span> i &gt; 0 <span class="pc-kw">and</span> a[i] = a[i - 1]: <span class="pc-kw">continue</span>       <span class="pc-cm">// duplicate anchor</span>
-          lo ← i + 1;  hi ← length(a) - 1
-          <span class="pc-kw">while</span> lo &lt; hi:
-              s ← a[i] + a[lo] + a[hi]
-              <span class="pc-kw">if</span> s = 0:
-                  append [a[i], a[lo], a[hi]] <span class="pc-kw">to</span> out
-                  <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[lo] = a[lo + 1]: lo ← lo + 1   <span class="pc-cm">// skip duplicates</span>
-                  <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[hi] = a[hi - 1]: hi ← hi - 1
-                  lo ← lo + 1;  hi ← hi - 1
-              <span class="pc-kw">else if</span> s &lt; 0: lo ← lo + 1
-              <span class="pc-kw">else</span>: hi ← hi - 1
-      <span class="pc-kw">return</span> out</pre>
+                  <pre><span class="pc-kw">function</span> levelOrder(root):
+    res ← empty list
+    <span class="pc-kw">if</span> root = null: <span class="pc-kw">return</span> res
+    q ← queue containing root
+    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+        size ← q.size                  <span class="pc-cm">// snapshot: this many nodes in the level</span>
+        level ← empty list
+        <span class="pc-kw">repeat</span> size <span class="pc-kw">times</span>:
+            n ← q.dequeue()
+            append n.val <span class="pc-kw">to</span> level
+            <span class="pc-kw">if</span> n.left ≠ null: q.enqueue(n.left)
+            <span class="pc-kw">if</span> n.right ≠ null: q.enqueue(n.right)
+        append level <span class="pc-kw">to</span> res
+    <span class="pc-kw">return</span> res</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n²)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1) beyond the output</span>
+                    ><span class="cx-val green">O(w) queue</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
+
+        <!-- P3 -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
                 Problem 04 &middot;
                 <a
-                  href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+                  href="https://leetcode.com/problems/diameter-of-binary-tree/"
                   target="_blank"
                   style="font-size: 11px"
-                  >LC 3</a
+                  >LC 543</a
                 >
               </div>
-              <div class="prob-title">
-                Longest Substring Without Repeating Characters
-              </div>
+              <div class="prob-title">Diameter of Binary Tree</div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Variable Window</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta &middot; Bloomberg</span
-                >
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">Pattern 4: Global via Local</span>
+                <span class="tag tag-co">Google · Meta · Amazon</span>
+                <span class="tag tag-lc">LC 543</span>
               </div>
             </div>
             <div class="prob-right">
@@ -2415,229 +2458,12 @@ slow <span class="pc-kw">&larr;</span> 0
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Find the length of the longest substring with no repeated
-                characters.
-              </p>
-              <div class="iobox">Input: "abcabcbb" → Output: 3 ("abc")</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Walk the right edge forward one character at a time. When
-                    does the window stop being valid, and which pointer must
-                    move to fix it?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep the last index of every character. On a repeat, jump
-                    <code>left</code> to just past that previous copy &mdash;
-                    never backwards, or you will double-count.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The <code>Math.max</code> on left is what keeps it correct: a
-                stale duplicate from before the current window must not drag
-                left backwards.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 3</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> lengthOfLongestSubstring(s):
-      last ← map char → last index + 1, default 0
-      left ← 0;  best ← 0
-      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
-          left ← max(left, last[s[r]])
-          best ← max(best, r - left + 1)
-          last[s[r]] ← r + 1
-      <span class="pc-kw">return</span> best</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 05 &middot;
-                <a
-                  href="https://leetcode.com/problems/longest-repeating-character-replacement/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 424</a
-                >
-              </div>
-              <div class="prob-title">
-                Longest Repeating Character Replacement
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Variable Window</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                You may change at most k characters. Find the longest substring
-                of one repeated letter you can produce.
-              </p>
-              <div class="iobox">Input: s="AABABBA", k=1 → Output: 4</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A window is valid when the characters you would have to
-                    replace fit inside k. How do you compute &ldquo;replacements
-                    needed&rdquo; from the window's letter counts?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Replacements needed = window length &minus; count of the
-                    most frequent letter. Shrink while that exceeds k.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                You do not need to recompute the max frequency when shrinking
-                &mdash; letting it go stale only ever <em>under</em>-estimates
-                the window, which never produces a wrong maximum.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 424</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> characterReplacement(s, k):
-      cnt ← count per letter, all 0
-      left ← 0;  most ← 0;  best ← 0
-      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
-          cnt[s[r]] ← cnt[s[r]] + 1
-          most ← max(most, cnt[s[r]])
-          <span class="pc-kw">while</span> (r - left + 1) - most &gt; k:        <span class="pc-cm">// too many chars to replace</span>
-              cnt[s[left]] ← cnt[s[left]] - 1
-              left ← left + 1
-          best ← max(best, r - left + 1)
-      <span class="pc-kw">return</span> best</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 06 &middot;
-                <a
-                  href="https://leetcode.com/problems/minimum-window-substring/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 76</a
-                >
-              </div>
-              <div class="prob-title">Minimum Window Substring</div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Variable Window (shortest)</span>
-                <span class="tag tag-co"
-                  >Meta &middot; Amazon &middot; Google &middot; Uber</span
-                >
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Find the smallest substring of s containing every character of
-                t, including duplicates.
+                Return the length of the longest path between any two nodes. The
+                path may not pass through the root.
               </p>
               <div class="iobox">
-                Input: s="ADOBECODEBANC", t="ABC" → Output: "BANC"
+                Input: [1,2,3,4,5] Output: 3 (path 4&#x2192;2&#x2192;1&#x2192;3
+                or 5&#x2192;2&#x2192;1&#x2192;3)
               </div>
             </div>
             <div class="prob-section">
@@ -2648,11 +2474,7 @@ slow <span class="pc-kw">&larr;</span> 0
                   nudge
                 </summary>
                 <div class="details-body">
-                  <p>
-                    This asks for the <em>shortest</em> valid window, not the
-                    longest. That flips where you record the answer relative to
-                    the shrink loop.
-                  </p>
+                  <p>The diameter may not pass through the root at all.</p>
                 </div>
               </details>
               <details class="hint">
@@ -2662,20 +2484,20 @@ slow <span class="pc-kw">&larr;</span> 0
                 </summary>
                 <div class="details-body">
                   <p>
-                    Keep a <code>need</code> map and one
-                    <code>missing</code> counter. When <code>missing</code> hits
-                    0 the window is valid &mdash; record it, then shrink from
-                    the left and keep recording while it stays valid.
+                    Compute height recursively, but at each node also record
+                    leftHeight + rightHeight against a global best. Return the
+                    height; update the answer as a side effect.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The single counter makes validity O(1). Characters outside t go
-                negative in the map, so the <code>&gt; 0</code> guards naturally
-                ignore them.
+                Pattern 4. Diameter <em>through any node</em> = leftHeight +
+                rightHeight. DFS returns height; global variable tracks the
+                maximum diameter seen at any node.
               </p>
             </div>
             <details>
@@ -2686,139 +2508,21 @@ slow <span class="pc-kw">&larr;</span> 0
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 76</span
+                      >&#128208; Pseudocode &middot; LC 543</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> minWindow(s, t):
-      need ← count of each char <span class="pc-kw">in</span> t, default 0
-      missing ← length(t)
-      left ← 0;  bestStart ← 0;  bestLen ← ∞
-      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
-          <span class="pc-kw">if</span> need[s[r]] &gt; 0: missing ← missing - 1   <span class="pc-cm">// this char was still needed</span>
-          need[s[r]] ← need[s[r]] - 1                <span class="pc-cm">// extras go negative</span>
+                  <pre>maxD ← 0
+<span class="pc-kw">function</span> diameterOfBinaryTree(root):
+    dfs(root)
+    <span class="pc-kw">return</span> maxD
 
-          <span class="pc-kw">while</span> missing = 0:                         <span class="pc-cm">// window is valid — shrink it</span>
-              <span class="pc-kw">if</span> r - left + 1 &lt; bestLen:
-                  bestLen ← r - left + 1
-                  bestStart ← left
-              need[s[left]] ← need[s[left]] + 1
-              <span class="pc-kw">if</span> need[s[left]] &gt; 0: missing ← missing + 1   <span class="pc-cm">// dropped a needed char</span>
-              left ← left + 1
-      <span class="pc-kw">if</span> bestLen = ∞: <span class="pc-kw">return</span> ""
-      <span class="pc-kw">return</span> s[bestStart .. bestStart + bestLen - 1]</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(|s| + |t|)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(|t|)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 07 &middot;
-                <a
-                  href="https://leetcode.com/problems/subarrays-with-k-different-integers/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 992</a
-                >
-              </div>
-              <div class="prob-title">Subarrays with K Different Integers</div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">At-Most Trick</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>Count the subarrays containing exactly k distinct integers.</p>
-              <div class="iobox">Input: [1,2,1,2,3], k=2 → Output: 7</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    A window can answer &ldquo;at most k distinct&rdquo; easily,
-                    because shrinking always keeps that true. &ldquo;Exactly
-                    k&rdquo; is not monotonic &mdash; so don't try to window it
-                    directly.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    exactly(k) = atMost(k) &minus; atMost(k&minus;1). Write the
-                    at-most window once and call it twice.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Inside <code>atMost</code>, every valid window ending at
-                <code>right</code> contributes
-                <code>right - left + 1</code> subarrays, counted in O(1).
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 992</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> subarraysWithKDistinct(a, k):
-      <span class="pc-kw">return</span> atMost(a, k) - atMost(a, k - 1)      <span class="pc-cm">// "exactly k" = "at most k" − "at most k−1"</span>
-
-  <span class="pc-kw">function</span> atMost(a, k):
-      freq ← empty map, default 0
-      left ← 0;  count ← 0
-      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 1:
-          freq[a[r]] ← freq[a[r]] + 1
-          <span class="pc-kw">if</span> freq[a[r]] = 1: k ← k - 1          <span class="pc-cm">// a new distinct value</span>
-          <span class="pc-kw">while</span> k &lt; 0:
-              freq[a[left]] ← freq[a[left]] - 1
-              <span class="pc-kw">if</span> freq[a[left]] = 0: k ← k + 1   <span class="pc-cm">// a value left the window entirely</span>
-              left ← left + 1
-          count ← count + (r - left + 1)         <span class="pc-cm">// every subarray ending at r</span>
-      <span class="pc-kw">return</span> count</pre>
+<span class="pc-kw">function</span> dfs(n):
+    <span class="pc-kw">if</span> n = null: <span class="pc-kw">return</span> 0
+    l ← dfs(n.left);  r ← dfs(n.right)
+    maxD ← max(maxD, l + r)
+    <span class="pc-kw">return</span> 1 + max(l, r)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2827,122 +2531,7 @@ slow <span class="pc-kw">&larr;</span> 0
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(k)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 08 &middot;
-                <a
-                  href="https://leetcode.com/problems/trapping-rain-water/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 42</a
-                >
-              </div>
-              <div class="prob-title">Trapping Rain Water</div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Opposite Ends</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given an elevation map, compute how much rain water it can trap.
-              </p>
-              <div class="iobox">
-                Input: [0,1,0,2,1,0,1,3,2,1,2,1] → Output: 6
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Water above any single bar is
-                    <code>min(tallestLeft, tallestRight) - height</code>. The
-                    O(n)-space answer precomputes both. Can you avoid storing
-                    them?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Walk from both ends keeping <code>leftMax</code> and
-                    <code>rightMax</code>. Whichever side is shorter is the
-                    binding constraint, so that side's water is already decided
-                    &mdash; settle it and step inwards.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The insight is that you never need the exact other-side maximum,
-                only the knowledge that it is at least as tall as the side you
-                are settling.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 42</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> trap(h):
-      lo ← 0;  hi ← length(h) - 1
-      leftMax ← 0;  rightMax ← 0;  water ← 0
-      <span class="pc-kw">while</span> lo &lt; hi:
-          <span class="pc-kw">if</span> h[lo] &lt; h[hi]:                      <span class="pc-cm">// left side is the bottleneck</span>
-              leftMax ← max(leftMax, h[lo])
-              water ← water + leftMax - h[lo]
-              lo ← lo + 1
-          <span class="pc-kw">else</span>:
-              rightMax ← max(rightMax, h[hi])
-              water ← water + rightMax - h[hi]
-              hi ← hi - 1
-      <span class="pc-kw">return</span> water</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
+                    ><span class="cx-val green">O(h)</span>
                   </div>
                 </div>
               </div>
@@ -2950,17 +2539,18 @@ slow <span class="pc-kw">&larr;</span> 0
           </div>
         </div>
 
+        <!-- P4 -->
         <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
         <div class="callout orange" style="margin: 14px 0">
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 18 Assignment &mdash; 30 Problems (10 Easy &middot; 15
-              Medium &middot; 5 Hard)</strong
+              >Lecture 18 Assignment &mdash; 29 Problems (11 Easy &middot; 14
+              Medium &middot; 4 Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by the
-            shape it needs. Complete it before moving to Lecture 19.<br /><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 19.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture18/Assignment.md"
               style="
@@ -2983,83 +2573,68 @@ slow <span class="pc-kw">&larr;</span> 0
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can name the five shapes and say which clue in a problem selects
-            each one
+            I can draw a tree and label root, leaf, height, depth and subtree
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the variable-window template from memory, without
-            looking
+            I can write the three DFS traversals without looking them up
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I know why longest records after the shrink loop and shortest
-            records inside it
+            I can say which traversal gives sorted order on a BST, and why
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why two nested loops are still O(n) here
+            I can write BFS level-order with a queue and a level-size loop
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can solve 3Sum including full duplicate handling
+            I can explain the recursive leap of faith in one sentence
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can derive exactly(k) = atMost(k) &minus; atMost(k&minus;1) and
-            say why it is needed
+            I can tell a height-returning recursion from a global-state one
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I know why sliding windows break on negative numbers
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I completed all 30 assignment problems and can name the pattern for
-            each
-          </div>
+          <div class="cb-text">I completed all 29 assignment problems</div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong
-              >You're ready for Lecture 19: Prefix Sums &amp; Difference
-              Arrays</strong
-            ><br />
-            The last row of the bug table is the handover: the moment negative
-            numbers appear, a sliding window is the wrong tool. Prefix sums pick
-            up exactly where windows stop working.
+            <strong>Next up &mdash; Lecture 19: Trees II</strong><br />
+            You can now walk any tree. Lecture 19 adds the structure that makes
+            a tree <em>searchable</em> &mdash; the BST ordering property &mdash;
+            then answers questions about relationships between two nodes, and
+            finally rebuilds a tree from nothing but its traversals.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture17/lecture17_notes.html"
-            >&larr; Lecture 17 &middot; Graphs</a
+            >&larr; Lecture 17 &middot; Matrix Problems</a
           >
           <a class="next" href="../Lecture19/lecture19_notes.html"
-            >Lecture 19 &middot; Prefix Sums &amp; Difference Arrays &rarr;</a
+            >Lecture 19 &middot; Trees II &rarr;</a
           >
         </div>
       </div>
-      <!-- /content -->
+      <!-- #content -->
     </div>
-    <!-- /main -->
+    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

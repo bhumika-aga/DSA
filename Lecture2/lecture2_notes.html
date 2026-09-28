@@ -2,8 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Lecture 2 — Java Memory Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecture 2 &mdash; Attacking an Unseen Problem</title>
+    <meta
+      name="description"
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Merriweather:ital,wght@0,700;1,400&display=swap"
       rel="stylesheet"
@@ -81,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1386,66 +1391,73 @@
       }
     </style>
   </head>
-
   <body>
+    <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Java Memory Management</div>
+        <div class="sb-title">Attacking a Problem</div>
         <div class="sb-meta">
-          Lecture 2 of 38 &middot; Phase 1 &mdash; Foundations
+          Lecture 2 of 45 &middot; Phase 1 &mdash; Foundations
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
-        <a class="toc-item" href="#jvm"
-          ><span class="toc-icon">🏗</span>JVM Architecture</a
+        <a class="toc-item" href="#intro"
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item toc-sub" href="#stack-vs-heap">Stack Frames</a>
-        <a class="toc-item toc-sub" href="#stack-vs-heap">Stack vs Heap</a>
-        <a class="toc-item" href="#string-pool"
-          ><span class="toc-icon">🔡</span>String Pool</a
+        <a class="toc-item" href="#steps"
+          ><span class="toc-icon">&#129517;</span>The Six Steps</a
         >
-        <a class="toc-item" href="#gc"
-          ><span class="toc-icon">🗑</span>Garbage Collection</a
+        <a class="toc-item toc-sub" href="#s1">1. Understand</a>
+        <a class="toc-item toc-sub" href="#s2">2. Size It Up</a>
+        <a class="toc-item toc-sub" href="#s3">3. Brute Force</a>
+        <a class="toc-item toc-sub" href="#s4">4. Find the Waste</a>
+        <a class="toc-item toc-sub" href="#s5">5. Match a Pattern</a>
+        <a class="toc-item toc-sub" href="#s6">6. Test on Paper</a>
+        <a class="toc-item" href="#walk"
+          ><span class="toc-icon">&#128694;</span>A Full Walkthrough</a
         >
-        <a class="toc-item" href="#jcf"
-          ><span class="toc-icon">🗂</span>JCF Masterclass</a
+        <a class="toc-item" href="#stuck"
+          ><span class="toc-icon">&#129300;</span>When You Are Stuck</a
         >
-        <a class="toc-item toc-sub" href="#hashmap-internals"
-          >HashMap Internals</a
+        <a class="toc-item" href="#talk"
+          ><span class="toc-icon">&#128483;&#65039;</span>Talking While You
+          Work</a
         >
-        <a class="toc-item toc-sub" href="#choice-guide">When to Use Which</a>
+        <a class="toc-item" href="#pitfalls"
+          ><span class="toc-icon">&#9888;&#65039;</span>Classic Mistakes</a
+        >
         <a class="toc-item" href="#practice"
-          ><span class="toc-icon">💪</span>Practice Problems</a
+          ><span class="toc-icon">&#128170;</span>Practice Problems</a
         >
         <a class="toc-item" href="#assignment"
-          ><span class="toc-icon">📝</span>Assignment</a
+          ><span class="toc-icon">&#128221;</span>Assignment</a
         >
         <a class="toc-item" href="#checklist"
-          ><span class="toc-icon">✅</span>Checklist</a
+          ><span class="toc-icon">&#9989;</span>Checklist</a
         >
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture1/lecture1_notes.html"
-          >&larr; Lecture 1 &middot; Java &amp; Programming Fundamentals</a
+          >&larr; Lecture 1 &middot; Complexity Analysis</a
         >
         <a class="toc-item" href="../Lecture3/lecture3_notes.html"
-          >&rarr; Lecture 3 &middot; OOP &amp; Java Collections Deep Dive</a
+          >&rarr; Lecture 3 &middot; Testing &amp; Debugging</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
+
+    <!-- MAIN -->
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase1">Phase 1</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 2 &mdash; Java Memory Management</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase1">Phase 1</a><span>&rsaquo;</span>
+          <span>Lecture 2 &mdash; Attacking a Problem</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1459,875 +1471,569 @@
           <button id="darkToggle" onclick="toggleDark()">&#127769; Dark</button>
         </div>
       </div>
+
       <div id="content">
+        <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">🧠</span>
-          <h1 class="page-title">Java Memory Management & Collections</h1>
+          <span class="page-emoji">&#129517;</span>
+          <h1 class="page-title">Attacking an Unseen Problem</h1>
           <p class="page-sub">
-            "You rent memory from the JVM. Understand the landlord — or face
-            eviction (OutOfMemoryError)."
+            &ldquo;You do not need to see the answer. You need a routine for
+            when you don&rsquo;t.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 2 of 38</span
-            ><span class="meta-chip accent">Phase 1 &mdash; Foundations</span
-            ><span class="meta-chip yellow">&#9201; 4 days</span
-            ><span class="meta-chip green">&#127919; 35 problems</span
-            ><span class="meta-chip">Google · Oracle · Goldman</span>
+            <span class="meta-chip accent">&#128218; Lecture 2 of 45</span>
+            <span class="meta-chip accent">Phase 1 &mdash; Foundations</span>
+            <span class="meta-chip yellow">&#9201; 3 days</span>
+            <span class="meta-chip green">&#127919; 15 problems</span>
+            <span class="meta-chip"
+              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              Microsoft</span
+            >
           </div>
         </div>
+        <!-- /.page-header -->
 
-        <!-- ══ BACKGROUND ══════════════════════════════════════════ -->
-        <div class="callout blue" style="margin-bottom: 20px">
-          <span class="callout-icon">🌍</span>
+        <!-- WHY THIS MATTERS -->
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
+          <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Memory management is invisible — until it crashes your program.
-            Understanding <em>where</em> a variable lives (stack vs heap)
-            explains every "surprising" Java behavior you will ever encounter:
-            why primitives are copied but objects are shared, why passing an
-            object to a method can change it while passing an int never can, and
-            why a missing <code>null</code> check causes a
-            <code>NullPointerException</code>. This knowledge also directly
-            impacts how you reason about the space complexity of your
-            algorithms.
+            Knowing fifty algorithms does not help if you freeze in front of a
+            problem you have never seen &mdash; and in an interview, every
+            problem is one you have never seen. This lecture gives you a routine
+            for that moment: six steps that take you from a blank page to a
+            correct answer, and then to a fast one. It is the most reusable
+            thing in the course; every later lecture is really just more
+            material for Step 5.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
+            <li>Restate a problem and check it with your own worked example</li>
             <li>
-              Master the difference between Stack (static) and Heap (dynamic)
-              memory
+              Turn the input size into a target Big-O before designing anything
             </li>
-            <li>Understand how Java handles primitive vs. object references</li>
+            <li>State a brute force and find the work it repeats</li>
+            <li>Use five concrete moves when you are stuck</li>
             <li>
-              Grasp Garbage Collection as a background process and why it
-              matters
-            </li>
-            <li>
-              Identify and prevent common memory leaks in Java applications
+              Explain your thinking out loud the way an interviewer wants to
+              hear it
             </li>
           </ul>
         </div>
 
-        <h3 class="h2" style="margin-top: 0">
-          📖 Before We Start — The Big Picture
-        </h3>
-        <p>
-          Every Java program runs inside the
-          <strong>Java Virtual Machine (JVM)</strong> — a software layer that
-          sits between your code and the real hardware. The JVM manages all
-          memory on your behalf, splitting it into distinct regions, each with a
-          specific job.
-        </p>
-        <p>
-          <strong>Stack</strong> = a small, fast notepad on your desk. Each
-          method call writes its local variables here. When the method returns,
-          the page is torn off and thrown away. <strong>Heap</strong> = a large
-          warehouse. Every object you create with <code>new</code> is stored
-          here and stays until nobody is referencing it anymore. The
-          <strong>Garbage Collector</strong> is the warehouse cleaner — it
-          periodically sweeps away objects nobody is using.
-        </p>
-
-        <div class="callout green" style="margin-bottom: 32px">
-          <span class="callout-icon">🔗</span>
-          <div class="callout-body">
-            <strong>How it connects:</strong> Lecture 1 taught you
-            <em>what</em> types exist. This lecture explains <em>where</em> they
-            live in memory. Lecture 3 (OOP) builds on this — every object you
-            create goes onto the heap, and understanding that is why
-            <code>==</code> compares addresses, not values.
-          </div>
-        </div>
-
         <hr />
 
-        <h2 class="h1" id="jvm">🏗 JVM Architecture</h2>
-        <div class="callout blue">
-          <span class="callout-icon">📌</span>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9749;</span>
           <div class="callout-body">
-            <strong>The Mental Model:</strong> The JVM manages all memory for
-            your program in distinct regions. Understanding these regions
-            explains why Java behaves differently from C/C++ and helps you
-            reason about performance and bugs.
+            <strong>Still no Java &mdash; still on purpose.</strong> Everything
+            here happens before you write a line of code, so it works in any
+            language. Solve the practice problems on paper; you will code them
+            after Lecture 4.
           </div>
         </div>
-        <div class="ascii-tree">
-          ┌──────────────────────── JVM MEMORY ────────────────────────┐ │ HEAP
-          (all threads share this) │ │ ┌───────────────┐ ┌───────────────────┐
-          ┌──────────┐ │ │ │ YOUNG GEN │ │ OLD GEN │ │ METASPACE│ │ │ │ Eden
-          |S0|S1 │ │ (long-lived objs) │ │ Classes │ │ │ │ new objs │ │ tenured
-          ≥15 GCs │ │ Statics │ │ │ └───────────────┘ └───────────────────┘
-          └──────────┘ │
-          ├────────────────────────────────────────────────────────────┤ │ STACK
-          (one per thread — holds method frames) │ │ ┌───────────────┐
-          ┌───────────────┐ ┌───────────┐ │ │ │ Frame:main │ │ Frame:sort │ │
-          Frame:cmp │ ← TOP │ │ │ local vars │ │ local vars │ │ a,b,ret │ │ │
-          └───────────────┘ └───────────────┘ └───────────┘ │
-          └────────────────────────────────────────────────────────────┘
-        </div>
-        <h3 class="h2" id="stack-vs-heap">Stack vs Heap Quick Reference</h3>
+        <h2 class="h1" id="steps">&#129517; The Six Steps</h2>
+        <p>
+          Good problem-solvers are not people who see the answer instantly. They
+          are people who have a routine for when they <em>don&rsquo;t</em>. Here
+          is the routine this whole course uses. Each step has one job, and
+          skipping one is how most wrong answers happen.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Property</th>
-                <th>Stack</th>
-                <th>Heap</th>
+                <th>Step</th>
+                <th>The question you ask</th>
+                <th>What you write down</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>What lives here</strong></td>
+                <td>1. Understand</td>
+                <td>What exactly goes in, and what must come out?</td>
+                <td>The problem in your own words, plus two worked examples</td>
+              </tr>
+              <tr>
+                <td>2. Size it up</td>
+                <td>How big can the input be?</td>
+                <td>The target Big-O, from Lecture 1&rsquo;s table</td>
+              </tr>
+              <tr>
+                <td>3. Brute force</td>
+                <td>What is the dumbest thing that is definitely correct?</td>
+                <td>That solution and its Big-O</td>
+              </tr>
+              <tr>
+                <td>4. Find the waste</td>
+                <td>Which work is repeated, or unnecessary?</td>
+                <td>The bottleneck, in one sentence</td>
+              </tr>
+              <tr>
+                <td>5. Match a pattern</td>
+                <td>Have I seen a problem shaped like this?</td>
+                <td>The tool you will use</td>
+              </tr>
+              <tr>
+                <td>6. Test on paper</td>
+                <td>Does it work on the awkward inputs?</td>
+                <td>Three edge cases, traced by hand</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong>It is how a doctor works.</strong> A good doctor does not
+            guess a diagnosis from the waiting room. They listen to the symptoms
+            (understand), take measurements (size it up), rule out the obvious
+            (brute force), look for what does not fit (find the waste), match it
+            to conditions they know (pattern), and check before prescribing
+            (test). You are doing the same thing, with code as the prescription.
+          </div>
+        </div>
+        <h2 class="h1" id="s1">&#128214; Step 1 — Understand the Problem</h2>
+        <p>
+          Most failed interviews fail here, silently. The candidate solves a
+          slightly different problem from the one that was asked. The cure is
+          cheap: before anything else, restate the problem and work two examples
+          <em>by hand</em>.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ask this</th>
+                <th>Because</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Can the input be empty?</td>
+                <td>Your loop may never run, or crash on <code>a[0]</code></td>
+              </tr>
+              <tr>
+                <td>Can there be duplicates?</td>
                 <td>
-                  Primitives, reference variables (pointer itself), frames
+                  &ldquo;Find the number&rdquo; changes meaning if it appears
+                  twice
                 </td>
-                <td>All objects, arrays</td>
               </tr>
               <tr>
-                <td><strong>Size</strong></td>
-                <td>Small ~1 MB/thread</td>
-                <td>Large (configured via -Xmx)</td>
+                <td>Can values be negative or zero?</td>
+                <td>Many tricks only work for positive numbers</td>
               </tr>
               <tr>
-                <td><strong>Thread safety</strong></td>
-                <td>✅ Private per thread</td>
-                <td>❌ Shared — needs sync</td>
+                <td>Is the input sorted?</td>
+                <td>Sorted input unlocks faster tools</td>
               </tr>
               <tr>
-                <td><strong>Speed</strong></td>
-                <td>⚡ Very fast (LIFO pointer)</td>
-                <td>Slower (GC pressure)</td>
+                <td>What should I return if there is no answer?</td>
+                <td>
+                  −1, an empty list, false &mdash; they are different programs
+                </td>
               </tr>
               <tr>
-                <td><strong>Error</strong></td>
-                <td>StackOverflowError</td>
-                <td>OutOfMemoryError</td>
+                <td>Does order in the output matter?</td>
+                <td>Sometimes any valid answer is accepted</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · Memory Layout</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="kw">int</span> x = 42;               <span class="cm">// x lives on STACK (primitive)</span>
-<span class="cls">String</span> s = <span class="str">"hi"</span>;          <span class="cm">// s (ref) on STACK → String object on HEAP</span>
-<span class="kw">int</span>[] arr = {1,2,3};    <span class="cm">// arr (ref) on STACK → int[3] on HEAP</span>
-
-<span class="cm">// Reference copy ≠ object copy!</span>
-<span class="kw">int</span>[] a = {1,2,3};
-<span class="kw">int</span>[] b = a;           <span class="cm">// b points to SAME array</span>
-b[0] = 99;
-System.out.println(a[0]); <span class="cm">// → 99! Same heap array</span>
-
-<span class="cm">// Deep copy needed for independence:</span>
-<span class="kw">int</span>[] c = <span class="cls">Arrays</span>.copyOf(a, a.length);</pre>
-        </div>
-        <h2 class="h1" id="string-pool">🔡 String Pool & Interning</h2>
-        <div class="code-block">
-          <div class="code-header">
-            <div class="code-lang">☕ Java · String Pool</div>
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="cls">String</span> a = <span class="str">"hello"</span>;           <span class="cm">// Pool["hello"] → 0xAAA</span>
-<span class="cls">String</span> b = <span class="str">"hello"</span>;           <span class="cm">// same Pool object 0xAAA</span>
-System.out.println(a == b);      <span class="cm">// → true</span>
-
-<span class="cls">String</span> c = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hello"</span>);<span class="cm">// bypasses pool → new heap obj</span>
-System.out.println(a == c);      <span class="cm">// → false (different refs)</span>
-System.out.println(a.equals(c)); <span class="cm">// → true  (same content)</span>
-
-<span class="cls">String</span> d = c.intern();          <span class="cm">// force into pool</span>
-System.out.println(a == d);      <span class="cm">// → true</span>
-
-<span class="cm">// RULE: ALWAYS use .equals() for string comparison. Never ==.</span></pre>
-        </div>
-        <h2 class="h1" id="gc">🗑 Garbage Collection</h2>
-        <div class="callout green">
-          <span class="callout-icon">💡</span>
-          <div class="callout-body">
-            <strong>Generational Hypothesis:</strong> Most objects die young. GC
-            exploits this by collecting the small Young Generation frequently
-            (Minor GC — fast) and the Old Generation rarely (Major GC — slow
-            Stop-the-World).
-          </div>
-        </div>
-        <h2 class="h1" id="jcf">🗂 JCF Masterclass</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Class</th>
-                <th>Backing</th>
-                <th>get</th>
-                <th>add/put</th>
-                <th>remove</th>
-                <th>Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>ArrayList</strong></td>
-                <td>Object[]</td>
-                <td>O(1)</td>
-                <td>O(1)*</td>
-                <td>O(n)</td>
-                <td>Insertion</td>
-              </tr>
-              <tr>
-                <td>LinkedList</td>
-                <td>Doubly linked</td>
-                <td>O(n)</td>
-                <td>O(1) ends</td>
-                <td>O(1) ends</td>
-                <td>Insertion</td>
-              </tr>
-              <tr>
-                <td><strong>ArrayDeque</strong></td>
-                <td>Circular array</td>
-                <td>O(1) ends</td>
-                <td>O(1)*</td>
-                <td>O(1) ends</td>
-                <td>Insertion</td>
-              </tr>
-              <tr>
-                <td><strong>PriorityQueue</strong></td>
-                <td>Binary heap</td>
-                <td>O(1) peek</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Priority</td>
-              </tr>
-              <tr>
-                <td><strong>HashSet</strong></td>
-                <td>HashMap</td>
-                <td>—</td>
-                <td>O(1) avg</td>
-                <td>O(1) avg</td>
-                <td>None</td>
-              </tr>
-              <tr>
-                <td>TreeSet</td>
-                <td>Red-Black</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Sorted</td>
-              </tr>
-              <tr>
-                <td><strong>HashMap</strong></td>
-                <td>Array+list/tree</td>
-                <td>O(1) avg</td>
-                <td>O(1) avg</td>
-                <td>O(1) avg</td>
-                <td>None</td>
-              </tr>
-              <tr>
-                <td>LinkedHashMap</td>
-                <td>HashMap+list</td>
-                <td>O(1) avg</td>
-                <td>O(1) avg</td>
-                <td>O(1) avg</td>
-                <td>Insertion</td>
-              </tr>
-              <tr>
-                <td>TreeMap</td>
-                <td>Red-Black</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Sorted key</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h3 class="h2" id="hashmap-internals">HashMap Internals</h3>
         <div class="callout blue">
-          <span class="callout-icon">🔍</span>
+          <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>Bucket index</strong> = <code>hash(key) &amp; (n-1)</code>.
-            Collisions form a linked list per bucket. When chain length ≥ 8 it
-            treeifies to a Red-Black Tree (O(log n) worst case). Doubles
-            capacity when size &gt; capacity × 0.75.
+            <strong>Work an example nobody gave you.</strong> The examples in a
+            problem are chosen to be friendly. Make up one of your own &mdash; a
+            little bigger, a little stranger &mdash; and solve it by hand. If
+            you cannot do it by hand, you are not ready to tell a computer how.
           </div>
         </div>
-        <h3 class="h2" id="choice-guide">When to Use Which</h3>
+        <h2 class="h1" id="s2">&#127919; Step 2 — Size It Up</h2>
+        <p>
+          Read the constraints and turn them into a target, exactly as in
+          Lecture 1. If n can be 100,000, you know
+          <em>before thinking about the method</em> that you need roughly O(n
+          log n) or better. That one fact rules out whole families of ideas and
+          tells you where to look.
+        </p>
+        <h2 class="h1" id="s3">
+          &#128296; Step 3 — Say the Brute Force Out Loud
+        </h2>
+        <p>
+          Always state the simplest correct solution first, even if it is far
+          too slow. It proves you understood the problem, it gives you something
+          to test the clever version against, and &mdash; surprisingly often
+          &mdash; it is already fast enough.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; A Brute Force for "Find Two Numbers
+              That Add to a Target"</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> findPair(a, target):
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 1:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> i + 1 <span class="pc-kw">to</span> length(a) - 1:      <span class="pc-cm">// every pair, once</span>
+            <span class="pc-kw">if</span> a[i] + a[j] = target:
+                <span class="pc-kw">return</span> (i, j)
+    <span class="pc-kw">return</span> none
+
+<span class="pc-cm">// Correct, obviously so, and O(n²). Now we have something to improve.</span></pre>
+        </div>
+        <h2 class="h1" id="s4">&#128269; Step 4 — Find the Waste</h2>
+        <p>
+          Look at the brute force and ask:
+          <em>what is it doing more than once?</em> In the pair search, for each
+          <code>a[i]</code> the inner loop is really asking one question &mdash;
+          &ldquo;is <code>target − a[i]</code> somewhere in the list?&rdquo;
+          &mdash; and answers it by scanning, every single time. That repeated
+          scan is the bottleneck.
+        </p>
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>Name the bottleneck in one sentence.</strong> &ldquo;For
+            every item I rescan the whole list to look something up.&rdquo; Once
+            you can say that, the fix is usually obvious:
+            <em>make the lookup fast</em>. A structure that answers &ldquo;is
+            this value present?&rdquo; instantly turns O(n&sup2;) into O(n).
+            That structure is a hash set, and it gets its own lecture (16).
+          </div>
+        </div>
+        <h2 class="h1" id="s5">&#129513; Step 5 — Match a Pattern</h2>
+        <p>
+          After enough problems you start to recognise shapes. This course
+          teaches about twenty of them. You do not know them yet &mdash; but it
+          helps to see now that the signals are learnable, and where each one is
+          taught.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Need</th>
-                <th>Use</th>
+                <th>If the problem says…</th>
+                <th>Reach for…</th>
+                <th>Taught in</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Frequency count</td>
-                <td><code>HashMap&lt;T,Integer&gt;</code> + getOrDefault</td>
+                <td>&ldquo;is this value present?&rdquo; many times</td>
+                <td>A hash set or hash map</td>
+                <td>Lecture 16</td>
               </tr>
               <tr>
-                <td>Visited set (BFS/DFS)</td>
-                <td><code>HashSet&lt;T&gt;</code></td>
+                <td>The input is sorted</td>
+                <td>Binary search or two pointers</td>
+                <td>Lectures 13, 25</td>
               </tr>
               <tr>
-                <td>Min/Max always available</td>
-                <td><code>PriorityQueue</code> (min-heap default)</td>
+                <td>&ldquo;a contiguous piece&rdquo; / subarray / substring</td>
+                <td>Sliding window or prefix sums</td>
+                <td>Lectures 25, 26</td>
               </tr>
               <tr>
-                <td>Stack or Queue</td>
-                <td><code>ArrayDeque</code> (faster than Stack class)</td>
+                <td>&ldquo;the k largest&rdquo; / &ldquo;top k&rdquo;</td>
+                <td>A heap</td>
+                <td>Lecture 20</td>
               </tr>
               <tr>
-                <td>LRU Cache</td>
-                <td><code>LinkedHashMap</code> with accessOrder=true</td>
+                <td>
+                  &ldquo;all combinations&rdquo; / &ldquo;every
+                  arrangement&rdquo;
+                </td>
+                <td>Backtracking</td>
+                <td>Lecture 24</td>
               </tr>
               <tr>
-                <td>Floor/Ceiling key queries</td>
-                <td><code>TreeMap</code></td>
+                <td>&ldquo;shortest path&rdquo; on a grid or network</td>
+                <td>Breadth-first search</td>
+                <td>Lecture 21</td>
+              </tr>
+              <tr>
+                <td>
+                  &ldquo;count the ways&rdquo; / &ldquo;minimum cost&rdquo; with
+                  choices
+                </td>
+                <td>Dynamic programming</td>
+                <td>Lecture 32</td>
+              </tr>
+              <tr>
+                <td>The locally best choice looks safe</td>
+                <td>Greedy</td>
+                <td>Lecture 29</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#128064;</span>
+          <div class="callout-body">
+            <strong>Preview, not a lesson.</strong> This table is a map of the
+            course, not something to memorise now. Come back to it after each
+            lecture &mdash; you will be surprised how many rows start to feel
+            obvious.
+          </div>
+        </div>
+        <h2 class="h1" id="s6">&#129514; Step 6 — Test on Paper</h2>
+        <p>
+          Before running anything, trace your solution on three awkward inputs:
+          the smallest possible (often empty or one item), one where every value
+          is the same, and one at the extreme end of the constraints. Lecture 3
+          turns this into a full checklist.
+        </p>
+        <h2 class="h1" id="walk">&#128694; A Full Walkthrough</h2>
+        <p>
+          Here are all six steps on the pair problem from Step 3, the way you
+          would say them out loud in an interview.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>What you say</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Understand</td>
+                <td>
+                  &ldquo;I return the positions of two different numbers that
+                  add to the target. Can the same position be used twice? No. Is
+                  there always an answer? I&rsquo;ll assume so, but return none
+                  otherwise.&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Size it up</td>
+                <td>
+                  &ldquo;Up to 10,000 numbers. Every pair is 50 million checks
+                  &mdash; borderline. I&rsquo;d like O(n log n) or
+                  better.&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Brute force</td>
+                <td>
+                  &ldquo;Check every pair: O(n&sup2;), O(1) space. Correct, but
+                  slow.&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Find the waste</td>
+                <td>
+                  &ldquo;For each number I rescan for its partner. The rescan is
+                  the waste.&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Match a pattern</td>
+                <td>
+                  &ldquo;Fast lookup means a hash map from value to position.
+                  One pass: before storing a number, ask whether its partner is
+                  already stored.&rdquo;
+                </td>
+              </tr>
+              <tr>
+                <td>Test</td>
+                <td>
+                  &ldquo;[3, 3], target 6: first 3 is stored, second 3 finds it
+                  &mdash; returns (0, 1), not (0, 0). Good.&rdquo;
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Improved Version</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> findPair(a, target):
+    seen ← empty map                    <span class="pc-cm">// value → position</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 1:
+        need ← target - a[i]
+        <span class="pc-kw">if</span> need <span class="pc-kw">in</span> seen:                <span class="pc-cm">// is the partner already here?</span>
+            <span class="pc-kw">return</span> (seen[need], i)
+        seen[a[i]] ← i                  <span class="pc-cm">// store AFTER checking: never pairs with itself</span>
+    <span class="pc-kw">return</span> none
+
+<span class="pc-cm">// O(n) time, O(n) space. The trade: memory for speed.</span></pre>
+        </div>
+        <h2 class="h1" id="stuck">&#129300; When You Are Stuck</h2>
+        <p>
+          Everyone gets stuck. The difference is having moves to make instead of
+          staring. Try these in order.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Move</th>
+                <th>Why it works</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Solve a tiny example completely by hand</td>
+                <td>Your hands often find the method before your head does</td>
+              </tr>
+              <tr>
+                <td>Draw it</td>
+                <td>
+                  Arrays as boxes, pointers as arrows &mdash; pictures reveal
+                  structure
+                </td>
+              </tr>
+              <tr>
+                <td>Make the problem easier</td>
+                <td>
+                  Sorted input? Only positive numbers? Solve that, then add the
+                  difficulty back
+                </td>
+              </tr>
+              <tr>
+                <td>Look at the answer&rsquo;s shape</td>
+                <td>
+                  If the answer is a single number, maybe it has a formula
+                </td>
+              </tr>
+              <tr>
+                <td>Work backwards from the end</td>
+                <td>What must be true just before the answer is known?</td>
+              </tr>
+              <tr>
+                <td>Say what you would do with unlimited time</td>
+                <td>
+                  That is your brute force &mdash; improve it one bottleneck at
+                  a time
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="talk">&#128483;&#65039; Talking While You Work</h2>
+        <p>
+          In an interview, a correct answer reached in silence scores lower than
+          a nearly-correct one explained well. The interviewer is grading how
+          you think. Say what you are about to try and why, say when you notice
+          a problem, and say the Big-O of every version you propose.
+        </p>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Silence is the only wrong answer.</strong> &ldquo;I
+            don&rsquo;t see the fast version yet, so let me write the brute
+            force and look for repeated work&rdquo; is a strong sentence. It
+            shows a method, and it buys you time.
+          </div>
+        </div>
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Mistakes
+        </h2>
+        <p>
+          These are mistakes of <em>process</em>. Every one of them is common,
+          and every one is prevented by one of the six steps.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mistake</th>
+                <th>What happens</th>
+                <th>The step that prevents it</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Coding immediately</td>
+                <td>You solve a slightly different problem</td>
+                <td>1 — Understand</td>
+              </tr>
+              <tr>
+                <td>Ignoring the constraints</td>
+                <td>A correct O(n&sup2;) solution times out</td>
+                <td>2 — Size it up</td>
+              </tr>
+              <tr>
+                <td>Skipping the brute force</td>
+                <td>No baseline, nothing to test against</td>
+                <td>3 — Brute force</td>
+              </tr>
+              <tr>
+                <td>Optimising the wrong part</td>
+                <td>Clever code, same Big-O</td>
+                <td>4 — Find the waste</td>
+              </tr>
+              <tr>
+                <td>Forcing a favourite technique</td>
+                <td>Sliding window on a problem that is not contiguous</td>
+                <td>5 — Match honestly</td>
+              </tr>
+              <tr>
+                <td>Testing only the given examples</td>
+                <td>Passes the samples, fails on empty input</td>
+                <td>6 — Test on paper</td>
+              </tr>
+              <tr>
+                <td>Going silent when stuck</td>
+                <td>The interviewer cannot give credit or hints</td>
+                <td>Talk while you work</td>
               </tr>
             </tbody>
           </table>
         </div>
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Four problems, each solved by one of the moves in this lecture rather
+          than by a data structure. For each one, try the steps yourself before
+          opening the hints.
+        </p>
+
+        <!-- Problem 01: Maximum Nesting Depth of the Parentheses -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">P01 &middot; HashMap Grouping</div>
-              <div class="prob-title">Find Duplicate File in System</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/find-duplicate-file-in-system/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 609 - Find Duplicate File in System</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Map to a List</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Dropbox</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each input string is a directory followed by files written as
-                <code>name(content)</code>. Return every group of file paths
-                whose contents are identical, keeping only groups with at least
-                two files.
-              </p>
-              <div class="iobox">
-                ["root/a 1.txt(abcd) 2.txt(efgh)", "root/c 3.txt(abcd)"] &rarr;
-                [["root/a/1.txt", "root/c/3.txt"]]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    &ldquo;Same content&rdquo; is a grouping key. Which
-                    collection maps one key to many values?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Split each line on spaces. For every file, cut it at
-                    <code>(</code> into a name and a content, and append
-                    <code>dir + "/" + name</code> to
-                    <code
-                      >map.computeIfAbsent(content, k -&gt; new
-                      ArrayList&lt;&gt;())</code
-                    >.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                A <code>HashMap&lt;String, List&lt;String&gt;&gt;</code> keyed
-                by file content does all the work.
-                <code>computeIfAbsent</code> allocates each list on the heap
-                only when it is first needed, and the map stores a reference to
-                it &mdash; the map itself never holds the strings. Because
-                <code>String</code> overrides <code>equals</code> and
-                <code>hashCode</code>, two identical contents built separately
-                still land in the same bucket.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Group by Content
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; <span class="fn">findDuplicate</span>(<span class="cls">String</span>[] paths) {
-    <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; byContent = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="cls">String</span> line : paths) {
-        <span class="cls">String</span>[] parts = line.<span class="fn">split</span>(<span class="str">&quot; &quot;</span>);
-        <span class="cls">String</span> dir = parts[<span class="num">0</span>];
-        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; parts.length; i++) {
-            <span class="kw">int</span> open = parts[i].<span class="fn">indexOf</span>(<span class="str">&#x27;(&#x27;</span>);
-            <span class="cls">String</span> name = parts[i].<span class="fn">substring</span>(<span class="num">0</span>, open);
-            <span class="cls">String</span> content = parts[i].<span class="fn">substring</span>(open + <span class="num">1</span>, parts[i].<span class="fn">length</span>() - <span class="num">1</span>);
-            byContent.<span class="fn">computeIfAbsent</span>(content, k -&gt; <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;())
-                     .<span class="fn">add</span>(dir + <span class="str">&quot;/&quot;</span> + name);
-        }
-    }
-    <span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">String</span>&gt;&gt; result = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="cls">List</span>&lt;<span class="cls">String</span>&gt; group : byContent.<span class="fn">values</span>())
-        <span class="kw">if</span> (group.<span class="fn">size</span>() &gt; <span class="num">1</span>) result.<span class="fn">add</span>(group);
-    <span class="ret">return</span> result;
-}</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(total characters)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(total characters)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">P02 &middot; HashMap + Comparator</div>
-              <div class="prob-title">Sort Array by Increasing Frequency</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/sort-array-by-increasing-frequency/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1636 - Sort Array by Increasing Frequency</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Count Then Sort</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; eBay</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Sort <code>nums</code> by increasing frequency. When two values
-                appear equally often, the larger value comes first.
-              </p>
-              <div class="iobox">
-                nums = [2, 3, 1, 3, 2] &rarr; [1, 3, 3, 2, 2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You cannot sort by frequency before you know the
-                    frequencies.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Count with a <code>HashMap</code>, copy the values into an
-                    <code>Integer[]</code>, and sort with a comparator:
-                    frequency ascending, then value descending.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two collection lessons meet here. The map gives O(1) frequency
-                lookups from inside the comparator. The boxing is not optional:
-                <code>Arrays.sort(int[])</code> has no comparator overload, so
-                you need <code>Integer[]</code> &mdash; an array of references
-                to heap objects, which costs memory but allows a custom order.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Count, Box, Sort
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">frequencySort</span>(<span class="kw">int</span>[] nums) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; freq = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums) freq.<span class="fn">merge</span>(x, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
-
-    <span class="cls">Integer</span>[] boxed = <span class="kw">new</span> <span class="cls">Integer</span>[nums.length];
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) boxed[i] = nums[i];
-
-    <span class="cls">Arrays</span>.<span class="fn">sort</span>(boxed, (a, b) -&gt; {
-        <span class="kw">int</span> fa = freq.<span class="fn">get</span>(a), fb = freq.<span class="fn">get</span>(b);
-        <span class="kw">if</span> (fa != fb) <span class="ret">return</span> fa - fb;   <span class="cm">// rarer values first</span>
-        <span class="ret">return</span> b - a;                   <span class="cm">// ties: larger value first</span>
-    });
-
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) nums[i] = boxed[i];
-    <span class="ret">return</span> nums;
-}</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">P03 &middot; HashMap Design</div>
-              <div class="prob-title">Design Authentication Manager</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/design-authentication-manager/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1797 - Design Authentication Manager</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Map with Expiry</span>
-                <span class="tag tag-co">Twitter &middot; Amazon</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Design an authentication manager where each token lives
-                <code>timeToLive</code> seconds. Support
-                <code>generate(id, t)</code>, <code>renew(id, t)</code> (only if
-                the token has not expired) and
-                <code>countUnexpiredTokens(t)</code>.
-              </p>
-              <div class="iobox">
-                ttl = 5: generate("a", 2) expires at 7 &middot; renew("a", 6)
-                expires at 11 &middot; count(12) &rarr; 0
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    What is the smallest piece of state you must remember per
-                    token?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Store <code>tokenId &rarr; expiryTime</code> in a
-                    <code>HashMap</code>. A token is alive at time
-                    <code>t</code> when <code>expiry &gt; t</code>. Renewing is
-                    a <code>put</code> guarded by that check.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                One <code>HashMap&lt;String, Integer&gt;</code> is the whole
-                design. The interesting part is memory: expired tokens stay in
-                the map forever unless you remove them, which is exactly the
-                leak this lecture warns about with long-lived maps. Pruning with
-                the iterator's <code>remove()</code> during the count keeps the
-                map the size of the live tokens.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Map of Expiry Times
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">class</span> <span class="cls">AuthenticationManager</span> {
-    <span class="kw">private</span> <span class="kw">final</span> <span class="kw">int</span> ttl;
-    <span class="kw">private</span> <span class="kw">final</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">Integer</span>&gt; expiry = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-
-    <span class="fn">AuthenticationManager</span>(<span class="kw">int</span> timeToLive) { <span class="kw">this</span>.ttl = timeToLive; }
-
-    <span class="kw">void</span> <span class="fn">generate</span>(<span class="cls">String</span> tokenId, <span class="kw">int</span> currentTime) {
-        expiry.<span class="fn">put</span>(tokenId, currentTime + ttl);
-    }
-
-    <span class="kw">void</span> <span class="fn">renew</span>(<span class="cls">String</span> tokenId, <span class="kw">int</span> currentTime) {
-        <span class="cls">Integer</span> exp = expiry.<span class="fn">get</span>(tokenId);
-        <span class="kw">if</span> (exp != <span class="kw">null</span> &amp;&amp; exp &gt; currentTime) expiry.<span class="fn">put</span>(tokenId, currentTime + ttl);
-    }
-
-    <span class="kw">int</span> <span class="fn">countUnexpiredTokens</span>(<span class="kw">int</span> currentTime) {
-        <span class="cls">Iterator</span>&lt;<span class="cls">Integer</span>&gt; it = expiry.<span class="fn">values</span>().<span class="fn">iterator</span>();
-        <span class="kw">int</span> alive = <span class="num">0</span>;
-        <span class="kw">while</span> (it.<span class="fn">hasNext</span>()) {
-            <span class="kw">if</span> (it.<span class="fn">next</span>() &gt; currentTime) alive++;
-            <span class="kw">else</span> it.<span class="fn">remove</span>();          <span class="cm">// prune, or the map leaks</span>
-        }
-        <span class="ret">return</span> alive;
-    }
-}</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(1) generate and renew</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(live tokens)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P04: Contains Duplicate II -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">P04 &middot; HashMap Lookup</div>
-              <div class="prob-title">Contains Duplicate II</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/contains-duplicate-ii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 219 - Contains Duplicate II</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Last Index Seen</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Return true when two distinct indices <code>i</code> and
-                <code>j</code> hold the same value and
-                <code>|i - j| &le; k</code>.
-              </p>
-              <div class="iobox">
-                nums = [1, 2, 3, 1], k = 3 &rarr; true &nbsp;|&nbsp; nums = [1,
-                2, 3, 1, 2, 3], k = 2 &rarr; false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    For a repeated value, which earlier occurrence is the only
-                    one worth remembering?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep <code>value &rarr; last index</code>. At index
-                    <code>i</code>, if the value is in the map and
-                    <code>i - map.get(v) &le; k</code>, return true; then
-                    overwrite the stored index with <code>i</code>.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The closest earlier occurrence is always the most recent one, so
-                a map of last indices suffices. Watch the boxing:
-                <code>map.get(v)</code> hands back an
-                <code>Integer</code> object, so comparing two of them with
-                <code>==</code> would compare references. Subtracting unboxes
-                them, which is what you want.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Last-Seen Index
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">boolean</span> <span class="fn">containsNearbyDuplicate</span>(<span class="kw">int</span>[] nums, <span class="kw">int</span> k) {
-    <span class="cls">Map</span>&lt;<span class="cls">Integer</span>, <span class="cls">Integer</span>&gt; lastIndex = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) {
-        <span class="cls">Integer</span> prev = lastIndex.<span class="fn">get</span>(nums[i]);
-        <span class="kw">if</span> (prev != <span class="kw">null</span> &amp;&amp; i - prev &lt;= k) <span class="ret">return</span> <span class="kw">true</span>;
-        lastIndex.<span class="fn">put</span>(nums[i], i);      <span class="cm">// keep only the most recent index</span>
-    }
-    <span class="ret">return</span> <span class="kw">false</span>;
-}
-
-<span class="cm">// [1,2,3,1], k = 3: at i=3 prev=0, 3 - 0 &lt;= 3 -&gt; true</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P05: Final Prices With a Special Discount in a Shop -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">P05 &middot; Deque as a Stack</div>
+              <div class="prob-num">Problem 01 &middot; All Six Steps</div>
               <div class="prob-title">
-                Final Prices With a Special Discount in a Shop
+                Maximum Nesting Depth of the Parentheses
               </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/final-prices-with-a-special-discount-in-a-shop/"
+                  href="https://leetcode.com/problems/maximum-nesting-depth-of-the-parentheses/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 1475 - Final Prices With a Special Discount in a
-                  Shop</a
+                  >&#128279; LC 1614 - Maximum Nesting Depth of the
+                  Parentheses</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Stack of Indices</span>
+                <span class="tag tag-pat">Running counter</span>
                 <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                <code>prices[i]</code> is an item's price. It gets a discount
-                equal to <code>prices[j]</code>, where <code>j</code> is the
-                first index after <code>i</code> with
-                <code>prices[j] &le; prices[i]</code>. Return the final price of
-                every item.
+                Given a valid expression with parentheses, return how deeply the
+                parentheses are nested at their deepest point.
               </p>
-              <div class="iobox">
-                prices = [8, 4, 6, 2, 3] &rarr; [4, 2, 4, 2, 3]
-              </div>
+              <div class="iobox">s = "(1+(2*3)+((8)/4))+1" → 3</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2338,8 +2044,9 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Scanning forward from each item is O(n&sup2;). Which items
-                    are still waiting for their discount?
+                    Step 1: solve the example by hand. How did <em>you</em> know
+                    the depth was 3 — what did you keep track of as your eyes
+                    moved right?
                   </p>
                 </div>
               </details>
@@ -2350,10 +2057,9 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Push indices onto an <code>ArrayDeque</code>. When the
-                    current price is at most the price at the top index, that
-                    top item has found its discount: pop and apply. Then push
-                    the current index.
+                    You counted: up one at every "(", down one at every ")". The
+                    deepest you ever got is the answer. No stack or recursion
+                    needed.
                   </p>
                 </div>
               </details>
@@ -2361,13 +2067,16 @@ System.out.println(a == d);      <span class="cm">// → true</span>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Use <code>ArrayDeque</code> rather than the legacy
-                <code>Stack</code> class &mdash; it is not synchronized and is
-                backed by a resizable array, so it is both faster and the modern
-                idiom. Each index is pushed once and popped at most once, which
-                makes the whole pass O(n). This &ldquo;stack of items still
-                waiting&rdquo; is the monotonic stack you meet properly in
-                Lecture 12.
+                A small problem, but walk all six steps.
+                <strong>Understand</strong>: the string is always valid, other
+                characters are irrelevant. <strong>Size</strong>: up to 100
+                characters &mdash; anything works. <strong>Brute force</strong>:
+                for every position, count the unmatched openings before it
+                &mdash; O(n&sup2;). <strong>Waste</strong>: each count redoes
+                the previous one plus a single character.
+                <strong>Pattern</strong>: keep a running counter instead.
+                <strong>Test</strong>: a string with no parentheses returns 0.
+                The whole solution came from noticing what your own hand did.
               </p>
             </div>
             <details>
@@ -2375,150 +2084,23 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Waiting Stack
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; One Counter, One Pass</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="kw">int</span>[] <span class="fn">finalPrices</span>(<span class="kw">int</span>[] prices) {
-    <span class="kw">int</span>[] ans = prices.<span class="fn">clone</span>();
-    <span class="cls">Deque</span>&lt;<span class="cls">Integer</span>&gt; waiting = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();   <span class="cm">// indices with no discount yet</span>
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; prices.length; i++) {
-        <span class="kw">while</span> (!waiting.<span class="fn">isEmpty</span>() &amp;&amp; prices[waiting.<span class="fn">peek</span>()] &gt;= prices[i]) {
-            <span class="kw">int</span> j = waiting.<span class="fn">pop</span>();
-            ans[j] = prices[j] - prices[i];        <span class="cm">// first price &lt;= it, to its right</span>
-        }
-        waiting.<span class="fn">push</span>(i);
-    }
-    <span class="ret">return</span> ans;
-}</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- P06: Number of Students Unable to Eat Lunch -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">P06 &middot; Deque as a Queue</div>
-              <div class="prob-title">
-                Number of Students Unable to Eat Lunch
-              </div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/number-of-students-unable-to-eat-lunch/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >🔗 LC 1700 - Number of Students Unable to Eat Lunch</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Queue Simulation</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Students queue for sandwiches stacked on a counter. The student
-                at the front takes the top sandwich if it matches their
-                preference (0 or 1), otherwise they move to the back of the
-                queue. Return how many students never eat.
-              </p>
-              <div class="iobox">
-                students = [1, 1, 1, 0, 0, 1], sandwiches = [1, 0, 0, 0, 1, 1]
-                &rarr; 3
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Simulate it with a real queue first. What condition means
-                    the line can never move again?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The rotation only stops when nobody left in the queue wants
-                    the top sandwich. So count how many students prefer 0 and
-                    how many prefer 1, then walk the sandwich stack until one
-                    has no taker.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Model it first with <code>ArrayDeque</code> as a FIFO queue
-                (<code>offer</code> at the tail, <code>poll</code> at the head)
-                to see the process. Then notice that the order of the students
-                never matters &mdash; only the two counts do. The counting
-                version answers in O(n) with O(1) memory, and it cannot loop
-                forever.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block">
-                  <div class="code-header">
-                    <div class="code-lang">
-                      &#9749; Java &middot; Count Preferences
-                    </div>
-                    <button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="kw">int</span> <span class="fn">countStudents</span>(<span class="kw">int</span>[] students, <span class="kw">int</span>[] sandwiches) {
-    <span class="kw">int</span>[] want = <span class="kw">new</span> <span class="kw">int</span>[<span class="num">2</span>];
-    <span class="kw">for</span> (<span class="kw">int</span> s : students) want[s]++;
-
-    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; sandwiches.length; i++) {
-        <span class="kw">int</span> top = sandwiches[i];
-        <span class="kw">if</span> (want[top] == <span class="num">0</span>) <span class="ret">return</span> sandwiches.length - i;  <span class="cm">// nobody takes it</span>
-        want[top]--;
-    }
-    <span class="ret">return</span> <span class="num">0</span>;
-}
-
-<span class="cm">// Queue version, for comparison:</span>
-<span class="cm">// Deque&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();</span>
-<span class="cm">// rotate with q.offer(q.poll()) until a whole lap matches nothing.</span></pre>
+                  <pre><span class="pc-kw">function</span> maxDepth(s):
+    depth ← 0;  best ← 0
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> ch <span class="pc-kw">in</span> s:
+        <span class="pc-kw">if</span> ch = '(':
+            depth ← depth + 1
+            best ← max(best, depth)
+        <span class="pc-kw">else</span> <span class="pc-kw">if</span> ch = ')':
+            depth ← depth - 1
+    <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2534,40 +2116,46 @@ System.out.println(a == d);      <span class="cm">// → true</span>
             </details>
           </div>
         </div>
-
-        <!-- P07: Find the Difference of Two Arrays -->
+        <!-- Problem 02: Partitioning Into Minimum Number Of Deci-Binary Numbers -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">P07 &middot; HashSet</div>
-              <div class="prob-title">Find the Difference of Two Arrays</div>
+              <div class="prob-num">Problem 02 &middot; Solve It by Hand</div>
+              <div class="prob-title">
+                Partitioning Into Minimum Number Of Deci-Binary Numbers
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/find-the-difference-of-two-arrays/"
+                  href="https://leetcode.com/problems/partitioning-into-minimum-number-of-deci-binary-numbers/"
                   target="_blank"
                   style="font-size: 12px"
-                  >🔗 LC 2215 - Find the Difference of Two Arrays</a
+                  >&#128279; LC 1689 - Partitioning Into Minimum Number Of
+                  Deci-Binary Numbers</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Set Difference</span>
-                <span class="tag tag-co">Amazon &middot; Microsoft</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Look at the answer&rsquo;s shape</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px">›</span>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given two arrays, return two lists: the distinct values of
-                <code>nums1</code> that are not in <code>nums2</code>, and the
-                distinct values of <code>nums2</code> that are not in
-                <code>nums1</code>.
+                A deci-binary number uses only the digits 0 and 1 (like 101 or
+                1100). What is the fewest deci-binary numbers that add up to the
+                given number <code>n</code>?
               </p>
               <div class="iobox">
-                nums1 = [1, 2, 3], nums2 = [2, 4, 6] &rarr; [[1, 3], [4, 6]]
+                n = "32" → 3 &nbsp;&nbsp;(10 + 11 + 11)
+                &nbsp;&nbsp;|&nbsp;&nbsp; n = "82734" → 8
               </div>
             </div>
             <div class="prob-section">
@@ -2579,8 +2167,8 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Searching an array for membership is O(n) each time. Which
-                    collection answers that in O(1)?
+                    Forget algorithms. Break 32 into deci-binary numbers by
+                    hand, then 82734. What limits how few you can use?
                   </p>
                 </div>
               </details>
@@ -2591,9 +2179,9 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 </summary>
                 <div class="details-body">
                   <p>
-                    Put each array into a <code>HashSet&lt;Integer&gt;</code>.
-                    Then collect the values of the first set where
-                    <code>!second.contains(x)</code>, and the other way round.
+                    Each deci-binary number adds at most 1 to each digit
+                    position. A digit of 8 needs at least 8 of them — and 8 is
+                    always enough.
                   </p>
                 </div>
               </details>
@@ -2601,12 +2189,15 @@ System.out.println(a == d);      <span class="cm">// → true</span>
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Sets drop duplicates for free and answer
-                <code>contains</code> in O(1) on average, which is the whole
-                point of hashing. <code>removeAll</code> on a copy also works,
-                but be careful: it may iterate the argument collection, so its
-                cost depends on which side you pass &mdash; a good reminder to
-                know what a library method does internally.
+                This is the &ldquo;look at the answer&rsquo;s shape&rdquo; move
+                from the stuck-list. The answer is one number, and the examples
+                (32 → 3, 82734 → 8) give it away once you work them by hand: it
+                is the largest digit. The reasoning: every deci-binary number
+                contributes at most 1 to each column, so a column with digit d
+                needs at least d numbers; and d numbers are enough, because each
+                one can put a 1 wherever that column still needs it. A problem
+                labelled Medium, solved by one pass and no data structures
+                &mdash; because the thinking happened on paper.
               </p>
             </div>
             <details>
@@ -2614,33 +2205,263 @@ System.out.println(a == d);      <span class="cm">// → true</span>
                 <span class="toggle-arrow">&#9654;</span>Full solution
               </summary>
               <div class="details-body">
-                <div class="code-block">
+                <div class="code-block pseudo">
                   <div class="code-header">
-                    <div class="code-lang">&#9749; Java &middot; Two Sets</div>
-                    <button class="copy-btn" onclick="copyCode(this)">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; The Answer Is the Largest
+                      Digit</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="cls">List</span>&lt;<span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt;&gt; <span class="fn">findDifference</span>(<span class="kw">int</span>[] nums1, <span class="kw">int</span>[] nums2) {
-    <span class="cls">Set</span>&lt;<span class="cls">Integer</span>&gt; a = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;(), b = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums1) a.<span class="fn">add</span>(x);
-    <span class="kw">for</span> (<span class="kw">int</span> x : nums2) b.<span class="fn">add</span>(x);
-
-    <span class="cls">List</span>&lt;<span class="cls">Integer</span>&gt; onlyA = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(), onlyB = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
-    <span class="kw">for</span> (<span class="kw">int</span> x : a) <span class="kw">if</span> (!b.<span class="fn">contains</span>(x)) onlyA.<span class="fn">add</span>(x);
-    <span class="kw">for</span> (<span class="kw">int</span> x : b) <span class="kw">if</span> (!a.<span class="fn">contains</span>(x)) onlyB.<span class="fn">add</span>(x);
-
-    <span class="ret">return</span> <span class="cls">List</span>.<span class="fn">of</span>(onlyA, onlyB);
-}</pre>
+                  <pre><span class="pc-kw">function</span> minPartitions(n):
+    best ← 0
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> ch <span class="pc-kw">in</span> n:
+        best ← max(best, digit value of ch)
+        <span class="pc-kw">if</span> best = 9: <span class="pc-kw">return</span> 9           <span class="pc-cm">// cannot do better than 9</span>
+    <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n + m)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n + m)</span>
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Maximum Number of Coins You Can Get -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Small Examples First
+              </div>
+              <div class="prob-title">Maximum Number of Coins You Can Get</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/maximum-number-of-coins-you-can-get/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1561 - Maximum Number of Coins You Can Get</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Sort, then a greedy choice found by hand</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                There are 3n piles of coins. Each round you pick any 3 piles;
+                Alice takes the largest, you take the next, Bob takes the
+                smallest. Maximise the coins you collect.
+              </p>
+              <div class="iobox">
+                piles = [2,4,1,2,7,8] → 9 &nbsp;&nbsp;(you get 7 + 2)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Try every grouping for the six-pile example by hand. Which
+                    piles should Bob always get?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Give Bob the smallest piles — he takes the minimum anyway.
+                    Then from what is left, Alice takes the biggest and you take
+                    the second biggest, round after round.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Steps 3 and 4 in action. The brute force tries every way to form
+                triples &mdash; exponential, hopeless for 10&#8309; piles.
+                Working the example by hand shows the structure: Bob&rsquo;s
+                pile is wasted, so it should be as small as possible, and you
+                always sit just below Alice. After sorting, that means Bob takes
+                the bottom third and you take every second pile from the top.
+                Sorting dominates, so the whole thing is O(n log n) &mdash;
+                which Step 2 said was the target.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sort, Then Take Every
+                      Second From the Top</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxCoins(piles):
+    sort(piles)                         <span class="pc-cm">// smallest first</span>
+    n ← length(piles) ÷ 3
+    total ← 0
+    i ← length(piles) - 2               <span class="pc-cm">// second largest</span>
+    <span class="pc-kw">repeat</span> n <span class="pc-kw">times</span>:
+        total ← total + piles[i]        <span class="pc-cm">// your pile</span>
+        i ← i - 2                       <span class="pc-cm">// skip Alice's next pile</span>
+    <span class="pc-kw">return</span> total
+<span class="pc-cm">// Bob silently gets piles[0 .. n-1], the smallest third.</span></pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Number of Laser Beams in a Bank -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Draw It</div>
+              <div class="prob-title">Number of Laser Beams in a Bank</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/number-of-laser-beams-in-a-bank/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2125 - Number of Laser Beams in a Bank</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Draw it, then count</span>
+                <span class="tag tag-co">Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A bank floor plan is a grid of rows; "1" marks a security
+                device. A beam joins every device on one row to every device on
+                the next non-empty row. Count the beams.
+              </p>
+              <div class="iobox">
+                bank = ["011001","000000","010100","001000"] → 8
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Draw the grid and draw the beams. Do empty rows affect
+                    anything?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Beams only connect consecutive <em>non-empty</em> rows.
+                    Between a row with a devices and the next with b, there are
+                    a × b beams.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The picture does the work. Once drawn, empty rows vanish (beams
+                pass straight through them) and each pair of neighbouring
+                non-empty rows contributes the product of their device counts.
+                The brute force would compare every device with every other
+                device &mdash; O((rows &times; cols)&sup2;) &mdash; but the
+                drawing shows that only the count per row matters, so one pass
+                is enough.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Multiply Neighbouring
+                      Counts</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> numberOfBeams(bank):
+    prev ← 0;  total ← 0
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> row <span class="pc-kw">in</span> bank:
+        c ← count of '1' <span class="pc-kw">in</span> row
+        <span class="pc-kw">if</span> c &gt; 0:                        <span class="pc-cm">// empty rows are skipped</span>
+            total ← total + prev × c
+            prev ← c
+    <span class="pc-kw">return</span> total</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(rows &times; cols)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                 </div>
               </div>
@@ -2648,129 +2469,108 @@ System.out.println(a == d);      <span class="cm">// → true</span>
           </div>
         </div>
 
+        <!-- ASSIGNMENT -->
         <h2 class="h1" id="assignment">&#128221; Assignment</h2>
-        <div class="callout orange">
-          <span class="callout-icon">📋</span>
+        <div class="callout orange" style="margin: 14px 0">
+          <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 2 Assignment &mdash; 35 Problems (15 Easy &middot; 15
-              Medium &middot; 5 Hard)</strong
-            ><br />25+ problems: JVM memory quiz, String pool traps, HashMap
-            patterns, LRU Cache, Top-K, Group Anagrams, and heap operation
-            practice.<br /><br /><a
+              >Lecture 2 Assignment &mdash; 15 Problems (4 Easy &middot; 11
+              Medium &middot; 0 Hard)</strong
+            ><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 3.<br /><br />
+            <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture2/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
-                padding: 6px 16px;
+                padding: 8px 16px;
                 border-radius: 6px;
-                font-size: 13px;
-                font-weight: 600;
                 text-decoration: none;
+                font-weight: 600;
+                display: inline-block;
               "
-              >Open Assignment →</a
+              >&#128196; Open Assignment &rarr;</a
             >
           </div>
         </div>
+
+        <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <div
-          style="
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 16px;
-            margin: 14px 0;
-          "
-        >
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can draw the JVM memory layout from scratch (Stack, Eden, S0/S1,
-              Old Gen, Metaspace)
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know what lives on Stack vs Heap and can trace any code snippet
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know why <code>new String("x") == "x"</code> is false
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can explain GC eligibility and what a memory leak looks like in
-              Java
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know time complexity of HashMap, TreeMap, PriorityQueue,
-              ArrayDeque
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I understand how HashMap computes bucket index and handles
-              collisions
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can implement LRU Cache using LinkedHashMap in under 10 min
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I can solve Top-K using HashMap + PriorityQueue
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I know when to use TreeMap.floorKey() vs HashMap
-            </div>
-          </div>
-          <div class="checklist-item" onclick="this.classList.toggle('done')">
-            <div class="cb-box">✓</div>
-            <div class="cb-text">
-              I understand the treeify threshold (8) and load factor (0.75) in
-              HashMap
-            </div>
+        <p>Check each item before advancing to Lecture 3.</p>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can list the six steps from memory, with the question each one
+            asks
           </div>
         </div>
-        <div class="callout green" style="margin-top: 24px">
-          <span class="callout-icon">🧠</span>
-          <div class="callout-body">
-            <strong
-              >You're ready for Lecture 3: OOP &amp; Java Collections Deep
-              Dive</strong
-            ><br />
-            You've mastered Java Memory — the JVM Stack &amp; Heap, garbage
-            collection, and String interning. OOP is where Java's power truly
-            unlocks. Get ready for inheritance, polymorphism, generics, and Java
-            Collections.
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I always write two worked examples before I design anything
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can state a brute force and its Big-O for any problem in the
+            assignment
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can name the bottleneck of a brute force in one sentence
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I have used at least three of the "when you are stuck" moves on a
+            real problem
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I can walk through the pair-sum example aloud, all six steps
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">
+            I worked all 15 assignment problems through at least Step 4 on paper
           </div>
         </div>
 
+        <div class="callout green">
+          <span class="callout-icon">&#127881;</span>
+          <div class="callout-body">
+            <strong>Next up &mdash; Lecture 3: Testing &amp; Debugging</strong
+            ><br />
+            Step 6 said &ldquo;test on paper&rdquo;. Lecture 3 shows you how to
+            do it properly: tracing by hand, the edge cases that catch almost
+            everyone, and what to do when the computer says your answer is
+            wrong.
+          </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture1/lecture1_notes.html"
-            >&larr; Lecture 1 &middot; Java &amp; Programming Fundamentals</a
+            >&larr; Lecture 1 &middot; Complexity Analysis</a
           >
           <a class="next" href="../Lecture3/lecture3_notes.html"
-            >Lecture 3 &middot; OOP &amp; Java Collections Deep Dive &rarr;</a
+            >Lecture 3 &middot; Testing &amp; Debugging &rarr;</a
           >
         </div>
       </div>
+      <!-- #content -->
     </div>
+    <!-- #main -->
+
     <script>
       // 1. Theme toggle — remembered across pages of the course
       function applyTheme(theme) {

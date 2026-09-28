@@ -1,9 +1,9 @@
-# 🔍 Assignment 23 — Divide & Conquer
+# 🛡️ Assignment 23 — Graphs III — MST, Bipartite & Bridges
 
-> **Lecture:** 23 of 38 — Divide & Conquer
-> **Phase:** 3 — Core Patterns
-> **Estimated Time:** 4 days · **Total Problems:** 18 (4 Easy · 10 Medium · 4 Hard)
-> **Goal:** Find the split point, keep the combine cheap, and read the running time straight off the recurrence.
+> **Lecture:** 23 of 45 — Graphs III — MST, Bipartite & Bridges
+> **Phase:** 2 — Core Data Structures
+> **Estimated Time:** 4 days · **Total Problems:** 10 (0 Easy · 7 Medium · 3 Hard)
+> **Goal:** Answer structural questions about a graph: cheapest connection, two-colouring, and the edges everything depends on.
 
 ---
 
@@ -11,188 +11,166 @@
 
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
-| Signal in the Problem                             | Pattern               | Move                                      |
-| ------------------------------------------------- | --------------------- | ----------------------------------------- |
-| "the answer for a range from its halves"          | Divide & Conquer      | split at the middle, combine the results  |
-| "kth largest / smallest", no full order needed    | QuickSelect           | partition, recurse into one side only     |
-| "count pairs i < j with a comparison"             | Merge Sort Counting   | count in bulk while the halves are sorted |
-| "all possible ways to group / build"              | Split at Every Choice | recurse on both sides, combine every pair |
-| a character or value that cannot be in the answer | Split at the Obstacle | solve the pieces between the obstacles    |
-| subproblems that repeat                           | **Not** plain D&C     | memoise — that is DP, Phase 4             |
+| Signal in the Problem                                | Pattern                    | Move                                                       |
+| ---------------------------------------------------- | -------------------------- | ---------------------------------------------------------- |
+| Connect everything as cheaply as possible            | MST — Kruskal or Prim      | Sort edges + union-find, or grow from one node with a heap |
+| Sparse graph, edges given as a list                  | Kruskal                    | Sorting edges dominates: O(E log E)                        |
+| Dense graph, or edges easy to enumerate per node     | Prim                       | O(E log V) with a priority queue                           |
+| Split into two groups with no conflict inside either | Bipartite 2-colouring      | BFS/DFS assigning alternating colours                      |
+| Which single edge would disconnect the graph?        | Tarjan bridges             | Compare low[child] with disc[parent]                       |
+| Use every edge exactly once                          | Eulerian path (Hierholzer) | Check degrees, then build the path backwards               |
 
 ---
 
-## 🟢 Easy Tier (4 Problems)
+## 🟢 Easy Tier (0 Problems)
 
-_Tree recursion, where the split is handed to you._
+_No Easy problems here — graph algorithms at this level simply do not have them. Start with the Medium tier._
 
-### E1 · Root Equals Sum of Children
+## 🟡 Medium Tier (7 Problems)
 
-**🔗 [LC 2236 — Root Equals Sum of Children](https://leetcode.com/problems/root-equals-sum-of-children/)** · Easy
-**Pattern:** Divide on the Root | **Companies:** Amazon
+_Spanning trees, two-colouring and degree arguments — structural questions rather than routing ones._
 
-**Hint:** One comparison, no recursion needed: the root's value against the sum of its two children. The smallest possible divide-and-conquer base case.
+### M1 · Is Graph Bipartite?
 
----
+**🔗 [LC 785 — Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)** · Medium
+**Pattern:** BFS 2-coloring | **Companies:** Google, Amazon, Facebook
 
-### E2 · Evaluate Boolean Binary Tree
-
-**🔗 [LC 2331 — Evaluate Boolean Binary Tree](https://leetcode.com/problems/evaluate-boolean-binary-tree/)** · Easy
-**Pattern:** Post-order Evaluation | **Companies:** Amazon, Google
-
-**Hint:** Leaves return their own value; an internal node combines its two children with AND or OR. Children must be evaluated before the node — that is post-order.
+**Hint:** BFS coloring: assign color 0 to the start, alternate colors for neighbours. If any neighbour has the same color
+as current node → not bipartite. Must handle disconnected graphs (loop all nodes).
 
 ---
 
-### E3 · Sum of Left Leaves
+### M2 · Min Cost to Connect All Points
 
-**🔗 [LC 404 — Sum of Left Leaves](https://leetcode.com/problems/sum-of-left-leaves/)** · Easy
-**Pattern:** Divide on the Root | **Companies:** Amazon, Adobe
+**🔗 [LC 1584 — Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/)** · Medium
+**Pattern:** MST (Prim's) | **Companies:** Google, Amazon
 
-**Hint:** Recurse on both children, but a left child that is a leaf contributes its value instead of recursing. Pass down whether this node is a left child.
-
----
-
-### E4 · Subtree of Another Tree
-
-**🔗 [LC 572 — Subtree of Another Tree](https://leetcode.com/problems/subtree-of-another-tree/)** · Easy
-**Pattern:** Two Recursions | **Companies:** Amazon, Google, Meta
-
-**Hint:** Write `isSame(a, b)` first, then: this node matches, or the left subtree contains it, or the right one does.
+**Hint:** Each pair of points has an edge with weight = Manhattan distance. MST on this complete graph. Use Prim's with
+a min-heap OR Kruskal's with sorted edges. Prim's is more efficient here since it avoids generating all O(n²) edges
+upfront.
 
 ---
 
-## 🟡 Medium Tier (10 Problems)
+### M3 · Possible Bipartition
 
-_Splits you have to invent: operators, obstacles, parities and roots._
+**🔗 [LC 886 — Possible Bipartition](https://leetcode.com/problems/possible-bipartition/)** · Medium
+**Pattern:** Bipartite 2-colouring | **Companies:** Amazon, Google
 
-### M1 · Different Ways to Add Parentheses
-
-**🔗 [LC 241 — Different Ways to Add Parentheses](https://leetcode.com/problems/different-ways-to-add-parentheses/)** · Medium
-**Pattern:** Split the Expression | **Companies:** Google, Amazon, Meta
-
-**Hint:** Each operator is the one applied last. Recurse on both sides, then combine every left result with every right result. Memoise on the substring.
+**Hint:** "Dislikes" are edges. Two groups means two colours — the same BFS as Is Graph Bipartite.
 
 ---
 
-### M2 · Longest Substring with At Least K Repeating Characters
+### M4 · Maximal Network Rank
 
-**🔗 [LC 395 — Longest Substring with At Least K Repeating Characters](https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/)** · Medium
-**Pattern:** Divide on the Impossible | **Companies:** Google, Amazon, Meta
+**🔗 [LC 1615 — Maximal Network Rank](https://leetcode.com/problems/maximal-network-rank/)** · Medium
+**Pattern:** Degree counting | **Companies:** Amazon, Google
 
-**Hint:** Any character appearing fewer than k times in the whole string cannot be in the answer, so split there and solve each piece.
-
----
-
-### M3 · Beautiful Array
-
-**🔗 [LC 932 — Beautiful Array](https://leetcode.com/problems/beautiful-array/)** · Medium
-**Pattern:** Construct by Parity | **Companies:** Google, Amazon
-
-**Hint:** If A is beautiful, so are `2A − 1` and `2A`. Build the odd half and the even half recursively and concatenate — odd plus even is odd, so no middle element breaks it.
+**Hint:** Rank is deg(a) + deg(b), minus one if they are directly connected. Only the highest-degree nodes can win.
 
 ---
 
-### M4 · Maximum Binary Tree
+### M5 · Detonate the Maximum Bombs
 
-**🔗 [LC 654 — Maximum Binary Tree](https://leetcode.com/problems/maximum-binary-tree/)** · Medium
-**Pattern:** Split at the Maximum | **Companies:** Amazon, Google
+**🔗 [LC 2101 — Detonate the Maximum Bombs](https://leetcode.com/problems/detonate-the-maximum-bombs/)** · Medium
+**Pattern:** Directed reachability | **Companies:** Amazon, Google
 
-**Hint:** The largest value is the root; everything left of it forms the left subtree, everything right the right subtree. Recurse on both ranges.
-
----
-
-### M5 · Balance a Binary Search Tree
-
-**🔗 [LC 1382 — Balance a Binary Search Tree](https://leetcode.com/problems/balance-a-binary-search-tree/)** · Medium
-**Pattern:** Split at the Middle | **Companies:** Amazon, Google
-
-**Hint:** In-order traversal gives sorted values. Rebuild by taking the middle as the root and recursing on both halves — the same construction as sorted-array-to-BST.
+**Hint:** Build a directed edge a→b when b is inside a, then DFS from every bomb and take the best count.
 
 ---
 
-### M6 · Unique Binary Search Trees II
+### M6 · Minimum Fuel Cost to Report to the Capital
 
-**🔗 [LC 95 — Unique Binary Search Trees II](https://leetcode.com/problems/unique-binary-search-trees-ii/)** · Medium
-**Pattern:** Split by the Root | **Companies:** Google, Amazon, Meta
+**🔗 [LC 2477 — Minimum Fuel Cost to Report to the Capital](https://leetcode.com/problems/minimum-fuel-cost-to-report-to-the-capital/)** · Medium
+**Pattern:** Tree DFS accumulating passengers | **Companies:** Google, Amazon
 
-**Hint:** For each value as root, recursively build all left subtrees from the smaller values and all right subtrees from the larger, then pair every left with every right.
-
----
-
-### M7 · All Possible Full Binary Trees
-
-**🔗 [LC 894 — All Possible Full Binary Trees](https://leetcode.com/problems/all-possible-full-binary-trees/)** · Medium
-**Pattern:** Split by Left Size | **Companies:** Google, Amazon
-
-**Hint:** A full binary tree has an odd number of nodes. For each odd split of `n − 1` into left and right, combine every left tree with every right tree. Memoise on n.
+**Hint:** Post-order: every subtree reports how many people it is sending up, and the edge cost is ceil(people ÷ seats).
 
 ---
 
-### M8 · Distribute Coins in Binary Tree
+### M7 · Minimum Height Trees
 
-**🔗 [LC 979 — Distribute Coins in Binary Tree](https://leetcode.com/problems/distribute-coins-in-binary-tree/)** · Medium
-**Pattern:** Post-order with a Balance | **Companies:** Google, Amazon
+**🔗 [LC 310 — Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)** · Medium
+**Pattern:** Topological peeling from the leaves | **Companies:** Google, Amazon
 
-**Hint:** Each subtree returns its surplus or deficit of coins. The moves along an edge equal the absolute value of what flows through it — sum those as you return.
-
----
-
-### M9 · Construct Quad Tree
-
-**🔗 [LC 427 — Construct Quad Tree](https://leetcode.com/problems/construct-quad-tree/)** · Medium
-**Pattern:** Split into Four | **Companies:** Google, Amazon
-
-**Hint:** If the square is uniform, it is a leaf. Otherwise split into four quadrants, recurse, and merge back into one leaf when all four children are identical leaves.
+**Hint:** Repeatedly strip the degree-1 nodes. Whatever survives last — one node or two — is the answer.
 
 ---
 
-### M10 · Global and Local Inversions
+## 🔴 Hard Tier (3 Problems)
 
-**🔗 [LC 775 — Global and Local Inversions](https://leetcode.com/problems/global-and-local-inversions/)** · Medium
-**Pattern:** Compare with the Sorted Order | **Companies:** Google, Amazon
+_Bridges, Eulerian paths, and an MST question that asks which edges matter rather than what the total is._
 
-**Hint:** Local inversions are a subset of global ones, so the answer is true exactly when every global inversion is local — check that no `nums[i]` exceeds the running minimum from two positions ahead.
+### H1 · Critical Connections in a Network
 
----
+**🔗 [LC 1192 — Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)** · Hard
+**Pattern:** Tarjan's bridges algorithm | **Companies:** Amazon, Google, Uber
 
-## 🔴 Hard Tier (4 Problems)
+**Hint:** DFS tracking `disc[]` (discovery time) and `low[]` (lowest disc reachable via DFS subtree). Edge `(u,v)` is a
+bridge if `low[v] > disc[u]` — meaning v's subtree can't reach u or above without this edge.
 
-_Divide and conquer carrying a counting argument._
-
-### H1 · Number of Pairs Satisfying Inequality
-
-**🔗 [LC 2426 — Number of Pairs Satisfying Inequality](https://leetcode.com/problems/number-of-pairs-satisfying-inequality/)** · Hard
-**Pattern:** Merge Sort Counting | **Companies:** Google, Amazon
-
-**Hint:** Rewrite as `d[i] = nums1[i] − nums2[i]`, so the condition becomes `d[i] ≤ d[j] + diff`. Count qualifying pairs during the merge with a forward pointer.
+**Why Hard?** Tarjan's algorithm requires careful `low[]` update logic and parent tracking to avoid using the same
+undirected edge bidirectionally.
 
 ---
 
-### H2 · Number of Ways to Reorder Array to Get Same BST
+### H2 · Reconstruct Itinerary
 
-**🔗 [LC 1569 — Number of Ways to Reorder Array to Get Same BST](https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/)** · Hard
-**Pattern:** Split by the Root | **Companies:** Google, Amazon
+**🔗 [LC 332 — Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/)** · Hard
+**Pattern:** Eulerian path (Hierholzer's algorithm) | **Companies:** Google, Amazon
 
-**Hint:** The first value is the root. Any interleaving of the two sides builds the same tree, so multiply `C(l + r, l)` by the ways for each side, and subtract one at the end.
+**Hint:** Build adjacency list with sorted destinations (min-heap or sorted list). DFS Hierholzer: post-order add to
+result. Reverse at end. The post-order trick ensures we don't get stuck in a dead end before exploring all other paths.
 
----
-
-### H3 · Count Good Triplets in an Array
-
-**🔗 [LC 2179 — Count Good Triplets in an Array](https://leetcode.com/problems/count-good-triplets-in-an-array/)** · Hard
-**Pattern:** Two Merge Passes (or a BIT) | **Companies:** Google, Amazon
-
-**Hint:** Map values to their positions in `nums2`. For each middle element, count how many smaller values precede it and how many larger follow, then multiply. A Fenwick tree does the counting.
+**Why Hard?** Recognising this as Eulerian path + the post-order trick to avoid greedy dead ends.
 
 ---
 
-### H4 · Create Sorted Array through Instructions
+### H3 · Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree
 
-**🔗 [LC 1649 — Create Sorted Array through Instructions](https://leetcode.com/problems/create-sorted-array-through-instructions/)** · Hard
-**Pattern:** Counting Structure | **Companies:** Google, Amazon
+**🔗 [LC 1489 — Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree](https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/)** · Hard
+**Pattern:** Kruskal, run three ways | **Companies:** Google, Amazon
 
-**Hint:** For each instruction, count elements strictly smaller and strictly larger among those already inserted. A Fenwick tree over the value range gives both in O(log n) — the same counting a merge sort does offline.
+**Hint:** Build the MST weight once. An edge is critical if excluding it raises the weight, pseudo-critical if forcing it in keeps the weight the same.
+
+---
+
+## 📊 Complexity Analysis Exercises
+
+Work out the time and space complexity of each snippet before checking the answers.
+
+```pseudocode
+// Snippet 1 — Kruskal: sort E edges, then union-find
+
+// Snippet 2 — Prim with a binary heap
+
+// Snippet 3 — Prim with an array scan, on a dense graph
+
+// Snippet 4 — bipartite check by BFS two-colouring
+
+// Snippet 5 — Tarjan's bridge-finding
+
+// Snippet 6 — Hierholzer's Eulerian path over E edges
+```
+
+**Complexity Answers:**
+
+1. **O(E log E)** — sorting dominates.
+2. **O(E log V)**.
+3. **O(V²)** — best for dense graphs.
+4. **O(V + E)**.
+5. **O(V + E)** — one DFS.
+6. **O(E)**.
+
+---
+
+## 🔍 Self-Assessment — True / False
+
+1. A minimum spanning tree of V nodes has V − 1 edges. → **True**
+2. The minimum spanning tree is always unique. → **False** — only when all edge weights are distinct
+3. A graph is bipartite exactly when it has no odd-length cycle. → **True**
+4. Kruskal needs a way to detect when an edge would form a cycle. → **True** — that is what union-find provides
+5. An edge that lies on a cycle can be a bridge. → **False** — removing it leaves the cycle's other path
+6. Prim and Kruskal can give MSTs with different total weights. → **False** — any two MSTs of a graph have the same total
 
 ---
 
@@ -200,12 +178,12 @@ _Divide and conquer carrying a counting argument._
 
 Answer these out loud, without looking at the notes:
 
-1. **Master Theorem:** Solve `T(n) = 2T(n/2) + O(n)` and `T(n) = T(n/2) + O(n)`. Why are the answers different?
-2. **QuickSelect:** Why is the average case O(n) rather than O(n log n), and what makes the worst case O(n²)?
-3. **Counting:** In inversion counting, why must the counting happen before the merge step rather than after?
-4. **D&C vs DP:** Both split problems. State the property that decides which one applies.
-5. **Base cases:** Give an example of a split that fails to shrink the problem, and say what happens when you run it.
-6. **Combine cost:** If combining two halves took O(n²), would divide and conquer still help? Work it out with the Master Theorem.
+1. **MST correctness:** Why is it safe to greedily take the cheapest edge that does not form a cycle?
+2. **Kruskal vs Prim:** Give the complexity of each and say which you would pick for a dense graph.
+3. **Uniqueness:** Is the minimum spanning tree unique? Under what condition is it?
+4. **Bipartite:** Explain why "two-colourable" and "no odd cycle" are the same statement.
+5. **Low-link:** Define disc and low in your own words. Why does low[v] > disc[u] mean (u, v) is a bridge?
+6. **Back edges:** In the bridge algorithm you skip the edge you arrived on — but only once. Why does that matter for parallel edges?
 
 ---
 
@@ -213,24 +191,27 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Amazon** | [Number of Pairs Satisfying Inequality](https://leetcode.com/problems/number-of-pairs-satisfying-inequality/), [Number of Ways to Reorder Array to Get Same BST](https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/), [Count Good Triplets in an Array](https://leetcode.com/problems/count-good-triplets-in-an-array/), [Create Sorted Array through Instructions](https://leetcode.com/problems/create-sorted-array-through-instructions/) |
-| **Google** | [Number of Pairs Satisfying Inequality](https://leetcode.com/problems/number-of-pairs-satisfying-inequality/), [Number of Ways to Reorder Array to Get Same BST](https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/), [Count Good Triplets in an Array](https://leetcode.com/problems/count-good-triplets-in-an-array/), [Create Sorted Array through Instructions](https://leetcode.com/problems/create-sorted-array-through-instructions/) |
-| **Meta**   | [Different Ways to Add Parentheses](https://leetcode.com/problems/different-ways-to-add-parentheses/), [Longest Substring with At Least K Repeating Characters](https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/), [Unique Binary Search Trees II](https://leetcode.com/problems/unique-binary-search-trees-ii/), [Subtree of Another Tree](https://leetcode.com/problems/subtree-of-another-tree/)                                 |
-| **Adobe**  | [Sum of Left Leaves](https://leetcode.com/problems/sum-of-left-leaves/)                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Company      | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon**   | [Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree](https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/), [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/), [Detonate the Maximum Bombs](https://leetcode.com/problems/detonate-the-maximum-bombs/), [Maximal Network Rank](https://leetcode.com/problems/maximal-network-rank/) |
+| **Google**   | [Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/), [Minimum Fuel Cost to Report to the Capital](https://leetcode.com/problems/minimum-fuel-cost-to-report-to-the-capital/), [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/), [Possible Bipartition](https://leetcode.com/problems/possible-bipartition/)                                       |
+| **Facebook** | [Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)                                                                                                                                                                                                                                                                                                                                                 |
+| **Uber**     | [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)                                                                                                                                                                                                                                                                                                                    |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 4 Easy problems solved
-- [ ] All 10 Medium problems solved
-- [ ] All 4 Hard problems attempted
+- [ ] All 0 Easy problems solved
+- [ ] All 7 Medium problems solved
+- [ ] All 3 Hard problems attempted
+- [ ] Every complexity exercise answered before checking
+- [ ] Self-assessment completed without looking at the notes
 - [ ] All 6 conceptual questions answered out loud
-- [ ] I can name the split point of any divide-and-conquer problem before coding it
-- [ ] I can add a counting line to a merge sort without changing its complexity
+- [ ] I can write Kruskal with union-find and Prim with a heap
+- [ ] I can two-colour a graph and explain the odd-cycle connection
+- [ ] I can find every bridge in one DFS and explain low-link
 
 ---
 
-**← [Lecture 22 · Greedy Algorithms](../Lecture22/Assignment.md)** &nbsp;·&nbsp; **[Lecture 24 · Union-Find (Disjoint Set Union)](../Lecture24/Assignment.md) →**
+**← [Lecture 22 · Graphs II — Topological Sort & Shortest Paths](../Lecture22/Assignment.md)** &nbsp;·&nbsp; **[Lecture 24 · Backtracking — Systematic Search](../Lecture24/Assignment.md) →**

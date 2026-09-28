@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 22 &mdash; Greedy Algorithms</title>
+    <title>
+      Lecture 22 &mdash; Graphs II (Topological Sort &amp; Shortest Paths)
+    </title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Master graphs: BFS, DFS, cycle detection, topological sort, Dijkstra, Bellman-Ford, MST, bipartite — with full dry runs and Java code."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -86,7 +88,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1391,40 +1393,33 @@
       }
     </style>
   </head>
+
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Greedy Algorithms</div>
+        <div class="sb-title">Graphs II &mdash; Paths</div>
         <div class="sb-meta">
-          Lecture 22 of 38 &middot; Phase 3 &mdash; Core Patterns
+          Lecture 22 of 45 &middot; Phase 2 &mdash; Core Data Structures
         </div>
       </div>
       <div class="sb-scroll">
         <div class="toc-label">On this page</div>
         <a class="toc-item" href="#intro"
-          ><span class="toc-icon">&#127757;</span>Introduction</a
+          ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#what"
-          ><span class="toc-icon">&#128161;</span>What Greedy Means</a
+        <a class="toc-item" href="#topo"
+          ><span class="toc-icon">&#9654;</span>Topological Sort</a
         >
-        <a class="toc-item" href="#proof"
-          ><span class="toc-icon">&#9878;&#65039;</span>Proving It Works</a
+        <a class="toc-item" href="#dijkstra"
+          ><span class="toc-icon">&#9881;</span>Dijkstra</a
         >
-        <a class="toc-item toc-sub" href="#pr-exchange">Exchange Argument</a>
-        <a class="toc-item toc-sub" href="#pr-fails">When Greedy Fails</a>
-        <a class="toc-item" href="#sorting"
-          ><span class="toc-icon">&#128202;</span>Greedy by Sorting</a
+        <a class="toc-item" href="#bellman"
+          ><span class="toc-icon">&#128308;</span>Bellman-Ford</a
         >
-        <a class="toc-item" href="#reach"
-          ><span class="toc-icon">&#127950;</span>Greedy by Reach</a
-        >
-        <a class="toc-item" href="#regret"
-          ><span class="toc-icon">&#128260;</span>Greedy with Regret</a
-        >
-        <a class="toc-item" href="#vs-dp"
-          ><span class="toc-icon">&#129518;</span>Greedy vs DP</a
+        <a class="toc-item" href="#floyd"
+          ><span class="toc-icon">&#128307;</span>Floyd-Warshall</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1442,14 +1437,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture21/lecture21_notes.html"
-          >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+          >&larr; Lecture 21 &middot; Graphs I</a
         >
         <a class="toc-item" href="../Lecture23/lecture23_notes.html"
-          >&rarr; Lecture 23 &middot; Divide &amp; Conquer</a
+          >&rarr; Lecture 23 &middot; Graphs III</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1457,10 +1451,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase3">Phase 3</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 22 &mdash; Greedy Algorithms</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
+          <span>Lecture 22 &mdash; Graphs II &mdash; Paths</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1478,1001 +1471,505 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128161;</span>
-          <h1 class="page-title">Greedy Algorithms</h1>
+          <span class="page-emoji">&#128739;&#65039;</span>
+          <h1 class="page-title">
+            Graphs II &mdash; Topological Sort &amp; Shortest Paths
+          </h1>
           <p class="page-sub">
-            &ldquo;Take the best-looking step and never look back. The hard part
-            is not the code &mdash; it is knowing that you are allowed
-            to.&rdquo;
+            &ldquo;Order the work, then price the route.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 22 of 38</span>
-            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
+            <span class="meta-chip accent">&#128218; Lecture 22 of 45</span>
+            <span class="meta-chip accent"
+              >Phase 2 &mdash; Core Data Structures</span
+            >
             <span class="meta-chip yellow">&#9201; 5 days</span>
-            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip green">&#127919; 16 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
             >
           </div>
         </div>
+        <!-- /.page-header -->
 
         <!-- WHY THIS MATTERS -->
-        <div class="callout blue" id="intro">
+        <div class="callout blue" style="margin-bottom: 20px" id="intro">
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            You have already written greedy algorithms without calling them
-            that: sorting by end time in Lecture 21, Kadane&#39;s reset in
-            Lecture 8, the heap that always took the most frequent task in
-            Lecture 16. What those have in common is a decision made once and
-            never revisited. This lecture is about the hard half &mdash; knowing
-            which rule to be greedy about, and being able to say why it cannot
-            go wrong.
+            Two questions dominate weighted-graph interviews. The first is
+            &ldquo;in what order may I do these tasks?&rdquo; &mdash; course
+            prerequisites, build dependencies, recipes &mdash; and topological
+            sort answers all of them. The second is &ldquo;what is the cheapest
+            route?&rdquo;, and there are three different answers depending on
+            whether weights can be negative and whether you need one source or
+            all of them. Knowing <em>which</em> to reach for is the skill being
+            tested; each algorithm itself is about fifteen lines.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>State the greedy-choice property and the exchange argument</li>
             <li>
-              Test a candidate rule against the inputs designed to break it
+              Produce a topological order with Kahn&#39;s algorithm and detect
+              impossibility
             </li>
+            <li>Run Dijkstra with a priority queue and state its assumption</li>
+            <li>Say exactly when Dijkstra breaks and Bellman-Ford is needed</li>
             <li>
-              Recognise the three shapes: sort-then-take, reach, and regret
+              Use Floyd-Warshall for all-pairs shortest paths and know its cost
             </li>
-            <li>
-              Say when a problem needs DP instead, and why greedy fails there
-            </li>
-            <li>
-              Write each pattern in a few lines, because the code is never the
-              hard part
-            </li>
+            <li>Pick the right one from the constraints in under a minute</li>
           </ul>
         </div>
 
-        <h2 class="h1" id="what">&#128161; What Greedy Actually Means</h2>
-        <p>
-          A greedy algorithm builds an answer one step at a time. At each step
-          it applies a fixed rule &mdash; take the cheapest, the earliest, the
-          largest &mdash; and it <strong>never undoes</strong> a step. That is
-          the whole definition, and also the whole risk.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; The Shape of Every Greedy
-              Solution</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>order the items by the rule           <span class="pc-cm">// the only creative step</span>
-answer ← empty
-
-<span class="pc-kw">for</span> item <span class="pc-kw">in</span> items:
-    <span class="pc-kw">if</span> item still fits the constraints:
-        take it                       <span class="pc-cm">// irrevocably</span>
-
-<span class="pc-kw">return</span> answer
-
-<span class="pc-cm">// The code is five lines. Choosing the rule — and proving it — is the work.</span></pre>
-        </div>
-
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>Two properties have to hold.</strong>
-            <em>Greedy choice:</em> some optimal answer contains the choice your
-            rule makes first. <em>Optimal substructure:</em> after making it,
-            what remains is the same problem on a smaller input. Interval
-            scheduling has both. Making change with coins {1, 3, 4} has neither
-            &mdash; which is why 6 becomes 4+1+1 instead of 3+3.
+            <strong
+              >The picture to keep in your head: Getting dressed, and water in
+              pipes.</strong
+            >
+            A topological order is any order of getting dressed that respects
+            the rules: socks before shoes, shirt before jacket. Dijkstra&rsquo;s
+            algorithm is water spreading from a tap through pipes of different
+            lengths: it reaches nearer junctions first, and the first time water
+            arrives at a junction, it got there by the shortest route.
           </div>
         </div>
 
-        <h2 class="h1" id="proof">&#9878;&#65039; Proving It Works</h2>
+        <hr />
+
+        <h2 class="h1" id="topo">&#9654; Topological Sort</h2>
         <p>
-          In an interview you will not write a formal proof, but you will be
-          asked <em>&ldquo;why does that work?&rdquo;</em> There is one answer
-          that fits almost every greedy problem.
+          A <strong>topological order</strong> of a DAG lists every node before
+          all nodes it points to. Only valid on Directed Acyclic Graphs. If a
+          cycle exists, no topological order exists. Use case: course
+          prerequisites, build dependency order, task scheduling.
         </p>
 
-        <h3 class="h2" id="pr-exchange">The Exchange Argument</h3>
-        <div class="callout yellow">
-          <span class="callout-icon">&#128270;</span>
-          <div class="callout-body">
-            <strong>The argument in three sentences.</strong> Suppose an optimal
-            answer disagrees with your first greedy choice. Swap your choice
-            into it, in place of whatever it used. Show the result is still
-            valid and no worse &mdash; so an optimal answer containing your
-            choice exists, and by repeating the argument, the whole greedy
-            answer is optimal.
-          </div>
-        </div>
-        <p>
-          For interval scheduling it reads: the optimal set&#39;s first meeting
-          ends no earlier than the earliest-ending meeting, so swapping yours in
-          cannot clash with anything that followed. Same size, still valid,
-          done.
-        </p>
-
-        <h3 class="h2" id="pr-fails">When Greedy Fails</h3>
-        <p>
-          Before trusting a rule, throw the standard counter-examples at it.
-          Most wrong greedy rules die to one of these four:
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Trap</th>
-              <th>Example</th>
-              <th>What breaks</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>A big item blocks two small ones</td>
-              <td>intervals [1, 10], [2, 3], [4, 5]</td>
-              <td>&ldquo;take the longest&rdquo; keeps 1 instead of 2</td>
-            </tr>
-            <tr>
-              <td>A cheap step now costs more later</td>
-              <td>coins {1, 3, 4}, target 6</td>
-              <td>largest-first gives 3 coins, best is 2</td>
-            </tr>
-            <tr>
-              <td>Negative or zero values</td>
-              <td>weights that can reduce a total</td>
-              <td>&ldquo;always add&rdquo; stops being safe</td>
-            </tr>
-            <tr>
-              <td>A choice that must be undone</td>
-              <td>0/1 knapsack with tight capacity</td>
-              <td>needs DP: items interact</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong>The two-minute test.</strong> Write your rule down, then
-            spend two minutes trying to build a five-element input that beats
-            it. If you cannot, sketch the exchange argument and commit. If you
-            can, you have just saved yourself a wrong solution &mdash; and the
-            counter-example usually points straight at DP.
-          </div>
-        </div>
-
-        <h2 class="h1" id="sorting">
-          &#128202; Shape 1 &mdash; Sort, Then Take
-        </h2>
-        <p>
-          The most common shape. Put the items in the right order and a single
-          pass is the whole algorithm. Everything depends on the sort key.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Two-Pointer Matching (Assign
-              Cookies)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending;  sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
-
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:       <span class="pc-cm">// smallest cookie that satisfies the least greedy child</span>
-            fed ← fed + 1;  i ← i + 1
-        j ← j + 1                       <span class="pc-cm">// a cookie too small is wasted on everyone</span>
-    <span class="pc-kw">return</span> fed
-
-<span class="pc-cm">// Exchange argument: giving a child a bigger cookie than needed can only
-// hurt, since that cookie might have been the only one for someone else.</span></pre>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Sort key</th>
-              <th>Problem shape</th>
-              <th>Why that key</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>end time ascending</td>
-              <td>keep the most non-overlapping items</td>
-              <td>finishing early leaves the most room</td>
-            </tr>
-            <tr>
-              <td>value per unit, descending</td>
-              <td>fractional knapsack, units on a truck</td>
-              <td>every unit of capacity should carry the most</td>
-            </tr>
-            <tr>
-              <td>both arrays ascending</td>
-              <td>matching two sets (cookies, boats)</td>
-              <td>spend the smallest resource that still works</td>
-            </tr>
-            <tr>
-              <td>tallest first, then insert by index</td>
-              <td>queue reconstruction</td>
-              <td>shorter people do not disturb taller ones</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="h1" id="reach">&#127950; Shape 2 &mdash; Track the Reach</h2>
-        <p>
-          No sorting at all: scan left to right, keeping the furthest point you
-          could get to. The greedy choice is invisible &mdash; it is the
-          decision to only ever extend the frontier.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Minimum Jumps</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0
-    currentEnd ← 0        <span class="pc-cm">// the last index reachable with the jumps taken</span>
-    farthest ← 0          <span class="pc-cm">// the best we could reach with one more</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:            <span class="pc-cm">// the current jump is used up</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest      <span class="pc-cm">// commit to the best frontier we saw</span>
-    <span class="pc-kw">return</span> jumps
-
-<span class="pc-cm">// [2,3,1,1,4]: frontier 0→2, then 2→4 → 2 jumps.
-// You never choose WHICH index to jump to — only how far the level reaches.</span></pre>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>It is BFS in disguise.</strong> Each &ldquo;level&rdquo; is
-            the set of indices reachable with one more jump, and
-            <code>currentEnd</code> marks the end of the level &mdash; exactly
-            the ring-by-ring sweep from Lecture 17, done with two integers
-            instead of a queue.
-          </div>
-        </div>
-
-        <p>
-          The same frontier idea, differently dressed: Gas Station asks where a
-          circular tour can start. If the total gas is at least the total cost a
-          solution exists, and the only possible start is just after the point
-          where the running tank hits its lowest value.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Gas Station &mdash; Start at the
-              Valley</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:                 <span class="pc-cm">// cannot reach i + 1 from the current start</span>
-            start ← i + 1              <span class="pc-cm">// so no station in between works either</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start</pre>
-        </div>
-
-        <h2 class="h1" id="regret">
-          &#128260; Shape 3 &mdash; Greedy with Regret
-        </h2>
-        <p>
-          Sometimes you must take things as they arrive, and only later discover
-          you cannot afford them all. The fix is a heap: take everything, and
-          when a constraint breaks, give back the worst thing you have taken.
-          The decision is still never re-examined &mdash; only the worst item is
-          ever dropped.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Course Schedule III</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending      <span class="pc-cm">// handle the most urgent first</span>
-    heap ← empty max-heap of durations
-    time ← 0
-
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration);  time ← time + duration    <span class="pc-cm">// take it first</span>
-
-        <span class="pc-kw">if</span> time &gt; deadline:                 <span class="pc-cm">// over budget — regret the longest course</span>
-            time ← time - heap.popMax()
-    <span class="pc-kw">return</span> heap.size
-
-<span class="pc-cm">// Dropping the longest course taken so far never reduces the count,
-// and always frees the most time. Same trick as Minimum Refueling Stops.</span></pre>
-        </div>
-
-        <h2 class="h1" id="vs-dp">&#129518; Greedy vs Dynamic Programming</h2>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Greedy</th>
-              <th>Dynamic programming</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Decisions</td>
-              <td>one rule, never revisited</td>
-              <td>every option explored, best kept</td>
-            </tr>
-            <tr>
-              <td>Cost</td>
-              <td>usually O(n log n), often O(n)</td>
-              <td>states &times; transitions</td>
-            </tr>
-            <tr>
-              <td>Needs</td>
-              <td>greedy choice + optimal substructure</td>
-              <td>optimal substructure alone</td>
-            </tr>
-            <tr>
-              <td>Fails when</td>
-              <td>a local best blocks a better global answer</td>
-              <td>rarely &mdash; but may be too slow or too big</td>
-            </tr>
-            <tr>
-              <td>Example pair</td>
-              <td>fractional knapsack</td>
-              <td>0/1 knapsack (Lecture 27)</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#9888;&#65039;</span>
-          <div class="callout-body">
-            <strong>The tell.</strong> If taking an item can make a later,
-            better item unaffordable &mdash; and you cannot fix that by sorting
-            &mdash; greedy is wrong and DP is right. If the items never interact
-            except through one running quantity (time, capacity, reach), greedy
-            usually wins.
-          </div>
-        </div>
-
-        <h2 class="h1" id="pitfalls">
-          &#9888;&#65039; Complexity &amp; The Classic Bugs
-        </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Shape</th>
-              <th>Time</th>
-              <th>Space</th>
-              <th>Typical problems</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Sort, then one pass</td>
-              <td>O(n log n)</td>
-              <td>O(1)</td>
-              <td>Assign Cookies, Boats, Non-overlapping Intervals</td>
-            </tr>
-            <tr>
-              <td>Track the reach</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Jump Game I / II, Gas Station</td>
-            </tr>
-            <tr>
-              <td>Greedy with regret (heap)</td>
-              <td>O(n log n)</td>
-              <td>O(n)</td>
-              <td>Course Schedule III, Refueling Stops</td>
-            </tr>
-            <tr>
-              <td>Counting greedy</td>
-              <td>O(n)</td>
-              <td>O(1)</td>
-              <td>Lemonade Change, Valid Parenthesis String</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Bug</th>
-              <th>Symptom</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Guessing the sort key</td>
-              <td>Passes the samples, fails hidden tests</td>
-              <td>Sketch the exchange argument before coding</td>
-            </tr>
-            <tr>
-              <td>
-                Sorting by start for a &ldquo;keep the most&rdquo; question
-              </td>
-              <td>One long item blocks two short ones</td>
-              <td>Sort by end</td>
-            </tr>
-            <tr>
-              <td>Greedy where items interact</td>
-              <td>Answer is close but never optimal</td>
-              <td>Switch to DP &mdash; the counter-example shows why</td>
-            </tr>
-            <tr>
-              <td>No feasibility check</td>
-              <td>Returns an answer where none exists</td>
-              <td>Test the total first (Gas Station, Taps)</td>
-            </tr>
-            <tr>
-              <td>Regret heap keyed on the wrong field</td>
-              <td>Drops an item that was not the costly one</td>
-              <td>The heap orders by what you want back, not by arrival</td>
-            </tr>
-            <tr>
-              <td>Ties left to the default order</td>
-              <td>Unstable results on equal keys</td>
-              <td>Make the tie-break explicit in the comparator</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="callout green">
+        <h3 class="h3" id="kahns">
+          Kahn&apos;s Algorithm (BFS-based) &mdash; Recommended
+        </h3>
+        <div class="callout blue">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong>
-            &ldquo;Maximum number of&hellip;&rdquo;, &ldquo;minimum steps
-            to&hellip;&rdquo;, &ldquo;can you finish&hellip;&rdquo; &mdash; with
-            no requirement to report the actual arrangement, and items that only
-            interact through one running quantity. Say the rule out loud, test
-            it against two adversarial inputs, then write the five lines.
+            <strong>Intuition:</strong> A node with in-degree 0 has no
+            dependencies &mdash; process it first. After removing it, some
+            neighbours lose a dependency (in-degree drops). If their in-degree
+            reaches 0, they&apos;re ready. Repeat. If the output order has fewer
+            than V nodes, there was a cycle.
           </div>
         </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Topological Sort (Kahn's)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Repeatedly take a node nothing depends on. If you can't empty</span>
+<span class="pc-cm">// the graph, what is left is a cycle.</span>
+indeg <span class="pc-kw">&larr;</span> count of incoming edges for every node
+queue <span class="pc-kw">&larr;</span> every node with indeg = 0
+order <span class="pc-kw">&larr;</span> empty list
 
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+<span class="pc-kw">while</span> queue not empty:
+    node <span class="pc-kw">&larr;</span> queue.popFront()
+    order.append(node)
+
+    <span class="pc-kw">for</span> nb <span class="pc-kw">in</span> adj[node]:
+        indeg[nb] <span class="pc-kw">&larr;</span> indeg[nb] - 1
+        <span class="pc-kw">if</span> indeg[nb] = 0: queue.pushBack(nb)
+
+<span class="pc-kw">if</span> length(order) &ne; V: <span class="pc-kw">return</span> CYCLE_DETECTED
+<span class="pc-kw">return</span> order
+
+<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
+        </div>
+
+        <h3 class="h3" id="topo-dfs">DFS-based Topological Sort</h3>
         <p>
-          Six problems across the three shapes. For each one, say the rule out
-          loud and try to break it before you write any code.
+          After fully processing a node (all descendants done), push it onto a
+          stack. Reverse the stack for the order. Equivalent to Kahn&apos;s but
+          DFS-native &mdash; useful when you already have DFS in the solution.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; DFS Topo Sort (post-order +
+              stack)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>stack ← empty stack
+visited ← array of V, all false
+
+<span class="pc-kw">function</span> dfs(node):
+    visited[node] ← true
+    <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> <span class="pc-kw">not</span> visited[nei]: dfs(nei)
+    stack.push(node)                 <span class="pc-cm">// push AFTER all neighbours are done</span>
+
+<span class="pc-cm">// Call dfs(i) for every unvisited i, then read the stack top-to-bottom</span></pre>
+        </div>
+
+        <hr />
+
+        <!-- ═══ DIJKSTRA ═══ -->
+        <h2 class="h1" id="dijkstra">&#9881; Dijkstra&apos;s Algorithm</h2>
+        <p>
+          Dijkstra finds the shortest path in a
+          <strong>weighted graph with non-negative edges</strong>. It is
+          essentially BFS with a <strong>min-heap</strong> instead of a plain
+          queue, always processing the node with the currently known shortest
+          distance.
         </p>
 
-        <!-- Problem 01: Assign Cookies -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 01 &middot; Sort, Then Match</div>
-              <div class="prob-title">Assign Cookies</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/assign-cookies/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 455 - Assign Cookies</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Two-Pointer Matching</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <div class="pattern-banner">
+          <h4>&#127919; Dijkstra Recognition Signal</h4>
+          <p>
+            "Shortest path", "minimum cost/time/effort" and edges have
+            <em>non-negative weights</em>
+            &rarr; Dijkstra. Weights are negative? &rarr; Bellman-Ford. K-stops
+            constraint? &rarr; Modified Bellman-Ford (DP with relaxation limit).
+          </p>
+        </div>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Dijkstra's Shortest Path</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each child has a greed factor and each cookie a size. A child is
-                content if the cookie is at least their greed. Maximise the
-                number of content children.
-              </p>
-              <div class="iobox">
-                greed = [1, 2, 3], cookies = [1, 1] → 1
-                &nbsp;&nbsp;|&nbsp;&nbsp; greed = [1, 2], cookies = [1, 2, 3] →
-                2
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Which cookie should go to the least greedy child? The
-                    smallest that works, or the largest?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sort both. Walk them with two pointers, giving the smallest
-                    cookie that satisfies the current child and skipping cookies
-                    that satisfy nobody.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The exchange argument: if an optimal solution gives a child a
-                larger cookie than needed, swapping in the smallest sufficient
-                one keeps everyone content and frees the larger cookie for
-                someone else. So the greedy match is never worse. Both pointers
-                only move forward, so after the sort it is one linear pass.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Smallest Sufficient
-                      Cookie</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> findContentChildren(greed, cookies):
-    sort greed ascending
-    sort cookies ascending
-    i ← 0;  j ← 0;  fed ← 0
+          <pre><span class="pc-cm">// Weighted, non-negative edges. Always expand the closest unfinished</span>
+<span class="pc-cm">// node — a min-heap keeps that cheap.</span>
+dist <span class="pc-kw">&larr;</span> array of infinity, length V
+dist[src] <span class="pc-kw">&larr;</span> 0
+heap <span class="pc-kw">&larr;</span> min-heap holding (0, src) ordered by distance
 
-    <span class="pc-kw">while</span> i &lt; length(greed) <span class="pc-kw">and</span> j &lt; length(cookies):
-        <span class="pc-kw">if</span> cookies[j] ≥ greed[i]:
-            fed ← fed + 1
-            i ← i + 1                 <span class="pc-cm">// this child is done</span>
-        j ← j + 1                     <span class="pc-cm">// the cookie is used or useless either way</span>
-    <span class="pc-kw">return</span> fed
+<span class="pc-kw">while</span> heap not empty:
+    (d, node) <span class="pc-kw">&larr;</span> heap.extractMin()
+    <span class="pc-kw">if</span> d > dist[node]: <span class="pc-kw">continue</span>     <span class="pc-cm">// a stale copy — skip it</span>
 
-<span class="pc-cm">// greed [1,2,3], cookies [1,1]: cookie 1 feeds child 1; the second
-// cookie satisfies nobody → 1 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n + m log m)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+    <span class="pc-kw">for</span> (nb, w) <span class="pc-kw">in</span> adj[node]:
+        <span class="pc-kw">if</span> d + w &lt; dist[nb]:
+            dist[nb] <span class="pc-kw">&larr;</span> d + w
+            heap.insert((dist[nb], nb))
+
+<span class="pc-kw">return</span> dist
+
+<span class="pc-cm">// Negative edges? Dijkstra is WRONG — use Bellman-Ford.</span>
+<span class="pc-cm">// All weights 0 or 1? A deque beats the heap (0-1 BFS).</span>
+
+<span class="pc-cm">// Time: O((V + E) log V)  Space: O(V)</span></pre>
+        </div>
+
+        <div class="callout yellow">
+          <span class="callout-icon">&#128204;</span>
+          <div class="callout-body">
+            <strong>The &ldquo;stale entry&rdquo; check is critical.</strong>
+            Java&apos;s PriorityQueue does not support decrease-key, so when you
+            find a shorter path you push a new entry rather than updating the
+            old one. Old (larger) entries remain in the heap. The check
+            <code>if (d &gt; dist[node]) continue</code> discards them when they
+            eventually pop.
           </div>
         </div>
 
-        <!-- Problem 02: Lemonade Change -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Counting Greedy</div>
-              <div class="prob-title">Lemonade Change</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/lemonade-change/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 860 - Lemonade Change</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-easy">Easy</span>
-                <span class="tag tag-pat">Spend the Largest First</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O((V+E) log V)</span>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Customers pay with $5, $10 or $20 bills for a $5 drink. You
-                start with no change. Return true if you can serve everyone in
-                order.
-              </p>
-              <div class="iobox">
-                bills = [5, 5, 5, 10, 20] → true &nbsp;&nbsp;|&nbsp;&nbsp; bills
-                = [5, 5, 10, 10, 20] → false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    For a $20 you owe $15. Two ways to make it &mdash; which do
-                    you use?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Prefer a $10 plus a $5. Fives are useful for every kind of
-                    change, so keep as many as you can.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Only two counters are needed; twenties are never given as
-                change, so they are not worth tracking. The greedy rule is to
-                spend the least flexible bill first: a $10 can only ever be part
-                of $15, while a $5 can pay change for a $10 or a $20. Giving
-                away three fives when a ten was available is the classic
-                failure.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Counters</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> lemonadeChange(bills):
-    fives ← 0;  tens ← 0
-
-    <span class="pc-kw">for</span> bill <span class="pc-kw">in</span> bills:
-        <span class="pc-kw">if</span> bill = 5: fives ← fives + 1
-        <span class="pc-kw">else</span> <span class="pc-kw">if</span> bill = 10:
-            <span class="pc-kw">if</span> fives = 0: <span class="pc-kw">return</span> false
-            fives ← fives - 1;  tens ← tens + 1
-        <span class="pc-kw">else</span>:                              <span class="pc-cm">// a 20 needs 15 back</span>
-            <span class="pc-kw">if</span> tens &gt; 0 <span class="pc-kw">and</span> fives &gt; 0:
-                tens ← tens - 1;  fives ← fives - 1   <span class="pc-cm">// prefer 10 + 5</span>
-            <span class="pc-kw">else</span> <span class="pc-kw">if</span> fives ≥ 3:
-                fives ← fives - 3
-            <span class="pc-kw">else</span>: <span class="pc-kw">return</span> false
-    <span class="pc-kw">return</span> true</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val">O(V + E)</span>
+          </div>
+          <div class="cx-badge yellow">
+            <span class="cx-label">Constraint</span
+            ><span class="cx-val">Non-negative weights only</span>
           </div>
         </div>
 
-        <!-- Problem 03: Jump Game II -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Track the Reach</div>
-              <div class="prob-title">Jump Game II</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/jump-game-ii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 45 - Jump Game II</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Frontier / Implicit BFS</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+        <hr />
+
+        <!-- ═══ BELLMAN-FORD ═══ -->
+        <h2 class="h1" id="bellman">&#128308; Bellman-Ford</h2>
+        <p>
+          Bellman-Ford relaxes all edges V&minus;1 times. Works with
+          <strong>negative weights</strong>. A V-th relaxation pass that still
+          improves a distance indicates a <strong>negative cycle</strong>.
+          Slower than Dijkstra but more general.
+        </p>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Bellman-Ford</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each <code>nums[i]</code> is the maximum jump length from index
-                <code>i</code>. Return the minimum number of jumps to reach the
-                last index (always possible).
-              </p>
-              <div class="iobox">
-                nums = [2, 3, 1, 1, 4] → 2 &nbsp;(index 0 → 1 → 4)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    You never need to decide which index to land on. What do you
-                    actually need to track?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Keep the end of the current jump&rsquo;s range and the
-                    furthest index reachable with one more. When you hit the end
-                    of the range, take a jump and move the frontier out.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is breadth-first search with two integers instead of a
-                queue: each jump is one BFS level, and
-                <code>currentEnd</code> marks where that level stops. Because
-                you only ever extend the frontier, no backtracking is possible
-                &mdash; the greedy choice is to always jump to the level that
-                reaches furthest. Stop the loop at <code>n - 2</code> so
-                arriving exactly at the last index does not count an extra jump.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Level by Level</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> jump(nums):
-    jumps ← 0;  currentEnd ← 0;  farthest ← 0
+          <pre><span class="pc-kw">function</span> bellmanFord(edges, V, src):
+    dist ← array of V, all ∞
+    dist[src] ← 0
 
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 2:
-        farthest ← max(farthest, i + nums[i])
-        <span class="pc-kw">if</span> i = currentEnd:          <span class="pc-cm">// this jump can go no further</span>
-            jumps ← jumps + 1
-            currentEnd ← farthest
-    <span class="pc-kw">return</span> jumps
+    <span class="pc-kw">repeat</span> V - 1 <span class="pc-kw">times</span>:                    <span class="pc-cm">// V-1 rounds</span>
+        <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges:
+            <span class="pc-kw">if</span> dist[u] ≠ ∞ <span class="pc-kw">and</span> dist[u] + w &lt; dist[v]:
+                dist[v] ← dist[u] + w
 
-<span class="pc-cm">// [2,3,1,1,4]: i=0 farthest=2, i=currentEnd → jump 1, end=2
-// i=1 farthest=4; i=2 = end → jump 2, end=4 → answer 2 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+    <span class="pc-cm">// Optional V-th pass: anything that still improves means a negative cycle</span>
+    <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges:
+        <span class="pc-kw">if</span> dist[u] ≠ ∞ <span class="pc-kw">and</span> dist[u] + w &lt; dist[v]:
+            report "negative cycle reachable <span class="pc-kw">from</span> src"
+    <span class="pc-kw">return</span> dist
+
+<span class="pc-cm">// Time: O(V × E)  Space: O(V)</span>
+<span class="pc-cm">// In fixed-width integers use a large finite INF (e.g. MAX ÷ 2) so dist[u] + w can't overflow</span></pre>
+        </div>
+
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong
+              >LC 787 &ldquo;Cheapest Flights Within K Stops&rdquo;:</strong
+            >
+            Use Bellman-Ford limited to K+1 rounds instead of V&minus;1. Copy
+            <code>dist</code> at the start of each round to avoid using the same
+            round&apos;s updates within the same round (the &ldquo;temp
+            array&rdquo; trick).
           </div>
         </div>
 
-        <!-- Problem 04: Gas Station -->
+        <div class="complexity-row">
+          <div class="cx-badge yellow">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V &times; E)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Handles</span
+            ><span class="cx-val">Negative weights</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ═══ FLOYD-WARSHALL ═══ -->
+        <h2 class="h1" id="floyd">&#128307; Floyd-Warshall</h2>
+        <p>
+          Floyd-Warshall computes <strong>all-pairs shortest paths</strong> in
+          O(V<sup>3</sup>) time. Works with negative weights (no negative
+          cycles). Use only when V is small (&le;&nbsp;300) and you need
+          distances between every pair of nodes.
+        </p>
+
+        <div class="pattern-banner">
+          <h4>&#127919; Floyd-Warshall Recognition Signal</h4>
+          <p>
+            "Shortest path between <em>all</em> pairs", "transitive closure",
+            "can i reach j?" for every pair, or small V (&le;&nbsp;300) with
+            negative weights &rarr; Floyd-Warshall. Single source? Use Dijkstra
+            or Bellman-Ford instead.
+          </p>
+        </div>
+
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Floyd-Warshall All-Pairs Shortest
+              Path</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// dist[i][j] = shortest distance from i to j</span>
+dist ← V × V matrix, all ∞
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1: dist[i][i] ← 0
+<span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> edges: dist[u][v] ← w
+
+<span class="pc-cm">// Try every intermediate node k</span>
+<span class="pc-kw">for</span> k <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> V - 1:
+            <span class="pc-kw">if</span> dist[i][k] &lt; ∞ <span class="pc-kw">and</span> dist[k][j] &lt; ∞:
+                dist[i][j] ← min(dist[i][j], dist[i][k] + dist[k][j])
+
+<span class="pc-cm">// Negative cycle: if dist[i][i] &lt; 0 for any i, a negative cycle exists</span>
+<span class="pc-cm">// Time: O(V³)  Space: O(V²)</span></pre>
+        </div>
+
+        <div class="callout orange">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-body">
+            <strong>Overflow guard:</strong> Use
+            <code>INF&nbsp;=&nbsp;1e9</code> (not
+            <code>Integer.MAX_VALUE</code>) to avoid overflow when computing
+            <code>dist[i][k]&nbsp;+&nbsp;dist[k][j]</code>. The guard
+            <code>if (dist[i][k] &lt; INF)</code> also protects you.
+          </div>
+        </div>
+
+        <div class="complexity-row">
+          <div class="cx-badge red">
+            <span class="cx-label">Time</span
+            ><span class="cx-val">O(V&sup3;)</span>
+          </div>
+          <div class="cx-badge yellow">
+            <span class="cx-label">Space</span
+            ><span class="cx-val">O(V&sup2;)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Handles</span
+            ><span class="cx-val">Negative weights</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
+        <p>
+          The costs worth quoting in an interview first, then the mistakes that
+          most often break code that looks correct. Every row in the second
+          table is a bug someone has shipped.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Cost</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Topological sort (Kahn)</td>
+                <td>O(V + E)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Dijkstra with a binary heap</td>
+                <td>O((V + E) log V)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Bellman-Ford</td>
+                <td>O(V &middot; E)</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Floyd-Warshall</td>
+                <td>O(V&sup3;) time, O(V&sup2;) space</td>
+                <td>Only for small V</td>
+              </tr>
+              <tr>
+                <td>0-1 BFS</td>
+                <td>O(V + E)</td>
+                <td>Weights of 0 and 1 only</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>Symptom</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dijkstra with negative edges</td>
+                <td>Wrong distances, no error</td>
+                <td>Use Bellman-Ford</td>
+              </tr>
+              <tr>
+                <td>Not skipping stale heap entries</td>
+                <td>Extra work, occasionally wrong results</td>
+                <td><code>if d &gt; dist[u]: continue</code></td>
+              </tr>
+              <tr>
+                <td>Topological sort ignoring leftovers</td>
+                <td>An &ldquo;order&rdquo; for a graph that has a cycle</td>
+                <td>Check that every node was output</td>
+              </tr>
+              <tr>
+                <td>Hop-limited Bellman-Ford without a snapshot</td>
+                <td>Uses more hops than allowed</td>
+                <td>Relax from a copy of the previous round</td>
+              </tr>
+              <tr>
+                <td>Floyd-Warshall with <code>k</code> as the inner loop</td>
+                <td>Wrong distances</td>
+                <td><code>k</code> must be the outermost loop</td>
+              </tr>
+              <tr>
+                <td>Infinity plus a weight</td>
+                <td>Overflow into a negative &ldquo;shortest&rdquo; path</td>
+                <td>Only relax when <code>dist[u]</code> is finite</td>
+              </tr>
+              <tr>
+                <td>Plain BFS on a weighted graph</td>
+                <td>Wrong shortest paths</td>
+                <td>Dijkstra, or 0-1 BFS for 0/1 weights</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <!-- ═══ MST ═══ -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Three problems, one per decision: is this an ordering question, a
+          plain shortest path, or a shortest path with a catch?
+        </p>
+
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 04 &middot; Start at the Valley
-              </div>
-              <div class="prob-title">Gas Station</div>
-              <div style="margin-top: 4px">
+                Problem 01 &middot;
                 <a
-                  href="https://leetcode.com/problems/gas-station/"
+                  href="https://leetcode.com/problems/course-schedule/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 134 - Gas Station</a
+                  style="font-size: 11px"
+                  >LC 207</a
                 >
               </div>
+              <div class="prob-title">Course Schedule</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Running Total + Restart</span>
+                <span class="tag tag-pat"
+                  >Topological Sort / Cycle Detection</span
+                >
                 <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
+                  >Amazon · Google · Meta · Microsoft</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Around a circular route, station <code>i</code> gives
-                <code>gas[i]</code> and driving to the next costs
-                <code>cost[i]</code>. Return the starting station that lets you
-                complete the circuit, or &minus;1.
-              </p>
-              <div class="iobox">gas = [1,2,3,4,5], cost = [3,4,5,1,2] → 3</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    First, when is the trip impossible at all? That question has
-                    nothing to do with the starting point.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    If the tank goes negative somewhere, no station between the
-                    old start and that point can work either &mdash; so restart
-                    from the next station and reset the tank.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Two separate facts. Feasibility is global: if total gas is at
-                least total cost, some start works. Location is local: whenever
-                the running tank dips below zero, every station in the failed
-                stretch is also a failure, so the search can jump past all of
-                them. That is what makes it one pass instead of n simulations.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Total + Restart Point</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> canCompleteCircuit(gas, cost):
-    total ← 0;  tank ← 0;  start ← 0
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(gas) - 1:
-        gain ← gas[i] - cost[i]
-        total ← total + gain
-        tank ← tank + gain
-        <span class="pc-kw">if</span> tank &lt; 0:
-            start ← i + 1              <span class="pc-cm">// skip the whole failed stretch</span>
-            tank ← 0
-    <span class="pc-kw">if</span> total &lt; 0: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> start
-
-<span class="pc-cm">// gains: -2, -2, -2, +3, +3 → total 0; tank dips at 0,1,2 → start = 3 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 05: Queue Reconstruction by Height -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Sort by Height</div>
-              <div class="prob-title">Queue Reconstruction by Height</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/queue-reconstruction-by-height/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 406 - Queue Reconstruction by Height</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Insert in the Right Order</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each person is <code>[h, k]</code>: height <code>h</code>, with
-                exactly <code>k</code> people of height at least
-                <code>h</code> in front of them. Rebuild the queue.
+                There are <code>n</code> courses (0 to n-1).
+                <code>prerequisites[i] = [a, b]</code> means you must take
+                <code>b</code> before <code>a</code>. Return true if it is
+                possible to finish all courses.
               </p>
               <div class="iobox">
-                people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]] →
-                [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+                Input: n=2, prerequisites=[[1,0]] Output: true Input: n=2,
+                prerequisites=[[1,0],[0,1]] Output: false (cycle)
               </div>
             </div>
             <div class="prob-section">
@@ -2484,8 +1981,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Whose position can you be certain about before placing
-                    anyone else?
+                    'Can I finish?' is really asking whether the prerequisite
+                    graph has a cycle.
                   </p>
                 </div>
               </details>
@@ -2496,22 +1993,21 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Place the tallest first: for them, <code>k</code> is
-                    literally the index. Shorter people inserted later are
-                    invisible to them, so earlier placements never break.
+                    Kahn's algorithm: repeatedly remove nodes with in-degree 0.
+                    If you cannot process all V nodes, the leftovers form a
+                    cycle.
                   </p>
                 </div>
               </details>
             </div>
+
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Sort by height descending, and by <code>k</code> ascending
-                within the same height. Then insert each person at index
-                <code>k</code>. The invariant is what makes it work: everyone
-                already placed is at least as tall, so the count in front of
-                them is unaffected by a later, shorter insertion. It is a greedy
-                order plus a list insert, not a rearrangement.
+                Build a directed graph. A cycle means a course depends on itself
+                (directly or indirectly) &mdash; impossible. Run Kahn&apos;s
+                BFS: if the number of processed nodes equals <code>n</code>, no
+                cycle.
               </p>
             </div>
             <details>
@@ -2522,31 +2018,34 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Tallest First, Insert at
-                      k</span
+                      >&#128208; Pseudocode &middot; LC 207</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> reconstructQueue(people):
-    sort people by height DESCENDING, <span class="pc-kw">and</span> by k ASCENDING on ties
-
-    queue ← empty list
-    <span class="pc-kw">for</span> (h, k) <span class="pc-kw">in</span> people:
-        insert (h, k) into queue at index k     <span class="pc-cm">// everyone already there is ≥ h</span>
-    <span class="pc-kw">return</span> queue
-
-<span class="pc-cm">// [7,0] [7,1] [6,1] [5,0] [5,2] [4,4]
-// → [7,0]; [7,0][7,1]; [7,0][6,1][7,1]; [5,0] at 0; [5,2] at 2; [4,4] at 4</span></pre>
+                  <pre><span class="pc-kw">function</span> canFinish(n, prerequisites):
+    adj ← n empty lists;  indeg ← array of n, all 0
+    <span class="pc-kw">for</span> (course, pre) <span class="pc-kw">in</span> prerequisites:
+        adj[pre].append(course)             <span class="pc-cm">// pre must come before course</span>
+        indeg[course] ← indeg[course] + 1
+    q ← every node with indeg = 0
+    done ← 0
+    <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
+        node ← q.dequeue()
+        done ← done + 1
+        <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> adj[node]:
+            indeg[nei] ← indeg[nei] - 1
+            <span class="pc-kw">if</span> indeg[nei] = 0: q.enqueue(nei)
+    <span class="pc-kw">return</span> done = n                          <span class="pc-cm">// anything left is stuck in a cycle</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n²)</span>
+                    ><span class="cx-val">O(V+E)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val">O(V+E)</span>
                   </div>
                 </div>
               </div>
@@ -2554,23 +2053,146 @@ answer ← empty
           </div>
         </div>
 
-        <!-- Problem 06: Course Schedule III -->
+        <!-- PROB 04 -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Greedy with Regret</div>
-              <div class="prob-title">Course Schedule III</div>
+              <div class="prob-num">
+                Problem 02 &middot;
+                <a
+                  href="https://leetcode.com/problems/network-delay-time/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 743</a
+                >
+              </div>
+              <div class="prob-title">Network Delay Time</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Dijkstra</span>
+                <span class="tag tag-co">Google · Amazon · Uber</span>
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Weighted directed graph with <code>n</code> nodes. Signal starts
+                from node <code>k</code>. Return the time for all nodes to
+                receive the signal, or -1 if any node is unreachable.
+              </p>
+              <div class="iobox">
+                Input: times=[[2,1,1],[2,3,1],[3,4,1]], n=4, k=2 Output: 2
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Edges have weights, so BFS is wrong. All weights are
+                    positive, so you have a choice.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Dijkstra with a min-heap. The answer is the maximum over all
+                    shortest distances; if any node is unreachable, return -1.
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Dijkstra from node <code>k</code>. Answer =
+                <code>max(dist[])</code>. If any dist remains infinity, return
+                -1. Classic single-source shortest path on a weighted graph.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 743</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> networkDelayTime(<span class="pc-kw">times</span>, n, k):
+    adj ← n + 1 empty lists                 <span class="pc-cm">// nodes are 1-indexed</span>
+    <span class="pc-kw">for</span> (u, v, w) <span class="pc-kw">in</span> <span class="pc-kw">times</span>: adj[u].append((v, w))
+    dist ← array of n + 1, all ∞;  dist[k] ← 0
+    pq ← min-heap of (distance, node), starting with (0, k)
+    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
+        (d, node) ← pq.popMin()
+        <span class="pc-kw">if</span> d &gt; dist[node]: <span class="pc-kw">continue</span>          <span class="pc-cm">// stale</span>
+        <span class="pc-kw">for</span> (nei, w) <span class="pc-kw">in</span> adj[node]:
+            <span class="pc-kw">if</span> dist[node] + w &lt; dist[nei]:
+                dist[nei] ← dist[node] + w
+                pq.push((dist[nei], nei))
+    ans ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">if</span> dist[i] = ∞: <span class="pc-kw">return</span> -1            <span class="pc-cm">// some node never hears the signal</span>
+        ans ← max(ans, dist[i])
+    <span class="pc-kw">return</span> ans</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val">O((V+E) log V)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val">O(V+E)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- PROB 05 -->
+        <!-- Problem 03: Cheapest Flights Within K Stops -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; When Dijkstra Fails
+              </div>
+              <div class="prob-title">Cheapest Flights Within K Stops</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/course-schedule-iii/"
+                  href="https://leetcode.com/problems/cheapest-flights-within-k-stops/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 630 - Course Schedule III</a
+                  >&#128279; LC 787 - Cheapest Flights Within K Stops</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Sort by Deadline + Max-Heap</span>
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Bellman-Ford (bounded relaxations)</span
+                >
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
@@ -2584,12 +2206,14 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Each course takes <code>duration</code> days and must finish by
-                <code>deadline</code>. Starting at day 1 and taking courses one
-                at a time, return the maximum number you can complete.
+                Find the cheapest price from <code>src</code> to
+                <code>dst</code> using at most <code>k</code> stops, or −1 if
+                there is no such route.
               </p>
               <div class="iobox">
-                courses = [[100,200],[200,1300],[1000,1250],[2000,3200]] → 3
+                n = 4, flights =
+                [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0,
+                dst = 3, k = 1 → 700
               </div>
             </div>
             <div class="prob-section">
@@ -2601,8 +2225,8 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Process the courses in deadline order. What do you do when
-                    the next course pushes you past its deadline?
+                    Dijkstra locks in a node the first time it pops it. Why is
+                    that wrong when a stop limit exists?
                   </p>
                 </div>
               </details>
@@ -2613,9 +2237,10 @@ answer ← empty
                 </summary>
                 <div class="details-body">
                   <p>
-                    Take it anyway, then give back the longest course taken so
-                    far. Swapping a longer course for a shorter one keeps the
-                    count and frees time.
+                    A more expensive route with fewer stops can still be the
+                    only legal one. Bound the work by <em>rounds</em>, not by
+                    cost: after i rounds of Bellman-Ford you know the best price
+                    using at most i edges.
                   </p>
                 </div>
               </details>
@@ -2623,12 +2248,15 @@ answer ← empty
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The regret heap is the key idea. Sorting by deadline means every
-                course you have taken is still valid so far; when the total time
-                exceeds the current deadline, dropping the longest course taken
-                restores feasibility with the same number of courses and the
-                most time reclaimed. The count never decreases, so the final
-                heap size is the answer.
+                This is the cleanest illustration of when to abandon Dijkstra.
+                Its greedy guarantee assumes the cheapest way to reach a node is
+                always the best way to continue &mdash; false here, because a
+                cheap route may burn too many stops. Bellman-Ford&rsquo;s
+                structure fits exactly: run <code>k + 1</code> relaxation rounds
+                and the answer is the best price reachable within that many
+                edges. The one detail that catches people is relaxing from a
+                <em>snapshot</em> of the previous round, so a single round
+                cannot chain two flights.
               </p>
             </div>
             <details>
@@ -2639,35 +2267,35 @@ answer ← empty
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Take, Then Regret</span
+                      >&#128208; Pseudocode &middot; k + 1 Rounds of
+                      Relaxation</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> scheduleCourse(courses):
-    sort courses by deadline ascending
-    heap ← empty max-heap of durations
-    time ← 0
+                  <pre><span class="pc-kw">function</span> findCheapestPrice(n, flights, src, dst, k):
+    dist ← array of n entries, all infinity
+    dist[src] ← 0
 
-    <span class="pc-kw">for</span> (duration, deadline) <span class="pc-kw">in</span> courses:
-        heap.push(duration)
-        time ← time + duration                 <span class="pc-cm">// optimistically take it</span>
+    <span class="pc-kw">repeat</span> k + 1 <span class="pc-kw">times</span>:                 <span class="pc-cm">// at most k stops = k+1 edges</span>
+        prev ← copy of dist                   <span class="pc-cm">// snapshot: no chaining</span>
+        <span class="pc-kw">for</span> (u, v, price) <span class="pc-kw">in</span> flights:
+            <span class="pc-kw">if</span> prev[u] ≠ infinity:
+                dist[v] ← min(dist[v], prev[u] + price)
 
-        <span class="pc-kw">if</span> time &gt; deadline:
-            time ← time - heap.popMax()        <span class="pc-cm">// undo the costliest choice</span>
-    <span class="pc-kw">return</span> heap.size
+    <span class="pc-kw">return</span> -1 <span class="pc-kw">if</span> dist[dst] = infinity <span class="pc-kw">else</span> dist[dst]
 
-<span class="pc-cm">// [100,200] ok; [1000,1250] ok (1100); [200,1300]: 1300 ≤ 1300 ok;
-// [2000,3200]: 3300 &gt; 3200 → drop 2000 → 3 courses ✓</span></pre>
+<span class="pc-cm">// Without the snapshot, one round could relax u→v then v→w, spending two
+// flights in a round that is only allowed to spend one.</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
+                    ><span class="cx-val green">O(k &middot; E)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(V)</span>
                   </div>
                 </div>
               </div>
@@ -2681,11 +2309,11 @@ answer ← empty
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 22 Assignment &mdash; 25 Problems (8 Easy &middot; 13
-              Medium &middot; 4 Hard)</strong
+              >Lecture 22 Assignment &mdash; 16 Problems (13 Medium &middot; 3
+              Hard)</strong
             ><br />
-            Every problem is LeetCode-linked and company-tagged, grouped by the
-            greedy shape it needs. Complete it before moving to Lecture 23.<br /><br />
+            Every problem is LeetCode-linked and company-tagged. Complete it
+            before moving to Lecture 23.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture22/Assignment.md"
               style="
@@ -2708,81 +2336,65 @@ answer ← empty
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can state the greedy choice property and optimal substructure in
-            my own words
+            I can write Kahn&#39;s algorithm and use a leftover node count to
+            detect a cycle
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can give an exchange argument for interval scheduling
+            I can write Dijkstra with a priority queue from memory
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I test a candidate rule against adversarial inputs before coding it
+            I can state Dijkstra&#39;s assumption and give an input where it
+            fails
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can name the three shapes and give a problem for each
+            I can say when Bellman-Ford is worth its extra cost
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why Jump Game II is breadth-first search with two
-            integers
+            I can write the three nested loops of Floyd-Warshall in the right
+            order
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I can use a heap to undo the worst choice without rethinking the
-            others
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I can say which problems need DP instead, and show the input that
-            proves it
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">
-            I completed all 25 assignment problems and can name the rule for
-            each
-          </div>
+          <div class="cb-text">I completed all 16 assignment problems</div>
         </div>
 
         <div class="callout green">
-          <span class="callout-icon">&#128640;</span>
+          <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>You're ready for Lecture 23: Divide &amp; Conquer</strong
-            ><br />
-            Greedy commits to one path and never looks back. The next lecture
-            takes the opposite route: split the problem in half, solve both
-            sides, and spend the real work on combining them.
+            <strong>Next up &mdash; Lecture 23: Graphs III</strong><br />
+            You can now order a graph and price a route through it. Lecture 23
+            asks structural questions instead: what is the cheapest way to keep
+            everything connected, can the nodes be split into two camps, and
+            which single edge would break the network if it failed?
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture21/lecture21_notes.html"
-            >&larr; Lecture 21 &middot; Intervals &amp; Sweep Line</a
+            >&larr; Lecture 21 &middot; Graphs I</a
           >
           <a class="next" href="../Lecture23/lecture23_notes.html"
-            >Lecture 23 &middot; Divide &amp; Conquer &rarr;</a
+            >Lecture 23 &middot; Graphs III &rarr;</a
           >
         </div>
       </div>
-      <!-- /content -->
+      <!-- #content -->
     </div>
-    <!-- /main -->
+    <!-- #main -->
 
     <script>
       // 1. Theme toggle — remembered across pages of the course

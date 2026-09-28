@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 25 &mdash; Dynamic Programming I</title>
+    <title>Lecture 25 — Two Pointers &amp; Sliding Window</title>
     <meta
       name="description"
       content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
@@ -86,7 +86,7 @@
       body {
         height: 100%;
         overflow: hidden;
-        scroll-behavior: smooth;
+        scroll-behaviour: smooth;
       }
 
       body {
@@ -1396,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Dynamic Programming I</div>
+        <div class="sb-title">Two Pointers &amp; Sliding Window</div>
         <div class="sb-meta">
-          Lecture 25 of 38 &middot; Phase 4 &mdash; Dynamic Programming
+          Lecture 25 of 45 &middot; Phase 3 &mdash; Core Patterns
         </div>
       </div>
       <div class="sb-scroll">
@@ -1406,29 +1406,30 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127757;</span>Introduction</a
         >
-        <a class="toc-item" href="#signals"
-          ><span class="toc-icon">&#128269;</span>The Two Signals</a
+        <a class="toc-item" href="#decide"
+          ><span class="toc-icon">&#129517;</span>Decision Guide</a
         >
-        <a class="toc-item" href="#ladder"
-          ><span class="toc-icon">&#129355;</span>The Four-Step Ladder</a
+        <a class="toc-item" href="#opposite"
+          ><span class="toc-icon">&#8596;&#65039;</span>Opposite Ends</a
         >
-        <a class="toc-item toc-sub" href="#l-brute"
-          >1 &middot; Brute Recursion</a
+        <a class="toc-item toc-sub" href="#os-3sum">3Sum &amp; 4Sum</a>
+        <a class="toc-item toc-sub" href="#os-water">Both Ends Decide</a>
+        <a class="toc-item" href="#fixed"
+          ><span class="toc-icon">&#129695;</span>Fixed Window</a
         >
-        <a class="toc-item toc-sub" href="#l-memo">2 &middot; Memoise</a>
-        <a class="toc-item toc-sub" href="#l-table">3 &middot; Tabulate</a>
-        <a class="toc-item toc-sub" href="#l-space"
-          >4 &middot; Shrink the Space</a
+        <a class="toc-item" href="#variable"
+          ><span class="toc-icon">&#127898;&#65039;</span>Variable Window</a
         >
-        <a class="toc-item" href="#state"
-          ><span class="toc-icon">&#127991;&#65039;</span>Defining the State</a
+        <a class="toc-item toc-sub" href="#var-longest">Longest</a>
+        <a class="toc-item toc-sub" href="#var-shortest">Shortest</a>
+        <a class="toc-item" href="#same-dir"
+          ><span class="toc-icon">&#128034;</span>Same Direction</a
         >
-        <a class="toc-item" href="#families"
-          ><span class="toc-icon">&#129513;</span>The 1D Families</a
+        <a class="toc-item" href="#atmost"
+          ><span class="toc-icon">&#127919;</span>At-Most Trick</a
         >
-        <a class="toc-item toc-sub" href="#f-lis">LIS and Patience</a>
-        <a class="toc-item" href="#pitfalls"
-          ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
+        <a class="toc-item" href="#complexity"
+          ><span class="toc-icon">&#9201;</span>Complexity &amp; Bugs</a
         >
         <a class="toc-item" href="#practice"
           ><span class="toc-icon">&#128170;</span>Practice Problems</a
@@ -1443,15 +1444,13 @@
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
         <a class="toc-item" href="../Lecture24/lecture24_notes.html"
-          >&larr; Lecture 24 &middot; Union-Find</a
+          >&larr; Lecture 24 &middot; Backtracking</a
         >
         <a class="toc-item" href="../Lecture26/lecture26_notes.html"
-          >&rarr; Lecture 26 &middot; Dynamic Programming II — Grids &amp;
-          Strings</a
+          >&rarr; Lecture 26 &middot; Prefix Sums &amp; Difference Arrays</a
         >
-        <a class="toc-item" href="../dsa_study_plan.html"
-          >&uarr; All 38 lectures</a
-        >
+        <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
+        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1459,10 +1458,9 @@
     <div id="main">
       <div id="topbar">
         <div class="breadcrumb">
-          <a href="../dsa_study_plan.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../dsa_study_plan.html#phase4">Phase 4</a
-          ><span>&rsaquo;</span>
-          <span>Lecture 25 &mdash; Dynamic Programming I</span>
+          <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
+          <a href="../index.html#phase3">Phase 3</a><span>&rsaquo;</span>
+          <span>Lecture 25 &mdash; Two Pointers &amp; Sliding Window</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1480,24 +1478,21 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129513;</span>
-          <h1 class="page-title">
-            Dynamic Programming I &mdash; Foundations &amp; 1D
-          </h1>
+          <span class="page-emoji">&#127919;</span>
+          <h1 class="page-title">Two Pointers &amp; Sliding Window</h1>
           <p class="page-sub">
-            &ldquo;Write the honest recursion first. Dynamic programming is what
-            happens when you stop solving the same subproblem twice.&rdquo;
+            &ldquo;Stop re-reading the same elements. Every pattern here is one
+            idea &mdash; touch each item a constant number of times, and
+            O(n&sup2;) collapses to O(n).&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 25 of 38</span>
-            <span class="meta-chip accent"
-              >Phase 4 &mdash; Dynamic Programming</span
-            >
+            <span class="meta-chip accent">&#128218; Lecture 25 of 45</span>
+            <span class="meta-chip accent">Phase 3 &mdash; Core Patterns</span>
             <span class="meta-chip yellow">&#9201; 6 days</span>
-            <span class="meta-chip green">&#127919; 25 problems</span>
+            <span class="meta-chip green">&#127919; 30 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
-              Microsoft</span
+              Uber</span
             >
           </div>
         </div>
@@ -1507,12 +1502,13 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            This is the topic candidates fear, and the reason is usually that
-            they were taught the tables first. Dynamic programming is not a
-            table. It is a recursion you already know how to write, plus the
-            observation that it keeps recomputing the same things. Get that
-            order right &mdash; recursion, then memo, then table &mdash; and
-            most DP problems become mechanical.
+            You have already met these pointers piecemeal &mdash; in Arrays, in
+            Searching, in Linked Lists. This lecture puts them in one place so
+            they stop being five tricks and become one decision. Between them,
+            two pointers and sliding windows cover a very large slice of the
+            array and string questions asked at every company on this page, and
+            they are the difference between a solution that passes and one that
+            times out.
           </div>
         </div>
 
@@ -1520,507 +1516,588 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Spot the two signals: overlapping subproblems and optimal
-              substructure
-            </li>
-            <li>Turn any recursion into memoised DP without thinking hard</li>
-            <li>Convert top-down into bottom-up, and then into O(1) space</li>
-            <li>
-              State in one sentence what <code>dp[i]</code> means &mdash; and
-              know why that sentence is the whole problem
+              Consolidate every two-pointer and sliding-window pattern into one
+              mental model
             </li>
             <li>
-              Recognise the 1D families: climbing, robbing, coins, state
-              machines and LIS
+              Recognise which shape a problem needs within twenty seconds of
+              reading it
+            </li>
+            <li>
+              Write the expand/shrink template from memory, for both longest and
+              shortest
+            </li>
+            <li>
+              Handle multi-pointer problems: 3Sum, 4Sum and beyond, including
+              deduplication
+            </li>
+            <li>
+              Use the at-most trick to count &ldquo;exactly k&rdquo; without a
+              second algorithm
             </li>
           </ul>
         </div>
 
-        <h2 class="h1" id="signals">&#128269; The Two Signals</h2>
-        <p>
-          A problem is a DP problem when both of these hold. Miss either one and
-          you should be reaching for something else.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Signal</th>
-              <th>What it means</th>
-              <th>How to check</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Overlapping subproblems</strong></td>
-              <td>the same smaller question is asked many times</td>
-              <td>draw the recursion tree and look for a repeated node</td>
-            </tr>
-            <tr>
-              <td><strong>Optimal substructure</strong></td>
-              <td>
-                the best answer is built from the best answers to smaller
-                versions
-              </td>
-              <td>
-                can you write the answer for <code>n</code> in terms of smaller
-                <code>n</code>?
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
         <div class="callout teal">
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
-            <strong>Compare with the neighbours.</strong> Divide and conquer
-            (Lecture 23) has optimal substructure but <em>no</em> overlap
-            &mdash; each half is solved once, so no memo is needed. Greedy
-            (Lecture 22) has optimal substructure and does not even explore
-            alternatives. DP is the case where the options genuinely interact
-            and the same states keep coming back.
+            <strong
+              >The picture to keep in your head: A camera panning across a
+              view.</strong
+            >
+            When a camera pans, you do not retake the whole photo &mdash; one
+            edge gains a new strip and the other loses one. A sliding window
+            works the same way: add what enters on the right, remove what leaves
+            on the left. Two pointers from both ends are two people searching a
+            sorted bookshelf from opposite ends and meeting in the middle.
           </div>
         </div>
 
-        <h2 class="h1" id="ladder">&#129355; The Four-Step Ladder</h2>
+        <h2 class="h1" id="decide">&#129517; The Decision Guide</h2>
         <p>
-          Every problem in this lecture is solved the same way. Climb as far as
-          you need and stop &mdash; step 2 is usually enough to pass, step 4 is
-          what impresses.
+          Everything in this lecture is one idea:
+          <strong>stop re-reading the same elements</strong>. A brute-force pair
+          loop reads every element n times. Two pointers and sliding windows
+          read each element a constant number of times, which turns O(n&sup2;)
+          into O(n). The only skill worth drilling is picking the right shape in
+          the first twenty seconds.
         </p>
-
-        <h3 class="h2" id="l-brute">Step 1 &mdash; The Honest Recursion</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Brute Force, Written
-              Deliberately</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// "How many ways to climb n stairs, taking 1 or 2 at a time?"</span>
-<span class="pc-kw">function</span> ways(n):
-    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> 1          <span class="pc-cm">// base case first, always</span>
-    <span class="pc-kw">return</span> ways(n - 1) + ways(n - 2)
-
-<span class="pc-cm">// ways(5) calls ways(3) twice, ways(2) three times, ways(1) five times.
-// That repetition IS the signal. Time: O(2ⁿ).</span></pre>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>What the problem says</th>
+                <th>Shape to reach for</th>
+                <th>Signature move</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&ldquo;sorted array&rdquo; + find a pair / triple</td>
+                <td><strong>Opposite ends</strong></td>
+                <td>lo = 0, hi = n-1, move the one that helps</td>
+              </tr>
+              <tr>
+                <td>&ldquo;subarray of size exactly k&rdquo;</td>
+                <td><strong>Fixed window</strong></td>
+                <td>add right, remove left, every step</td>
+              </tr>
+              <tr>
+                <td>
+                  &ldquo;longest / shortest subarray such that &hellip;&rdquo;
+                </td>
+                <td><strong>Variable window</strong></td>
+                <td>expand right, shrink left while invalid</td>
+              </tr>
+              <tr>
+                <td>&ldquo;in-place, keep order, drop some&rdquo;</td>
+                <td><strong>Same direction</strong></td>
+                <td>slow writes, fast reads</td>
+              </tr>
+              <tr>
+                <td>&ldquo;exactly k distinct / exactly k odds&rdquo;</td>
+                <td><strong>At-most trick</strong></td>
+                <td>atMost(k) &minus; atMost(k&minus;1)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <h3 class="h2" id="l-memo">Step 2 &mdash; Add a Memo</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Top-Down with Memoisation</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>memo ← empty map                  <span class="pc-cm">// or an array filled with "unknown"</span>
-
-<span class="pc-kw">function</span> ways(n):
-    <span class="pc-kw">if</span> n ≤ 1: <span class="pc-kw">return</span> 1
-    <span class="pc-kw">if</span> n <span class="pc-kw">in</span> memo: <span class="pc-kw">return</span> memo[n]       <span class="pc-cm">// ← the entire technique, one line</span>
-    memo[n] ← ways(n - 1) + ways(n - 2)
-    <span class="pc-kw">return</span> memo[n]
-
-<span class="pc-cm">// Each state is computed once: O(n) time, O(n) memo + O(n) stack.
-// Nothing about the logic changed — only how often it runs.</span></pre>
-        </div>
-
-        <h3 class="h2" id="l-table">Step 3 &mdash; Turn It Inside Out</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Bottom-Up Tabulation</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>dp ← array of length n + 1
-dp[0] ← 1;  dp[1] ← 1              <span class="pc-cm">// the same base cases, written as data</span>
-
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
-    dp[i] ← dp[i - 1] + dp[i - 2]  <span class="pc-cm">// the same recurrence, in dependency order</span>
-
-<span class="pc-kw">return</span> dp[n]
-
-<span class="pc-cm">// No recursion, no stack. The loop order must guarantee that everything
-// dp[i] depends on is already filled in.</span></pre>
-        </div>
-
-        <h3 class="h2" id="l-space">Step 4 &mdash; Keep Only What You Need</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; O(1) Space</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>a ← 1;  b ← 1                      <span class="pc-cm">// dp[i-2] and dp[i-1]</span>
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 2 <span class="pc-kw">to</span> n:
-    a, b ← b, a + b
-<span class="pc-kw">return</span> b
-
-<span class="pc-cm">// The recurrence only ever looks back two steps, so only two numbers
-// need to exist. Works whenever dp[i] depends on a fixed window.</span></pre>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Step</th>
-              <th>Time</th>
-              <th>Space</th>
-              <th>When to stop here</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1 &middot; recursion</td>
-              <td>exponential</td>
-              <td>O(depth)</td>
-              <td>never &mdash; but always write it first</td>
-            </tr>
-            <tr>
-              <td>2 &middot; memoised</td>
-              <td>O(states)</td>
-              <td>O(states + depth)</td>
-              <td>states are sparse, or the order is awkward</td>
-            </tr>
-            <tr>
-              <td>3 &middot; tabulated</td>
-              <td>O(states)</td>
-              <td>O(states)</td>
-              <td>deep recursion risks a stack overflow</td>
-            </tr>
-            <tr>
-              <td>4 &middot; rolling</td>
-              <td>O(states)</td>
-              <td>O(window)</td>
-              <td>the interviewer asks for better space</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="h1" id="state">&#127991;&#65039; Defining the State</h2>
-        <p>
-          The hardest part of DP is not the code. It is finishing this sentence
-          honestly:
-        </p>
-        <div class="ascii-tree">
-          dp[i] = &ldquo;the &lt;best / number of / whether&gt; &hellip;
-          considering only the first i items, ending at i&rdquo;
-        </div>
-        <p>
-          Two candidate meanings for the same problem give two different
-          recurrences, and only one of them usually works.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th><code>dp[i]</code> means</th>
-              <th>Recurrence</th>
-              <th>Answer is</th>
-              <th>Used by</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>best over the first <code>i</code> items</td>
-              <td>choose to use item <code>i</code> or not</td>
-              <td><code>dp[n]</code></td>
-              <td>House Robber, Coin Change</td>
-            </tr>
-            <tr>
-              <td>best <em>ending exactly at</em> <code>i</code></td>
-              <td>extend one of the earlier endings</td>
-              <td><code>max(dp)</code></td>
-              <td>LIS, Kadane, arithmetic slices</td>
-            </tr>
-            <tr>
-              <td>best starting at <code>i</code></td>
-              <td>fill backwards</td>
-              <td><code>dp[0]</code></td>
-              <td>jump games, Brainpower</td>
-            </tr>
-            <tr>
-              <td>best at <code>i</code> in state <code>s</code></td>
-              <td>a small machine of states per index</td>
-              <td><code>max over s of dp[n][s]</code></td>
-              <td>stock problems with cooldown or fees</td>
-            </tr>
-          </tbody>
-        </table>
-
         <div class="callout yellow">
           <span class="callout-icon">&#9888;&#65039;</span>
           <div class="callout-body">
-            <strong
-              >If the recurrence will not come, the state is wrong.</strong
-            >
-            Struggling to write <code>dp[i]</code> in terms of earlier entries
-            almost always means the definition is missing something &mdash;
-            usually a second dimension (how many transactions left, whether the
-            previous item was taken, what the last difference was). Add it to
-            the state rather than patching the loop.
+            <strong>The one precondition people forget</strong><br />Sliding
+            windows need the answer to be <em>monotonic</em> as the window grows
+            &mdash; adding an element must never make an invalid window valid
+            again. That holds for positive numbers, distinct-character counts
+            and frequency caps. It <strong>breaks</strong> the moment negatives
+            enter, which is why <em>Subarray Sum Equals K</em> is a prefix-sum
+            problem, not a window problem.
           </div>
         </div>
-
-        <h2 class="h1" id="families">&#129513; The 1D Families</h2>
-        <p>
-          Nearly every one-dimensional DP problem is one of five shapes. Learn
-          the shape and the problem writes itself.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Take or Skip (House Robber)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// dp[i] = the most you can take from the first i houses</span>
-prev2 ← 0;  prev1 ← 0
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-    take ← prev2 + x                <span class="pc-cm">// rob this one: skip the neighbour</span>
-    skip ← prev1                    <span class="pc-cm">// leave it: keep the best so far</span>
-    prev2, prev1 ← prev1, max(take, skip)
-<span class="pc-kw">return</span> prev1</pre>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Unbounded Choice (Coin
-              Change)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// dp[a] = fewest coins that make exactly a</span>
-dp ← array of amount + 1, filled with infinity
-dp[0] ← 0                            <span class="pc-cm">// zero coins make zero</span>
-
-<span class="pc-kw">for</span> a <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> amount:
-    <span class="pc-kw">for</span> coin <span class="pc-kw">in</span> coins:
-        <span class="pc-kw">if</span> coin ≤ a <span class="pc-kw">and</span> dp[a - coin] + 1 &lt; dp[a]:
-            dp[a] ← dp[a - coin] + 1
-
-<span class="pc-kw">if</span> dp[amount] = infinity: <span class="pc-kw">return</span> -1
-<span class="pc-kw">return</span> dp[amount]
-
-<span class="pc-cm">// Each coin may be reused, which is why the loop goes forward over a.
-// Lecture 27 shows what changes when each item may be used only once.</span></pre>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; State Machine (Stock with
-              Cooldown)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Three states per day: holding, just sold, free to buy.</span>
-hold ← -infinity;  sold ← -infinity;  rest ← 0
-
-<span class="pc-kw">for</span> price <span class="pc-kw">in</span> prices:
-    prevSold ← sold
-    sold ← hold + price              <span class="pc-cm">// sell today</span>
-    hold ← max(hold, rest - price)   <span class="pc-cm">// keep holding, or buy today</span>
-    rest ← max(rest, prevSold)       <span class="pc-cm">// cooldown finishes</span>
-
-<span class="pc-kw">return</span> max(sold, rest)             <span class="pc-cm">// never end while holding</span></pre>
-        </div>
-
-        <h3 class="h2" id="f-lis">LIS &mdash; and the O(n log n) Upgrade</h3>
-        <p>
-          The longest increasing subsequence deserves its own section, because
-          both of its solutions are worth knowing and the fast one is often
-          mis-explained.
-        </p>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; LIS, Two Ways</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// O(n²): dp[i] = length of the best subsequence ENDING at i</span>
-dp ← array of 1s
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> i - 1:
-        <span class="pc-kw">if</span> nums[j] &lt; nums[i]: dp[i] ← max(dp[i], dp[j] + 1)
-<span class="pc-kw">return</span> max(dp)
-
-<span class="pc-cm">// O(n log n): tails[k] = smallest possible tail of a subsequence of length k+1</span>
-tails ← empty list
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-    pos ← first index <span class="pc-kw">in</span> tails with value ≥ x     <span class="pc-cm">// binary search</span>
-    <span class="pc-kw">if</span> pos = length(tails): tails.append(x)
-    <span class="pc-kw">else</span>: tails[pos] ← x                          <span class="pc-cm">// a smaller tail is always better</span>
-<span class="pc-kw">return</span> length(tails)</pre>
-        </div>
-
-        <div class="callout red">
-          <span class="callout-icon">&#128721;</span>
-          <div class="callout-body">
-            <strong><code>tails</code> is not the answer.</strong> Its
-            <em>length</em> is the length of the longest increasing subsequence,
-            but its contents are usually not a valid subsequence of the input.
-            If the problem asks you to reconstruct the actual sequence, keep
-            parent pointers alongside &mdash; or use the O(n&sup2;) version,
-            where the reconstruction is easy.
-          </div>
-        </div>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#129504;</span>
-          <div class="callout-body">
-            <strong>Where you have seen the trick before.</strong> Replacing a
-            tail with a smaller value is the greedy exchange argument from
-            Lecture 22, and the binary search is Lecture 10&#39;s lower bound.
-            Russian Doll Envelopes then sorts by width ascending and height
-            <em>descending</em> so that same-width envelopes cannot chain
-            &mdash; a sort decision straight out of Lecture 21.
-          </div>
-        </div>
-
-        <h2 class="h1" id="pitfalls">
-          &#9888;&#65039; Complexity &amp; The Classic Bugs
+        <h2 class="h1" id="opposite">
+          &#8596;&#65039; Opposite Ends &mdash; Converging Pointers
         </h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Family</th>
-              <th>States</th>
-              <th>Work per state</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Climbing / take-or-skip</td>
-              <td>n</td>
-              <td>O(1)</td>
-              <td>O(n), O(1) space</td>
-            </tr>
-            <tr>
-              <td>Coin change / unbounded choice</td>
-              <td>amount</td>
-              <td>O(coins)</td>
-              <td>O(amount &middot; coins)</td>
-            </tr>
-            <tr>
-              <td>State machine (stocks)</td>
-              <td>n &times; k states</td>
-              <td>O(1)</td>
-              <td>O(n &middot; k)</td>
-            </tr>
-            <tr>
-              <td>LIS, quadratic</td>
-              <td>n</td>
-              <td>O(n)</td>
-              <td>O(n&sup2;)</td>
-            </tr>
-            <tr>
-              <td>LIS, patience</td>
-              <td>n</td>
-              <td>O(log n)</td>
-              <td>O(n log n)</td>
-            </tr>
-          </tbody>
-        </table>
+        <p>
+          Start wide, walk inwards. Each step throws away a candidate you can
+          prove is useless, so n steps settle the whole problem. This only works
+          when the array is <strong>sorted</strong>, or when the quantity you
+          are optimising depends on the two ends alone.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Converging Pointers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// The array is sorted, so the sum moves predictably:</span>
+<span class="pc-cm">//   move lo right  -> sum increases</span>
+<span class="pc-cm">//   move hi left   -> sum decreases</span>
+lo <span class="pc-kw">&larr;</span> 0
+hi <span class="pc-kw">&larr;</span> length(a) - 1
 
-        <table>
-          <thead>
-            <tr>
-              <th>Bug</th>
-              <th>Symptom</th>
-              <th>Fix</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>A vague state definition</td>
-              <td>The recurrence refuses to come out</td>
-              <td>Write the sentence first; add a dimension if needed</td>
-            </tr>
-            <tr>
-              <td>Memoising on an incomplete key</td>
-              <td>Wrong answers that look almost right</td>
-              <td>The key must include every value the result depends on</td>
-            </tr>
-            <tr>
-              <td>Filling the table in the wrong order</td>
-              <td>Reads an entry that is still empty</td>
-              <td>Loop in dependency order &mdash; draw the arrows</td>
-            </tr>
-            <tr>
-              <td>Missing or wrong base case</td>
-              <td>Off-by-one everywhere, or infinite recursion</td>
-              <td>Decide <code>dp[0]</code> before anything else</td>
-            </tr>
-            <tr>
-              <td>Using &ldquo;unreachable&rdquo; as a number</td>
-              <td>Coin Change returns <code>amount + 1</code></td>
-              <td>Sentinel of infinity, checked before returning</td>
-            </tr>
-            <tr>
-              <td>Rolling variables updated in the wrong order</td>
-              <td>The new value is read as if it were the old one</td>
-              <td>Save the previous value before overwriting it</td>
-            </tr>
-          </tbody>
-        </table>
+<span class="pc-kw">while</span> lo &lt; hi:
+    sum <span class="pc-kw">&larr;</span> a[lo] + a[hi]
+    <span class="pc-kw">if</span> sum = target: <span class="pc-kw">return</span> (lo, hi)
+    <span class="pc-kw">if</span> sum &lt; target: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// need more</span>
+    <span class="pc-kw">else</span>:              hi <span class="pc-kw">&larr;</span> hi - 1     <span class="pc-cm">// need less</span>
 
-        <div class="callout green">
+<span class="pc-kw">return</span> NOT_FOUND</pre>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(n) &mdash; each index visited once</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
+        </div>
+        <h3 class="h3" id="os-3sum">Scaling Up: 3Sum and 4Sum</h3>
+        <p>
+          A k-sum problem is a (k&minus;1)-sum problem with one number pinned.
+          Sort once, fix the outer index, then run the converging pair inside.
+          Each extra level costs one more loop: 3Sum is O(n&sup2;), 4Sum is
+          O(n&sup3;).
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; 3Sum &mdash; anchor + converging
+              pair</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>sort(a)
+result <span class="pc-kw">&larr;</span> empty list
+
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 3:
+    <span class="pc-kw">if</span> i > 0 <span class="pc-kw">and</span> a[i] = a[i-1]: <span class="pc-kw">continue</span>   <span class="pc-cm">// skip duplicate anchors</span>
+
+    lo <span class="pc-kw">&larr;</span> i + 1;  hi <span class="pc-kw">&larr;</span> n - 1
+    <span class="pc-kw">while</span> lo &lt; hi:
+        s <span class="pc-kw">&larr;</span> a[i] + a[lo] + a[hi]
+        <span class="pc-kw">if</span> s = 0:
+            record (a[i], a[lo], a[hi])
+            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[lo] = a[lo+1]: lo <span class="pc-kw">&larr;</span> lo + 1
+            <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[hi] = a[hi-1]: hi <span class="pc-kw">&larr;</span> hi - 1
+            lo <span class="pc-kw">&larr;</span> lo + 1;  hi <span class="pc-kw">&larr;</span> hi - 1
+        <span class="pc-kw">else if</span> s &lt; 0: lo <span class="pc-kw">&larr;</span> lo + 1
+        <span class="pc-kw">else</span>:          hi <span class="pc-kw">&larr;</span> hi - 1
+
+<span class="pc-kw">return</span> result</pre>
+        </div>
+        <div class="callout purple">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>How to spot it in an interview.</strong> &ldquo;Maximum /
-            minimum / number of ways&rdquo;, a sequence of choices where each
-            one affects the next, and a brute force that visibly repeats work.
-            Say &ldquo;let me write the recursion first&rdquo; out loud &mdash;
-            it buys thinking time and gets you most of the marks even if you
-            never reach the table.
+            <strong>Duplicates are the whole difficulty</strong><br />3Sum is
+            not hard because of the pointers &mdash; it is hard because the
+            answer must contain no repeated triple. Skip a duplicate
+            <em>anchor</em> before the inner loop, and skip duplicate
+            <em>lo</em>/<em>hi</em> values only after recording a hit. Sorting
+            first is what makes both skips a single comparison.
+          </div>
+        </div>
+        <h3 class="h3" id="os-water">When Both Ends Decide the Answer</h3>
+        <p>
+          Container With Most Water and Trapping Rain Water are not sorted, yet
+          converging pointers still work &mdash; because the quantity being
+          measured (width &times; shorter wall) depends only on the two ends.
+          Always move the pointer at the <em>shorter</em> wall: the width
+          shrinks either way, so moving the taller one can never improve the
+          answer.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Container With Most Water</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Area is width x the SHORTER wall, so the short side is the bottleneck.</span>
+lo <span class="pc-kw">&larr;</span> 0;  hi <span class="pc-kw">&larr;</span> n - 1;  best <span class="pc-kw">&larr;</span> 0
+
+<span class="pc-kw">while</span> lo &lt; hi:
+    best <span class="pc-kw">&larr;</span> max(best, (hi - lo) &times; min(h[lo], h[hi]))
+    <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo <span class="pc-kw">&larr;</span> lo + 1     <span class="pc-cm">// only raising the short wall can help</span>
+    <span class="pc-kw">else</span>:               hi <span class="pc-kw">&larr;</span> hi - 1
+
+<span class="pc-kw">return</span> best</pre>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(n)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
+        </div>
+        <h2 class="h1" id="fixed">&#129695; Fixed-Size Window</h2>
+        <p>
+          The simplest window: size never changes. Build the first k elements,
+          then for every step add one on the right and drop one on the left. The
+          work per step is O(1), so the whole scan is O(n) no matter how big k
+          is.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Fixed Window &mdash; roll, don't
+              rebuild</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// Build the first window, then roll it along.</span>
+sum <span class="pc-kw">&larr;</span> sum of a[0 .. k-1]
+best <span class="pc-kw">&larr;</span> sum
+
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> k <span class="pc-kw">to</span> n - 1:
+    sum <span class="pc-kw">&larr;</span> sum + a[right] - a[right - k]   <span class="pc-cm">// add new, drop old</span>
+    best <span class="pc-kw">&larr;</span> max(best, sum)
+
+<span class="pc-kw">return</span> best</pre>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(n)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
           </div>
         </div>
 
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <h2 class="h1" id="variable">
+          &#127898;&#65039; Variable-Size Window &mdash; Expand and Shrink
+        </h2>
         <p>
-          Six problems, one per family. Before coding each one, finish the
-          sentence &ldquo;<code>dp[i]</code> is &hellip;&rdquo; out loud.
+          This is the one to memorise. Nearly every &ldquo;longest / shortest
+          subarray such that&hellip;&rdquo; question is the same eight lines:
+          the right pointer always moves forward, and the left pointer only
+          catches up when the window breaks the rule. Each index enters once and
+          leaves once, so it is O(n) even though there are two loops.
         </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; The Universal Sliding-Window
+              Template</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// The universal template. Only the three marked lines change.</span>
+left <span class="pc-kw">&larr;</span> 0
+best <span class="pc-kw">&larr;</span> 0
+state <span class="pc-kw">&larr;</span> empty        <span class="pc-cm">// counts, a sum, a frequency map ...</span>
 
-        <!-- Problem 01: Coin Change -->
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    add a[right] to state              <span class="pc-cm">// &lt;-- 1. grow</span>
+
+    <span class="pc-kw">while</span> state is invalid:               <span class="pc-cm">// &lt;-- 2. the rule</span>
+        remove a[left] from state
+        left <span class="pc-kw">&larr;</span> left + 1
+
+    best <span class="pc-kw">&larr;</span> max(best, right - left + 1)   <span class="pc-cm">// &lt;-- 3. what you want</span>
+
+<span class="pc-kw">return</span> best
+
+<span class="pc-cm">// Longest valid window  -> record AFTER the while loop (as above).</span>
+<span class="pc-cm">// Shortest valid window -> record INSIDE the while loop, before shrinking,</span>
+<span class="pc-cm">//                          and invert the condition to 'while state is VALID'.</span></pre>
+        </div>
+        <h3 class="h3" id="var-longest">Longest: Record After Shrinking</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Longest Substring Without Repeating
+              Characters (LC 3)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> lengthOfLongestSubstring(s):
+    last ← map <span class="pc-kw">from</span> character → (last index where it appeared) + 1, default 0
+    left ← 0;  best ← 0
+
+    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
+        c ← s[right]
+        left ← max(left, last[c])          <span class="pc-cm">// jump past the previous copy (never move back)</span>
+        best ← max(best, right - left + 1)
+        last[c] ← right + 1
+    <span class="pc-kw">return</span> best</pre>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(n) &mdash; right advances n times, left never rewinds</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1) &mdash; fixed alphabet</span>
+          </div>
+        </div>
+        <h3 class="h3" id="var-shortest">Shortest: Record Before Shrinking</h3>
+        <p>
+          Flip the template and the same machinery finds the <em>smallest</em>
+          window instead. Minimum Window Substring is the canonical hard
+          version: keep a
+          <code>need</code> map and a counter of how many required characters
+          are still missing. The window is valid the moment that counter hits
+          zero.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Minimum Window Substring (LC
+              76)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>need <span class="pc-kw">&larr;</span> frequency map of t
+missing <span class="pc-kw">&larr;</span> length(t)
+left <span class="pc-kw">&larr;</span> 0;  bestLen <span class="pc-kw">&larr;</span> infinity
+
+<span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">if</span> need[s[right]] > 0: missing <span class="pc-kw">&larr;</span> missing - 1
+    need[s[right]] <span class="pc-kw">&larr;</span> need[s[right]] - 1
+
+    <span class="pc-kw">while</span> missing = 0:                  <span class="pc-cm">// window is VALID -> try to shrink</span>
+        <span class="pc-kw">if</span> right - left + 1 &lt; bestLen:
+            bestLen <span class="pc-kw">&larr;</span> right - left + 1;  bestStart <span class="pc-kw">&larr;</span> left
+        need[s[left]] <span class="pc-kw">&larr;</span> need[s[left]] + 1
+        <span class="pc-kw">if</span> need[s[left]] > 0: missing <span class="pc-kw">&larr;</span> missing + 1
+        left <span class="pc-kw">&larr;</span> left + 1
+
+<span class="pc-kw">return</span> substring at bestStart of length bestLen</pre>
+        </div>
+        <div class="callout purple">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Why one counter beats comparing two maps</strong
+            ><br />Re-checking &ldquo;does the window contain every character of
+            t?&rdquo; costs O(52) per step. Tracking a single
+            <code>missing</code> integer makes the validity test O(1).
+            Characters not in t go negative in the map and are simply never
+            counted &mdash; that is what the <code>&gt; 0</code> guards are
+            doing.
+          </div>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(|s| + |t|)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(|t|)</span>
+          </div>
+        </div>
+        <h2 class="h1" id="same-dir">
+          &#128034; Same Direction &mdash; Slow Writes, Fast Reads
+        </h2>
+        <p>
+          When a problem says &ldquo;in place, keep the relative order, remove
+          the ones that don't qualify&rdquo;, use two pointers moving the same
+          way. The fast pointer reads every element; the slow pointer marks
+          where the next keeper belongs. Everything before <code>slow</code> is
+          finished and correct.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Read/Write Two Pointers</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-cm">// slow = write cursor, fast = read cursor</span>
+slow <span class="pc-kw">&larr;</span> 0
+
+<span class="pc-kw">for</span> fast <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    <span class="pc-kw">if</span> keep(a[fast]):
+        a[slow] <span class="pc-kw">&larr;</span> a[fast]
+        slow <span class="pc-kw">&larr;</span> slow + 1
+
+<span class="pc-kw">return</span> slow                 <span class="pc-cm">// length of the cleaned prefix</span></pre>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green">O(n)</span>
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(1)</span>
+          </div>
+        </div>
+        <h2 class="h1" id="atmost">&#127919; The At-Most Trick</h2>
+        <p>
+          A sliding window can count subarrays with <em>at most</em> k of
+          something, because that property is monotonic &mdash; shrink the
+          window and it stays true. It cannot directly count <em>exactly</em> k,
+          because that is not monotonic. The fix is arithmetic, not algorithmic:
+        </p>
+        <div class="callout green">
+          <span class="callout-icon">&#129518;</span>
+          <div class="callout-body">
+            <strong>exactly(k) = atMost(k) &minus; atMost(k&minus;1)</strong
+            ><br />Every subarray with at most k distinct values is either one
+            with at most k&minus;1, or one with exactly k. Subtract and only the
+            exact ones survive. You write the window <em>once</em> and call it
+            twice.
+          </div>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Subarrays with K Different Integers
+              (LC 992)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> exactly(k):
+    <span class="pc-kw">return</span> atMost(k) - atMost(k - 1)
+
+<span class="pc-kw">function</span> atMost(k):
+    count <span class="pc-kw">&larr;</span> 0;  left <span class="pc-kw">&larr;</span> 0;  freq <span class="pc-kw">&larr;</span> empty map
+
+    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> freq[a[right]] = 0: k <span class="pc-kw">&larr;</span> k - 1
+        freq[a[right]] <span class="pc-kw">&larr;</span> freq[a[right]] + 1
+
+        <span class="pc-kw">while</span> k &lt; 0:                     <span class="pc-cm">// too many distinct -> shrink</span>
+            freq[a[left]] <span class="pc-kw">&larr;</span> freq[a[left]] - 1
+            <span class="pc-kw">if</span> freq[a[left]] = 0: k <span class="pc-kw">&larr;</span> k + 1
+            left <span class="pc-kw">&larr;</span> left + 1
+
+        count <span class="pc-kw">&larr;</span> count + (right - left + 1)   <span class="pc-cm">// every window ending at right</span>
+
+    <span class="pc-kw">return</span> count</pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Why <code>right - left + 1</code>?</strong><br />When the
+            window [left, right] is valid, every subarray that <em>ends</em> at
+            <code>right</code> and starts anywhere from
+            <code>left</code> onwards is also valid. That is exactly
+            <code>right - left + 1</code> subarrays &mdash; so you count them
+            all in O(1) instead of enumerating them.
+          </div>
+        </div>
+        <div class="complexity-row">
+          <div class="cx-badge green">
+            <span class="cx-label">Time</span
+            ><span class="cx-val green"
+              >O(n) &mdash; two passes of the same window</span
+            >
+          </div>
+          <div class="cx-badge green">
+            <span class="cx-label">Space</span
+            ><span class="cx-val green">O(k)</span>
+          </div>
+        </div>
+        <h2 class="h1" id="complexity">
+          &#9201; Complexity &amp; The Four Classic Bugs
+        </h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bug</th>
+                <th>What you see</th>
+                <th>Fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Recording in the wrong place</td>
+                <td>Off-by-one on every answer</td>
+                <td>
+                  Longest &rarr; record after the while; shortest &rarr; inside
+                  it
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Shrinking with <code>if</code> instead of <code>while</code>
+                </td>
+                <td>Passes small tests, fails big ones</td>
+                <td>
+                  One step may not restore validity &mdash; loop until it does
+                </td>
+              </tr>
+              <tr>
+                <td>Forgetting to undo state on shrink</td>
+                <td>Counts drift, window never reopens</td>
+                <td>
+                  Every add on the right needs a matching remove on the left
+                </td>
+              </tr>
+              <tr>
+                <td>Using a window with negative numbers</td>
+                <td>Wrong answers, no crash</td>
+                <td>
+                  Not monotonic &mdash; switch to prefix sums (Lecture 26)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128200;</span>
+          <div class="callout-body">
+            <strong>Why two nested loops are still O(n)</strong><br />The inner
+            <code>while</code> looks like it makes this quadratic. It doesn't:
+            <code>left</code> only ever moves forward and can advance at most n
+            times <em>in total</em> across the whole run. Amortised, every index
+            is added once and removed once &mdash; 2n operations.
+          </div>
+        </div>
+
+        <!-- PRACTICE -->
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <div class="callout blue">
+          <span class="callout-icon">&#128218;</span>
+          <div class="callout-body">
+            <strong>Eight problems, one per shape.</strong> Try each yourself
+            before opening a hint. The goal: within thirty seconds of reading a
+            new problem, name the shape it needs.
+          </div>
+        </div>
+
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 01 &middot; The Four-Step Ladder
-              </div>
-              <div class="prob-title">Coin Change</div>
-              <div style="margin-top: 4px">
+                Problem 01 &middot;
                 <a
-                  href="https://leetcode.com/problems/coin-change/"
+                  href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 322 - Coin Change</a
+                  style="font-size: 11px"
+                  >LC 167</a
                 >
               </div>
+              <div class="prob-title">Two Sum II — Input Array Is Sorted</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Unbounded Choice</span>
+                <span class="tag tag-pat">Opposite Ends</span>
                 <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta</span
+                  >Amazon &middot; Google &middot; Adobe</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given coin denominations and an <code>amount</code>, return the
-                fewest coins that add up to it exactly, or &minus;1 if it cannot
-                be done. Coins may be reused.
+                Given a <strong>1-indexed sorted</strong> array and a target,
+                return the indices of the two numbers that add up to it. Exactly
+                one solution exists, and you may not use extra space.
               </p>
               <div class="iobox">
-                coins = [1, 2, 5], amount = 11 → 3 &nbsp;(5 + 5 +
-                1)&nbsp;&nbsp;|&nbsp;&nbsp; coins = [2], amount = 3 → -1
+                Input: [2,7,11,15], target=9 → Output: [1,2]
               </div>
             </div>
             <div class="prob-section">
@@ -2032,9 +2109,9 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Greedy fails here — try coins [1, 3, 4] and amount 6. So
-                    write the recursion: what is the answer for
-                    <code>amount</code> in terms of smaller amounts?
+                    The array is sorted &mdash; that is the whole gift. What
+                    happens to the sum if you move the left pointer right? What
+                    about moving the right pointer left?
                   </p>
                 </div>
               </details>
@@ -2045,9 +2122,10 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    <code>best(a) = 1 + min(best(a - coin))</code> over every
-                    usable coin. Memoise on <code>a</code>, then turn it into a
-                    loop from 0 upwards.
+                    Start at both ends. If the sum is too small the only way to
+                    grow it is <code>lo++</code>; if it is too big the only way
+                    to shrink it is <code>hi--</code>. Neither move can skip the
+                    answer.
                   </p>
                 </div>
               </details>
@@ -2055,14 +2133,9 @@ tails ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                This is the whole lecture in one problem. The recursion is
-                obvious and exponential; the memo makes it O(amount &times;
-                coins); the bottom-up version removes the stack. Two details
-                decide correctness: <code>dp[0] = 0</code> (zero coins make
-                zero), and treating &ldquo;impossible&rdquo; as infinity so an
-                unreachable amount never looks like a real answer. The forward
-                loop is what allows a coin to be reused &mdash; Lecture 27 flips
-                that loop for 0/1 items.
+                A HashMap would work but costs O(n) space, and the sorted input
+                makes it unnecessary. Converging pointers solve it in constant
+                space.
               </p>
             </div>
             <details>
@@ -2073,148 +2146,19 @@ tails ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Bottom-Up over
-                      Amounts</span
+                      >&#128208; Pseudocode &middot; Two Sum II</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> coinChange(coins, amount):
-    dp ← array of amount + 1, filled with infinity
-    dp[0] ← 0                              <span class="pc-cm">// base case: zero coins make zero</span>
-
-    <span class="pc-kw">for</span> a <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> amount:
-        <span class="pc-kw">for</span> coin <span class="pc-kw">in</span> coins:
-            <span class="pc-kw">if</span> coin ≤ a <span class="pc-kw">and</span> dp[a - coin] + 1 &lt; dp[a]:
-                dp[a] ← dp[a - coin] + 1
-
-    <span class="pc-kw">if</span> dp[amount] = infinity: <span class="pc-kw">return</span> -1
-    <span class="pc-kw">return</span> dp[amount]
-
-<span class="pc-cm">// coins [1,2,5], amount 11
-// dp: 0,1,1,2,2,1,2,2,3,3,2,3 → answer 3 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(amount × coins)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(amount)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 02: House Robber II -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 02 &middot; Take or Skip</div>
-              <div class="prob-title">House Robber II</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/house-robber-ii/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 213 - House Robber II</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Linear DP, Twice</span>
-                <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Microsoft</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Houses are arranged in a circle, so the first and last are
-                neighbours. You cannot rob two adjacent houses. Return the
-                maximum you can take.
-              </p>
-              <div class="iobox">
-                nums = [2, 3, 2] → 3 &nbsp;&nbsp;|&nbsp;&nbsp; nums = [1, 2, 3,
-                1] → 4
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    The straight-line version is
-                    <code>dp[i] = max(dp[i-1], dp[i-2] + nums[i])</code>. What
-                    does the circle add?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Only one extra fact: the first and last house cannot both be
-                    robbed. So run the linear solution twice &mdash; once
-                    without the last house, once without the first &mdash; and
-                    take the better result.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The instinct is to invent a circular recurrence; the better move
-                is to remove the circularity by case analysis. Either house 0 is
-                robbed (so house n&minus;1 is out) or it is not (so the rest of
-                the row is free). Each case is the plain House Robber on a
-                slice, and each runs in O(1) space. Watch the single-house
-                input, where both slices are empty.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Two Linear Passes</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> rob(nums):
-    <span class="pc-kw">if</span> length(nums) = 1: <span class="pc-kw">return</span> nums[0]
-    <span class="pc-kw">return</span> max(robLine(nums, 0, n - 2),      <span class="pc-cm">// drop the last house</span>
-               robLine(nums, 1, n - 1))      <span class="pc-cm">// drop the first house</span>
-
-<span class="pc-kw">function</span> robLine(nums, lo, hi):
-    prev2 ← 0;  prev1 ← 0
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> lo <span class="pc-kw">to</span> hi:
-        take ← prev2 + nums[i]
-        prev2, prev1 ← prev1, max(take, prev1)
-    <span class="pc-kw">return</span> prev1
-
-<span class="pc-cm">// [1,2,3,1]: without last → 1,2,3 gives 4; without first → 2,3,1 gives 3 → 4 ✓</span></pre>
+                  <pre><span class="pc-kw">function</span> twoSum(a, target):
+      lo ← 0;  hi ← length(a) - 1
+      <span class="pc-kw">while</span> lo &lt; hi:
+          sum ← a[lo] + a[hi]
+          <span class="pc-kw">if</span> sum = target: <span class="pc-kw">return</span> [lo + 1, hi + 1]     <span class="pc-cm">// 1-indexed answer</span>
+          <span class="pc-kw">if</span> sum &lt; target: lo ← lo + 1                 <span class="pc-cm">// need bigger</span>
+          <span class="pc-kw">else</span>: hi ← hi - 1                            <span class="pc-cm">// need smaller</span>
+      <span class="pc-kw">return</span> []</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2230,44 +2174,147 @@ tails ← empty list
             </details>
           </div>
         </div>
-
-        <!-- Problem 03: Longest Increasing Subsequence -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 03 &middot; Ending Exactly Here
-              </div>
-              <div class="prob-title">Longest Increasing Subsequence</div>
-              <div style="margin-top: 4px">
+                Problem 02 &middot;
                 <a
-                  href="https://leetcode.com/problems/longest-increasing-subsequence/"
+                  href="https://leetcode.com/problems/container-with-most-water/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 300 - Longest Increasing Subsequence</a
+                  style="font-size: 11px"
+                  >LC 11</a
                 >
               </div>
+              <div class="prob-title">Container With Most Water</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">LIS / Patience</span>
+                <span class="tag tag-pat">Opposite Ends</span>
                 <span class="tag tag-co"
-                  >Amazon &middot; Google &middot; Meta &middot; Microsoft</span
+                  >Google &middot; Amazon &middot; Meta &middot; Bloomberg</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Return the length of the longest strictly increasing
-                subsequence. Elements need not be contiguous.
+                Given heights of vertical lines, find two that together with the
+                x-axis hold the most water.
+              </p>
+              <div class="iobox">Input: [1,8,6,2,5,4,8,3,7] → Output: 49</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Area is width &times; the <em>shorter</em> of the two walls.
+                    Start as wide as possible &mdash; then every move you make
+                    loses width.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Since width only shrinks, the only way to win is a taller
+                    wall. Always move the pointer at the shorter wall; moving
+                    the taller one can never help.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Greedy converging pointers. The proof: whichever wall is shorter
+                caps the area, so keeping it and moving the tall one strictly
+                loses.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Container With Most
+                      Water</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxArea(h):
+      lo ← 0;  hi ← length(h) - 1;  best ← 0
+      <span class="pc-kw">while</span> lo &lt; hi:
+          best ← max(best, (hi - lo) × min(h[lo], h[hi]))
+          <span class="pc-kw">if</span> h[lo] &lt; h[hi]: lo ← lo + 1       <span class="pc-cm">// move the shorter wall — it caps the area</span>
+          <span class="pc-kw">else</span>: hi ← hi - 1
+      <span class="pc-kw">return</span> best</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot;
+                <a
+                  href="https://leetcode.com/problems/3sum/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 15</a
+                >
+              </div>
+              <div class="prob-title">3Sum</div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Anchor + Converging Pair</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Meta &middot; Google &middot; Adobe</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return all unique triplets that sum to zero. The answer must
+                contain no duplicate triplets.
               </p>
               <div class="iobox">
-                nums = [10, 9, 2, 5, 3, 7, 101, 18] → 4 &nbsp;([2, 3, 7, 101])
+                Input: [-1,0,1,2,-1,-4] → Output: [[-1,-1,2],[-1,0,1]]
               </div>
             </div>
             <div class="prob-section">
@@ -2279,9 +2326,8 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    &ldquo;Best over the first i&rdquo; does not work here. What
-                    if <code>dp[i]</code> is the best subsequence
-                    <em>ending at</em> i?
+                    Fix one number and the problem collapses to Two Sum on the
+                    rest. What must you do first to make that inner search O(n)?
                   </p>
                 </div>
               </details>
@@ -2292,10 +2338,10 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Then <code>dp[i] = 1 + max(dp[j])</code> over earlier
-                    <code>j</code> with a smaller value — O(n²). For O(n log n),
-                    keep a <code>tails</code> array and binary search each new
-                    value into it.
+                    Sort, then for each anchor <code>i</code> run converging
+                    pointers on <code>i+1 .. n-1</code>. The hard part is
+                    duplicates: skip repeated anchors, and after recording a hit
+                    skip repeated <code>lo</code>/<code>hi</code> values.
                   </p>
                 </div>
               </details>
@@ -2303,14 +2349,8 @@ tails ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The state definition is the lesson: anchoring the subsequence at
-                <code>i</code> makes the recurrence possible, and the answer
-                becomes the maximum over the table rather than its last entry.
-                The patience upgrade keeps <code>tails[k]</code> = the smallest
-                tail of any length-(k+1) subsequence; a smaller tail is never
-                worse, so each value either extends the array or replaces the
-                first entry that is at least as large. Its length is the answer
-                &mdash; its contents are not a real subsequence.
+                Sorting costs O(n log n) but buys both the pointer walk and
+                cheap deduplication. Total O(n²).
               </p>
             </div>
             <details>
@@ -2321,83 +2361,186 @@ tails ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Quadratic, Then
-                      Patience</span
+                      >&#128208; Pseudocode &middot; 3Sum</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-cm">// O(n²) — easy to reconstruct from</span>
-dp ← array of 1s
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
-    <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> i - 1:
-        <span class="pc-kw">if</span> nums[j] &lt; nums[i]:
-            dp[i] ← max(dp[i], dp[j] + 1)
-<span class="pc-kw">return</span> max(dp)
-
-<span class="pc-cm">// O(n log n) — patience sorting</span>
-tails ← empty list
-<span class="pc-kw">for</span> x <span class="pc-kw">in</span> nums:
-    pos ← lowerBound(tails, x)          <span class="pc-cm">// first index with value ≥ x</span>
-    <span class="pc-kw">if</span> pos = length(tails): tails.append(x)
-    <span class="pc-kw">else</span>: tails[pos] ← x
-<span class="pc-kw">return</span> length(tails)</pre>
+                  <pre><span class="pc-kw">function</span> threeSum(a):
+      sort a
+      out ← empty list
+      <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 3:
+          <span class="pc-kw">if</span> i &gt; 0 <span class="pc-kw">and</span> a[i] = a[i - 1]: <span class="pc-kw">continue</span>       <span class="pc-cm">// duplicate anchor</span>
+          lo ← i + 1;  hi ← length(a) - 1
+          <span class="pc-kw">while</span> lo &lt; hi:
+              s ← a[i] + a[lo] + a[hi]
+              <span class="pc-kw">if</span> s = 0:
+                  append [a[i], a[lo], a[hi]] <span class="pc-kw">to</span> out
+                  <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[lo] = a[lo + 1]: lo ← lo + 1   <span class="pc-cm">// skip duplicates</span>
+                  <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> a[hi] = a[hi - 1]: hi ← hi - 1
+                  lo ← lo + 1;  hi ← hi - 1
+              <span class="pc-kw">else if</span> s &lt; 0: lo ← lo + 1
+              <span class="pc-kw">else</span>: hi ← hi - 1
+      <span class="pc-kw">return</span> out</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n log n)</span>
+                    ><span class="cx-val green">O(n²)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
+                    ><span class="cx-val green">O(1) beyond the output</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
-
-        <!-- Problem 04: Best Time to Buy and Sell Stock with Cooldown -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; State Machine</div>
-              <div class="prob-title">
-                Best Time to Buy and Sell Stock with Cooldown
-              </div>
-              <div style="margin-top: 4px">
+              <div class="prob-num">
+                Problem 04 &middot;
                 <a
-                  href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/"
+                  href="https://leetcode.com/problems/longest-substring-without-repeating-characters/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 309 - Best Time to Buy and Sell Stock with
-                  Cooldown</a
+                  style="font-size: 11px"
+                  >LC 3</a
                 >
+              </div>
+              <div class="prob-title">
+                Longest Substring Without Repeating Characters
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">DP over States</span>
+                <span class="tag tag-pat">Variable Window</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Google &middot; Meta &middot; Bloomberg</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Find the length of the longest substring with no repeated
+                characters.
+              </p>
+              <div class="iobox">Input: "abcabcbb" → Output: 3 ("abc")</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Walk the right edge forward one character at a time. When
+                    does the window stop being valid, and which pointer must
+                    move to fix it?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Keep the last index of every character. On a repeat, jump
+                    <code>left</code> to just past that previous copy &mdash;
+                    never backwards, or you will double-count.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The <code>Math.max</code> on left is what keeps it correct: a
+                stale duplicate from before the current window must not drag
+                left backwards.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 3</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> lengthOfLongestSubstring(s):
+      last ← map char → last index + 1, default 0
+      left ← 0;  best ← 0
+      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
+          left ← max(left, last[s[r]])
+          best ← max(best, r - left + 1)
+          last[s[r]] ← r + 1
+      <span class="pc-kw">return</span> best</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot;
+                <a
+                  href="https://leetcode.com/problems/longest-repeating-character-replacement/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 424</a
+                >
+              </div>
+              <div class="prob-title">
+                Longest Repeating Character Replacement
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Variable Window</span>
                 <span class="tag tag-co"
                   >Google &middot; Amazon &middot; Meta</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                You may buy and sell many times, but after selling you must rest
-                one day before buying again. Return the maximum profit.
+                You may change at most k characters. Find the longest substring
+                of one repeated letter you can produce.
               </p>
-              <div class="iobox">
-                prices = [1, 2, 3, 0, 2] → 3 &nbsp;(buy 1, sell 2, cooldown, buy
-                0, sell 2)
-              </div>
+              <div class="iobox">Input: s="AABABBA", k=1 → Output: 4</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2408,8 +2551,9 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Each day you are in one of a few situations. List them:
-                    holding a share, having just sold, or free to act.
+                    A window is valid when the characters you would have to
+                    replace fit inside k. How do you compute &ldquo;replacements
+                    needed&rdquo; from the window's letter counts?
                   </p>
                 </div>
               </details>
@@ -2420,10 +2564,8 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Write one variable per state and update all three from the
-                    previous day&rsquo;s values. Hold comes from
-                    resting-then-buying; sold comes from holding-then-selling;
-                    rest comes from having sold earlier.
+                    Replacements needed = window length &minus; count of the
+                    most frequent letter. Shrink while that exceeds k.
                   </p>
                 </div>
               </details>
@@ -2431,14 +2573,9 @@ tails ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                When a plain <code>dp[i]</code> cannot express the constraint,
-                the missing piece belongs in the state. Three running values are
-                enough, but the update order matters: <code>sold</code> must be
-                computed from <em>yesterday&rsquo;s</em> <code>hold</code>, and
-                <code>rest</code> from yesterday&rsquo;s <code>sold</code>, so
-                save the old value before overwriting. Initialising
-                <code>hold</code> to &minus;infinity stops a sale that never had
-                a purchase.
+                You do not need to recompute the max frequency when shrinking
+                &mdash; letting it go stale only ever <em>under</em>-estimates
+                the window, which never produces a wrong maximum.
               </p>
             </div>
             <details>
@@ -2449,23 +2586,22 @@ tails ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Three Running States</span
+                      >&#128208; Pseudocode &middot; LC 424</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> maxProfit(prices):
-    hold ← -infinity      <span class="pc-cm">// best profit while holding a share</span>
-    sold ← -infinity      <span class="pc-cm">// best profit having sold TODAY</span>
-    rest ← 0              <span class="pc-cm">// best profit while free to buy</span>
-
-    <span class="pc-kw">for</span> price <span class="pc-kw">in</span> prices:
-        prevSold ← sold                      <span class="pc-cm">// yesterday&#39;s value</span>
-        sold ← hold + price                  <span class="pc-cm">// sell what we held</span>
-        hold ← max(hold, rest - price)       <span class="pc-cm">// keep holding, or buy today</span>
-        rest ← max(rest, prevSold)           <span class="pc-cm">// cooldown day finishes</span>
-
-    <span class="pc-kw">return</span> max(sold, rest)                 <span class="pc-cm">// never finish holding</span></pre>
+                  <pre><span class="pc-kw">function</span> characterReplacement(s, k):
+      cnt ← count per letter, all 0
+      left ← 0;  most ← 0;  best ← 0
+      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
+          cnt[s[r]] ← cnt[s[r]] + 1
+          most ← max(most, cnt[s[r]])
+          <span class="pc-kw">while</span> (r - left + 1) - most &gt; k:        <span class="pc-cm">// too many chars to replace</span>
+              cnt[s[left]] ← cnt[s[left]] - 1
+              left ← left + 1
+          best ← max(best, r - left + 1)
+      <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
@@ -2481,163 +2617,40 @@ tails ← empty list
             </details>
           </div>
         </div>
-
-        <!-- Problem 05: Solving Questions With Brainpower -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 05 &middot; Fill Backwards</div>
-              <div class="prob-title">Solving Questions With Brainpower</div>
-              <div style="margin-top: 4px">
+              <div class="prob-num">
+                Problem 06 &middot;
                 <a
-                  href="https://leetcode.com/problems/solving-questions-with-brainpower/"
+                  href="https://leetcode.com/problems/minimum-window-substring/"
                   target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2140 - Solving Questions With Brainpower</a
+                  style="font-size: 11px"
+                  >LC 76</a
                 >
               </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Suffix DP</span>
-                <span class="tag tag-co">Google &middot; Amazon</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Each question gives <code>points</code> but costs
-                <code>brainpower</code>, skipping that many questions after it.
-                Return the maximum points obtainable.
-              </p>
-              <div class="iobox">
-                questions = [[3,2],[4,3],[4,4],[2,5]] → 5 &nbsp;(solve question
-                0, skip 2, solve question 3)
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Solving question <code>i</code> affects what comes
-                    <em>after</em> it. Which direction should the table be
-                    filled?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Let <code>dp[i]</code> be the best score obtainable from
-                    question <code>i</code> onwards, and fill from the end:
-                    solve it and jump to <code>i + brainpower + 1</code>, or
-                    skip to <code>i + 1</code>.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                A forward table would need to know which earlier question locked
-                this one out. Flipping the definition to &ldquo;from here to the
-                end&rdquo; makes each choice depend only on entries already
-                computed. Size the array <code>n + 1</code> so a jump past the
-                end lands on a defined zero, and use 64-bit totals &mdash; the
-                points add up beyond 32 bits.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Right to Left</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> mostPoints(questions):
-    n ← length(questions)
-    dp ← array of n + 1 zeros            <span class="pc-cm">// dp[n] = 0: nothing left to solve</span>
-
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:
-        (points, brainpower) ← questions[i]
-        next ← min(n, i + brainpower + 1)      <span class="pc-cm">// clamp the jump</span>
-        solve ← points + dp[next]
-        skip ← dp[i + 1]
-        dp[i] ← max(solve, skip)
-
-    <span class="pc-kw">return</span> dp[0]
-
-<span class="pc-cm">// [[3,2],[4,3],[4,4],[2,5]] → dp = [5, 4, 4, 2, 0] → 5 ✓</span></pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- Problem 06: Best Time to Buy and Sell Stock IV -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 06 &middot; Two Dimensions</div>
-              <div class="prob-title">Best Time to Buy and Sell Stock IV</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 188 - Best Time to Buy and Sell Stock IV</a
-                >
-              </div>
+              <div class="prob-title">Minimum Window Substring</div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">DP over Transactions</span>
+                <span class="tag tag-pat">Variable Window (shortest)</span>
                 <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
+                  >Meta &middot; Amazon &middot; Google &middot; Uber</span
                 >
               </div>
             </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                You may complete at most <code>k</code> transactions (buy then
-                sell). Return the maximum profit.
+                Find the smallest substring of s containing every character of
+                t, including duplicates.
               </p>
               <div class="iobox">
-                k = 2, prices = [3, 2, 6, 5, 0, 3] → 7 &nbsp;(2→6 and 0→3)
+                Input: s="ADOBECODEBANC", t="ABC" → Output: "BANC"
               </div>
             </div>
             <div class="prob-section">
@@ -2649,8 +2662,9 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    The cooldown problem needed one extra state. What extra
-                    information does a transaction limit require?
+                    This asks for the <em>shortest</em> valid window, not the
+                    longest. That flips where you record the answer relative to
+                    the shrink loop.
                   </p>
                 </div>
               </details>
@@ -2661,9 +2675,10 @@ tails ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    How many transactions are left. Keep <code>buy[t]</code> and
-                    <code>sell[t]</code> for each <code>t</code> from 1 to k,
-                    and update them for every price.
+                    Keep a <code>need</code> map and one
+                    <code>missing</code> counter. When <code>missing</code> hits
+                    0 the window is valid &mdash; record it, then shrink from
+                    the left and keep recording while it stays valid.
                   </p>
                 </div>
               </details>
@@ -2671,14 +2686,9 @@ tails ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Two dimensions &mdash; day and transactions used &mdash; but
-                only the transaction axis needs to be stored, because each day
-                depends on the day before. When <code>k</code> is at least
-                <code>n / 2</code> the limit is no limit at all, and the problem
-                collapses to &ldquo;take every rise&rdquo;; handling that case
-                separately keeps the array from being enormous. Initialise each
-                <code>buy[t]</code> to &minus;infinity so an unstarted
-                transaction cannot be sold.
+                The single counter makes validity O(1). Characters outside t go
+                negative in the map, so the <code>&gt; 0</code> guards naturally
+                ignore them.
               </p>
             </div>
             <details>
@@ -2689,35 +2699,263 @@ tails ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Rolling over
-                      Transactions</span
+                      >&#128208; Pseudocode &middot; LC 76</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> maxProfit(k, prices):
-    n ← length(prices)
-    <span class="pc-kw">if</span> k ≥ n ÷ 2:                        <span class="pc-cm">// effectively unlimited</span>
-        <span class="pc-kw">return</span> sum of every positive price rise
+                  <pre><span class="pc-kw">function</span> minWindow(s, t):
+      need ← count of each char <span class="pc-kw">in</span> t, default 0
+      missing ← length(t)
+      left ← 0;  bestStart ← 0;  bestLen ← ∞
+      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(s) - 1:
+          <span class="pc-kw">if</span> need[s[r]] &gt; 0: missing ← missing - 1   <span class="pc-cm">// this char was still needed</span>
+          need[s[r]] ← need[s[r]] - 1                <span class="pc-cm">// extras go negative</span>
 
-    buy ← array of k + 1, filled with -infinity   <span class="pc-cm">// best profit while holding, t-th transaction</span>
-    sell ← array of k + 1 zeros                   <span class="pc-cm">// best profit after closing t transactions</span>
-
-    <span class="pc-kw">for</span> price <span class="pc-kw">in</span> prices:
-        <span class="pc-kw">for</span> t <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> k:
-            buy[t] ← max(buy[t], sell[t - 1] - price)
-            sell[t] ← max(sell[t], buy[t] + price)
-
-    <span class="pc-kw">return</span> sell[k]</pre>
+          <span class="pc-kw">while</span> missing = 0:                         <span class="pc-cm">// window is valid — shrink it</span>
+              <span class="pc-kw">if</span> r - left + 1 &lt; bestLen:
+                  bestLen ← r - left + 1
+                  bestStart ← left
+              need[s[left]] ← need[s[left]] + 1
+              <span class="pc-kw">if</span> need[s[left]] &gt; 0: missing ← missing + 1   <span class="pc-cm">// dropped a needed char</span>
+              left ← left + 1
+      <span class="pc-kw">if</span> bestLen = ∞: <span class="pc-kw">return</span> ""
+      <span class="pc-kw">return</span> s[bestStart .. bestStart + bestLen - 1]</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n × k)</span>
+                    ><span class="cx-val green">O(|s| + |t|)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(|t|)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 07 &middot;
+                <a
+                  href="https://leetcode.com/problems/subarrays-with-k-different-integers/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 992</a
+                >
+              </div>
+              <div class="prob-title">Subarrays with K Different Integers</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">At-Most Trick</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>Count the subarrays containing exactly k distinct integers.</p>
+              <div class="iobox">Input: [1,2,1,2,3], k=2 → Output: 7</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A window can answer &ldquo;at most k distinct&rdquo; easily,
+                    because shrinking always keeps that true. &ldquo;Exactly
+                    k&rdquo; is not monotonic &mdash; so don't try to window it
+                    directly.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    exactly(k) = atMost(k) &minus; atMost(k&minus;1). Write the
+                    at-most window once and call it twice.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Inside <code>atMost</code>, every valid window ending at
+                <code>right</code> contributes
+                <code>right - left + 1</code> subarrays, counted in O(1).
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 992</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> subarraysWithKDistinct(a, k):
+      <span class="pc-kw">return</span> atMost(a, k) - atMost(a, k - 1)      <span class="pc-cm">// "exactly k" = "at most k" − "at most k−1"</span>
+
+  <span class="pc-kw">function</span> atMost(a, k):
+      freq ← empty map, default 0
+      left ← 0;  count ← 0
+      <span class="pc-kw">for</span> r <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(a) - 1:
+          freq[a[r]] ← freq[a[r]] + 1
+          <span class="pc-kw">if</span> freq[a[r]] = 1: k ← k - 1          <span class="pc-cm">// a new distinct value</span>
+          <span class="pc-kw">while</span> k &lt; 0:
+              freq[a[left]] ← freq[a[left]] - 1
+              <span class="pc-kw">if</span> freq[a[left]] = 0: k ← k + 1   <span class="pc-cm">// a value left the window entirely</span>
+              left ← left + 1
+          count ← count + (r - left + 1)         <span class="pc-cm">// every subarray ending at r</span>
+      <span class="pc-kw">return</span> count</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
                     ><span class="cx-val green">O(k)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 08 &middot;
+                <a
+                  href="https://leetcode.com/problems/trapping-rain-water/"
+                  target="_blank"
+                  style="font-size: 11px"
+                  >LC 42</a
+                >
+              </div>
+              <div class="prob-title">Trapping Rain Water</div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Opposite Ends</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Meta &middot; Microsoft</span
+                >
+              </div>
+            </div>
+            <div class="prob-right">
+              <div class="toggle-arrow">&#9654;</div>
+            </div>
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given an elevation map, compute how much rain water it can trap.
+              </p>
+              <div class="iobox">
+                Input: [0,1,0,2,1,0,1,3,2,1,2,1] → Output: 6
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Water above any single bar is
+                    <code>min(tallestLeft, tallestRight) - height</code>. The
+                    O(n)-space answer precomputes both. Can you avoid storing
+                    them?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Walk from both ends keeping <code>leftMax</code> and
+                    <code>rightMax</code>. Whichever side is shorter is the
+                    binding constraint, so that side's water is already decided
+                    &mdash; settle it and step inwards.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The insight is that you never need the exact other-side maximum,
+                only the knowledge that it is at least as tall as the side you
+                are settling.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; LC 42</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> trap(h):
+      lo ← 0;  hi ← length(h) - 1
+      leftMax ← 0;  rightMax ← 0;  water ← 0
+      <span class="pc-kw">while</span> lo &lt; hi:
+          <span class="pc-kw">if</span> h[lo] &lt; h[hi]:                      <span class="pc-cm">// left side is the bottleneck</span>
+              leftMax ← max(leftMax, h[lo])
+              water ← water + leftMax - h[lo]
+              lo ← lo + 1
+          <span class="pc-kw">else</span>:
+              rightMax ← max(rightMax, h[hi])
+              water ← water + rightMax - h[hi]
+              hi ← hi - 1
+      <span class="pc-kw">return</span> water</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                 </div>
               </div>
@@ -2731,11 +2969,11 @@ tails ← empty list
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 25 Assignment &mdash; 25 Problems (10 Easy &middot; 12
-              Medium &middot; 3 Hard)</strong
+              >Lecture 25 Assignment &mdash; 30 Problems (10 Easy &middot; 15
+              Medium &middot; 5 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged, grouped by the
-            1D family it belongs to. Complete it before moving to Lecture 26.<br /><br />
+            shape it needs. Complete it before moving to Lecture 26.<br /><br />
             <a
               href="https://github.com/bhumika-aga/DSA/blob/main/Lecture25/Assignment.md"
               style="
@@ -2758,53 +2996,54 @@ tails ← empty list
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can name the two signals and check them on a new problem
+            I can name the five shapes and say which clue in a problem selects
+            each one
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I write the brute-force recursion first, every time
+            I can write the variable-window template from memory, without
+            looking
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can add memoisation to any recursion in one line, with the right
-            key
+            I know why longest records after the shrink loop and shortest
+            records inside it
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can convert top-down into bottom-up and get the loop order right
+            I can explain why two nested loops are still O(n) here
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can state what dp[i] means in one sentence before writing the
-            recurrence
+            I can solve 3Sum including full duplicate handling
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can reduce a fixed-window recurrence to O(1) space
+            I can derive exactly(k) = atMost(k) &minus; atMost(k&minus;1) and
+            say why it is needed
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write both LIS solutions and say what the tails array really
-            holds
+            I know why sliding windows break on negative numbers
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I completed all 25 assignment problems and can state the dp
-            definition for each
+            I completed all 30 assignment problems and can name the pattern for
+            each
           </div>
         </div>
 
@@ -2812,24 +3051,22 @@ tails ← empty list
           <span class="callout-icon">&#128640;</span>
           <div class="callout-body">
             <strong
-              >You're ready for Lecture 26: Dynamic Programming II &mdash; Grids
-              &amp; Strings</strong
+              >You're ready for Lecture 26: Prefix Sums &amp; Difference
+              Arrays</strong
             ><br />
-            One index gave you a row of states. Two indices give you a grid
-            &mdash; and with it the string problems every interview loop
-            contains: edit distance, longest common subsequence, and the
-            palindrome family.
+            The last row of the bug table is the handover: the moment negative
+            numbers appear, a sliding window is the wrong tool. Prefix sums pick
+            up exactly where windows stop working.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
           <a href="../Lecture24/lecture24_notes.html"
-            >&larr; Lecture 24 &middot; Union-Find</a
+            >&larr; Lecture 24 &middot; Backtracking</a
           >
           <a class="next" href="../Lecture26/lecture26_notes.html"
-            >Lecture 26 &middot; Dynamic Programming II — Grids &amp; Strings
-            &rarr;</a
+            >Lecture 26 &middot; Prefix Sums &amp; Difference Arrays &rarr;</a
           >
         </div>
       </div>
