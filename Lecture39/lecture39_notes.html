@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 23 &mdash; Graphs III (MST, Bipartite &amp; Bridges)</title>
+    <title>Lecture 39 &mdash; String Algorithms</title>
     <meta
       name="description"
-      content="Master graphs: BFS, DFS, cycle detection, topological sort, Dijkstra, Bellman-Ford, MST, bipartite — with full dry runs and Java code."
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1391,15 +1391,14 @@
       }
     </style>
   </head>
-
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Graphs III &mdash; Structure</div>
+        <div class="sb-title">String Algorithms</div>
         <div class="sb-meta">
-          Lecture 23 of 45 &middot; Phase 2 &mdash; Core Data Structures
+          Lecture 39 of 45 &middot; Phase 5 &mdash; Advanced Structures
         </div>
       </div>
       <div class="sb-scroll">
@@ -1407,17 +1406,23 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#mst"
-          ><span class="toc-icon">&#127795;</span>Minimum Spanning Tree</a
+        <a class="toc-item toc-sub" href="#naive"
+          >Why the Obvious Method Is Slow</a
         >
-        <a class="toc-item" href="#bipartite"
-          ><span class="toc-icon">&#127800;</span>Bipartite Graphs</a
+        <a class="toc-item" href="#kmp"
+          ><span class="toc-icon">&#129513;</span>KMP</a
         >
-        <a class="toc-item" href="#tarjan"
-          ><span class="toc-icon">&#128291;</span>Bridges (Tarjan)</a
+        <a class="toc-item" href="#rk"
+          ><span class="toc-icon">&#128273;</span>Rabin-Karp</a
         >
-        <a class="toc-item" href="#patterns"
-          ><span class="toc-icon">&#127919;</span>Decision Guide</a
+        <a class="toc-item" href="#z"
+          ><span class="toc-icon">&#127916;</span>Z-Algorithm</a
+        >
+        <a class="toc-item" href="#manacher"
+          ><span class="toc-icon">&#129966;</span>Manacher</a
+        >
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129517;</span>Which One When</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1434,14 +1439,14 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture22/lecture22_notes.html"
-          >&larr; Lecture 22 &middot; Graphs II</a
+        <a class="toc-item" href="../Lecture38/lecture38_notes.html"
+          >&larr; Lecture 38 &middot; Square Root Decomposition &amp; Mo&#39;s
+          Algorithm</a
         >
-        <a class="toc-item" href="../Lecture24/lecture24_notes.html"
-          >&rarr; Lecture 24 &middot; Backtracking</a
+        <a class="toc-item" href="../Lecture40/lecture40_notes.html"
+          >&rarr; Lecture 40 &middot; Advanced Graph Algorithms</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
-        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1450,8 +1455,8 @@
       <div id="topbar">
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
-          <span>Lecture 23 &mdash; Graphs III &mdash; Structure</span>
+          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
+          <span>Lecture 39 &mdash; String Algorithms</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1469,21 +1474,20 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128737;&#65039;</span>
+          <span class="page-emoji">&#128289;</span>
           <h1 class="page-title">
-            Graphs III &mdash; MST, Bipartite &amp; Bridges
+            String Algorithms &mdash; KMP, Z, Rabin-Karp &amp; Manacher
           </h1>
           <p class="page-sub">
-            &ldquo;Not where to go &mdash; what holds the whole thing
-            together.&rdquo;
+            &ldquo;Never re-read what you already know.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 23 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 39 of 45</span>
             <span class="meta-chip accent"
-              >Phase 2 &mdash; Core Data Structures</span
+              >Phase 5 &mdash; Advanced Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 10 problems</span>
+            <span class="meta-chip yellow">&#9201; 5 days</span>
+            <span class="meta-chip green">&#127919; 20 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
@@ -1497,383 +1501,399 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            The last two lectures moved <em>through</em> a graph. This one asks
-            about its shape. Think of a utility company wiring up a town: they
-            do not care about the route between any two houses, only about the
-            cheapest set of cables that reaches every house &mdash; that is a
-            minimum spanning tree. The other two questions here are equally
-            structural: can everyone be split into two groups with no conflicts
-            inside either, and which single link would cut the network in half
-            if it failed?
+            Finding a pattern inside a text sounds like a solved problem &mdash;
+            every language has a search function. But the obvious method
+            re-reads the same characters over and over, and on unlucky inputs it
+            is quadratic. The four algorithms here are linear, and each stores a
+            different kind of memory about the text: KMP remembers how the
+            pattern overlaps itself, a rolling hash turns windows into numbers,
+            the Z-array records where the start reappears, and Manacher reuses
+            the mirror image inside a palindrome. Hard string questions are
+            almost always one of these in disguise.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Build a minimum spanning tree with Kruskal and with Prim</li>
             <li>
-              Say which of the two fits a dense graph and which a sparse one
+              Build the KMP failure table and use it to search in O(n + m)
             </li>
-            <li>Test a graph for bipartiteness by two-colouring it</li>
+            <li>Roll a hash across a string and handle collisions safely</li>
             <li>
-              Find every bridge in one DFS using discovery and low-link times
+              Build the Z-array and use it for matching and prefix questions
             </li>
-            <li>Choose the right algorithm from a problem statement</li>
+            <li>
+              Find palindromes in O(n) with Manacher, and know when O(n&sup2;)
+              is enough
+            </li>
+            <li>Choose between the four from the wording of a problem</li>
           </ul>
         </div>
 
         <hr />
 
-        <h2 class="h1" id="mst">&#127795; Minimum Spanning Tree (MST)</h2>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: never re-read what you already
+              know.</strong
+            >
+            Imagine hunting for the phrase &ldquo;abcabd&rdquo; in a long text.
+            You have matched &ldquo;abcab&rdquo; and the next letter is wrong.
+            The slow way is to go back and start again one letter later. But you
+            <em>already know</em> the last two letters you read were
+            &ldquo;ab&rdquo; &mdash; which is exactly how the phrase begins. So
+            you carry on as if you had matched &ldquo;ab&rdquo;, without
+            re-reading anything. Every algorithm in this lecture is a different
+            way of remembering what you have already seen.
+          </div>
+        </div>
+        <h2 class="h1" id="naive">&#128034; Why the Obvious Method Is Slow</h2>
         <p>
-          An MST connects all V nodes using exactly V&minus;1 edges with the
-          minimum total weight. Two classic algorithms, both greedily build the
-          MST.
+          To find a pattern of length m in a text of length n, the obvious
+          method tries every starting position and compares character by
+          character. That is correct, and usually fine &mdash; but on text like
+          <code>aaaa…ab</code> searching for <code>aaab</code>, each attempt
+          gets almost to the end before failing, and the next attempt re-reads
+          nearly all the same characters. Worst case: O(n &times; m). The
+          algorithms below all reach O(n + m) by refusing to re-read.
         </p>
-
+        <h2 class="h1" id="kmp">&#129513; KMP &mdash; The Failure Table</h2>
+        <p>
+          KMP (Knuth&ndash;Morris&ndash;Pratt) first studies the
+          <em>pattern alone</em>. For every prefix of the pattern it records one
+          number: the length of the longest proper prefix that is also a suffix
+          &mdash; the part that &ldquo;starts the way it ends&rdquo;. This is
+          called the <strong>failure table</strong> (or LPS, for longest
+          prefix-suffix). When a mismatch happens, the table says how much of
+          the match you can keep.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>i</th>
+                <th>0</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>p[i]</code></td>
+                <td>a</td>
+                <td>b</td>
+                <td>a</td>
+                <td>b</td>
+                <td>a</td>
+                <td>c</td>
+                <td>a</td>
+              </tr>
+              <tr>
+                <td><code>lps[i]</code></td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>0</td>
+                <td>1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Read <code>lps[4] = 3</code> as: &ldquo;<code>ababa</code> ends with
+          <code>aba</code>, which is also how it starts.&rdquo; If the text
+          matched <code>ababa</code> and then failed, you continue as if
+          <code>aba</code> were already matched.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Build the Failure Table</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> buildLps(p):
+    lps ← array of zeros, length(p)
+    len ← 0                                  <span class="pc-cm">// length of the current prefix-suffix</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> length(p) - 1:
+        <span class="pc-kw">while</span> len &gt; 0 <span class="pc-kw">and</span> p[i] ≠ p[len]:
+            len ← lps[len - 1]               <span class="pc-cm">// fall back to a shorter one</span>
+        <span class="pc-kw">if</span> p[i] = p[len]:
+            len ← len + 1
+        lps[i] ← len
+    <span class="pc-kw">return</span> lps</pre>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Search With It</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> kmpSearch(text, p):
+    lps ← buildLps(p)
+    j ← 0                                    <span class="pc-cm">// characters of p matched so far</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(text) - 1:
+        <span class="pc-kw">while</span> j &gt; 0 <span class="pc-kw">and</span> text[i] ≠ p[j]:
+            j ← lps[j - 1]                   <span class="pc-cm">// keep what still matches; never move i back</span>
+        <span class="pc-kw">if</span> text[i] = p[j]: j ← j + 1
+        <span class="pc-kw">if</span> j = length(p):
+            record a match starting at i - j + 1
+            j ← lps[j - 1]                   <span class="pc-cm">// allow overlapping matches</span>
+<span class="pc-cm">// i only ever moves forward, and j can only fall back as far as it has</span>
+<span class="pc-cm">// climbed, so the total work is O(n + m).</span></pre>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>The table answers questions on its own.</strong> Many
+            problems never search a text at all. &ldquo;Is this string made of a
+            repeated block?&rdquo; and &ldquo;what is the longest prefix that is
+            also a suffix?&rdquo; are read straight off <code>lps</code> for the
+            last position.
+          </div>
+        </div>
+        <h2 class="h1" id="rk">&#128273; Rabin-Karp &mdash; Fingerprints</h2>
+        <p>
+          You met the rolling hash as a preview in Lecture 11; this is the full
+          treatment. Turn each window of m characters into a number &mdash; a
+          fingerprint &mdash; by treating it as an m-digit number in some base
+          B. Sliding one step right removes the leftmost digit and adds a new
+          one, in O(1). Numbers get huge, so everything is taken modulo a large
+          prime M.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rabin-Karp With a Modulus</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> rabinKarp(text, p):
+    n ← length(text);  m ← length(p)
+    B ← 31;  M ← 1000000007
+    power ← B^(m - 1) mod M                  <span class="pc-cm">// weight of the leftmost character</span>
+    hp ← hash of p;  ht ← hash of text[0..m-1]
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - m:
+        <span class="pc-kw">if</span> ht = hp <span class="pc-kw">and</span> text[i..i+m-1] = p:   <span class="pc-cm">// equal hashes are only a hint: verify</span>
+            record a match at i
+        <span class="pc-kw">if</span> i + m &lt; n:                        <span class="pc-cm">// roll the window one step right</span>
+            ht ← (ht - text[i] × power) mod M
+            ht ← (ht × B + text[i + m]) mod M
+            <span class="pc-kw">if</span> ht &lt; 0: ht ← ht + M
+<span class="pc-cm">// hash of s = (s[0]·B^(m-1) + s[1]·B^(m-2) + … + s[m-1]) mod M</span></pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#9888;&#65039;</span>
+          <div class="callout-body">
+            <strong>Two different strings can share a fingerprint.</strong> That
+            is called a <strong>collision</strong>. Either check the characters
+            whenever the hashes match (as above), or use two different moduli
+            and require both to agree. The real strength of rolling hashes is
+            not single searches &mdash; KMP does those better &mdash; but
+            comparing <em>many</em> substrings, such as &ldquo;the longest
+            substring that appears twice&rdquo;.
+          </div>
+        </div>
+        <h2 class="h1" id="z">&#127916; The Z-Algorithm</h2>
+        <p>
+          The Z-array stores, for every position i, how many characters starting
+          at i match the start of the string. It is another way of recording
+          &ldquo;where does the beginning reappear?&rdquo;.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>i</th>
+                <th>0</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>s[i]</code></td>
+                <td>a</td>
+                <td>a</td>
+                <td>b</td>
+                <td>x</td>
+                <td>a</td>
+                <td>a</td>
+                <td>b</td>
+              </tr>
+              <tr>
+                <td><code>Z[i]</code></td>
+                <td>&mdash;</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>3</td>
+                <td>1</td>
+                <td>0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Build the Z-Array in O(n)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> zArray(s):
+    n ← length(s);  Z ← array of zeros, length n
+    l ← 0;  r ← 0                           <span class="pc-cm">// s[l..r-1] is the rightmost copy of a prefix</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> i &lt; r:
+            Z[i] ← min(r - i, Z[i - l])     <span class="pc-cm">// the box already proves this much</span>
+        <span class="pc-kw">while</span> i + Z[i] &lt; n <span class="pc-kw">and</span> s[Z[i]] = s[i + Z[i]]:
+            Z[i] ← Z[i] + 1                 <span class="pc-cm">// extend past what was proven</span>
+        <span class="pc-kw">if</span> i + Z[i] &gt; r:
+            l ← i;  r ← i + Z[i]
+    <span class="pc-kw">return</span> Z
+<span class="pc-cm">// To find p in text: build Z for  p + "$" + text  (with "$" in neither).</span>
+<span class="pc-cm">// Every position whose Z value equals length(p) is a match.</span></pre>
+        </div>
+        <h2 class="h1" id="manacher">
+          &#129966; Palindromes and Manacher&rsquo;s Algorithm
+        </h2>
+        <p>
+          The simple way to find the longest palindrome is to try every centre
+          and expand outwards while both sides match &mdash; O(n&sup2;), easy to
+          write, and often good enough (it is covered in Lecture 33).
+          Manacher&rsquo;s algorithm reaches O(n) with the same &ldquo;do not
+          re-read&rdquo; idea: inside a palindrome, the left half mirrors the
+          right half, so a centre on the right can copy what its mirror image on
+          the left already found.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Manacher’s Algorithm</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> longestPalindrome(s):
+    t ← "#" + s with "#" between every character + "#"     <span class="pc-cm">// "aba" → "#a#b#a#"</span>
+    P ← array of zeros, length(t)        <span class="pc-cm">// P[i] = radius of the palindrome centred at i</span>
+    center ← 0;  right ← 0               <span class="pc-cm">// the palindrome reaching furthest right so far</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(t) - 1:
+        <span class="pc-kw">if</span> i &lt; right:
+            P[i] ← min(right - i, P[2 × center - i])      <span class="pc-cm">// copy from the mirror</span>
+        <span class="pc-kw">while</span> i - P[i] - 1 ≥ 0 <span class="pc-kw">and</span> i + P[i] + 1 &lt; length(t)
+              <span class="pc-kw">and</span> t[i - P[i] - 1] = t[i + P[i] + 1]:
+            P[i] ← P[i] + 1                               <span class="pc-cm">// expand beyond the copy</span>
+        <span class="pc-kw">if</span> i + P[i] &gt; right:
+            center ← i;  right ← i + P[i]
+    best ← the index with the largest P
+    start ← (best - P[best]) ÷ 2
+    <span class="pc-kw">return</span> s <span class="pc-kw">from</span> start, length P[best]
+<span class="pc-cm">// The "#" separators make even- and odd-length palindromes look the same.</span></pre>
+        </div>
+        <h2 class="h1" id="choose">&#129517; Which One When</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>The question</th>
+                <th>Use</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Find one pattern in one text</td>
+                <td>KMP</td>
+                <td>Guaranteed O(n + m), no hashing risk</td>
+              </tr>
+              <tr>
+                <td>
+                  Is the string one block repeated? Longest prefix that is also
+                  a suffix?
+                </td>
+                <td>KMP failure table</td>
+                <td>Read the answer off the last entry</td>
+              </tr>
+              <tr>
+                <td>Compare many substrings against each other</td>
+                <td>Rolling hash</td>
+                <td>Each comparison is O(1)</td>
+              </tr>
+              <tr>
+                <td>Longest repeated substring</td>
+                <td>Binary search on length + rolling hash</td>
+                <td>A length that works means every shorter one does</td>
+              </tr>
+              <tr>
+                <td>How much of the start matches at every position</td>
+                <td>Z-array</td>
+                <td>Exactly what it stores</td>
+              </tr>
+              <tr>
+                <td>Longest palindrome, n ≤ 1000</td>
+                <td>Expand around centre</td>
+                <td>O(n&sup2;) and hard to get wrong</td>
+              </tr>
+              <tr>
+                <td>Longest palindrome, n ≈ 10&#8309;</td>
+                <td>Manacher</td>
+                <td>O(n)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Algorithm</th>
-                <th>Strategy</th>
-                <th>Data Structure</th>
                 <th>Time</th>
-                <th>Best When</th>
+                <th>Space</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Kruskal's</strong></td>
-                <td>Sort edges, add if no cycle</td>
-                <td>Union-Find</td>
-                <td>O(E log E)</td>
-                <td>Sparse graphs</td>
+                <td>Naive matching</td>
+                <td>O(n &middot; m)</td>
+                <td>O(1)</td>
               </tr>
               <tr>
-                <td><strong>Prim's</strong></td>
-                <td>
-                  Grow MST from a node, always add cheapest reachable edge
-                </td>
-                <td>Min-Heap</td>
-                <td>O(E log V)</td>
-                <td>Dense graphs</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 class="h3" id="kruskal">Kruskal&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Kruskal's Minimum Spanning
-              Tree</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Sort every edge cheapest first; keep an edge only if it joins</span>
-<span class="pc-cm">// two components that were not already connected.</span>
-sort edges by weight ascending
-dsu <span class="pc-kw">&larr;</span> disjoint-set over V nodes
-total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span> 0
-
-<span class="pc-kw">for</span> (w, u, v) <span class="pc-kw">in</span> edges:
-    <span class="pc-kw">if</span> dsu.find(u) &ne; dsu.find(v):    <span class="pc-cm">// different components — safe</span>
-        dsu.union(u, v)
-        total <span class="pc-kw">&larr;</span> total + w
-        used <span class="pc-kw">&larr;</span> used + 1
-        <span class="pc-kw">if</span> used = V - 1: <span class="pc-kw">break</span>       <span class="pc-cm">// a spanning tree has V-1 edges</span>
-
-<span class="pc-kw">if</span> used &lt; V - 1: <span class="pc-kw">return</span> GRAPH_NOT_CONNECTED
-<span class="pc-kw">return</span> total
-
-<span class="pc-cm">// The disjoint-set find, with path compression:</span>
-<span class="pc-kw">function</span> find(parent, x):
-    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent, parent[x])   <span class="pc-cm">// point straight at the root</span>
-    <span class="pc-kw">return</span> parent[x]</pre>
-        </div>
-
-        <h3 class="h3" id="prim">Prim&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Prim's MST (min-heap)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> prim(adj, V):
-    inMST ← array of V, all false
-    pq ← min-heap of (edgeWeight, node), starting with (0, 0)   <span class="pc-cm">// start from node 0</span>
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (w, node) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[node]: <span class="pc-kw">continue</span>        <span class="pc-cm">// already joined by a cheaper edge</span>
-        inMST[node] ← true
-        cost ← cost + w
-        <span class="pc-kw">for</span> (nei, weight) <span class="pc-kw">in</span> adj[node]:
-            <span class="pc-kw">if</span> <span class="pc-kw">not</span> inMST[nei]: pq.push((weight, nei))
-    <span class="pc-kw">return</span> cost
-
-<span class="pc-cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ═══ BIPARTITE ═══ -->
-        <h2 class="h1" id="bipartite">&#127800; Bipartite Graphs</h2>
-        <p>
-          A graph is <strong>bipartite</strong> if its nodes can be split into
-          two groups such that every edge crosses between groups (no edge within
-          a group). Equivalently: the graph is 2-colorable, equivalently:
-          contains no odd-length cycle.
-        </p>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Check: BFS 2-coloring.</strong> Assign alternating colors
-            (0/1) during BFS. If you ever try to color a node the same color as
-            its neighbour, the graph is not bipartite.
-          </div>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Bipartite Check (BFS
-              coloring)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> isBipartite(graph):
-    n ← length(graph)
-    color ← array of n, all -1          <span class="pc-cm">// -1 = uncolored, otherwise 0 or 1</span>
-
-    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:           <span class="pc-cm">// the graph may be disconnected</span>
-        <span class="pc-kw">if</span> color[start] ≠ -1: <span class="pc-kw">continue</span>
-        color[start] ← 0
-        q ← queue containing start
-        <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
-            node ← q.dequeue()
-            <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> graph[node]:
-                <span class="pc-kw">if</span> color[nei] = -1:
-                    color[nei] ← 1 - color[node]    <span class="pc-cm">// opposite color</span>
-                    q.enqueue(nei)
-                <span class="pc-kw">else if</span> color[nei] = color[node]:
-                    <span class="pc-kw">return</span> false                    <span class="pc-cm">// conflict</span>
-    <span class="pc-kw">return</span> true</pre>
-        </div>
-
-        <hr />
-
-        <!-- ═══ TARJAN'S BRIDGES ═══ -->
-        <h2 class="h1" id="tarjan">&#128291; Tarjan&apos;s Bridge Finding</h2>
-        <p>
-          A <strong>bridge</strong> is an edge whose removal disconnects the
-          graph. Tarjan&apos;s algorithm finds all bridges in O(V&nbsp;+&nbsp;E)
-          using two DFS arrays: <code>disc[]</code> (discovery time) and
-          <code>low[]</code> (lowest discovery time reachable from the subtree
-          <em>without</em> using the parent edge).
-        </p>
-
-        <div class="callout blue">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Key insight:</strong> Edge <code>(u,&nbsp;v)</code> is a
-            bridge when the subtree rooted at <code>v</code> cannot "look back"
-            past <code>u</code> without this edge. Formally:
-            <code>low[v] &gt; disc[u]</code>. If
-            <code>low[v] &le; disc[u]</code>, there is a back-edge in the
-            subtree that bypasses the edge &mdash; removing it won&apos;t
-            disconnect anything.
-          </div>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Tarjan's Bridge Finding (LC
-              1192)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>disc ← array of n, all -1     <span class="pc-cm">// discovery time</span>
-low ← array of n              <span class="pc-cm">// earliest discovery time reachable from the subtree</span>
-timer ← 0
-bridges ← empty list
-
-<span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← undirected adjacency list built <span class="pc-kw">from</span> connections
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> disc[i] = -1: dfs(adj, i, -1)
-    <span class="pc-kw">return</span> bridges
-
-<span class="pc-kw">function</span> dfs(adj, u, parent):
-    disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
-    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-        <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>                 <span class="pc-cm">// skip the edge we came from</span>
-        <span class="pc-kw">if</span> disc[v] = -1:                        <span class="pc-cm">// tree edge — recurse</span>
-            dfs(adj, v, u)
-            low[u] ← min(low[u], low[v])
-            <span class="pc-kw">if</span> low[v] &gt; disc[u]:                <span class="pc-cm">// v can't reach u or above without this edge</span>
-                append (u, v) <span class="pc-kw">to</span> bridges
-        <span class="pc-kw">else</span>:                                   <span class="pc-cm">// back edge — update low</span>
-            low[u] ← min(low[u], disc[v])
-
-<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
-        </div>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Multigraph caveat:</strong> The parent-skip
-            <code>if&nbsp;(v&nbsp;==&nbsp;parent)</code> fails when there are
-            parallel edges (e.g., two edges between u and v). For multigraphs,
-            track the parent <em>edge index</em> instead of the parent node.
-          </div>
-        </div>
-
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val">O(V + E)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- ═══ PATTERNS SUMMARY ═══ -->
-        <h2 class="h1" id="patterns">&#127919; Pattern Decision Guide</h2>
-        <p>
-          This guide covers all three graph lectures, not just this one &mdash;
-          it is the page to come back to when a new problem turns out to be a
-          graph and you have to pick a tool. Rows marked
-          <em>Lecture 21</em> or <em>Lecture 22</em> point back to where that
-          algorithm was taught.
-        </p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Signal in Problem</th>
-                <th>Pattern</th>
-                <th>Key Tool</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>"Shortest path" — unweighted / unit weight</td>
-                <td>BFS</td>
-                <td>Queue + visited[]</td>
+                <td>KMP</td>
+                <td>O(n + m)</td>
+                <td>O(m)</td>
               </tr>
               <tr>
-                <td>"Shortest path" — weighted, non-negative</td>
-                <td>Dijkstra</td>
-                <td>Min-heap PQ</td>
+                <td>Rabin-Karp</td>
+                <td>O(n + m) expected</td>
+                <td>O(1)</td>
               </tr>
               <tr>
-                <td>"Shortest path" — negative weights or K-stop limit</td>
-                <td>Bellman-Ford</td>
-                <td>Edge list, V&minus;1 rounds</td>
+                <td>Z-algorithm</td>
+                <td>O(n + m)</td>
+                <td>O(n + m)</td>
               </tr>
               <tr>
-                <td>"Connected components", "number of islands"</td>
-                <td>DFS flood fill</td>
-                <td>visited[] + recursive DFS</td>
+                <td>Expand around centre</td>
+                <td>O(n&sup2;)</td>
+                <td>O(1)</td>
               </tr>
               <tr>
-                <td>"Course prerequisites", "task order", "dependency"</td>
-                <td>Topological Sort</td>
-                <td>Kahn's (in-degree) or DFS post-order</td>
-              </tr>
-              <tr>
-                <td>
-                  "Can you complete all courses" = detect cycle in directed
-                  graph
-                </td>
-                <td>Cycle Detection</td>
-                <td>3-color DFS or Kahn's (idx &lt; n)</td>
-              </tr>
-              <tr>
-                <td>"Minimum cost to connect all nodes"</td>
-                <td>MST</td>
-                <td>Kruskal's (edges) or Prim's (heap)</td>
-              </tr>
-              <tr>
-                <td>"Two groups", "no conflict", "bipartite"</td>
-                <td>BFS 2-coloring</td>
-                <td>color[] alternating</td>
-              </tr>
-              <tr>
-                <td>"All-pairs shortest path" (small V)</td>
-                <td>Floyd-Warshall</td>
-                <td>3-loop DP, O(V&sup3;)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout green">
-          <span class="callout-icon">&#9989;</span>
-          <div class="callout-body">
-            <strong>The 4-question framework for any graph problem:</strong
-            ><br />
-            1. <strong>What are the nodes?</strong> (cells, words, courses,
-            …)<br />
-            2. <strong>What are the edges?</strong> (adjacent cells, one-letter
-            diff, prerequisite, …)<br />
-            3. <strong>Directed or undirected? Weighted?</strong><br />
-            4. <strong>What am I computing?</strong> (shortest path,
-            reachability, order, connectivity)
-          </div>
-        </div>
-
-        <hr />
-
-        <h2 class="h1" id="pitfalls">
-          &#9888;&#65039; Complexity &amp; Classic Bugs
-        </h2>
-        <p>
-          The costs worth quoting in an interview first, then the mistakes that
-          most often break code that looks correct. Every row in the second
-          table is a bug someone has shipped.
-        </p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Cost</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Kruskal</td>
-                <td>O(E log E)</td>
-                <td>Sorting dominates</td>
-              </tr>
-              <tr>
-                <td>Prim with a heap</td>
-                <td>O(E log V)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Bipartite check</td>
-                <td>O(V + E)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Tarjan&#39;s bridges</td>
-                <td>O(V + E)</td>
-                <td>One DFS</td>
-              </tr>
-              <tr>
-                <td>Eulerian path (Hierholzer)</td>
-                <td>O(E)</td>
-                <td></td>
+                <td>Manacher</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
               </tr>
             </tbody>
           </table>
@@ -1889,89 +1909,110 @@ bridges ← empty list
             </thead>
             <tbody>
               <tr>
-                <td>Kruskal without a cycle check</td>
-                <td>The result is not a tree</td>
-                <td>Union-find; skip edges inside one set</td>
+                <td>Letting <code>lps[i]</code> include the whole prefix</td>
+                <td>Every value is its own index; the search loops forever</td>
+                <td>
+                  The prefix-suffix must be <em>proper</em>: start
+                  <code>i</code> at 1
+                </td>
               </tr>
               <tr>
-                <td>Prim on a disconnected graph</td>
-                <td>Stops early with a wrong total</td>
-                <td>Check that every node was reached</td>
+                <td>Moving the text pointer backwards in KMP</td>
+                <td>Correct but back to O(n &middot; m)</td>
+                <td>
+                  Only <code>j</code> falls back; <code>i</code> never moves
+                  left
+                </td>
               </tr>
               <tr>
-                <td>Bipartite check from node 0 only</td>
-                <td>Misses other components</td>
-                <td>Start from every uncoloured node</td>
+                <td>Trusting equal hashes</td>
+                <td>Rare wrong answers you cannot reproduce</td>
+                <td>Verify the characters, or use two moduli</td>
               </tr>
               <tr>
-                <td>Tarjan skipping every visited neighbour</td>
-                <td>Misses back edges</td>
-                <td>Skip only the edge you arrived on</td>
+                <td>Negative values after subtracting under a modulus</td>
+                <td>Hashes never match</td>
+                <td>Add M back when the result is negative</td>
+              </tr>
+              <tr>
+                <td>Overflow in <code>hash × B</code></td>
+                <td>Silently wrong hashes</td>
+                <td>Use 64-bit arithmetic before taking the modulus</td>
+              </tr>
+              <tr>
+                <td>Using a separator that appears in the text</td>
+                <td>False Z-array matches</td>
+                <td>Pick a character outside the alphabet</td>
               </tr>
               <tr>
                 <td>
-                  Updating <code>low</code> with <code>low[v]</code> on a back
-                  edge
+                  Mixing up positions in <code>t</code> and in
+                  <code>s</code> for Manacher
                 </td>
-                <td>Wrong articulation points</td>
-                <td>Use <code>disc[v]</code> for back edges</td>
-              </tr>
-              <tr>
-                <td>Hierholzer building the path forwards</td>
-                <td>The path comes out in the wrong order</td>
-                <td>Build it backwards, then reverse</td>
-              </tr>
-              <tr>
-                <td>Assuming the MST is unique</td>
-                <td>Arguing about &ldquo;the&rdquo; answer</td>
-                <td>It is unique only when all weights differ</td>
+                <td>Off-by-one substring</td>
+                <td>
+                  <code>start = (best − P[best]) ÷ 2</code>, length
+                  <code>P[best]</code>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <hr />
-
-        <!-- ═══ PRACTICE ═══ -->
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it.</strong> &ldquo;Find this pattern&rdquo;,
+            &ldquo;repeated&rdquo;, &ldquo;prefix that is also a suffix&rdquo;,
+            &ldquo;longest duplicate substring&rdquo;, &ldquo;shortest
+            palindrome by adding characters&rdquo; &mdash; and a string length
+            of 10&#8309;, which rules out anything O(n&sup2;).
+          </div>
+        </div>
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Three problems on structure: the cheapest way to connect everything,
-          the edges that everything depends on, and splitting a graph in two.
+          Five problems, one per algorithm: KMP to search, KMP&rsquo;s table on
+          its own, a rolling hash chosen to run the right way, the Z-array, and
+          Manacher.
         </p>
 
+        <!-- Problem 01: Find the Index of the First Occurrence in a String -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">
-                Problem 01 &middot;
+              <div class="prob-num">Problem 01 &middot; KMP End to End</div>
+              <div class="prob-title">
+                Find the Index of the First Occurrence in a String
+              </div>
+              <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/min-cost-to-connect-all-points/"
+                  href="https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/"
                   target="_blank"
-                  style="font-size: 11px"
-                  >LC 1584</a
+                  style="font-size: 12px"
+                  >&#128279; LC 28 - Find the Index of the First Occurrence in a
+                  String</a
                 >
               </div>
-              <div class="prob-title">Min Cost to Connect All Points</div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">MST &mdash; Prim's</span>
-                <span class="tag tag-co">Google · Amazon · Meta</span>
+                <span class="tag tag-easy">Easy</span>
+                <span class="tag tag-pat">KMP</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Microsoft</span
+                >
               </div>
             </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given <code>n</code> points on a 2D plane, return the minimum
-                cost to connect all points. Cost of connecting two points =
-                Manhattan distance. All pairs are implicitly edges.
+                Return the index of the first occurrence of
+                <code>needle</code> in <code>haystack</code>, or −1.
               </p>
               <div class="iobox">
-                Input: [[0,0],[2,2],[3,10],[5,2],[7,0]] Output: 20
+                haystack = "sadbutsad", needle = "sad" → 0
               </div>
             </div>
             <div class="prob-section">
@@ -1983,8 +2024,8 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Every pair of points is connectable, so this is a complete
-                    weighted graph.
+                    The built-in search is fine here — but what does it cost on
+                    haystack "aaaa…ab" and needle "aaab"?
                   </p>
                 </div>
               </details>
@@ -1995,21 +2036,24 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Minimum spanning tree over Manhattan distances. Prim's with
-                    a min-heap is O(n&#178; log n) and avoids materialising all
-                    n&#178; edges; Kruskal's with union-find also works.
+                    O(n · m), because every failed attempt re-reads almost the
+                    same characters. Build the failure table for the needle and
+                    never move backwards in the haystack.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                MST on a complete graph where edge weight = Manhattan distance.
-                Prim&apos;s is efficient here: maintain a min-heap of (cost,
-                node). The <code>inMST[]</code> flag replaces the visited check.
-                Greedily add the cheapest reachable edge.
+                An Easy label, but it is the cleanest place to write KMP once,
+                completely. Build <code>lps</code> for the needle, then scan the
+                haystack with a single forward pointer; on a mismatch only the
+                needle pointer falls back, to <code>lps[j − 1]</code>. The first
+                time <code>j</code> reaches the needle&rsquo;s length, the match
+                started at <code>i − j + 1</code>. Saying out loud why the naive
+                method is O(n &middot; m) is half of what the interviewer wants
+                from this question.
               </p>
             </div>
             <details>
@@ -2020,70 +2064,60 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 1584</span
+                      >&#128208; Pseudocode &middot; Failure Table, Then One
+                      Forward Pass</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> minCostConnectPoints(pts):
-    n ← length(pts)
-    inMST ← array of n, all false
-    minDist ← array of n, all ∞;  minDist[0] ← 0
-    pq ← min-heap of (distance, index), starting with (0, 0)
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (d, i) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[i]: <span class="pc-kw">continue</span>
-        inMST[i] ← true
-        cost ← cost + d
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:              <span class="pc-cm">// dense graph: every point is a neighbour</span>
-            <span class="pc-kw">if</span> inMST[j]: <span class="pc-kw">continue</span>
-            dj ← |pts[i].x - pts[j].x| + |pts[i].y - pts[j].y|   <span class="pc-cm">// Manhattan distance</span>
-            <span class="pc-kw">if</span> dj &lt; minDist[j]:
-                minDist[j] ← dj
-                pq.push((dj, j))
-    <span class="pc-kw">return</span> cost</pre>
+                  <pre><span class="pc-kw">function</span> strStr(haystack, needle):
+    m ← length(needle)
+    lps ← array of zeros, length m;  len ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> m - 1:                         <span class="pc-cm">// build the failure table</span>
+        <span class="pc-kw">while</span> len &gt; 0 <span class="pc-kw">and</span> needle[i] ≠ needle[len]: len ← lps[len - 1]
+        <span class="pc-kw">if</span> needle[i] = needle[len]: len ← len + 1
+        lps[i] ← len
+    j ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(haystack) - 1:          <span class="pc-cm">// search</span>
+        <span class="pc-kw">while</span> j &gt; 0 <span class="pc-kw">and</span> haystack[i] ≠ needle[j]: j ← lps[j - 1]
+        <span class="pc-kw">if</span> haystack[i] = needle[j]: j ← j + 1
+        <span class="pc-kw">if</span> j = m: <span class="pc-kw">return</span> i - m + 1
+    <span class="pc-kw">return</span> -1</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val">O(n² log n)</span>
+                    ><span class="cx-val green">O(n + m)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val">O(n)</span>
+                    ><span class="cx-val green">O(m)</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
-
-        <hr />
-
-        <!-- ═══ ASSIGNMENT ═══ -->
-        <!-- Problem 02: Critical Connections in a Network -->
+        <!-- Problem 02: Longest Happy Prefix -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 02 &middot; What Holds It Together
+                Problem 02 &middot; The Table on Its Own
               </div>
-              <div class="prob-title">Critical Connections in a Network</div>
+              <div class="prob-title">Longest Happy Prefix</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/critical-connections-in-a-network/"
+                  href="https://leetcode.com/problems/longest-happy-prefix/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 1192 - Critical Connections in a Network</a
+                  >&#128279; LC 1392 - Longest Happy Prefix</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Tarjan's Bridges</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-pat">KMP failure table</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2094,11 +2128,13 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Return every edge whose removal would disconnect the network
-                &mdash; the bridges of the graph.
+                A happy prefix is a non-empty prefix that is also a suffix,
+                excluding the whole string. Return the longest one, or an empty
+                string.
               </p>
               <div class="iobox">
-                n = 4, connections = [[0,1],[1,2],[2,0],[1,3]] → [[1,3]]
+                s = "level" → "l" &nbsp;&nbsp;|&nbsp;&nbsp; s = "ababab" →
+                "abab"
               </div>
             </div>
             <div class="prob-section">
@@ -2110,9 +2146,10 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Removing each edge and re-running DFS works but costs
-                    O(E&middot;(V+E)). What does an edge inside a cycle have
-                    that a bridge does not?
+                    Checking every length from longest to shortest is O(n²)
+                    character comparisons. Which structure from this lecture
+                    stores exactly "longest proper prefix that is also a
+                    suffix"?
                   </p>
                 </div>
               </details>
@@ -2123,10 +2160,8 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    A way around. Give each node a discovery time, and track the
-                    earliest node its subtree can reach by any other route — if
-                    a child cannot reach at or above the parent, that edge is a
-                    bridge.
+                    The KMP failure table. Its last entry,
+                    <code>lps[n − 1]</code>, is the answer&rsquo;s length.
                   </p>
                 </div>
               </details>
@@ -2134,15 +2169,14 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Tarjan&rsquo;s algorithm in its most useful form. One DFS
-                assigns each node a discovery time, and each node reports back
-                the <em>lowest</em> discovery time reachable from its subtree
-                using at most one back-edge. The edge <code>(u, v)</code> is a
-                bridge exactly when <code>low[v] &gt; disc[u]</code>: v&rsquo;s
-                whole subtree has no alternative route back to u or earlier, so
-                cutting that edge strands it. Skipping the edge you arrived on
-                &mdash; but only that one &mdash; is the detail people get
-                wrong.
+                A Hard label for a problem that is one line once you know the
+                failure table: the definition of <code>lps[n − 1]</code>
+                <em>is</em> the question. The lesson is that KMP&rsquo;s table
+                is useful by itself, with no text to search &mdash; for longest
+                borders, for detecting repeated blocks, and for building
+                shortest palindromes. A rolling hash comparing every prefix with
+                its matching suffix also works in O(n), but it can collide, and
+                the table cannot.
               </p>
             </div>
             <details>
@@ -2153,68 +2187,52 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Discovery Time vs
-                      Low-Link</span
+                      >&#128208; Pseudocode &middot; Read the Last Entry</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← adjacency list
-    disc ← array of -1;  low ← array of 0
-    timer ← 0;  bridges ← empty list
-
-    <span class="pc-kw">function</span> dfs(u, parent):
-        disc[u] ← low[u] ← timer;  timer ← timer + 1
-
-        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-            <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>       <span class="pc-cm">// skip the edge we came on</span>
-
-            <span class="pc-kw">if</span> disc[v] = -1:               <span class="pc-cm">// tree edge</span>
-                dfs(v, u)
-                low[u] ← min(low[u], low[v])
-                <span class="pc-kw">if</span> low[v] &gt; disc[u]:
-                    bridges.add((u, v))    <span class="pc-cm">// no way around → bridge</span>
-            <span class="pc-kw">else</span>:                          <span class="pc-cm">// back edge: a way around</span>
-                low[u] ← min(low[u], disc[v])
-
-    dfs(0, -1)
-    <span class="pc-kw">return</span> bridges</pre>
+                  <pre><span class="pc-kw">function</span> longestPrefix(s):
+    n ← length(s)
+    lps ← array of zeros, length n;  len ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">while</span> len &gt; 0 <span class="pc-kw">and</span> s[i] ≠ s[len]: len ← lps[len - 1]
+        <span class="pc-kw">if</span> s[i] = s[len]: len ← len + 1
+        lps[i] ← len
+    <span class="pc-kw">return</span> s <span class="pc-kw">from</span> 0, length lps[n - 1]</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
-        <!-- Problem 03: Is Graph Bipartite? -->
+        <!-- Problem 03: Find Substring With Given Hash Value -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Two Colours</div>
-              <div class="prob-title">Is Graph Bipartite?</div>
+              <div class="prob-num">Problem 03 &middot; Roll the Other Way</div>
+              <div class="prob-title">Find Substring With Given Hash Value</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/is-graph-bipartite/"
+                  href="https://leetcode.com/problems/find-substring-with-given-hash-value/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 785 - Is Graph Bipartite?</a
+                  >&#128279; LC 2156 - Find Substring With Given Hash Value</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">BFS/DFS 2-Colouring</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Rolling hash, right to left</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2225,11 +2243,16 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Decide whether a graph&rsquo;s nodes can be split into two sets
-                so that every edge joins one set to the other.
+                The hash of a length-k string is
+                <code
+                  >(val(s[0])·p⁰ + val(s[1])·p¹ + … + val(s[k−1])·p^(k−1)) mod
+                  m</code
+                >, with <code>val(&#39;a&#39;) = 1</code>. Return the first
+                length-k substring whose hash equals <code>hashValue</code>.
               </p>
               <div class="iobox">
-                graph = [[1,2,3],[0,2],[0,1,3],[0,2]] → false
+                s = "leetcode", power = 7, modulo = 20, k = 2, hashValue = 0 →
+                "ee"
               </div>
             </div>
             <div class="prob-section">
@@ -2241,8 +2264,9 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Try colouring a node red and everything next to it blue.
-                    When does that go wrong?
+                    Rolling left to right means the leftmost character (weight
+                    p⁰) leaves and every other weight drops by one power. How do
+                    you lower every power by one under a modulus?
                   </p>
                 </div>
               </details>
@@ -2253,9 +2277,10 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    When you reach a node that is already coloured the same as
-                    the one you came from. That happens exactly when the graph
-                    has an odd-length cycle.
+                    You would have to divide by p — and m is not guaranteed
+                    prime, so the modular inverse may not exist. Roll from the
+                    right instead: the entering character gets p⁰ and everything
+                    else is multiplied by p.
                   </p>
                 </div>
               </details>
@@ -2263,14 +2288,14 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Bipartite means two-colourable, and two-colourable means no odd
-                cycle &mdash; three ways of saying the same thing, and saying
-                that out loud is most of the answer. The traversal itself is
-                ordinary BFS or DFS with a colour array instead of a visited
-                array: neighbours get the opposite colour, and a neighbour
-                already wearing your colour is the contradiction. The one thing
-                people forget is that the graph may be disconnected, so the
-                outer loop must restart from every uncoloured node.
+                This is the rolling hash with its direction chosen deliberately.
+                The hash weights increase to the right, so a window moving
+                <em>leftwards</em> updates by multiplying:
+                <code>h ← h × p + val(new)</code>, then subtract the character
+                that fell off the right end, now carrying weight p&#7503;. No
+                division, so it works for any modulus. Walking right to left
+                also means the last match you see is the leftmost one, which is
+                the one the problem asks for.
               </p>
             </div>
             <details>
@@ -2281,38 +2306,285 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Colour, Then Check
-                      Neighbours</span
+                      >&#128208; Pseudocode &middot; Multiply, Add, Subtract the
+                      Leaver</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> isBipartite(graph):
-    colour ← array of n entries, all 0      <span class="pc-cm">// 0 = uncoloured, 1 / -1 = sides</span>
-
-    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> colour[start] ≠ 0: <span class="pc-kw">continue</span>   <span class="pc-cm">// graph may be disconnected</span>
-
-        colour[start] ← 1
-        queue ← [start]
-        <span class="pc-kw">while</span> queue is not empty:
-            u ← queue.popFront()
-            <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
-                <span class="pc-kw">if</span> colour[v] = colour[u]: <span class="pc-kw">return</span> false   <span class="pc-cm">// odd cycle</span>
-                <span class="pc-kw">if</span> colour[v] = 0:
-                    colour[v] ← -colour[u]
-                    queue.pushBack(v)
-
-    <span class="pc-kw">return</span> true</pre>
+                  <pre><span class="pc-kw">function</span> subStrHash(s, p, m, k, hashValue):
+    n ← length(s)
+    pk ← p^k mod m                                  <span class="pc-cm">// weight of the character leaving on the right</span>
+    h ← 0;  best ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 1 <span class="pc-kw">down to</span> 0:
+        h ← (h × p + val(s[i])) mod m               <span class="pc-cm">// s[i] enters with weight p⁰</span>
+        <span class="pc-kw">if</span> i + k &lt; n:
+            h ← (h - val(s[i + k]) × pk mod m + m) mod m      <span class="pc-cm">// s[i+k] leaves with weight pᵏ</span>
+        <span class="pc-kw">if</span> i + k ≤ n <span class="pc-kw">and</span> h = hashValue:
+            best ← i                                <span class="pc-cm">// later iterations are further left</span>
+    <span class="pc-kw">return</span> s <span class="pc-kw">from</span> best, length k</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Sum of Scores of Built Strings -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; The Z-Array Is the Answer
+              </div>
+              <div class="prob-title">Sum of Scores of Built Strings</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sum-of-scores-of-built-strings/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2223 - Sum of Scores of Built Strings</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Z-algorithm</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A string is built by prepending characters, so the intermediate
+                strings are the suffixes of the final string s. Each suffix
+                scores the length of its longest common prefix with s. Return
+                the total score.
+              </p>
+              <div class="iobox">
+                s = "babab" → 9 &nbsp;&nbsp;(scores 1, 0, 3, 0, 5)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Write down what "longest common prefix of the suffix
+                    starting at i with the whole string" means. Have you seen an
+                    array that stores exactly that?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    It is Z[i]. The full string scores n, so the answer is n
+                    plus the sum of the Z-array.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Once the question is restated &mdash; &ldquo;for every suffix,
+                how far does it match the start of the string?&rdquo; &mdash; it
+                is the definition of the Z-array, and the O(n) construction from
+                this lecture solves it directly. Computing each common prefix
+                separately would be O(n&sup2;) on a string like
+                &ldquo;aaaa…&rdquo;. Restating a problem in terms of a known
+                array is a skill worth practising: many Hard string problems are
+                one well-chosen array plus a loop.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; n + Sum of Z</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> sumScores(s):
+    n ← length(s);  Z ← array of zeros, length n
+    l ← 0;  r ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1:
+        <span class="pc-kw">if</span> i &lt; r: Z[i] ← min(r - i, Z[i - l])
+        <span class="pc-kw">while</span> i + Z[i] &lt; n <span class="pc-kw">and</span> s[Z[i]] = s[i + Z[i]]: Z[i] ← Z[i] + 1
+        <span class="pc-kw">if</span> i + Z[i] &gt; r: l ← i;  r ← i + Z[i]
+    total ← n                                       <span class="pc-cm">// the whole string matches itself</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1: total ← total + Z[i]
+    <span class="pc-kw">return</span> total</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Maximum Product of the Length of Two Palindromic Substrings -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Manacher at Work</div>
+              <div class="prob-title">
+                Maximum Product of the Length of Two Palindromic Substrings
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/maximum-product-of-the-length-of-two-palindromic-substrings/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1960 - Maximum Product of the Length of Two
+                  Palindromic Substrings</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat"
+                  >Manacher + best-before / best-after</span
+                >
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Choose two non-overlapping palindromic substrings of
+                <em>odd</em> length, the first ending before the second starts.
+                Maximise the product of their lengths.
+              </p>
+              <div class="iobox">
+                s = "ababbb" → 9 &nbsp;&nbsp;("aba" and "bbb")
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    If you knew, for every position i, the longest odd
+                    palindrome ending at or before i and the longest starting at
+                    or after i + 1, how would you finish?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Multiply those two and take the maximum over every split
+                    point. Manacher gives every centre&rsquo;s radius in O(n);
+                    two sweeps turn radii into the before/after arrays.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two ideas stacked. Manacher (odd lengths only, so no
+                <code>#</code> separators are needed) gives, for each centre,
+                its longest palindrome. A palindrome ending at position e of
+                length L also contains one ending at e &minus; 1 of length L
+                &minus; 2 &mdash; strip a character from each side &mdash; so
+                one right-to-left sweep spreads each value inward, and a prefix
+                maximum turns &ldquo;ending exactly at&rdquo; into &ldquo;ending
+                at or before&rdquo;. The mirror image gives the &ldquo;starting
+                at or after&rdquo; array, and the answer is one final loop over
+                split points.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Radii, Then Two Sweeps,
+                      Then One Split</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxProduct(s):
+    n ← length(s);  d ← array of zeros, length n     <span class="pc-cm">// odd palindrome at i has length 2·d[i] − 1</span>
+    c ← 0;  r ← -1                                    <span class="pc-cm">// rightmost palindrome: centre c, right edge r</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        k ← 1 <span class="pc-kw">if</span> i &gt; r <span class="pc-kw">else</span> min(d[2 × c - i], r - i + 1)      <span class="pc-cm">// copy from the mirror</span>
+        <span class="pc-kw">while</span> i - k ≥ 0 <span class="pc-kw">and</span> i + k &lt; n <span class="pc-kw">and</span> s[i - k] = s[i + k]: k ← k + 1
+        d[i] ← k
+        <span class="pc-kw">if</span> i + k - 1 &gt; r: c ← i;  r ← i + k - 1
+
+    endAt ← zeros;  startAt ← zeros                   <span class="pc-cm">// longest odd palindrome ending / starting at i</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+        endAt[i + d[i] - 1] ← max(endAt[i + d[i] - 1], 2 × d[i] - 1)
+        startAt[i - d[i] + 1] ← max(startAt[i - d[i] + 1], 2 × d[i] - 1)
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 2 <span class="pc-kw">down to</span> 0: endAt[i] ← max(endAt[i], endAt[i + 1] - 2)      <span class="pc-cm">// strip both ends</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1: startAt[i] ← max(startAt[i], startAt[i - 1] - 2)
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n - 1: endAt[i] ← max(endAt[i], endAt[i - 1])               <span class="pc-cm">// ending at or before i</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> n - 2 <span class="pc-kw">down to</span> 0: startAt[i] ← max(startAt[i], startAt[i + 1])    <span class="pc-cm">// starting at or after i</span>
+
+    best ← 0
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 2: best ← max(best, endAt[i] × startAt[i + 1])
+    <span class="pc-kw">return</span> best</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2326,13 +2598,13 @@ bridges ← empty list
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 23 Assignment &mdash; 10 Problems (7 Medium &middot; 3
-              Hard)</strong
+              >Lecture 39 Assignment &mdash; 20 Problems (3 Easy &middot; 10
+              Medium &middot; 7 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 24.<br /><br />
+            before moving to Lecture 40.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture23/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture39/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2349,61 +2621,67 @@ bridges ← empty list
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 24.</p>
+        <p>Check each item before advancing to Lecture 40.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write Kruskal with union-find and Prim with a priority queue
+            I can build the KMP failure table for a pattern by hand
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say which MST algorithm suits a dense graph and which a sparse
-            one
+            I can write KMP search and explain why it is O(n + m)
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why a greedy choice is safe when building an MST
+            I can roll a hash one step and say how to guard against collisions
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can two-colour a graph and connect bipartiteness to odd cycles
+            I can build the Z-array and say what each entry means
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain discovery time versus low-link and what makes an edge
-            a bridge
+            I can explain the mirror trick in Manacher&rsquo;s algorithm
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">I completed all 10 assignment problems</div>
+          <div class="cb-text">
+            I can pick the right algorithm from the problem&rsquo;s wording
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">I completed all 20 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 24: Backtracking</strong><br />
-            Graphs are done. Lecture 24 returns to recursion with the technique
-            that searches a space nobody handed you &mdash; building candidates
-            one choice at a time, and undoing the choice when it leads nowhere.
+            <strong
+              >Next up &mdash; Lecture 40: Advanced Graph Algorithms</strong
+            ><br />
+            Back to graphs, for the directed version of connectivity, the nodes
+            a network depends on, shortest paths with unusual weights, and flow.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture22/lecture22_notes.html"
-            >&larr; Lecture 22 &middot; Graphs II</a
+          <a href="../Lecture38/lecture38_notes.html"
+            >&larr; Lecture 38 &middot; Square Root Decomposition &amp; Mo&#39;s
+            Algorithm</a
           >
-          <a class="next" href="../Lecture24/lecture24_notes.html"
-            >Lecture 24 &middot; Backtracking &rarr;</a
+          <a class="next" href="../Lecture40/lecture40_notes.html"
+            >Lecture 40 &middot; Advanced Graph Algorithms &rarr;</a
           >
         </div>
       </div>

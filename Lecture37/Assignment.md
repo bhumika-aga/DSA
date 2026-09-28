@@ -321,4 +321,4 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ---
 
-**← [Lecture 36 · Tries (Prefix Trees)](../Lecture36/Assignment.md)** &nbsp;·&nbsp; **Lecture 38 · Square Root Decomposition & Mo's Algorithm — coming soon →**
+**← [Lecture 36 · Tries (Prefix Trees)](../Lecture36/Assignment.md)** &nbsp;·&nbsp; **[Lecture 38 · Square Root Decomposition & Mo's Algorithm](../Lecture38/Assignment.md) →**

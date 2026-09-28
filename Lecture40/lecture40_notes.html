@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 23 &mdash; Graphs III (MST, Bipartite &amp; Bridges)</title>
+    <title>Lecture 40 &mdash; Advanced Graph Algorithms</title>
     <meta
       name="description"
-      content="Master graphs: BFS, DFS, cycle detection, topological sort, Dijkstra, Bellman-Ford, MST, bipartite — with full dry runs and Java code."
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1391,15 +1391,14 @@
       }
     </style>
   </head>
-
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Graphs III &mdash; Structure</div>
+        <div class="sb-title">Advanced Graphs</div>
         <div class="sb-meta">
-          Lecture 23 of 45 &middot; Phase 2 &mdash; Core Data Structures
+          Lecture 40 of 45 &middot; Phase 5 &mdash; Advanced Structures
         </div>
       </div>
       <div class="sb-scroll">
@@ -1407,17 +1406,30 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#mst"
-          ><span class="toc-icon">&#127795;</span>Minimum Spanning Tree</a
+        <a class="toc-item" href="#artic"
+          ><span class="toc-icon">&#128205;</span>Articulation Points</a
         >
-        <a class="toc-item" href="#bipartite"
-          ><span class="toc-icon">&#127800;</span>Bipartite Graphs</a
+        <a class="toc-item" href="#scc"
+          ><span class="toc-icon">&#127963;&#65039;</span>Strongly Connected
+          Components</a
         >
-        <a class="toc-item" href="#tarjan"
-          ><span class="toc-icon">&#128291;</span>Bridges (Tarjan)</a
+        <a class="toc-item toc-sub" href="#kosaraju">Kosaraju</a>
+        <a class="toc-item toc-sub" href="#tarjan-scc">Tarjan</a>
+        <a class="toc-item" href="#special"
+          ><span class="toc-icon">&#9878;&#65039;</span>Special Shortest
+          Paths</a
         >
-        <a class="toc-item" href="#patterns"
-          ><span class="toc-icon">&#127919;</span>Decision Guide</a
+        <a class="toc-item toc-sub" href="#zero-one">0-1 BFS</a>
+        <a class="toc-item toc-sub" href="#state">Dijkstra Over States</a>
+        <a class="toc-item" href="#flow"
+          ><span class="toc-icon">&#128688;</span>Max Flow &amp; Matching</a
+        >
+        <a class="toc-item toc-sub" href="#matching">Bipartite Matching</a>
+        <a class="toc-item" href="#hard"
+          ><span class="toc-icon">&#129521;</span>Genuinely Hard Problems</a
+        >
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129513;</span>Choosing an Algorithm</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1434,14 +1446,14 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture22/lecture22_notes.html"
-          >&larr; Lecture 22 &middot; Graphs II</a
+        <a class="toc-item" href="../Lecture39/lecture39_notes.html"
+          >&larr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
+          Manacher)</a
         >
-        <a class="toc-item" href="../Lecture24/lecture24_notes.html"
-          >&rarr; Lecture 24 &middot; Backtracking</a
+        <a class="toc-item" href="../index.html"
+          >&rarr; Lecture 41 &middot; coming soon</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
-        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1450,8 +1462,8 @@
       <div id="topbar">
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
-          <span>Lecture 23 &mdash; Graphs III &mdash; Structure</span>
+          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
+          <span>Lecture 40 &mdash; Advanced Graphs</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1469,21 +1481,19 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128737;&#65039;</span>
-          <h1 class="page-title">
-            Graphs III &mdash; MST, Bipartite &amp; Bridges
-          </h1>
+          <span class="page-emoji">&#128371;&#65039;</span>
+          <h1 class="page-title">Advanced Graph Algorithms</h1>
           <p class="page-sub">
-            &ldquo;Not where to go &mdash; what holds the whole thing
-            together.&rdquo;
+            &ldquo;Which nodes the network cannot lose, which groups reach each
+            other, and how much can flow.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 23 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 40 of 45</span>
             <span class="meta-chip accent"
-              >Phase 2 &mdash; Core Data Structures</span
+              >Phase 5 &mdash; Advanced Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 10 problems</span>
+            <span class="meta-chip yellow">&#9201; 6 days</span>
+            <span class="meta-chip green">&#127919; 22 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
@@ -1497,383 +1507,399 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            The last two lectures moved <em>through</em> a graph. This one asks
-            about its shape. Think of a utility company wiring up a town: they
-            do not care about the route between any two houses, only about the
-            cheapest set of cables that reaches every house &mdash; that is a
-            minimum spanning tree. The other two questions here are equally
-            structural: can everyone be split into two groups with no conflicts
-            inside either, and which single link would cut the network in half
-            if it failed?
+            Lectures 21&ndash;23 answered the everyday graph questions. The ones
+            that separate strong candidates are subtler: which <em>nodes</em> a
+            network cannot lose, which groups in a one-way graph can all reach
+            each other, what to do when edge weights are only 0 or 1 or depend
+            on what you are carrying, and how much can flow through a network at
+            once. Each has a clean algorithm, and the skill is recognising which
+            one a problem is really asking for.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Build a minimum spanning tree with Kruskal and with Prim</li>
             <li>
-              Say which of the two fits a dense graph and which a sparse one
+              Find articulation points in one DFS, and relate them to bridges
             </li>
-            <li>Test a graph for bipartiteness by two-colouring it</li>
             <li>
-              Find every bridge in one DFS using discovery and low-link times
+              Find strongly connected components with Kosaraju and with Tarjan
             </li>
-            <li>Choose the right algorithm from a problem statement</li>
+            <li>Use 0-1 BFS, and run Dijkstra over expanded states</li>
+            <li>
+              Explain max flow, min cut and augmenting paths, and model matching
+              as flow
+            </li>
+            <li>
+              Recognise an NP-hard graph problem and fall back on bitmask DP
+            </li>
           </ul>
         </div>
 
         <hr />
 
-        <h2 class="h1" id="mst">&#127795; Minimum Spanning Tree (MST)</h2>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: one-way streets and water
+              pipes.</strong
+            >
+            A <strong>strongly connected component</strong> is a district of
+            one-way streets where you can drive from any corner to any other
+            corner and back again. Shrink each district to a single dot and the
+            roads between districts can never loop back &mdash; the map of
+            districts is always a DAG. <strong>Max flow</strong> is water pushed
+            through pipes of different widths from a source to a drain; the
+            <strong>minimum cut</strong> is the cheapest set of pipes to block
+            so that no water gets through, and the two numbers are always equal.
+          </div>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#8617;&#65039;</span>
+          <div class="callout-body">
+            <strong>Built on Lectures 21&ndash;23.</strong> Lecture 23 taught
+            discovery and low-link times, bridges and Eulerian paths in full;
+            this lecture uses them without re-teaching them. What is new here is
+            the <em>directed</em> version of connectivity, the node version of
+            bridges, shortest paths with special weights, and flow.
+          </div>
+        </div>
+        <h2 class="h1" id="artic">&#128205; Articulation Points</h2>
         <p>
-          An MST connects all V nodes using exactly V&minus;1 edges with the
-          minimum total weight. Two classic algorithms, both greedily build the
-          MST.
+          A bridge is an edge whose removal disconnects the graph. An
+          <strong>articulation point</strong> is the same idea for a node:
+          remove it, and its edges with it, and the graph falls apart. The test
+          is almost the bridge test from Lecture 23 with one character changed
+          &mdash; <code>≥</code> instead of <code>&gt;</code> &mdash; plus a
+          special rule for the root.
         </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Articulation Points in One
+              DFS</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> articulationPoints(graph):
+    disc ← all -1;  low ← all 0;  timer ← 0;  result ← empty set
+    <span class="pc-kw">function</span> dfs(u, parent):
+        disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
+        children ← 0
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
+            <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>
+            <span class="pc-kw">if</span> disc[v] = -1:                         <span class="pc-cm">// tree edge</span>
+                children ← children + 1
+                dfs(v, u)
+                low[u] ← min(low[u], low[v])
+                <span class="pc-kw">if</span> parent ≠ -1 <span class="pc-kw">and</span> low[v] ≥ disc[u]:
+                    result.add(u)                    <span class="pc-cm">// v's subtree cannot get above u</span>
+            <span class="pc-kw">else</span>:                                    <span class="pc-cm">// back edge</span>
+                low[u] ← min(low[u], disc[v])
+        <span class="pc-kw">if</span> parent = -1 <span class="pc-kw">and</span> children ≥ 2:
+            result.add(u)                            <span class="pc-cm">// a root with two separate subtrees</span>
+    <span class="pc-kw">for</span> u <span class="pc-kw">in</span> every node:
+        <span class="pc-kw">if</span> disc[u] = -1: dfs(u, -1)
+    <span class="pc-kw">return</span> result
+<span class="pc-cm">// Bridge (u, v):          low[v] &gt; disc[u]</span>
+<span class="pc-cm">// Articulation point u:   low[v] ≥ disc[u]   — even reaching u itself is not enough</span></pre>
+        </div>
+        <h2 class="h1" id="scc">
+          &#127963;&#65039; Strongly Connected Components
+        </h2>
+        <p>
+          In a directed graph, &ldquo;connected&rdquo; splits in two. A
+          <strong>strongly connected component</strong> (SCC) is a largest group
+          of nodes in which every node can reach every other node
+          <em>following the arrows</em>. Two classic algorithms find them in O(V
+          + E).
+        </p>
+        <h3 class="h2" id="kosaraju">Kosaraju: two passes</h3>
+        <p>
+          First pass: DFS the graph and record each node at the moment it
+          <em>finishes</em>. Second pass: reverse every edge, and DFS again,
+          starting from nodes in order of latest finish. Each DFS in the second
+          pass collects exactly one component &mdash; reversing the edges stops
+          it leaking into the next district.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang">&#128208; Pseudocode &middot; Kosaraju</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> kosaraju(graph):
+    visited ← empty set;  order ← empty list
+    <span class="pc-kw">function</span> dfs1(u):
+        visited.add(u)
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
+            <span class="pc-kw">if</span> v <span class="pc-kw">not</span> <span class="pc-kw">in</span> visited: dfs1(v)
+        order.append(u)                          <span class="pc-cm">// u has FINISHED</span>
+    <span class="pc-kw">for</span> u <span class="pc-kw">in</span> every node:
+        <span class="pc-kw">if</span> u <span class="pc-kw">not</span> <span class="pc-kw">in</span> visited: dfs1(u)
 
+    rev ← graph with every edge reversed
+    comp ← empty map;  c ← 0
+    <span class="pc-kw">function</span> dfs2(u):
+        comp[u] ← c
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> rev[u]:
+            <span class="pc-kw">if</span> v <span class="pc-kw">not</span> <span class="pc-kw">in</span> comp: dfs2(v)
+    <span class="pc-kw">for</span> u <span class="pc-kw">in</span> order, <span class="pc-kw">from</span> last <span class="pc-kw">to</span> first:          <span class="pc-cm">// latest finisher first</span>
+        <span class="pc-kw">if</span> u <span class="pc-kw">not</span> <span class="pc-kw">in</span> comp:
+            dfs2(u);  c ← c + 1
+    <span class="pc-kw">return</span> comp                                  <span class="pc-cm">// node → component number</span></pre>
+        </div>
+        <h3 class="h2" id="tarjan-scc">Tarjan: one pass with a stack</h3>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Tarjan’s SCC</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> tarjanSCC(graph):
+    disc ← all -1;  low ← all 0;  timer ← 0
+    stack ← empty;  onStack ← all false;  components ← empty list
+    <span class="pc-kw">function</span> dfs(u):
+        disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
+        stack.push(u);  onStack[u] ← true
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
+            <span class="pc-kw">if</span> disc[v] = -1:
+                dfs(v);  low[u] ← min(low[u], low[v])
+            <span class="pc-kw">else</span> <span class="pc-kw">if</span> onStack[v]:                  <span class="pc-cm">// an edge back into the current component</span>
+                low[u] ← min(low[u], disc[v])
+        <span class="pc-kw">if</span> low[u] = disc[u]:                     <span class="pc-cm">// u is the first node of its component</span>
+            component ← empty list
+            <span class="pc-kw">repeat</span>:
+                w ← stack.pop();  onStack[w] ← false
+                component.append(w)
+                <span class="pc-kw">if</span> w = u: <span class="pc-kw">break</span>
+            components.append(component)
+    <span class="pc-kw">for</span> u <span class="pc-kw">in</span> every node:
+        <span class="pc-kw">if</span> disc[u] = -1: dfs(u)
+    <span class="pc-kw">return</span> components</pre>
+        </div>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Why components matter: the condensation.</strong> Replace
+            every component by one node and keep the edges between components.
+            The result is always a DAG, so everything from Lecture 22 &mdash;
+            topological order, DP over a DAG &mdash; now works on graphs that
+            had cycles. A preview for the curious: the
+            <strong>2-SAT</strong> problem (satisfy a list of &ldquo;a or
+            b&rdquo; conditions) is solved by building a graph of implications
+            and checking that no variable sits in the same component as its own
+            negation.
+          </div>
+        </div>
+        <h2 class="h1" id="special">
+          &#9878;&#65039; Shortest Paths With Special Weights
+        </h2>
+        <h3 class="h2" id="zero-one">0-1 BFS</h3>
+        <p>
+          When every edge costs 0 or 1, Dijkstra&rsquo;s heap is more than you
+          need. Use a deque: a node reached by a free edge goes to the
+          <em>front</em> (it is exactly as close as the current one), a node
+          reached by a cost-1 edge goes to the back. The deque stays sorted by
+          distance, just like BFS&rsquo;s queue does, in O(V + E).
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang">&#128208; Pseudocode &middot; 0-1 BFS</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> zeroOneBFS(graph, src):
+    dist ← all infinity;  dist[src] ← 0
+    dq ← deque containing src
+    <span class="pc-kw">while</span> dq is <span class="pc-kw">not</span> empty:
+        u ← dq.popFront()
+        <span class="pc-kw">for</span> (v, w) <span class="pc-kw">in</span> graph[u]:                  <span class="pc-cm">// w is 0 or 1</span>
+            <span class="pc-kw">if</span> dist[u] + w &lt; dist[v]:
+                dist[v] ← dist[u] + w
+                <span class="pc-kw">if</span> w = 0: dq.pushFront(v)
+                <span class="pc-kw">else</span>: dq.pushBack(v)
+    <span class="pc-kw">return</span> dist
+<span class="pc-cm">// Grid version: moving into an obstacle costs 1 (you remove it), empty cells cost 0.</span></pre>
+        </div>
+        <h3 class="h2" id="state">Dijkstra over states</h3>
+        <p>
+          When the cost of the future depends on more than the current node
+          &mdash; stops used, fuel left, keys collected &mdash; make that
+          information part of the node. The graph becomes one of
+          <code>(node, extra)</code> pairs, and ordinary Dijkstra runs on it
+          unchanged. You saw the idea with Cheapest Flights in Lecture 22; it is
+          the general-purpose fix whenever plain shortest paths give the wrong
+          answer.
+        </p>
+        <div class="callout blue">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>A* in one sentence.</strong> A* is Dijkstra that also adds
+            an optimistic estimate of the distance still to go, so it explores
+            towards the target first. It is guaranteed correct as long as the
+            estimate never overestimates &mdash; for a grid, the straight-line
+            or Manhattan distance.
+          </div>
+        </div>
+        <h2 class="h1" id="flow">&#128688; Max Flow and Min Cut</h2>
+        <p>
+          A flow network has a source, a sink, and edges with capacities. The
+          <strong>maximum flow</strong> is the most that can travel from source
+          to sink. The method: find any path with spare capacity (an
+          <em>augmenting path</em>), push as much as its narrowest edge allows,
+          repeat until no path is left. The crucial detail is the
+          <strong>residual edge</strong>: pushing flow along u&rarr;v adds
+          capacity to v&rarr;u, which lets a later path undo an earlier bad
+          choice.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Edmonds-Karp (Augmenting Paths
+              Found by BFS)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> maxFlow(cap, s, t):                     <span class="pc-cm">// cap[u][v] = remaining capacity</span>
+    flow ← 0
+    <span class="pc-kw">repeat</span>:
+        parent ← BFS <span class="pc-kw">from</span> s using only edges with cap[u][v] &gt; 0
+        <span class="pc-kw">if</span> t was <span class="pc-kw">not</span> reached: <span class="pc-kw">break</span>
+        bottleneck ← smallest cap on the path <span class="pc-kw">from</span> s <span class="pc-kw">to</span> t
+        <span class="pc-kw">for</span> <span class="pc-kw">each</span> edge (u, v) on that path:
+            cap[u][v] ← cap[u][v] - bottleneck
+            cap[v][u] ← cap[v][u] + bottleneck   <span class="pc-cm">// residual edge: allows undoing</span>
+        flow ← flow + bottleneck
+    <span class="pc-kw">return</span> flow
+<span class="pc-cm">// O(V · E²). The max-flow min-cut theorem: this number equals the cheapest set</span>
+<span class="pc-cm">// of edges whose removal separates s from t.</span></pre>
+        </div>
+        <h3 class="h2" id="matching">Bipartite matching</h3>
+        <p>
+          Matching workers to jobs, students to projects, or rows to columns is
+          max flow on a special network: source &rarr; every left node &rarr;
+          allowed right nodes &rarr; sink, all capacity 1. There is also a
+          shorter direct algorithm: for each left node, try to find a free
+          partner, and if the partner is taken, ask its current match to move
+          elsewhere.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Maximum Bipartite Matching
+              (Augmenting Paths)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> maxMatching(leftNodes, adj):
+    matchOf ← empty map                          <span class="pc-cm">// right node → its left partner</span>
+    <span class="pc-kw">function</span> tryAssign(u, seen):
+        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
+            <span class="pc-kw">if</span> v <span class="pc-kw">in</span> seen: <span class="pc-kw">continue</span>
+            seen.add(v)
+            <span class="pc-kw">if</span> v <span class="pc-kw">not</span> <span class="pc-kw">in</span> matchOf <span class="pc-kw">or</span> tryAssign(matchOf[v], seen):
+                matchOf[v] ← u                   <span class="pc-cm">// take v, possibly after moving its partner</span>
+                <span class="pc-kw">return</span> true
+        <span class="pc-kw">return</span> false
+    count ← 0
+    <span class="pc-kw">for</span> u <span class="pc-kw">in</span> leftNodes:
+        <span class="pc-kw">if</span> tryAssign(u, empty set): count ← count + 1
+    <span class="pc-kw">return</span> count                                 <span class="pc-cm">// O(V · E)</span></pre>
+        </div>
+        <h2 class="h1" id="hard">
+          &#129521; When a Graph Problem Is Genuinely Hard
+        </h2>
+        <p>
+          Some innocent-sounding questions have no known fast solution:
+          &ldquo;visit every <em>node</em> exactly once&rdquo; (a Hamiltonian
+          path) and the travelling salesman problem among them. Notice the
+          contrast with Eulerian paths, which visit every <em>edge</em> once and
+          are easy. When you meet one of these in an interview, the constraint
+          will be tiny &mdash; n ≤ 20 or so &mdash; and the intended answer is
+          bitmask DP from Lecture 35.
+        </p>
+        <h2 class="h1" id="choose">&#129513; Choosing an Algorithm</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>The question</th>
+                <th>Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Which edges or nodes hold the network together?</td>
+                <td>Bridges (Lecture 23) / articulation points</td>
+              </tr>
+              <tr>
+                <td>
+                  Groups where everyone reaches everyone, in a directed graph
+                </td>
+                <td>SCC: Kosaraju or Tarjan</td>
+              </tr>
+              <tr>
+                <td>A directed graph with cycles, but you need a DAG</td>
+                <td>Condense the SCCs</td>
+              </tr>
+              <tr>
+                <td>Shortest path, every weight 0 or 1</td>
+                <td>0-1 BFS</td>
+              </tr>
+              <tr>
+                <td>Shortest path that depends on stops, fuel or keys</td>
+                <td>Dijkstra over (node, state)</td>
+              </tr>
+              <tr>
+                <td>
+                  How much can get from A to B? Cheapest way to cut A from B?
+                </td>
+                <td>Max flow = min cut</td>
+              </tr>
+              <tr>
+                <td>Pair up two groups with allowed pairs</td>
+                <td>Bipartite matching</td>
+              </tr>
+              <tr>
+                <td>Visit every node exactly once, n ≤ 20</td>
+                <td>Bitmask DP (Lecture 35)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="h1" id="pitfalls">
+          &#9888;&#65039; Complexity &amp; Classic Bugs
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Algorithm</th>
-                <th>Strategy</th>
-                <th>Data Structure</th>
                 <th>Time</th>
-                <th>Best When</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Kruskal's</strong></td>
-                <td>Sort edges, add if no cycle</td>
-                <td>Union-Find</td>
-                <td>O(E log E)</td>
-                <td>Sparse graphs</td>
-              </tr>
-              <tr>
-                <td><strong>Prim's</strong></td>
-                <td>
-                  Grow MST from a node, always add cheapest reachable edge
-                </td>
-                <td>Min-Heap</td>
-                <td>O(E log V)</td>
-                <td>Dense graphs</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 class="h3" id="kruskal">Kruskal&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Kruskal's Minimum Spanning
-              Tree</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Sort every edge cheapest first; keep an edge only if it joins</span>
-<span class="pc-cm">// two components that were not already connected.</span>
-sort edges by weight ascending
-dsu <span class="pc-kw">&larr;</span> disjoint-set over V nodes
-total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span> 0
-
-<span class="pc-kw">for</span> (w, u, v) <span class="pc-kw">in</span> edges:
-    <span class="pc-kw">if</span> dsu.find(u) &ne; dsu.find(v):    <span class="pc-cm">// different components — safe</span>
-        dsu.union(u, v)
-        total <span class="pc-kw">&larr;</span> total + w
-        used <span class="pc-kw">&larr;</span> used + 1
-        <span class="pc-kw">if</span> used = V - 1: <span class="pc-kw">break</span>       <span class="pc-cm">// a spanning tree has V-1 edges</span>
-
-<span class="pc-kw">if</span> used &lt; V - 1: <span class="pc-kw">return</span> GRAPH_NOT_CONNECTED
-<span class="pc-kw">return</span> total
-
-<span class="pc-cm">// The disjoint-set find, with path compression:</span>
-<span class="pc-kw">function</span> find(parent, x):
-    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent, parent[x])   <span class="pc-cm">// point straight at the root</span>
-    <span class="pc-kw">return</span> parent[x]</pre>
-        </div>
-
-        <h3 class="h3" id="prim">Prim&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Prim's MST (min-heap)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> prim(adj, V):
-    inMST ← array of V, all false
-    pq ← min-heap of (edgeWeight, node), starting with (0, 0)   <span class="pc-cm">// start from node 0</span>
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (w, node) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[node]: <span class="pc-kw">continue</span>        <span class="pc-cm">// already joined by a cheaper edge</span>
-        inMST[node] ← true
-        cost ← cost + w
-        <span class="pc-kw">for</span> (nei, weight) <span class="pc-kw">in</span> adj[node]:
-            <span class="pc-kw">if</span> <span class="pc-kw">not</span> inMST[nei]: pq.push((weight, nei))
-    <span class="pc-kw">return</span> cost
-
-<span class="pc-cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ═══ BIPARTITE ═══ -->
-        <h2 class="h1" id="bipartite">&#127800; Bipartite Graphs</h2>
-        <p>
-          A graph is <strong>bipartite</strong> if its nodes can be split into
-          two groups such that every edge crosses between groups (no edge within
-          a group). Equivalently: the graph is 2-colorable, equivalently:
-          contains no odd-length cycle.
-        </p>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Check: BFS 2-coloring.</strong> Assign alternating colors
-            (0/1) during BFS. If you ever try to color a node the same color as
-            its neighbour, the graph is not bipartite.
-          </div>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Bipartite Check (BFS
-              coloring)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> isBipartite(graph):
-    n ← length(graph)
-    color ← array of n, all -1          <span class="pc-cm">// -1 = uncolored, otherwise 0 or 1</span>
-
-    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:           <span class="pc-cm">// the graph may be disconnected</span>
-        <span class="pc-kw">if</span> color[start] ≠ -1: <span class="pc-kw">continue</span>
-        color[start] ← 0
-        q ← queue containing start
-        <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
-            node ← q.dequeue()
-            <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> graph[node]:
-                <span class="pc-kw">if</span> color[nei] = -1:
-                    color[nei] ← 1 - color[node]    <span class="pc-cm">// opposite color</span>
-                    q.enqueue(nei)
-                <span class="pc-kw">else if</span> color[nei] = color[node]:
-                    <span class="pc-kw">return</span> false                    <span class="pc-cm">// conflict</span>
-    <span class="pc-kw">return</span> true</pre>
-        </div>
-
-        <hr />
-
-        <!-- ═══ TARJAN'S BRIDGES ═══ -->
-        <h2 class="h1" id="tarjan">&#128291; Tarjan&apos;s Bridge Finding</h2>
-        <p>
-          A <strong>bridge</strong> is an edge whose removal disconnects the
-          graph. Tarjan&apos;s algorithm finds all bridges in O(V&nbsp;+&nbsp;E)
-          using two DFS arrays: <code>disc[]</code> (discovery time) and
-          <code>low[]</code> (lowest discovery time reachable from the subtree
-          <em>without</em> using the parent edge).
-        </p>
-
-        <div class="callout blue">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Key insight:</strong> Edge <code>(u,&nbsp;v)</code> is a
-            bridge when the subtree rooted at <code>v</code> cannot "look back"
-            past <code>u</code> without this edge. Formally:
-            <code>low[v] &gt; disc[u]</code>. If
-            <code>low[v] &le; disc[u]</code>, there is a back-edge in the
-            subtree that bypasses the edge &mdash; removing it won&apos;t
-            disconnect anything.
-          </div>
-        </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Tarjan's Bridge Finding (LC
-              1192)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>disc ← array of n, all -1     <span class="pc-cm">// discovery time</span>
-low ← array of n              <span class="pc-cm">// earliest discovery time reachable from the subtree</span>
-timer ← 0
-bridges ← empty list
-
-<span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← undirected adjacency list built <span class="pc-kw">from</span> connections
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> disc[i] = -1: dfs(adj, i, -1)
-    <span class="pc-kw">return</span> bridges
-
-<span class="pc-kw">function</span> dfs(adj, u, parent):
-    disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
-    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-        <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>                 <span class="pc-cm">// skip the edge we came from</span>
-        <span class="pc-kw">if</span> disc[v] = -1:                        <span class="pc-cm">// tree edge — recurse</span>
-            dfs(adj, v, u)
-            low[u] ← min(low[u], low[v])
-            <span class="pc-kw">if</span> low[v] &gt; disc[u]:                <span class="pc-cm">// v can't reach u or above without this edge</span>
-                append (u, v) <span class="pc-kw">to</span> bridges
-        <span class="pc-kw">else</span>:                                   <span class="pc-cm">// back edge — update low</span>
-            low[u] ← min(low[u], disc[v])
-
-<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
-        </div>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Multigraph caveat:</strong> The parent-skip
-            <code>if&nbsp;(v&nbsp;==&nbsp;parent)</code> fails when there are
-            parallel edges (e.g., two edges between u and v). For multigraphs,
-            track the parent <em>edge index</em> instead of the parent node.
-          </div>
-        </div>
-
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val">O(V + E)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- ═══ PATTERNS SUMMARY ═══ -->
-        <h2 class="h1" id="patterns">&#127919; Pattern Decision Guide</h2>
-        <p>
-          This guide covers all three graph lectures, not just this one &mdash;
-          it is the page to come back to when a new problem turns out to be a
-          graph and you have to pick a tool. Rows marked
-          <em>Lecture 21</em> or <em>Lecture 22</em> point back to where that
-          algorithm was taught.
-        </p>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Signal in Problem</th>
-                <th>Pattern</th>
-                <th>Key Tool</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>"Shortest path" — unweighted / unit weight</td>
-                <td>BFS</td>
-                <td>Queue + visited[]</td>
-              </tr>
-              <tr>
-                <td>"Shortest path" — weighted, non-negative</td>
-                <td>Dijkstra</td>
-                <td>Min-heap PQ</td>
-              </tr>
-              <tr>
-                <td>"Shortest path" — negative weights or K-stop limit</td>
-                <td>Bellman-Ford</td>
-                <td>Edge list, V&minus;1 rounds</td>
-              </tr>
-              <tr>
-                <td>"Connected components", "number of islands"</td>
-                <td>DFS flood fill</td>
-                <td>visited[] + recursive DFS</td>
-              </tr>
-              <tr>
-                <td>"Course prerequisites", "task order", "dependency"</td>
-                <td>Topological Sort</td>
-                <td>Kahn's (in-degree) or DFS post-order</td>
-              </tr>
-              <tr>
-                <td>
-                  "Can you complete all courses" = detect cycle in directed
-                  graph
-                </td>
-                <td>Cycle Detection</td>
-                <td>3-color DFS or Kahn's (idx &lt; n)</td>
-              </tr>
-              <tr>
-                <td>"Minimum cost to connect all nodes"</td>
-                <td>MST</td>
-                <td>Kruskal's (edges) or Prim's (heap)</td>
-              </tr>
-              <tr>
-                <td>"Two groups", "no conflict", "bipartite"</td>
-                <td>BFS 2-coloring</td>
-                <td>color[] alternating</td>
-              </tr>
-              <tr>
-                <td>"All-pairs shortest path" (small V)</td>
-                <td>Floyd-Warshall</td>
-                <td>3-loop DP, O(V&sup3;)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="callout green">
-          <span class="callout-icon">&#9989;</span>
-          <div class="callout-body">
-            <strong>The 4-question framework for any graph problem:</strong
-            ><br />
-            1. <strong>What are the nodes?</strong> (cells, words, courses,
-            …)<br />
-            2. <strong>What are the edges?</strong> (adjacent cells, one-letter
-            diff, prerequisite, …)<br />
-            3. <strong>Directed or undirected? Weighted?</strong><br />
-            4. <strong>What am I computing?</strong> (shortest path,
-            reachability, order, connectivity)
-          </div>
-        </div>
-
-        <hr />
-
-        <h2 class="h1" id="pitfalls">
-          &#9888;&#65039; Complexity &amp; Classic Bugs
-        </h2>
-        <p>
-          The costs worth quoting in an interview first, then the mistakes that
-          most often break code that looks correct. Every row in the second
-          table is a bug someone has shipped.
-        </p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Cost</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Kruskal</td>
-                <td>O(E log E)</td>
-                <td>Sorting dominates</td>
-              </tr>
-              <tr>
-                <td>Prim with a heap</td>
-                <td>O(E log V)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Bipartite check</td>
+                <td>Articulation points / bridges</td>
                 <td>O(V + E)</td>
-                <td></td>
               </tr>
               <tr>
-                <td>Tarjan&#39;s bridges</td>
+                <td>Kosaraju / Tarjan SCC</td>
                 <td>O(V + E)</td>
-                <td>One DFS</td>
               </tr>
               <tr>
-                <td>Eulerian path (Hierholzer)</td>
-                <td>O(E)</td>
-                <td></td>
+                <td>0-1 BFS</td>
+                <td>O(V + E)</td>
+              </tr>
+              <tr>
+                <td>Dijkstra over states</td>
+                <td>O((V·S + E·S) log(V·S))</td>
+              </tr>
+              <tr>
+                <td>Edmonds-Karp max flow</td>
+                <td>O(V · E²)</td>
+              </tr>
+              <tr>
+                <td>Bipartite matching (augmenting paths)</td>
+                <td>O(V · E)</td>
               </tr>
             </tbody>
           </table>
@@ -1889,201 +1915,97 @@ bridges ← empty list
             </thead>
             <tbody>
               <tr>
-                <td>Kruskal without a cycle check</td>
-                <td>The result is not a tree</td>
-                <td>Union-find; skip edges inside one set</td>
-              </tr>
-              <tr>
-                <td>Prim on a disconnected graph</td>
-                <td>Stops early with a wrong total</td>
-                <td>Check that every node was reached</td>
-              </tr>
-              <tr>
-                <td>Bipartite check from node 0 only</td>
-                <td>Misses other components</td>
-                <td>Start from every uncoloured node</td>
-              </tr>
-              <tr>
-                <td>Tarjan skipping every visited neighbour</td>
-                <td>Misses back edges</td>
-                <td>Skip only the edge you arrived on</td>
-              </tr>
-              <tr>
+                <td>Using <code>&gt;</code> for articulation points</td>
+                <td>Misses nodes that are cut points</td>
                 <td>
-                  Updating <code>low</code> with <code>low[v]</code> on a back
-                  edge
+                  Articulation uses <code>≥</code>; bridges use
+                  <code>&gt;</code>
                 </td>
-                <td>Wrong articulation points</td>
-                <td>Use <code>disc[v]</code> for back edges</td>
               </tr>
               <tr>
-                <td>Hierholzer building the path forwards</td>
-                <td>The path comes out in the wrong order</td>
-                <td>Build it backwards, then reverse</td>
+                <td>Forgetting the root rule</td>
+                <td>The DFS root is always (or never) reported</td>
+                <td>
+                  A root is a cut point only with two or more DFS children
+                </td>
               </tr>
               <tr>
-                <td>Assuming the MST is unique</td>
-                <td>Arguing about &ldquo;the&rdquo; answer</td>
-                <td>It is unique only when all weights differ</td>
+                <td>Tarjan SCC updating low from nodes already finished</td>
+                <td>Components merge wrongly</td>
+                <td>
+                  Only use <code>disc[v]</code> when <code>v</code> is still on
+                  the stack
+                </td>
+              </tr>
+              <tr>
+                <td>Kosaraju second pass on the original graph</td>
+                <td>Everything reachable joins one component</td>
+                <td>The second pass runs on the <em>reversed</em> graph</td>
+              </tr>
+              <tr>
+                <td>0-1 BFS pushing a free edge to the back</td>
+                <td>Wrong distances</td>
+                <td>Weight 0 goes to the front</td>
+              </tr>
+              <tr>
+                <td>No residual edges in max flow</td>
+                <td>The flow found is too small</td>
+                <td>
+                  Add capacity to <code>v→u</code> when pushing along
+                  <code>u→v</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Reusing <code>seen</code> across matching attempts</td>
+                <td>Misses augmenting paths</td>
+                <td>Start each left node with a fresh <code>seen</code></td>
+              </tr>
+              <tr>
+                <td>Deep recursion on 10&#8309; nodes</td>
+                <td><code>StackOverflowError</code></td>
+                <td>Iterative DFS, or raise the stack size</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <hr />
-
-        <!-- ═══ PRACTICE ═══ -->
-        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
-        <p>
-          Three problems on structure: the cheapest way to connect everything,
-          the edges that everything depends on, and splitting a graph in two.
-        </p>
-
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 01 &middot;
-                <a
-                  href="https://leetcode.com/problems/min-cost-to-connect-all-points/"
-                  target="_blank"
-                  style="font-size: 11px"
-                  >LC 1584</a
-                >
-              </div>
-              <div class="prob-title">Min Cost to Connect All Points</div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">MST &mdash; Prim's</span>
-                <span class="tag tag-co">Google · Amazon · Meta</span>
-              </div>
-            </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given <code>n</code> points on a 2D plane, return the minimum
-                cost to connect all points. Cost of connecting two points =
-                Manhattan distance. All pairs are implicitly edges.
-              </p>
-              <div class="iobox">
-                Input: [[0,0],[2,2],[3,10],[5,2],[7,0]] Output: 20
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Every pair of points is connectable, so this is a complete
-                    weighted graph.
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Minimum spanning tree over Manhattan distances. Prim's with
-                    a min-heap is O(n&#178; log n) and avoids materialising all
-                    n&#178; edges; Kruskal's with union-find also works.
-                  </p>
-                </div>
-              </details>
-            </div>
-
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                MST on a complete graph where edge weight = Manhattan distance.
-                Prim&apos;s is efficient here: maintain a min-heap of (cost,
-                node). The <code>inMST[]</code> flag replaces the visited check.
-                Greedily add the cheapest reachable edge.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 1584</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> minCostConnectPoints(pts):
-    n ← length(pts)
-    inMST ← array of n, all false
-    minDist ← array of n, all ∞;  minDist[0] ← 0
-    pq ← min-heap of (distance, index), starting with (0, 0)
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (d, i) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[i]: <span class="pc-kw">continue</span>
-        inMST[i] ← true
-        cost ← cost + d
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:              <span class="pc-cm">// dense graph: every point is a neighbour</span>
-            <span class="pc-kw">if</span> inMST[j]: <span class="pc-kw">continue</span>
-            dj ← |pts[i].x - pts[j].x| + |pts[i].y - pts[j].y|   <span class="pc-cm">// Manhattan distance</span>
-            <span class="pc-kw">if</span> dj &lt; minDist[j]:
-                minDist[j] ← dj
-                pq.push((dj, j))
-    <span class="pc-kw">return</span> cost</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge yellow">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val">O(n² log n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it.</strong> &ldquo;Critical&rdquo; nodes or
+            links, &ldquo;mutually reachable&rdquo;, &ldquo;one-way&rdquo; roads
+            with groups, &ldquo;remove the fewest obstacles&rdquo;,
+            &ldquo;assign each worker to at most one job&rdquo;, &ldquo;maximum
+            throughput&rdquo;.
           </div>
         </div>
+        <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
+        <p>
+          Five problems, one per idea: 0-1 BFS, cycles in a directed graph,
+          articulation points, shortest paths over states, and a matching
+          problem whose constraint lets you avoid a matching algorithm.
+        </p>
 
-        <hr />
-
-        <!-- ═══ ASSIGNMENT ═══ -->
-        <!-- Problem 02: Critical Connections in a Network -->
+        <!-- Problem 01: Minimum Obstacle Removal to Reach Corner -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot; What Holds It Together
+              <div class="prob-num">Problem 01 &middot; 0-1 BFS</div>
+              <div class="prob-title">
+                Minimum Obstacle Removal to Reach Corner
               </div>
-              <div class="prob-title">Critical Connections in a Network</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/critical-connections-in-a-network/"
+                  href="https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 1192 - Critical Connections in a Network</a
+                  >&#128279; LC 2290 - Minimum Obstacle Removal to Reach
+                  Corner</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Tarjan's Bridges</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-pat">0-1 BFS on a grid</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2094,12 +2016,11 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Return every edge whose removal would disconnect the network
-                &mdash; the bridges of the graph.
+                In a grid of empty cells (0) and removable obstacles (1), find
+                the fewest obstacles to remove to walk from the top-left to the
+                bottom-right corner.
               </p>
-              <div class="iobox">
-                n = 4, connections = [[0,1],[1,2],[2,0],[1,3]] → [[1,3]]
-              </div>
+              <div class="iobox">grid = [[0,1,1],[1,1,0],[1,1,0]] → 2</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -2110,9 +2031,8 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Removing each edge and re-running DFS works but costs
-                    O(E&middot;(V+E)). What does an edge inside a cycle have
-                    that a bridge does not?
+                    Turn it into a shortest-path question. What does it cost to
+                    step onto an empty cell? Onto an obstacle?
                   </p>
                 </div>
               </details>
@@ -2123,10 +2043,9 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    A way around. Give each node a discovery time, and track the
-                    earliest node its subtree can reach by any other route — if
-                    a child cannot reach at or above the parent, that edge is a
-                    bridge.
+                    0 and 1. With only those two weights, a deque replaces
+                    Dijkstra&rsquo;s heap: free steps go to the front, costly
+                    ones to the back.
                   </p>
                 </div>
               </details>
@@ -2134,15 +2053,13 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Tarjan&rsquo;s algorithm in its most useful form. One DFS
-                assigns each node a discovery time, and each node reports back
-                the <em>lowest</em> discovery time reachable from its subtree
-                using at most one back-edge. The edge <code>(u, v)</code> is a
-                bridge exactly when <code>low[v] &gt; disc[u]</code>: v&rsquo;s
-                whole subtree has no alternative route back to u or earlier, so
-                cutting that edge strands it. Skipping the edge you arrived on
-                &mdash; but only that one &mdash; is the detail people get
-                wrong.
+                Once the cost of entering a cell is its value, this is a
+                shortest path where every weight is 0 or 1 &mdash; the exact
+                case 0-1 BFS was made for. Dijkstra would also work in O(mn
+                log(mn)), but the deque keeps the frontier sorted for free,
+                giving O(mn). The general lesson is to ask what each step costs
+                before choosing an algorithm; the costs decide between BFS, 0-1
+                BFS and Dijkstra.
               </p>
             </div>
             <details>
@@ -2153,68 +2070,59 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Discovery Time vs
-                      Low-Link</span
+                      >&#128208; Pseudocode &middot; Deque Instead of a
+                      Heap</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← adjacency list
-    disc ← array of -1;  low ← array of 0
-    timer ← 0;  bridges ← empty list
-
-    <span class="pc-kw">function</span> dfs(u, parent):
-        disc[u] ← low[u] ← timer;  timer ← timer + 1
-
-        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-            <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>       <span class="pc-cm">// skip the edge we came on</span>
-
-            <span class="pc-kw">if</span> disc[v] = -1:               <span class="pc-cm">// tree edge</span>
-                dfs(v, u)
-                low[u] ← min(low[u], low[v])
-                <span class="pc-kw">if</span> low[v] &gt; disc[u]:
-                    bridges.add((u, v))    <span class="pc-cm">// no way around → bridge</span>
-            <span class="pc-kw">else</span>:                          <span class="pc-cm">// back edge: a way around</span>
-                low[u] ← min(low[u], disc[v])
-
-    dfs(0, -1)
-    <span class="pc-kw">return</span> bridges</pre>
+                  <pre><span class="pc-kw">function</span> minimumObstacles(grid):
+    dist ← m × n array of infinity;  dist[0][0] ← 0
+    dq ← deque containing (0, 0)
+    <span class="pc-kw">while</span> dq is <span class="pc-kw">not</span> empty:
+        (r, c) ← dq.popFront()
+        <span class="pc-kw">for</span> (nr, nc) <span class="pc-kw">in</span> the four neighbours of (r, c) inside the grid:
+            w ← grid[nr][nc]                          <span class="pc-cm">// cost of entering: 0 or 1</span>
+            <span class="pc-kw">if</span> dist[r][c] + w &lt; dist[nr][nc]:
+                dist[nr][nc] ← dist[r][c] + w
+                <span class="pc-kw">if</span> w = 0: dq.pushFront((nr, nc))
+                <span class="pc-kw">else</span>: dq.pushBack((nr, nc))
+    <span class="pc-kw">return</span> dist[m - 1][n - 1]</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
+                    ><span class="cx-val green">O(m &middot; n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
+                    ><span class="cx-val green">O(m &middot; n)</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
-        <!-- Problem 03: Is Graph Bipartite? -->
+        <!-- Problem 02: Longest Cycle in a Graph -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Two Colours</div>
-              <div class="prob-title">Is Graph Bipartite?</div>
+              <div class="prob-num">
+                Problem 02 &middot; Cycles in a Directed Graph
+              </div>
+              <div class="prob-title">Longest Cycle in a Graph</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/is-graph-bipartite/"
+                  href="https://leetcode.com/problems/longest-cycle-in-a-graph/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 785 - Is Graph Bipartite?</a
+                  >&#128279; LC 2360 - Longest Cycle in a Graph</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">BFS/DFS 2-Colouring</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Walk with timestamps</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2225,11 +2133,12 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Decide whether a graph&rsquo;s nodes can be split into two sets
-                so that every edge joins one set to the other.
+                In a directed graph where each node has at most one outgoing
+                edge (<code>edges[i]</code>, or −1), return the length of the
+                longest cycle, or −1.
               </p>
               <div class="iobox">
-                graph = [[1,2,3],[0,2],[0,1,3],[0,2]] → false
+                edges = [3,3,4,2,3] → 3 &nbsp;&nbsp;(2 → 4 → 3 → 2)
               </div>
             </div>
             <div class="prob-section">
@@ -2241,8 +2150,9 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Try colouring a node red and everything next to it blue.
-                    When does that go wrong?
+                    With one outgoing edge per node, starting anywhere and
+                    following arrows traces a single path. What must happen if
+                    that path revisits a node?
                   </p>
                 </div>
               </details>
@@ -2253,9 +2163,10 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    When you reach a node that is already coloured the same as
-                    the one you came from. That happens exactly when the graph
-                    has an odd-length cycle.
+                    It has entered a cycle. Stamp each node with the time you
+                    first reach it; if you return to a node stamped during the
+                    <em>current</em> walk, the cycle length is the time
+                    difference.
                   </p>
                 </div>
               </details>
@@ -2263,14 +2174,13 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Bipartite means two-colourable, and two-colourable means no odd
-                cycle &mdash; three ways of saying the same thing, and saying
-                that out loud is most of the answer. The traversal itself is
-                ordinary BFS or DFS with a colour array instead of a visited
-                array: neighbours get the opposite colour, and a neighbour
-                already wearing your colour is the contradiction. The one thing
-                people forget is that the graph may be disconnected, so the
-                outer loop must restart from every uncoloured node.
+                A graph where every node has out-degree at most one is called a
+                <em>functional graph</em>, and its strongly connected components
+                are simply its cycles. That structure makes Tarjan unnecessary:
+                walk from each unvisited node, stamping visit times. Reaching a
+                node from an earlier walk means no new cycle; reaching one from
+                this walk closes a cycle whose length is the difference in
+                stamps. Every node is stamped once, so the whole thing is O(n).
               </p>
             </div>
             <details>
@@ -2281,38 +2191,419 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Colour, Then Check
-                      Neighbours</span
+                      >&#128208; Pseudocode &middot; Global Clock, Per-Walk
+                      Start Time</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> isBipartite(graph):
-    colour ← array of n entries, all 0      <span class="pc-cm">// 0 = uncoloured, 1 / -1 = sides</span>
-
+                  <pre><span class="pc-kw">function</span> longestCycle(edges):
+    n ← length(edges);  seenAt ← array of 0, length n     <span class="pc-cm">// 0 = never visited</span>
+    clock ← 1;  best ← -1
     <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> colour[start] ≠ 0: <span class="pc-kw">continue</span>   <span class="pc-cm">// graph may be disconnected</span>
-
-        colour[start] ← 1
-        queue ← [start]
-        <span class="pc-kw">while</span> queue is not empty:
-            u ← queue.popFront()
-            <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
-                <span class="pc-kw">if</span> colour[v] = colour[u]: <span class="pc-kw">return</span> false   <span class="pc-cm">// odd cycle</span>
-                <span class="pc-kw">if</span> colour[v] = 0:
-                    colour[v] ← -colour[u]
-                    queue.pushBack(v)
-
-    <span class="pc-kw">return</span> true</pre>
+        <span class="pc-kw">if</span> seenAt[start] ≠ 0: <span class="pc-kw">continue</span>
+        walkStart ← clock;  u ← start
+        <span class="pc-kw">while</span> u ≠ -1 <span class="pc-kw">and</span> seenAt[u] = 0:
+            seenAt[u] ← clock;  clock ← clock + 1
+            u ← edges[u]
+        <span class="pc-kw">if</span> u ≠ -1 <span class="pc-kw">and</span> seenAt[u] ≥ walkStart:              <span class="pc-cm">// back into THIS walk: a cycle</span>
+            best ← max(best, clock - seenAt[u])
+    <span class="pc-kw">return</span> best</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Minimum Number of Days to Disconnect Island -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Articulation Points
+              </div>
+              <div class="prob-title">
+                Minimum Number of Days to Disconnect Island
+              </div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1568 - Minimum Number of Days to Disconnect
+                  Island</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Answer ≤ 2 + articulation point</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Each day you may turn one land cell into water. Return the
+                fewest days needed so the grid no longer has exactly one island.
+              </p>
+              <div class="iobox">
+                grid = [[0,1,1,0],[0,1,1,0],[0,0,0,0]] → 2
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Before any algorithm: can the answer ever be more than 2?
+                    Think about the topmost, then leftmost land cell.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    That cell has at most two land neighbours, so removing them
+                    isolates it — the answer is 0, 1 or 2. It is 1 exactly when
+                    some single land cell holds the island together: an
+                    articulation point.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Bounding the answer first turns an open-ended question into
+                three checks. 0 if the grid is already not one island. 1 if the
+                island is a single cell, or if some land cell is an articulation
+                point of the graph whose nodes are land cells &mdash; found in
+                one DFS with discovery and low times. Otherwise 2. With a 30
+                &times; 30 grid, removing each cell and recounting islands also
+                passes; the articulation-point version is the one that scales
+                and the one this lecture is about.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Bound the Answer, Then One
+                      DFS</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> minDays(grid):
+    <span class="pc-kw">if</span> number of islands <span class="pc-kw">in</span> grid ≠ 1: <span class="pc-kw">return</span> 0           <span class="pc-cm">// already disconnected</span>
+    <span class="pc-kw">if</span> number of land cells = 1: <span class="pc-kw">return</span> 1                <span class="pc-cm">// remove it: zero islands</span>
+    disc ← all -1;  low ← all 0;  timer ← 0;  cut ← false
+    <span class="pc-kw">function</span> dfs(cell, parent):
+        disc[cell] ← timer;  low[cell] ← timer;  timer ← timer + 1
+        children ← 0
+        <span class="pc-kw">for</span> next <span class="pc-kw">in</span> the land neighbours of cell:
+            <span class="pc-kw">if</span> next = parent: <span class="pc-kw">continue</span>
+            <span class="pc-kw">if</span> disc[next] = -1:
+                children ← children + 1
+                dfs(next, cell)
+                low[cell] ← min(low[cell], low[next])
+                <span class="pc-kw">if</span> parent ≠ none <span class="pc-kw">and</span> low[next] ≥ disc[cell]: cut ← true
+            <span class="pc-kw">else</span>:
+                low[cell] ← min(low[cell], disc[next])
+        <span class="pc-kw">if</span> parent = none <span class="pc-kw">and</span> children ≥ 2: cut ← true
+    dfs(any land cell, none)
+    <span class="pc-kw">return</span> 1 <span class="pc-kw">if</span> cut <span class="pc-kw">else</span> 2</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(m &middot; n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(m &middot; n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Shortest Path to Get All Keys -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 04 &middot; Dijkstra Over States
+              </div>
+              <div class="prob-title">Shortest Path to Get All Keys</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/shortest-path-to-get-all-keys/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 864 - Shortest Path to Get All Keys</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">BFS over (cell, keys held)</span>
+                <span class="tag tag-co"
+                  >Google &middot; Amazon &middot; Airbnb</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A grid has a start <code>@</code>, walls <code>#</code>, keys
+                <code>a</code>–<code>f</code> and matching locks
+                <code>A</code>–<code>F</code>. A lock can be passed only while
+                holding its key. Return the fewest moves to collect every key,
+                or −1.
+              </p>
+              <div class="iobox">grid = ["@.a..", "###.#", "b.A.B"] → 8</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Plain BFS marks a cell visited once. Why is it wrong to
+                    refuse to revisit a cell here?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Coming back to the same cell holding more keys is a
+                    genuinely new situation. Make the state (row, column, keys
+                    held as a bitmask) and BFS over states.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the &ldquo;put the extra information into the
+                node&rdquo; idea from the lecture. Every step still costs 1, so
+                BFS is enough &mdash; but over states rather than cells. With at
+                most six keys there are 64 masks, so the state space is at most
+                64 times the grid. The first time a state with every key bit set
+                leaves the queue, its distance is the answer. Walls block
+                always; a lock blocks unless its bit is set; picking up a key
+                sets its bit.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; State = (r, c, mask)</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> shortestPathAllKeys(grid):
+    start ← position of '@';  K ← number of keys;  all ← 2^K - 1
+    queue ← [(start, 0)];  seen ← {(start, 0)};  steps ← 0
+    <span class="pc-kw">while</span> queue is <span class="pc-kw">not</span> empty:
+        <span class="pc-kw">repeat</span> size(queue) <span class="pc-kw">times</span>:
+            ((r, c), mask) ← queue.popFront()
+            <span class="pc-kw">if</span> mask = all: <span class="pc-kw">return</span> steps
+            <span class="pc-kw">for</span> (nr, nc) <span class="pc-kw">in</span> the four neighbours of (r, c) inside the grid:
+                ch ← grid[nr][nc]
+                <span class="pc-kw">if</span> ch = '#': <span class="pc-kw">continue</span>
+                <span class="pc-kw">if</span> ch is a lock <span class="pc-kw">and</span> the bit <span class="pc-kw">for</span> its key is <span class="pc-kw">not</span> <span class="pc-kw">in</span> mask: <span class="pc-kw">continue</span>
+                m2 ← mask OR (bit <span class="pc-kw">for</span> ch) <span class="pc-kw">if</span> ch is a key <span class="pc-kw">else</span> mask
+                <span class="pc-kw">if</span> ((nr, nc), m2) <span class="pc-kw">not</span> <span class="pc-kw">in</span> seen:
+                    seen.add(((nr, nc), m2));  queue.pushBack(((nr, nc), m2))
+        steps ← steps + 1
+    <span class="pc-kw">return</span> -1</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O(m &middot; n &middot; 2&#7503;)</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green"
+                      >O(m &middot; n &middot; 2&#7503;)</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Maximum Compatibility Score Sum -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot; Assignment as Matching
+              </div>
+              <div class="prob-title">Maximum Compatibility Score Sum</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/maximum-compatibility-score-sum/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1947 - Maximum Compatibility Score Sum</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Weighted matching via bitmask DP</span
+                >
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Assign each of m students to a different one of m mentors. A
+                pair scores the number of questions they answered the same way.
+                Maximise the total score.
+              </p>
+              <div class="iobox">
+                students = [[1,1,0],[1,0,1],[0,0,1]], mentors =
+                [[1,0,0],[0,0,1],[1,1,0]] → 8
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    This is a matching between two groups, like the
+                    lecture&rsquo;s bipartite matching — but every pair has a
+                    score. How big is m?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    m ≤ 8, so the set of mentors already used fits in a bitmask.
+                    The next student to place is popcount(mask).
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Weighted bipartite matching in general needs the Hungarian
+                algorithm or min-cost flow &mdash; well beyond interviews. The
+                constraint is the escape hatch: with m ≤ 8 there are only 256
+                subsets of mentors, so bitmask DP from Lecture 35 solves it.
+                <code>dp[mask]</code> is the best total after assigning the
+                first <code>popcount(mask)</code> students to exactly the
+                mentors in mask. Recognising a matching problem, then reading
+                the constraint to see that it does not need a matching
+                algorithm, is exactly the judgement this lecture is trying to
+                build.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; dp[mask] Over Mentors
+                      Used</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> maxCompatibilitySum(students, mentors):
+    m ← length(students)
+    score[i][j] ← number of equal answers between student i <span class="pc-kw">and</span> mentor j
+    dp ← array of 2^m entries, all -infinity;  dp[0] ← 0
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> 2^m - 1:
+        <span class="pc-kw">if</span> dp[mask] = -infinity: <span class="pc-kw">continue</span>
+        i ← popcount(mask)                                <span class="pc-cm">// next student to place</span>
+        <span class="pc-kw">if</span> i = m: <span class="pc-kw">continue</span>
+        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> m - 1:
+            <span class="pc-kw">if</span> mask AND (1 &lt;&lt; j) = 0:
+                dp[mask OR (1 &lt;&lt; j)] ← max(dp[mask OR (1 &lt;&lt; j)], dp[mask] + score[i][j])
+    <span class="pc-kw">return</span> dp[2^m - 1]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O(2&#7504; &middot; m &middot; n)</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(2&#7504;)</span>
                   </div>
                 </div>
               </div>
@@ -2326,13 +2617,13 @@ bridges ← empty list
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 23 Assignment &mdash; 10 Problems (7 Medium &middot; 3
-              Hard)</strong
+              >Lecture 40 Assignment &mdash; 22 Problems (0 Easy &middot; 10
+              Medium &middot; 12 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 24.<br /><br />
+            before moving to Lecture 41.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture23/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture40/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2349,61 +2640,71 @@ bridges ← empty list
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 24.</p>
+        <p>Check each item before advancing to Lecture 41.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write Kruskal with union-find and Prim with a priority queue
+            I can find articulation points and say how the test differs from
+            bridges
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say which MST algorithm suits a dense graph and which a sparse
-            one
+            I can write Kosaraju&rsquo;s two passes and explain why the second
+            uses the reversed graph
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why a greedy choice is safe when building an MST
+            I can write 0-1 BFS and say when it replaces Dijkstra
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can two-colour a graph and connect bipartiteness to odd cycles
+            I can add state to a shortest-path node and say how big the new
+            graph is
           </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">I can explain what a residual edge is for</div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain discovery time versus low-link and what makes an edge
-            a bridge
+            I can model a matching problem as flow, and spot when bitmask DP is
+            enough
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">I completed all 10 assignment problems</div>
+          <div class="cb-text">I completed all 22 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 24: Backtracking</strong><br />
-            Graphs are done. Lecture 24 returns to recursion with the technique
-            that searches a space nobody handed you &mdash; building candidates
-            one choice at a time, and undoing the choice when it leads nowhere.
+            <strong
+              >Next up &mdash; Lecture 41: Balanced BSTs &amp; Ordered
+              Structures</strong
+            ><br />
+            From graphs back to trees: how Java&rsquo;s TreeMap stays fast, and
+            the questions &mdash; nearest value, k-th smallest, ordered windows
+            &mdash; that only an ordered structure answers well.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture22/lecture22_notes.html"
-            >&larr; Lecture 22 &middot; Graphs II</a
+          <a href="../Lecture39/lecture39_notes.html"
+            >&larr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
+            Manacher)</a
           >
-          <a class="next" href="../Lecture24/lecture24_notes.html"
-            >Lecture 24 &middot; Backtracking &rarr;</a
+          <a class="next" href="../index.html"
+            >Lecture 41 &middot; coming soon &rarr;</a
           >
         </div>
       </div>

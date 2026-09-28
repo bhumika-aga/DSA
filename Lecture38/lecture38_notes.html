@@ -3,10 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecture 23 &mdash; Graphs III (MST, Bipartite &amp; Bridges)</title>
+    <title>
+      Lecture 38 &mdash; Square Root Decomposition &amp; Mo&#39;s Algorithm
+    </title>
     <meta
       name="description"
-      content="Master graphs: BFS, DFS, cycle detection, topological sort, Dijkstra, Bellman-Ford, MST, bipartite — with full dry runs and Java code."
+      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1391,15 +1393,14 @@
       }
     </style>
   </head>
-
   <body>
     <!-- SIDEBAR -->
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Graphs III &mdash; Structure</div>
+        <div class="sb-title">Sqrt Decomposition &amp; Mo&rsquo;s</div>
         <div class="sb-meta">
-          Lecture 23 of 45 &middot; Phase 2 &mdash; Core Data Structures
+          Lecture 38 of 45 &middot; Phase 5 &mdash; Advanced Structures
         </div>
       </div>
       <div class="sb-scroll">
@@ -1407,17 +1408,19 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#mst"
-          ><span class="toc-icon">&#127795;</span>Minimum Spanning Tree</a
+        <a class="toc-item" href="#blocks"
+          ><span class="toc-icon">&#129521;</span>Square Root Blocks</a
         >
-        <a class="toc-item" href="#bipartite"
-          ><span class="toc-icon">&#127800;</span>Bipartite Graphs</a
+        <a class="toc-item toc-sub" href="#why-sqrt">Why &radic;n?</a>
+        <a class="toc-item" href="#heavy"
+          ><span class="toc-icon">&#9878;&#65039;</span>Heavy and Light</a
         >
-        <a class="toc-item" href="#tarjan"
-          ><span class="toc-icon">&#128291;</span>Bridges (Tarjan)</a
+        <a class="toc-item" href="#mo"
+          ><span class="toc-icon">&#128666;</span>Mo&rsquo;s Algorithm</a
         >
-        <a class="toc-item" href="#patterns"
-          ><span class="toc-icon">&#127919;</span>Decision Guide</a
+        <a class="toc-item toc-sub" href="#freq">Frequency of Frequencies</a>
+        <a class="toc-item" href="#choose"
+          ><span class="toc-icon">&#129513;</span>Choosing a Tool</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1434,14 +1437,14 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture22/lecture22_notes.html"
-          >&larr; Lecture 22 &middot; Graphs II</a
+        <a class="toc-item" href="../Lecture37/lecture37_notes.html"
+          >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
         >
-        <a class="toc-item" href="../Lecture24/lecture24_notes.html"
-          >&rarr; Lecture 24 &middot; Backtracking</a
+        <a class="toc-item" href="../Lecture39/lecture39_notes.html"
+          >&rarr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
+          Manacher)</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
-        <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
       </div>
     </nav>
 
@@ -1450,8 +1453,8 @@
       <div id="topbar">
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../index.html#phase2">Phase 2</a><span>&rsaquo;</span>
-          <span>Lecture 23 &mdash; Graphs III &mdash; Structure</span>
+          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
+          <span>Lecture 38 &mdash; Sqrt Decomposition &amp; Mo&rsquo;s</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1469,21 +1472,21 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#128737;&#65039;</span>
+          <span class="page-emoji">&#129717;</span>
           <h1 class="page-title">
-            Graphs III &mdash; MST, Bipartite &amp; Bridges
+            Square Root Decomposition &amp; Mo&rsquo;s Algorithm
           </h1>
           <p class="page-sub">
-            &ldquo;Not where to go &mdash; what holds the whole thing
-            together.&rdquo;
+            &ldquo;When a tree is too much: split into blocks, or change the
+            order of the questions.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 23 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 38 of 45</span>
             <span class="meta-chip accent"
-              >Phase 2 &mdash; Core Data Structures</span
+              >Phase 5 &mdash; Advanced Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 4 days</span>
-            <span class="meta-chip green">&#127919; 10 problems</span>
+            <span class="meta-chip yellow">&#9201; 3 days</span>
+            <span class="meta-chip green">&#127919; 12 problems</span>
             <span class="meta-chip"
               >&#128188; Google &middot; Amazon &middot; Meta &middot;
               Microsoft</span
@@ -1497,349 +1500,283 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            The last two lectures moved <em>through</em> a graph. This one asks
-            about its shape. Think of a utility company wiring up a town: they
-            do not care about the route between any two houses, only about the
-            cheapest set of cables that reaches every house &mdash; that is a
-            minimum spanning tree. The other two questions here are equally
-            structural: can everyone be split into two groups with no conflicts
-            inside either, and which single link would cut the network in half
-            if it failed?
+            Lecture 37 gave you trees that answer range questions in O(log n).
+            This short lecture gives you two simpler ideas that are sometimes
+            the better tool. <em>Square root decomposition</em> splits an array
+            into &radic;n blocks and keeps a summary per block &mdash; slower
+            than a tree, but written in minutes.
+            <em>Mo&rsquo;s algorithm</em> answers a whole batch of range
+            questions by choosing a clever order to answer them in, which
+            handles questions like &ldquo;how many distinct values?&rdquo; that
+            no tree combines neatly.
           </div>
         </div>
 
         <div class="objectives">
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
-            <li>Build a minimum spanning tree with Kruskal and with Prim</li>
             <li>
-              Say which of the two fits a dense graph and which a sparse one
+              Split an array into &radic;n blocks and answer range queries in
+              O(&radic;n)
             </li>
-            <li>Test a graph for bipartiteness by two-colouring it</li>
             <li>
-              Find every bridge in one DFS using discovery and low-link times
+              Explain why &radic;n is the right block size, from the balancing
+              argument
             </li>
-            <li>Choose the right algorithm from a problem statement</li>
+            <li>Separate heavy and light values to bound the work per query</li>
+            <li>
+              Order offline queries with Mo&rsquo;s algorithm and slide a window
+              between them
+            </li>
+            <li>
+              Track distinct counts and most-frequent values under add and
+              remove
+            </li>
           </ul>
         </div>
 
         <hr />
 
-        <h2 class="h1" id="mst">&#127795; Minimum Spanning Tree (MST)</h2>
+        <div class="callout teal">
+          <span class="callout-icon">&#129504;</span>
+          <div class="callout-body">
+            <strong
+              >The picture to keep in your head: a book with chapters.</strong
+            >
+            To count the words from page 37 to page 912, nobody counts every
+            page. You count the loose pages at each end, and for every complete
+            chapter in between you read the total off a list. That is square
+            root decomposition: whole blocks answered from a stored total, only
+            the two ragged ends done by hand. Mo&rsquo;s algorithm is a delivery
+            driver who sorts the day&rsquo;s stops by neighbourhood instead of
+            driving them in the order they were booked &mdash; same deliveries,
+            far less driving.
+          </div>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#127919;</span>
+          <div class="callout-body">
+            <strong>How often will you need this?</strong> Honestly: rarely in
+            an interview, often in programming contests. A Fenwick or segment
+            tree (Lecture 37) is usually the expected answer. This lecture is
+            short because the two ideas in it &mdash;
+            <em>split into blocks</em> and
+            <em>answer queries in a clever order</em> &mdash; are worth knowing
+            on their own, and because some questions (&ldquo;how many distinct
+            values in this range?&rdquo;) are genuinely easier with them than
+            with any tree.
+          </div>
+        </div>
+        <h2 class="h1" id="blocks">&#129521; Square Root Decomposition</h2>
         <p>
-          An MST connects all V nodes using exactly V&minus;1 edges with the
-          minimum total weight. Two classic algorithms, both greedily build the
-          MST.
+          Split an array of n items into blocks of about &radic;n items each,
+          and store one summary per block &mdash; its sum, its minimum, whatever
+          the question needs. For n = 10,000 that is 100 blocks of 100. A range
+          query then has three parts: the partial block at the left end, the
+          whole blocks in the middle, and the partial block at the right end.
         </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Build, Query, Update</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>B ← floor(sqrt(n))                      <span class="pc-cm">// block size</span>
+blockSum ← array of (n ÷ B + 1) zeros
+<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
+    blockSum[i ÷ B] ← blockSum[i ÷ B] + a[i]
 
+<span class="pc-kw">function</span> query(l, r):                   <span class="pc-cm">// sum of a[l..r]</span>
+    total ← 0
+    <span class="pc-kw">while</span> l ≤ r <span class="pc-kw">and</span> l mod B ≠ 0:        <span class="pc-cm">// ragged left end</span>
+        total ← total + a[l];  l ← l + 1
+    <span class="pc-kw">while</span> l + B - 1 ≤ r:                <span class="pc-cm">// whole blocks</span>
+        total ← total + blockSum[l ÷ B];  l ← l + B
+    <span class="pc-kw">while</span> l ≤ r:                        <span class="pc-cm">// ragged right end</span>
+        total ← total + a[l];  l ← l + 1
+    <span class="pc-kw">return</span> total
+
+<span class="pc-kw">function</span> update(i, value):              <span class="pc-cm">// point update in O(1)</span>
+    blockSum[i ÷ B] ← blockSum[i ÷ B] + (value - a[i])
+    a[i] ← value</pre>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Algorithm</th>
-                <th>Strategy</th>
-                <th>Data Structure</th>
-                <th>Time</th>
-                <th>Best When</th>
+                <th>Structure</th>
+                <th>Range query</th>
+                <th>Point update</th>
+                <th>Code size</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Kruskal's</strong></td>
-                <td>Sort edges, add if no cycle</td>
-                <td>Union-Find</td>
-                <td>O(E log E)</td>
-                <td>Sparse graphs</td>
+                <td>Plain array</td>
+                <td>O(n)</td>
+                <td>O(1)</td>
+                <td>Trivial</td>
               </tr>
               <tr>
-                <td><strong>Prim's</strong></td>
-                <td>
-                  Grow MST from a node, always add cheapest reachable edge
-                </td>
-                <td>Min-Heap</td>
-                <td>O(E log V)</td>
-                <td>Dense graphs</td>
+                <td>Prefix sums</td>
+                <td>O(1)</td>
+                <td>O(n)</td>
+                <td>Tiny</td>
+              </tr>
+              <tr>
+                <td><strong>Square root blocks</strong></td>
+                <td><strong>O(&radic;n)</strong></td>
+                <td><strong>O(1)</strong></td>
+                <td><strong>Small</strong></td>
+              </tr>
+              <tr>
+                <td>Fenwick / segment tree</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>Medium</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <h3 class="h3" id="kruskal">Kruskal&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Kruskal's Minimum Spanning
-              Tree</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-cm">// Sort every edge cheapest first; keep an edge only if it joins</span>
-<span class="pc-cm">// two components that were not already connected.</span>
-sort edges by weight ascending
-dsu <span class="pc-kw">&larr;</span> disjoint-set over V nodes
-total <span class="pc-kw">&larr;</span> 0; used <span class="pc-kw">&larr;</span> 0
-
-<span class="pc-kw">for</span> (w, u, v) <span class="pc-kw">in</span> edges:
-    <span class="pc-kw">if</span> dsu.find(u) &ne; dsu.find(v):    <span class="pc-cm">// different components — safe</span>
-        dsu.union(u, v)
-        total <span class="pc-kw">&larr;</span> total + w
-        used <span class="pc-kw">&larr;</span> used + 1
-        <span class="pc-kw">if</span> used = V - 1: <span class="pc-kw">break</span>       <span class="pc-cm">// a spanning tree has V-1 edges</span>
-
-<span class="pc-kw">if</span> used &lt; V - 1: <span class="pc-kw">return</span> GRAPH_NOT_CONNECTED
-<span class="pc-kw">return</span> total
-
-<span class="pc-cm">// The disjoint-set find, with path compression:</span>
-<span class="pc-kw">function</span> find(parent, x):
-    <span class="pc-kw">if</span> parent[x] ≠ x: parent[x] ← find(parent, parent[x])   <span class="pc-cm">// point straight at the root</span>
-    <span class="pc-kw">return</span> parent[x]</pre>
-        </div>
-
-        <h3 class="h3" id="prim">Prim&apos;s Algorithm</h3>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Prim's MST (min-heap)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre><span class="pc-kw">function</span> prim(adj, V):
-    inMST ← array of V, all false
-    pq ← min-heap of (edgeWeight, node), starting with (0, 0)   <span class="pc-cm">// start from node 0</span>
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (w, node) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[node]: <span class="pc-kw">continue</span>        <span class="pc-cm">// already joined by a cheaper edge</span>
-        inMST[node] ← true
-        cost ← cost + w
-        <span class="pc-kw">for</span> (nei, weight) <span class="pc-kw">in</span> adj[node]:
-            <span class="pc-kw">if</span> <span class="pc-kw">not</span> inMST[nei]: pq.push((weight, nei))
-    <span class="pc-kw">return</span> cost
-
-<span class="pc-cm">// Time: O(E log V)  Space: O(V + E)</span></pre>
-        </div>
-
-        <hr />
-
-        <!-- ═══ BIPARTITE ═══ -->
-        <h2 class="h1" id="bipartite">&#127800; Bipartite Graphs</h2>
+        <h3 class="h2" id="why-sqrt">Why &radic;n, exactly?</h3>
         <p>
-          A graph is <strong>bipartite</strong> if its nodes can be split into
-          two groups such that every edge crosses between groups (no edge within
-          a group). Equivalently: the graph is 2-colorable, equivalently:
-          contains no odd-length cycle.
+          With blocks of size B, a query touches at most n ÷ B whole blocks plus
+          up to 2B loose items. Make B small and there are too many blocks; make
+          it large and the ragged ends get long. The total, n ÷ B + 2B, is
+          smallest when the two terms are about equal &mdash; which happens at B
+          &asymp; &radic;n. That balancing argument is the whole idea, and it
+          applies well beyond sums.
         </p>
-
-        <div class="callout teal">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Check: BFS 2-coloring.</strong> Assign alternating colors
-            (0/1) during BFS. If you ever try to color a node the same color as
-            its neighbour, the graph is not bipartite.
-          </div>
-        </div>
-
+        <h2 class="h1" id="heavy">&#9878;&#65039; Heavy and Light Elements</h2>
+        <p>
+          The same balancing trick works on <em>values</em> instead of
+          positions. In an array of n items, at most &radic;n different values
+          can each appear more than &radic;n times &mdash; there simply is not
+          room for more. Call those values <strong>heavy</strong>. You can
+          afford to precompute something for every heavy value (such as a prefix
+          count), and handle every <strong>light</strong>
+          value by brute force, because a light value never appears more than
+          &radic;n times. The worked example on Online Majority Element uses
+          this split &mdash; with the cut-off at &radic;n/2, for a reason the
+          example explains.
+        </p>
+        <h2 class="h1" id="mo">&#128666; Mo&rsquo;s Algorithm</h2>
+        <p>
+          Some range questions are awkward for any tree: &ldquo;how many
+          distinct numbers are in <code>a[l..r]</code>?&rdquo; does not combine
+          neatly from two halves. But if you already know the answer for one
+          range, you can get the answer for a neighbouring range cheaply &mdash;
+          add one element on the right, or remove one on the left, updating a
+          count table as you go. Mo&rsquo;s algorithm makes that cheap-step idea
+          fast by answering the queries in a smart <em>order</em>.
+        </p>
+        <p>
+          The order: group queries by which &radic;n-block their left end falls
+          in, and within a group sort by right end. Then walk a window from
+          query to query. Inside one group the right end only moves forward, and
+          the left end only wobbles within one block &mdash; so the total
+          movement is about (n + q)&radic;n steps instead of n &times; q.
+        </p>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Bipartite Check (BFS
-              coloring)</span
+              >&#128208; Pseudocode &middot; Mo’s Algorithm — Count Distinct
+              Values in Each Query Range</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre><span class="pc-kw">function</span> isBipartite(graph):
-    n ← length(graph)
-    color ← array of n, all -1          <span class="pc-cm">// -1 = uncolored, otherwise 0 or 1</span>
+          <pre>B ← floor(sqrt(n))
+order ← query indices sorted by (l ÷ B, then r)
+count ← array of zeros;  distinct ← 0
+curL ← 0;  curR ← -1                  <span class="pc-cm">// the current window is empty</span>
 
-    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:           <span class="pc-cm">// the graph may be disconnected</span>
-        <span class="pc-kw">if</span> color[start] ≠ -1: <span class="pc-kw">continue</span>
-        color[start] ← 0
-        q ← queue containing start
-        <span class="pc-kw">while</span> q <span class="pc-kw">is not empty</span>:
-            node ← q.dequeue()
-            <span class="pc-kw">for</span> nei <span class="pc-kw">in</span> graph[node]:
-                <span class="pc-kw">if</span> color[nei] = -1:
-                    color[nei] ← 1 - color[node]    <span class="pc-cm">// opposite color</span>
-                    q.enqueue(nei)
-                <span class="pc-kw">else if</span> color[nei] = color[node]:
-                    <span class="pc-kw">return</span> false                    <span class="pc-cm">// conflict</span>
-    <span class="pc-kw">return</span> true</pre>
+<span class="pc-kw">function</span> add(i):
+    count[a[i]] ← count[a[i]] + 1
+    <span class="pc-kw">if</span> count[a[i]] = 1: distinct ← distinct + 1
+<span class="pc-kw">function</span> remove(i):
+    count[a[i]] ← count[a[i]] - 1
+    <span class="pc-kw">if</span> count[a[i]] = 0: distinct ← distinct - 1
+
+<span class="pc-kw">for</span> q <span class="pc-kw">in</span> order:
+    (l, r) ← queries[q]
+    <span class="pc-kw">while</span> curR &lt; r: curR ← curR + 1;  add(curR)       <span class="pc-cm">// grow right</span>
+    <span class="pc-kw">while</span> curL &gt; l: curL ← curL - 1;  add(curL)       <span class="pc-cm">// grow left</span>
+    <span class="pc-kw">while</span> curR &gt; r: remove(curR);  curR ← curR - 1    <span class="pc-cm">// shrink right</span>
+    <span class="pc-kw">while</span> curL &lt; l: remove(curL);  curL ← curL + 1    <span class="pc-cm">// shrink left</span>
+    answer[q] ← distinct
+
+<span class="pc-kw">return</span> answer                          <span class="pc-cm">// in the ORIGINAL query order</span></pre>
         </div>
-
-        <hr />
-
-        <!-- ═══ TARJAN'S BRIDGES ═══ -->
-        <h2 class="h1" id="tarjan">&#128291; Tarjan&apos;s Bridge Finding</h2>
-        <p>
-          A <strong>bridge</strong> is an edge whose removal disconnects the
-          graph. Tarjan&apos;s algorithm finds all bridges in O(V&nbsp;+&nbsp;E)
-          using two DFS arrays: <code>disc[]</code> (discovery time) and
-          <code>low[]</code> (lowest discovery time reachable from the subtree
-          <em>without</em> using the parent edge).
-        </p>
-
         <div class="callout blue">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>Key insight:</strong> Edge <code>(u,&nbsp;v)</code> is a
-            bridge when the subtree rooted at <code>v</code> cannot "look back"
-            past <code>u</code> without this edge. Formally:
-            <code>low[v] &gt; disc[u]</code>. If
-            <code>low[v] &le; disc[u]</code>, there is a back-edge in the
-            subtree that bypasses the edge &mdash; removing it won&apos;t
-            disconnect anything.
+            <strong>Offline means you see every question first.</strong>
+            Mo&rsquo;s algorithm only works when all the queries are known
+            before you answer any of them, so you can reorder them. That is
+            called answering <em>offline</em>. If each query depends on the
+            answer to the previous one, you are <em>online</em>, and Mo&rsquo;s
+            is off the table.
           </div>
         </div>
-
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Tarjan's Bridge Finding (LC
-              1192)</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>disc ← array of n, all -1     <span class="pc-cm">// discovery time</span>
-low ← array of n              <span class="pc-cm">// earliest discovery time reachable from the subtree</span>
-timer ← 0
-bridges ← empty list
-
-<span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← undirected adjacency list built <span class="pc-kw">from</span> connections
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> disc[i] = -1: dfs(adj, i, -1)
-    <span class="pc-kw">return</span> bridges
-
-<span class="pc-kw">function</span> dfs(adj, u, parent):
-    disc[u] ← timer;  low[u] ← timer;  timer ← timer + 1
-    <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-        <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>                 <span class="pc-cm">// skip the edge we came from</span>
-        <span class="pc-kw">if</span> disc[v] = -1:                        <span class="pc-cm">// tree edge — recurse</span>
-            dfs(adj, v, u)
-            low[u] ← min(low[u], low[v])
-            <span class="pc-kw">if</span> low[v] &gt; disc[u]:                <span class="pc-cm">// v can't reach u or above without this edge</span>
-                append (u, v) <span class="pc-kw">to</span> bridges
-        <span class="pc-kw">else</span>:                                   <span class="pc-cm">// back edge — update low</span>
-            low[u] ← min(low[u], disc[v])
-
-<span class="pc-cm">// Time: O(V + E)  Space: O(V)</span></pre>
-        </div>
-
-        <div class="callout yellow">
-          <span class="callout-icon">&#128204;</span>
-          <div class="callout-body">
-            <strong>Multigraph caveat:</strong> The parent-skip
-            <code>if&nbsp;(v&nbsp;==&nbsp;parent)</code> fails when there are
-            parallel edges (e.g., two edges between u and v). For multigraphs,
-            track the parent <em>edge index</em> instead of the parent node.
-          </div>
-        </div>
-
-        <div class="complexity-row">
-          <div class="cx-badge green">
-            <span class="cx-label">Time</span
-            ><span class="cx-val">O(V + E)</span>
-          </div>
-          <div class="cx-badge green">
-            <span class="cx-label">Space</span><span class="cx-val">O(V)</span>
-          </div>
-        </div>
-
-        <hr />
-
-        <!-- ═══ PATTERNS SUMMARY ═══ -->
-        <h2 class="h1" id="patterns">&#127919; Pattern Decision Guide</h2>
+        <h3 class="h2" id="freq">Frequency of Frequencies</h3>
         <p>
-          This guide covers all three graph lectures, not just this one &mdash;
-          it is the page to come back to when a new problem turns out to be a
-          graph and you have to pick a tool. Rows marked
-          <em>Lecture 21</em> or <em>Lecture 22</em> point back to where that
-          algorithm was taught.
+          Counting distinct values needs one table. Tracking the
+          <em>most frequent</em> value as the window moves needs two:
+          <code>count[v]</code> (how often value v appears) and
+          <code>howMany[f]</code> (how many values currently appear exactly f
+          times). When you remove an element, the maximum frequency can only
+          drop by one, and <code>howMany</code> tells you instantly whether it
+          did. This is the trick behind most &ldquo;mode in a range&rdquo;
+          questions.
         </p>
-
+        <h2 class="h1" id="choose">&#129513; Choosing a Tool</h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Signal in Problem</th>
-                <th>Pattern</th>
-                <th>Key Tool</th>
+                <th>The situation</th>
+                <th>Reach for</th>
+                <th>Why</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>"Shortest path" — unweighted / unit weight</td>
-                <td>BFS</td>
-                <td>Queue + visited[]</td>
+                <td>Range sums, array never changes</td>
+                <td>Prefix sums</td>
+                <td>O(1) per query</td>
               </tr>
               <tr>
-                <td>"Shortest path" — weighted, non-negative</td>
-                <td>Dijkstra</td>
-                <td>Min-heap PQ</td>
+                <td>Range sums with updates</td>
+                <td>Fenwick tree (Lecture 37)</td>
+                <td>O(log n) both, very little code</td>
               </tr>
               <tr>
-                <td>"Shortest path" — negative weights or K-stop limit</td>
-                <td>Bellman-Ford</td>
-                <td>Edge list, V&minus;1 rounds</td>
+                <td>Range min/max with updates</td>
+                <td>Segment tree (Lecture 37)</td>
+                <td>Min and max are not invertible</td>
               </tr>
               <tr>
-                <td>"Connected components", "number of islands"</td>
-                <td>DFS flood fill</td>
-                <td>visited[] + recursive DFS</td>
-              </tr>
-              <tr>
-                <td>"Course prerequisites", "task order", "dependency"</td>
-                <td>Topological Sort</td>
-                <td>Kahn's (in-degree) or DFS post-order</td>
+                <td>Updates, and a tree feels like too much code</td>
+                <td>Square root blocks</td>
+                <td>O(&radic;n), written in five minutes</td>
               </tr>
               <tr>
                 <td>
-                  "Can you complete all courses" = detect cycle in directed
-                  graph
+                  Distinct count or mode in many ranges, all known upfront
                 </td>
-                <td>Cycle Detection</td>
-                <td>3-color DFS or Kahn's (idx &lt; n)</td>
+                <td>Mo&rsquo;s algorithm</td>
+                <td>Answers do not merge, but they slide</td>
               </tr>
               <tr>
-                <td>"Minimum cost to connect all nodes"</td>
-                <td>MST</td>
-                <td>Kruskal's (edges) or Prim's (heap)</td>
-              </tr>
-              <tr>
-                <td>"Two groups", "no conflict", "bipartite"</td>
-                <td>BFS 2-coloring</td>
-                <td>color[] alternating</td>
-              </tr>
-              <tr>
-                <td>"All-pairs shortest path" (small V)</td>
-                <td>Floyd-Warshall</td>
-                <td>3-loop DP, O(V&sup3;)</td>
+                <td>Values in a small range (say &minus;50 to 50)</td>
+                <td>Counting buckets</td>
+                <td>Scan 101 buckets instead of sorting</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <div class="callout green">
-          <span class="callout-icon">&#9989;</span>
-          <div class="callout-body">
-            <strong>The 4-question framework for any graph problem:</strong
-            ><br />
-            1. <strong>What are the nodes?</strong> (cells, words, courses,
-            …)<br />
-            2. <strong>What are the edges?</strong> (adjacent cells, one-letter
-            diff, prerequisite, …)<br />
-            3. <strong>Directed or undirected? Weighted?</strong><br />
-            4. <strong>What am I computing?</strong> (shortest path,
-            reachability, order, connectivity)
-          </div>
-        </div>
-
-        <hr />
-
         <h2 class="h1" id="pitfalls">
           &#9888;&#65039; Complexity &amp; Classic Bugs
         </h2>
-        <p>
-          The costs worth quoting in an interview first, then the mistakes that
-          most often break code that looks correct. Every row in the second
-          table is a bug someone has shipped.
-        </p>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1851,29 +1788,29 @@ bridges ← empty list
             </thead>
             <tbody>
               <tr>
-                <td>Kruskal</td>
-                <td>O(E log E)</td>
-                <td>Sorting dominates</td>
-              </tr>
-              <tr>
-                <td>Prim with a heap</td>
-                <td>O(E log V)</td>
+                <td>Build the blocks</td>
+                <td>O(n)</td>
                 <td></td>
               </tr>
               <tr>
-                <td>Bipartite check</td>
-                <td>O(V + E)</td>
-                <td></td>
+                <td>Block range query</td>
+                <td>O(&radic;n)</td>
+                <td>Two ragged ends plus whole blocks</td>
               </tr>
               <tr>
-                <td>Tarjan&#39;s bridges</td>
-                <td>O(V + E)</td>
-                <td>One DFS</td>
+                <td>Block point update</td>
+                <td>O(1)</td>
+                <td>Update the item and its block</td>
               </tr>
               <tr>
-                <td>Eulerian path (Hierholzer)</td>
-                <td>O(E)</td>
-                <td></td>
+                <td>Mo&rsquo;s algorithm, q queries</td>
+                <td>O((n + q)&radic;n)</td>
+                <td>Plus O(q log q) to sort the queries</td>
+              </tr>
+              <tr>
+                <td>Heavy/light precompute</td>
+                <td>O(n&radic;n) worst case</td>
+                <td>Prefix counts for at most &radic;n heavy values</td>
               </tr>
             </tbody>
           </table>
@@ -1889,89 +1826,223 @@ bridges ← empty list
             </thead>
             <tbody>
               <tr>
-                <td>Kruskal without a cycle check</td>
-                <td>The result is not a tree</td>
-                <td>Union-find; skip edges inside one set</td>
+                <td>Block size of 0 when n is tiny</td>
+                <td>Division by zero</td>
+                <td>Use <code>max(1, floor(sqrt(n)))</code></td>
               </tr>
               <tr>
-                <td>Prim on a disconnected graph</td>
-                <td>Stops early with a wrong total</td>
-                <td>Check that every node was reached</td>
+                <td>Returning Mo&rsquo;s answers in sorted order</td>
+                <td>Answers attached to the wrong queries</td>
+                <td>Store each answer at its original index</td>
               </tr>
               <tr>
-                <td>Bipartite check from node 0 only</td>
-                <td>Misses other components</td>
-                <td>Start from every uncoloured node</td>
-              </tr>
-              <tr>
-                <td>Tarjan skipping every visited neighbour</td>
-                <td>Misses back edges</td>
-                <td>Skip only the edge you arrived on</td>
-              </tr>
-              <tr>
+                <td>Shrinking before growing the window</td>
                 <td>
-                  Updating <code>low</code> with <code>low[v]</code> on a back
-                  edge
+                  Removing an element that was never added; negative counts
                 </td>
-                <td>Wrong articulation points</td>
-                <td>Use <code>disc[v]</code> for back edges</td>
+                <td>
+                  Grow first (<code>curR</code> up, <code>curL</code> down),
+                  then shrink
+                </td>
               </tr>
               <tr>
-                <td>Hierholzer building the path forwards</td>
-                <td>The path comes out in the wrong order</td>
-                <td>Build it backwards, then reverse</td>
+                <td>Off-by-one on the whole-block loop</td>
+                <td>Double-counts or skips the last full block</td>
+                <td>Loop while <code>l + B − 1 ≤ r</code></td>
               </tr>
               <tr>
-                <td>Assuming the MST is unique</td>
-                <td>Arguing about &ldquo;the&rdquo; answer</td>
-                <td>It is unique only when all weights differ</td>
+                <td>Forgetting to update the block summary</td>
+                <td>Queries ignore the update</td>
+                <td>Update both the item and its block</td>
+              </tr>
+              <tr>
+                <td>Using Mo&rsquo;s on online queries</td>
+                <td>Impossible to reorder</td>
+                <td>Use a tree, or rethink the problem</td>
+              </tr>
+              <tr>
+                <td>A count array sized by value on huge values</td>
+                <td>Out of memory</td>
+                <td>Compress the values first</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <hr />
-
-        <!-- ═══ PRACTICE ═══ -->
+        <div class="callout green">
+          <span class="callout-icon">&#128269;</span>
+          <div class="callout-body">
+            <strong>How to spot it.</strong> A pile of range queries, all given
+            up front, asking something that does not split into halves &mdash;
+            distinct count, mode, pairs of equal values. Or a constraint around
+            10&#8309; where you would like a simpler alternative to a tree. And
+            if the <em>values</em> are small, try buckets before anything
+            clever.
+          </div>
+        </div>
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Three problems on structure: the cheapest way to connect everything,
-          the edges that everything depends on, and splitting a graph in two.
+          Four problems, one per idea in this lecture: the cheap add/remove
+          step, buckets over a small value range, answering queries in a better
+          order, and the heavy/light split.
         </p>
 
+        <!-- Problem 01: Count the Number of Good Subarrays -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 01 &middot;
+                Problem 01 &middot; The Add/Remove Primitive
+              </div>
+              <div class="prob-title">Count the Number of Good Subarrays</div>
+              <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/min-cost-to-connect-all-points/"
+                  href="https://leetcode.com/problems/count-the-number-of-good-subarrays/"
                   target="_blank"
-                  style="font-size: 11px"
-                  >LC 1584</a
+                  style="font-size: 12px"
+                  >&#128279; LC 2537 - Count the Number of Good Subarrays</a
                 >
               </div>
-              <div class="prob-title">Min Cost to Connect All Points</div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">MST &mdash; Prim's</span>
-                <span class="tag tag-co">Google · Amazon · Meta</span>
+                <span class="tag tag-pat"
+                  >Window with a running pair count</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
-            <div class="prob-right">
-              <div class="toggle-arrow">&#9654;</div>
-            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
           </div>
           <div class="prob-body" style="display: none">
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Given <code>n</code> points on a 2D plane, return the minimum
-                cost to connect all points. Cost of connecting two points =
-                Manhattan distance. All pairs are implicitly edges.
+                Count the subarrays that contain at least <code>k</code> pairs
+                of equal elements (<code>i &lt; j</code> with
+                <code>nums[i] = nums[j]</code>).
+              </p>
+              <div class="iobox">nums = [3,1,4,3,2,2,4], k = 2 → 4</div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    When one more copy of a value x enters a window that already
+                    holds c copies, how many new equal pairs appear?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Exactly c. And removing a copy removes c − 1 pairs. So the
+                    pair count updates in O(1) per step — exactly the cheap
+                    add/remove step Mo&rsquo;s algorithm is built on.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The whole trick is the O(1) update: adding a value that already
+                appears c times creates c new pairs, removing one destroys (c −
+                1). With that, a sliding window works. For each right end,
+                shrink the left end while the window still has at least k pairs;
+                then every start position before the current left end gives a
+                good subarray. This add/remove bookkeeping is the same primitive
+                Mo&rsquo;s algorithm uses &mdash; here the queries happen to
+                arrive in a convenient order already.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Pairs Change by the Current
+                      Count</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> countGood(nums, k):
+    count ← empty map;  pairs ← 0;  left ← 0;  result ← 0
+    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        x ← nums[right]
+        pairs ← pairs + count[x]            <span class="pc-cm">// x pairs with every copy already here</span>
+        count[x] ← count[x] + 1
+        <span class="pc-kw">while</span> pairs ≥ k:                    <span class="pc-cm">// window [left..right] is good</span>
+            y ← nums[left]
+            count[y] ← count[y] - 1
+            pairs ← pairs - count[y]        <span class="pc-cm">// lost pairs with the copies that remain</span>
+            left ← left + 1
+        result ← result + left              <span class="pc-cm">// starts 0..left-1 all give good subarrays</span>
+    <span class="pc-kw">return</span> result</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 02: Sliding Subarray Beauty -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 02 &middot; Small Values → Buckets
+              </div>
+              <div class="prob-title">Sliding Subarray Beauty</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sliding-subarray-beauty/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2653 - Sliding Subarray Beauty</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Counting buckets in a window</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                For every window of length <code>k</code>, report its
+                <em>beauty</em>: the x-th smallest negative number in the
+                window, or 0 if there are fewer than x negatives.
               </p>
               <div class="iobox">
-                Input: [[0,0],[2,2],[3,10],[5,2],[7,0]] Output: 20
+                nums = [1,-1,-3,-2,3], k = 3, x = 2 → [-1,-2,-2]
               </div>
             </div>
             <div class="prob-section">
@@ -1983,8 +2054,9 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Every pair of points is connectable, so this is a complete
-                    weighted graph.
+                    Sorting every window costs O(k log k) each time. Look at the
+                    constraints on the values — how many different values can
+                    there be?
                   </p>
                 </div>
               </details>
@@ -1995,21 +2067,23 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Minimum spanning tree over Manhattan distances. Prim's with
-                    a min-heap is O(n&#178; log n) and avoids materialising all
-                    n&#178; edges; Kruskal's with union-find also works.
+                    Values lie between −50 and 50. Keep a count for each of the
+                    50 negative values; the x-th smallest is found by walking
+                    those 50 buckets.
                   </p>
                 </div>
               </details>
             </div>
-
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                MST on a complete graph where edge weight = Manhattan distance.
-                Prim&apos;s is efficient here: maintain a min-heap of (cost,
-                node). The <code>inMST[]</code> flag replaces the visited check.
-                Greedily add the cheapest reachable edge.
+                When the <em>values</em> are small, bucket them. A window update
+                is O(1) &mdash; add one count, remove one count &mdash; and a
+                query walks at most 50 buckets from &minus;50 upwards until x
+                negatives have been passed. That makes the whole thing O(n
+                &times; 50), independent of k. It is the same &ldquo;fixed-size
+                summary per block&rdquo; idea as square root decomposition,
+                applied to the value range instead of the positions.
               </p>
             </div>
             <details>
@@ -2020,70 +2094,191 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; LC 1584</span
+                      >&#128208; Pseudocode &middot; 50 Buckets per Window</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> minCostConnectPoints(pts):
-    n ← length(pts)
-    inMST ← array of n, all false
-    minDist ← array of n, all ∞;  minDist[0] ← 0
-    pq ← min-heap of (distance, index), starting with (0, 0)
-    cost ← 0
-    <span class="pc-kw">while</span> pq <span class="pc-kw">is not empty</span>:
-        (d, i) ← pq.popMin()
-        <span class="pc-kw">if</span> inMST[i]: <span class="pc-kw">continue</span>
-        inMST[i] ← true
-        cost ← cost + d
-        <span class="pc-kw">for</span> j <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:              <span class="pc-cm">// dense graph: every point is a neighbour</span>
-            <span class="pc-kw">if</span> inMST[j]: <span class="pc-kw">continue</span>
-            dj ← |pts[i].x - pts[j].x| + |pts[i].y - pts[j].y|   <span class="pc-cm">// Manhattan distance</span>
-            <span class="pc-kw">if</span> dj &lt; minDist[j]:
-                minDist[j] ← dj
-                pq.push((dj, j))
-    <span class="pc-kw">return</span> cost</pre>
+                  <pre><span class="pc-kw">function</span> getSubarrayBeauty(nums, k, x):
+    count ← array of 51 zeros               <span class="pc-cm">// count[v] for v = -50..-1, stored at index -v</span>
+    result ← empty list
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        <span class="pc-kw">if</span> nums[i] &lt; 0: count[-nums[i]] ← count[-nums[i]] + 1
+        <span class="pc-kw">if</span> i ≥ k <span class="pc-kw">and</span> nums[i - k] &lt; 0:       <span class="pc-cm">// the element leaving the window</span>
+            count[-nums[i - k]] ← count[-nums[i - k]] - 1
+        <span class="pc-kw">if</span> i ≥ k - 1:
+            seen ← 0;  beauty ← 0
+            <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 50 <span class="pc-kw">down to</span> 1:        <span class="pc-cm">// -50, -49, ... smallest first</span>
+                seen ← seen + count[v]
+                <span class="pc-kw">if</span> seen ≥ x: beauty ← -v;  <span class="pc-kw">break</span>
+            result.append(beauty)
+    <span class="pc-kw">return</span> result</pre>
                 </div>
                 <div class="complexity-row">
-                  <div class="cx-badge yellow">
+                  <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val">O(n² log n)</span>
+                    ><span class="cx-val green">O(n &middot; 50)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val">O(n)</span>
+                    ><span class="cx-val green">O(1)</span>
                   </div>
                 </div>
               </div>
             </details>
           </div>
         </div>
-
-        <hr />
-
-        <!-- ═══ ASSIGNMENT ═══ -->
-        <!-- Problem 02: Critical Connections in a Network -->
+        <!-- Problem 03: Count Zero Request Servers -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 02 &middot; What Holds It Together
+                Problem 03 &middot; Reorder the Queries
               </div>
-              <div class="prob-title">Critical Connections in a Network</div>
+              <div class="prob-title">Count Zero Request Servers</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/critical-connections-in-a-network/"
+                  href="https://leetcode.com/problems/count-zero-request-servers/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 1192 - Critical Connections in a Network</a
+                  >&#128279; LC 2747 - Count Zero Request Servers</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Offline queries + sliding window</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Given server logs <code>[serverId, time]</code> and queries
+                asking about the interval <code>[q − x, q]</code>, return, for
+                each query, how many of the <code>n</code> servers received no
+                requests in that interval.
+              </p>
+              <div class="iobox">
+                n = 3, logs = [[1,3],[2,6],[1,5]], x = 5, queries = [10,11] →
+                [1,2]
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Answering each query by scanning every log is O(logs ×
+                    queries). What if you answered the queries in increasing
+                    order of time instead of the order given?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Sort the logs by time and the queries by time. The window [q
+                    − x, q] then only ever moves forward: add logs entering on
+                    the right, remove logs leaving on the left, and keep a count
+                    of servers with at least one request.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the core of Mo&rsquo;s algorithm in its simplest form:
+                <strong
+                  >answer the queries in a different order from the one they
+                  were asked in</strong
+                >, so that each step reuses the previous answer. Once queries
+                are sorted by time, both window ends only move forward, so every
+                log is added once and removed once. The only extra care is to
+                remember each query&rsquo;s original position and write its
+                answer there.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Sort Queries, Slide
+                      Once</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> countServers(n, logs, x, queries):
+    sort logs by time
+    order ← query indices sorted by queries[i]
+    count ← array of n + 1 zeros;  active ← 0     <span class="pc-cm">// servers with ≥ 1 request</span>
+    lo ← 0;  hi ← 0;  answer ← array of length(queries)
+    <span class="pc-kw">for</span> qi <span class="pc-kw">in</span> order:
+        q ← queries[qi]
+        <span class="pc-kw">while</span> hi &lt; length(logs) <span class="pc-kw">and</span> logs[hi].time ≤ q:          <span class="pc-cm">// entering</span>
+            s ← logs[hi].server
+            <span class="pc-kw">if</span> count[s] = 0: active ← active + 1
+            count[s] ← count[s] + 1;  hi ← hi + 1
+        <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> logs[lo].time &lt; q - x:                <span class="pc-cm">// leaving</span>
+            s ← logs[lo].server
+            count[s] ← count[s] - 1
+            <span class="pc-kw">if</span> count[s] = 0: active ← active - 1
+            lo ← lo + 1
+        answer[qi] ← n - active                                  <span class="pc-cm">// original position</span>
+    <span class="pc-kw">return</span> answer</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(L log L + Q log Q)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n + Q)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Online Majority Element In Subarray -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Heavy and Light</div>
+              <div class="prob-title">Online Majority Element In Subarray</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/online-majority-element-in-subarray/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1157 - Online Majority Element In Subarray</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Tarjan's Bridges</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
+                <span class="tag tag-pat">Square root split by frequency</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
             <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
@@ -2094,11 +2289,16 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Return every edge whose removal would disconnect the network
-                &mdash; the bridges of the graph.
+                Build a structure over an array that answers
+                <code>query(left, right, threshold)</code>: the element
+                appearing at least <code>threshold</code> times in
+                <code>arr[left..right]</code>, or −1. It is guaranteed that
+                <code>2 × threshold &gt; right − left + 1</code>, so the answer
+                is a strict majority.
               </p>
               <div class="iobox">
-                n = 4, connections = [[0,1],[1,2],[2,0],[1,3]] → [[1,3]]
+                arr = [1,1,2,2,1,1]; query(0,5,4) → 1, query(0,3,3) → −1,
+                query(2,3,2) → 2
               </div>
             </div>
             <div class="prob-section">
@@ -2110,9 +2310,9 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    Removing each edge and re-running DFS works but costs
-                    O(E&middot;(V+E)). What does an edge inside a cycle have
-                    that a bridge does not?
+                    Short ranges are easy: a single Boyer-Moore pass finds the
+                    majority candidate. What about long ranges — which values
+                    could possibly be a majority of a long range?
                   </p>
                 </div>
               </details>
@@ -2123,10 +2323,12 @@ bridges ← empty list
                 </summary>
                 <div class="details-body">
                   <p>
-                    A way around. Give each node a discovery time, and track the
-                    earliest node its subtree can reach by any other route — if
-                    a child cannot reach at or above the parent, that edge is a
-                    bridge.
+                    A range longer than &radic;n needs more than &radic;n/2
+                    copies of its majority, so only values appearing more than
+                    &radic;n/2 times in the whole array can win it — and there
+                    are at most 2&radic;n of those. Give each such
+                    <em>heavy</em> value a prefix-count array; handle short
+                    ranges (length ≤ &radic;n) by brute force.
                   </p>
                 </div>
               </details>
@@ -2134,15 +2336,19 @@ bridges ← empty list
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                Tarjan&rsquo;s algorithm in its most useful form. One DFS
-                assigns each node a discovery time, and each node reports back
-                the <em>lowest</em> discovery time reachable from its subtree
-                using at most one back-edge. The edge <code>(u, v)</code> is a
-                bridge exactly when <code>low[v] &gt; disc[u]</code>: v&rsquo;s
-                whole subtree has no alternative route back to u or earlier, so
-                cutting that edge strands it. Skipping the edge you arrived on
-                &mdash; but only that one &mdash; is the detail people get
-                wrong.
+                The split is by <em>frequency</em>, and the threshold is
+                &radic;n. A range longer than &radic;n needs a majority of more
+                than &radic;n/2 copies, so its answer must appear more than
+                &radic;n/2 times in the whole array &mdash; and at most
+                2&radic;n values do, each checked in O(1) with prefix counts.
+                (Setting the cut-off at &radic;n instead is a tempting bug: a
+                value with, say, 0.7&radic;n copies can still be the majority of
+                a range just over &radic;n long.) A range of length at most
+                &radic;n is scanned directly with Boyer-Moore voting. Every
+                query is therefore O(&radic;n). Binary search on each
+                value&rsquo;s positions, or a segment tree of Boyer-Moore votes,
+                also work &mdash; but the heavy/light split is the square-root
+                idea in its purest form.
               </p>
             </div>
             <details>
@@ -2153,166 +2359,35 @@ bridges ← empty list
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Discovery Time vs
-                      Low-Link</span
+                      >&#128208; Pseudocode &middot; Prefix Counts for Heavy
+                      Values, Brute Force for Short Ranges</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> criticalConnections(n, connections):
-    adj ← adjacency list
-    disc ← array of -1;  low ← array of 0
-    timer ← 0;  bridges ← empty list
+                  <pre><span class="pc-kw">function</span> MajorityChecker(arr):
+    n ← length(arr);  S ← floor(sqrt(n))
+    heavy ← values appearing more than S ÷ 2 <span class="pc-kw">times</span> <span class="pc-kw">in</span> arr    <span class="pc-cm">// at most 2S of them</span>
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:
+        pref[v] ← prefix counts of v over arr                 <span class="pc-cm">// pref[v][i] = copies in arr[0..i-1]</span>
 
-    <span class="pc-kw">function</span> dfs(u, parent):
-        disc[u] ← low[u] ← timer;  timer ← timer + 1
-
-        <span class="pc-kw">for</span> v <span class="pc-kw">in</span> adj[u]:
-            <span class="pc-kw">if</span> v = parent: <span class="pc-kw">continue</span>       <span class="pc-cm">// skip the edge we came on</span>
-
-            <span class="pc-kw">if</span> disc[v] = -1:               <span class="pc-cm">// tree edge</span>
-                dfs(v, u)
-                low[u] ← min(low[u], low[v])
-                <span class="pc-kw">if</span> low[v] &gt; disc[u]:
-                    bridges.add((u, v))    <span class="pc-cm">// no way around → bridge</span>
-            <span class="pc-kw">else</span>:                          <span class="pc-cm">// back edge: a way around</span>
-                low[u] ← min(low[u], disc[v])
-
-    dfs(0, -1)
-    <span class="pc-kw">return</span> bridges</pre>
+<span class="pc-kw">function</span> query(left, right, threshold):
+    <span class="pc-kw">if</span> right - left + 1 ≤ S:                                  <span class="pc-cm">// short range: vote directly</span>
+        cand ← Boyer-Moore majority candidate of arr[left..right]
+        <span class="pc-kw">return</span> cand <span class="pc-kw">if</span> count of cand <span class="pc-kw">in</span> arr[left..right] ≥ threshold <span class="pc-kw">else</span> -1
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:                                      <span class="pc-cm">// long range: only heavy values qualify</span>
+        <span class="pc-kw">if</span> pref[v][right + 1] - pref[v][left] ≥ threshold:
+            <span class="pc-kw">return</span> v
+    <span class="pc-kw">return</span> -1</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
+                    ><span class="cx-val green">O(&radic;n) per query</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 03: Is Graph Bipartite? -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 03 &middot; Two Colours</div>
-              <div class="prob-title">Is Graph Bipartite?</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/is-graph-bipartite/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 785 - Is Graph Bipartite?</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">BFS/DFS 2-Colouring</span>
-                <span class="tag tag-co"
-                  >Google &middot; Amazon &middot; Meta</span
-                >
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Decide whether a graph&rsquo;s nodes can be split into two sets
-                so that every edge joins one set to the other.
-              </p>
-              <div class="iobox">
-                graph = [[1,2,3],[0,2],[0,1,3],[0,2]] → false
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Try colouring a node red and everything next to it blue.
-                    When does that go wrong?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    When you reach a node that is already coloured the same as
-                    the one you came from. That happens exactly when the graph
-                    has an odd-length cycle.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                Bipartite means two-colourable, and two-colourable means no odd
-                cycle &mdash; three ways of saying the same thing, and saying
-                that out loud is most of the answer. The traversal itself is
-                ordinary BFS or DFS with a colour array instead of a visited
-                array: neighbours get the opposite colour, and a neighbour
-                already wearing your colour is the contradiction. The one thing
-                people forget is that the graph may be disconnected, so the
-                outer loop must restart from every uncoloured node.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Colour, Then Check
-                      Neighbours</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> isBipartite(graph):
-    colour ← array of n entries, all 0      <span class="pc-cm">// 0 = uncoloured, 1 / -1 = sides</span>
-
-    <span class="pc-kw">for</span> start <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-        <span class="pc-kw">if</span> colour[start] ≠ 0: <span class="pc-kw">continue</span>   <span class="pc-cm">// graph may be disconnected</span>
-
-        colour[start] ← 1
-        queue ← [start]
-        <span class="pc-kw">while</span> queue is not empty:
-            u ← queue.popFront()
-            <span class="pc-kw">for</span> v <span class="pc-kw">in</span> graph[u]:
-                <span class="pc-kw">if</span> colour[v] = colour[u]: <span class="pc-kw">return</span> false   <span class="pc-cm">// odd cycle</span>
-                <span class="pc-kw">if</span> colour[v] = 0:
-                    colour[v] ← -colour[u]
-                    queue.pushBack(v)
-
-    <span class="pc-kw">return</span> true</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(V + E)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(V)</span>
+                    ><span class="cx-val green">O(n&radic;n)</span>
                   </div>
                 </div>
               </div>
@@ -2326,13 +2401,13 @@ bridges ← empty list
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 23 Assignment &mdash; 10 Problems (7 Medium &middot; 3
-              Hard)</strong
+              >Lecture 38 Assignment &mdash; 12 Problems (2 Easy &middot; 6
+              Medium &middot; 4 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 24.<br /><br />
+            before moving to Lecture 39.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture23/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture38/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2349,61 +2424,68 @@ bridges ← empty list
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 24.</p>
+        <p>Check each item before advancing to Lecture 39.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write Kruskal with union-find and Prim with a priority queue
+            I can write the block build, query and point update from memory
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can say which MST algorithm suits a dense graph and which a sparse
-            one
+            I can derive the &radic;n block size from n ÷ B + 2B
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why a greedy choice is safe when building an MST
+            I can explain why at most &radic;n values can be heavy
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can two-colour a graph and connect bipartiteness to odd cycles
+            I can sort queries in Mo&rsquo;s order and say why the total
+            movement is about (n + q)&radic;n
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain discovery time versus low-link and what makes an edge
-            a bridge
+            I can write add and remove for a distinct-count window
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">I completed all 10 assignment problems</div>
+          <div class="cb-text">
+            I know when a problem is offline, and why that matters
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="cb-box"></div>
+          <div class="cb-text">I completed all 12 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 24: Backtracking</strong><br />
-            Graphs are done. Lecture 24 returns to recursion with the technique
-            that searches a space nobody handed you &mdash; building candidates
-            one choice at a time, and undoing the choice when it leads nowhere.
+            <strong>Next up &mdash; Lecture 39: String Algorithms</strong><br />
+            The &ldquo;never re-read what you already know&rdquo; idea behind
+            Mo&rsquo;s algorithm returns in a sharper form: KMP, the
+            Z-algorithm, rolling hashes and Manacher all find patterns in text
+            in linear time.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture22/lecture22_notes.html"
-            >&larr; Lecture 22 &middot; Graphs II</a
+          <a href="../Lecture37/lecture37_notes.html"
+            >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
           >
-          <a class="next" href="../Lecture24/lecture24_notes.html"
-            >Lecture 24 &middot; Backtracking &rarr;</a
+          <a class="next" href="../Lecture39/lecture39_notes.html"
+            >Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
+            Manacher) &rarr;</a
           >
         </div>
       </div>

@@ -14,7 +14,7 @@
 | **Study Days**     | 215 days of content                                  |
 | **Duration**       | ~34 weeks at one lecture block at a time             |
 | **Total Problems** | 1038                                                 |
-| **Written So Far** | 37 lectures · 873 problems                           |
+| **Written So Far** | 40 lectures · 927 problems                           |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 > 📖 **New to the vocabulary?** Every term the course uses is defined in plain English in the [Glossary](glossary.html).
@@ -78,9 +78,9 @@
 | 35  | 🎛️ Dynamic Programming IV — Interval, Tree, Bitmask & Digit | Phase 4 | 7d   | 25       | ✅     |
 | 36  | 🔤 Tries (Prefix Trees)                                     | Phase 5 | 4d   | 18       | ✅     |
 | 37  | 📶 Segment Trees & Fenwick Trees                            | Phase 5 | 6d   | 22       | ✅     |
-| 38  | 🪵 Square Root Decomposition & Mo's Algorithm               | Phase 5 | 3d   | 12       | 📝     |
-| 39  | 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)         | Phase 5 | 5d   | 20       | 📝     |
-| 40  | 🕳️ Advanced Graph Algorithms                                | Phase 5 | 6d   | 22       | 📝     |
+| 38  | 🪵 Square Root Decomposition & Mo's Algorithm               | Phase 5 | 3d   | 12       | ✅     |
+| 39  | 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)         | Phase 5 | 5d   | 20       | ✅     |
+| 40  | 🕳️ Advanced Graph Algorithms                                | Phase 5 | 6d   | 22       | ✅     |
 | 41  | 🎚️ Balanced BSTs & Ordered Structures                       | Phase 5 | 4d   | 18       | 📝     |
 | 42  | 🎲 Advanced Math & Game Theory                              | Phase 5 | 4d   | 18       | 📝     |
 | 43  | 🛠️ Design Data Structures                                   | Phase 6 | 5d   | 20       | 📝     |
@@ -93,7 +93,7 @@
 
 > Learn to think like a program. Java, memory, recursion, and the maths underneath everything else.
 
-**7 lectures · 31 days · 230 problems**
+**10 lectures · 38 days · 261 problems**
 
 ---
 
@@ -509,7 +509,7 @@
 
 > The structures every interview is built from — arrays through graphs, each with its own notes and assignment.
 
-**10 lectures · 62 days · 285 problems**
+**14 lectures · 67 days · 307 problems**
 
 ---
 
@@ -1118,6 +1118,14 @@
 
 ---
 
+## 🟡 Phase 3 — Core Patterns (Weeks 18–22)
+
+> The reusable techniques. Once these click, most medium problems stop being new problems.
+
+**7 lectures · 32 days · 160 problems**
+
+---
+
 ### Lecture 25: 🎯 Two Pointers & Sliding Window
 
 | Detail               | Value                                                                                   |
@@ -1685,13 +1693,14 @@
 
 ### Lecture 38: 🪵 Square Root Decomposition & Mo's Algorithm
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 3 days                     |
-| **Problems**         | 12                         |
-| **Difficulty Split** | 2 Easy · 6 Medium · 4 Hard |
-| **Prerequisites**    | Lecture 37                 |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 3 days                                                                                  |
+| **Problems**         | 12                                                                                      |
+| **Difficulty Split** | 2 Easy · 6 Medium · 4 Hard                                                              |
+| **Prerequisites**    | Lecture 37                                                                              |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture38/lecture38_notes.html) · [Assignment](Lecture38/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1723,13 +1732,14 @@
 
 ### Lecture 39: 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 3 Easy · 10 Medium · 7 Hard |
-| **Prerequisites**    | Lectures 11, 36             |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 3 Easy · 10 Medium · 7 Hard                                                             |
+| **Prerequisites**    | Lectures 11, 36                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture39/lecture39_notes.html) · [Assignment](Lecture39/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1762,13 +1772,14 @@
 
 ### Lecture 40: 🕳️ Advanced Graph Algorithms
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 6 days                      |
-| **Problems**         | 22                          |
-| **Difficulty Split** | 4 Easy · 11 Medium · 7 Hard |
-| **Prerequisites**    | Lectures 21, 31             |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 6 days                                                                                  |
+| **Problems**         | 22                                                                                      |
+| **Difficulty Split** | 0 Easy · 10 Medium · 12 Hard                                                            |
+| **Prerequisites**    | Lectures 21, 31                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture40/lecture40_notes.html) · [Assignment](Lecture40/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1780,23 +1791,23 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                | Description                                       | Example Problem                          |
-| ---------------------- | ------------------------------------------------- | ---------------------------------------- |
-| **Kosaraju SCC**       | Two DFS passes — one on G, one on its reverse     | Strongly Connected Components            |
-| **Tarjan low-link**    | disc[] and low[] computed in a single DFS         | Critical Connections in a Network        |
-| **0-1 BFS**            | A deque replaces the heap when weights are 0 or 1 | Minimum Obstacle Removal to Reach Corner |
-| **Max flow / min cut** | Push augmenting paths until none remain           | Maximum Bipartite Matching               |
-| **Eulerian path**      | Degree parity plus Hierholzer's algorithm         | Reconstruct Itinerary                    |
+| Pattern                 | Description                                       | Example Problem                          |
+| ----------------------- | ------------------------------------------------- | ---------------------------------------- |
+| **Kosaraju SCC**        | Two DFS passes — one on G, one on its reverse     | Strongly Connected Components            |
+| **Articulation points** | disc[] and low[] with ≥ in a single DFS           | Minimum Days to Disconnect Island        |
+| **0-1 BFS**             | A deque replaces the heap when weights are 0 or 1 | Minimum Obstacle Removal to Reach Corner |
+| **Max flow / min cut**  | Push augmenting paths until none remain           | Maximum Compatibility Score Sum          |
+| **Eulerian path**       | Degree parity plus Hierholzer's algorithm         | Valid Arrangement of Pairs               |
 
 #### 📝 Sub-Topics & Lecture Flow
 
 1. **Day 1:** Low-link theory — discovery times, tree vs back edges, and why low[] works at all.
-2. **Day 2:** Bridges & articulation points — Critical Connections, network reliability questions.
+2. **Day 2:** Articulation points (bridges recap from Lecture 23) — Minimum Days to Disconnect Island.
 3. **Day 3:** SCC — Kosaraju's two passes, Tarjan's single pass, the condensation graph, a 2-SAT preview.
 4. **Day 4:** Weighted variants — 0-1 BFS with a deque, Dijkstra carrying extra state (Cheapest Flights With K Stops),
    A\* intuition.
 5. **Day 5:** Max flow — Ford-Fulkerson and Edmonds-Karp, min-cut duality, bipartite matching.
-6. **Day 6:** Eulerian path and circuit via Hierholzer; Reconstruct Itinerary; where Hamiltonian paths become NP-hard.
+6. **Day 6:** Eulerian paths revisited (Lecture 23) — Valid Arrangement of Pairs, Cracking the Safe; where Hamiltonian paths become NP-hard.
 
 #### 🏢 Companies That Ask These
 
