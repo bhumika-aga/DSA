@@ -360,7 +360,8 @@ remove every even number from list   // each removal shifts the elements after i
 5. **O(1)** Time. This is a mathematical constant-time trick!
 6. **O(1)**.
 7. **O(1)** (Technically O(bits) but bits is a constant like 32/64).
-8. **O(n)** Time. List traversal and bitwise check for parity.
+8. **O(n²)** Time. About n/2 removals, and each one shifts up to n elements. Building a new list of the odd
+   numbers (or `removeIf`) does it in O(n).
 
 ---
 
@@ -370,7 +371,8 @@ remove every even number from list   // each removal shifts the elements after i
 2. `n & (n - 1)` always clears the leftmost set bit. → **False** (it clears the **rightmost** set bit).
 3. Right shift `>>` is equivalent to dividing by 2. → **True** (for positive integers).
 4. `~n` is always equal to `-n`. → **False** (`~n = -n - 1`).
-5. Bitwise operations work faster than arithmetic operations like `*` or `/`. → **True**.
+5. Replacing `*` and `/` with bit shifts makes Java code noticeably faster. → **False** (the compiler already turns
+   `x * 2` into a shift, and multiplication is about as fast; write whichever is clearer)
 6. XORing all elements in an array cancels everything out. → **False** (only if they appear even times).
 7. `1 << 31` will result in a negative number in Java. → **True** (sign bit set).
 8. Every Even number has the 0-th bit as 0. → **True**.

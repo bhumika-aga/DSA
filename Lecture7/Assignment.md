@@ -292,7 +292,8 @@ long distinct = lists.stream()
 1. **O(n)** Time, O(1) Space. Pipeline lazy evaluation.
 2. **O(n log n)** Time, O(n) Space for sorting result.
 3. **O(n)** Time, O(n) Space for the HashMap.
-4. **O(n/k)** Time where k is CPU cores, O(log n) overhead.
+4. **O(n)** Time. Running in parallel can divide the wall-clock time by up to the number of cores, but the total
+   work — and so the Big-O — is unchanged.
 5. **O(n)** Time, O(1) Space.
 6. **O(Total Elements)** Time, O(Distinct Elements) Space.
 

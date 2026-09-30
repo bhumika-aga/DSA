@@ -166,7 +166,7 @@ Work out the time and space complexity of each snippet before checking the answe
 ## 🔍 Self-Assessment — True / False
 
 1. A minimum spanning tree of V nodes has V − 1 edges. → **True**
-2. The minimum spanning tree is always unique. → **False** — only when all edge weights are distinct
+2. The minimum spanning tree is always unique. → **False** — distinct edge weights guarantee a unique MST; with equal weights there may be several
 3. A graph is bipartite exactly when it has no odd-length cycle. → **True**
 4. Kruskal needs a way to detect when an edge would form a cycle. → **True** — that is what union-find provides
 5. An edge that lies on a cycle can be a bridge. → **False** — removing it leaves the cycle's other path

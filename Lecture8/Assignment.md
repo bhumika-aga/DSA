@@ -236,14 +236,14 @@ function work(n):
 ## 🔍 Self-Assessment — True / False
 
 1. Base case is optional in recursion if the input is always positive. → **False** (leads to infinite recursion).
-2. Recursion always uses more memory than iteration due to stack frames. → **True** (unless Tail Call Optimisation
-   exists).
+2. A recursive function uses stack memory in proportion to its depth, which a simple loop avoids. → **True** (Java
+   never removes those frames — it has no tail-call optimisation).
 3. A recursive call with a smaller argument always terminates. → **False** (only if every path reaches a base case).
 4. Memoisation converts a recursive problem to O(n) space always. → **False** (Depends on state variables).
 5. Tail recursion can be turned into a loop without any extra stack. → **True** (the call is the last thing, so no frame needs to survive it).
 6. Recursion stack limit can be changed in JVM flags. → **True**.
 7. Divide and Conquer and Dynamic Programming mean the same thing. → **False** (DP has overlapping subproblems).
-8. Every recursive solution can be written iteratively. → **True** (Church-Turing thesis).
+8. Every recursive solution can be written iteratively. → **True** (replace the call stack with an explicit stack).
 
 ---
 

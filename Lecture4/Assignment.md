@@ -480,8 +480,8 @@ for (int i = 0; i < n; i++)
 Answer without running the code:
 
 1. `5 / 2 == 2.5` in Java → **False** (integer division → 2; cast needed)
-2. `"hello" == "hello"` is always true → **False** (string literals CAN be cached, but `new String()` creates new
-   object)
+2. `new String("hello") == "hello"` is true → **False** (`new String` always makes a separate object, so `==` compares
+   two different references; use `.equals()` to compare text)
 3. `Arrays.sort(int[])` is O(n log n) → **True** (dual-pivot quicksort)
 4. `ArrayList.get(i)` is O(n) → **False** (O(1) — backed by array)
 5. A recursive factorial (n) uses O(n) stack space → **True** (n frames on call stack)

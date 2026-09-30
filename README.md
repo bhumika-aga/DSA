@@ -12,7 +12,7 @@
 | **Total Lectures** | 45                                                   |
 | **Phases**         | 6                                                    |
 | **Study Days**     | 215 days of content                                  |
-| **Duration**       | ~34 weeks at one lecture block at a time             |
+| **Duration**       | ~36 weeks at six study days a week                   |
 | **Total Problems** | 1037                                                 |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
@@ -87,7 +87,7 @@
 
 ---
 
-## 🟣 Phase 1 — Foundations (Weeks 1–6)
+## 🟣 Phase 1 — Foundations (Weeks 1–7)
 
 > Learn to think like a program. Java, memory, recursion, and the maths underneath everything else.
 
@@ -503,7 +503,7 @@
 
 ---
 
-## 🟢 Phase 2 — Core Data Structures (Weeks 7–17)
+## 🟢 Phase 2 — Core Data Structures (Weeks 8–18)
 
 > The structures every interview is built from — arrays through graphs, each with its own notes and assignment.
 
@@ -1116,7 +1116,7 @@
 
 ---
 
-## 🟡 Phase 3 — Core Patterns (Weeks 18–22)
+## 🟡 Phase 3 — Core Patterns (Weeks 19–23)
 
 > The reusable techniques. Once these click, most medium problems stop being new problems.
 
@@ -1410,7 +1410,7 @@
 
 ---
 
-## 🔴 Phase 4 — Dynamic Programming (Weeks 23–26)
+## 🔴 Phase 4 — Dynamic Programming (Weeks 24–28)
 
 > The topic that decides most offers, split into four graded steps instead of one wall.
 
@@ -1598,7 +1598,7 @@
 
 ---
 
-## 🔵 Phase 5 — Advanced Structures & Algorithms (Weeks 27–30)
+## 🔵 Phase 5 — Advanced Structures & Algorithms (Weeks 29–33)
 
 > The differentiators: range queries, string algorithms, hard graphs, ordered structures, advanced maths.
 
@@ -1901,7 +1901,7 @@
 
 ---
 
-## 🟦 Phase 6 — Interview Mastery (Weeks 31–34)
+## 🟦 Phase 6 — Interview Mastery (Weeks 34–36)
 
 > Stop learning, start performing. Design rounds, timed drills, and full mock interviews.
 

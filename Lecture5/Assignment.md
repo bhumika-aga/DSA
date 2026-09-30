@@ -460,8 +460,8 @@ void recurse(int n) {
 1. `HashMap` order is guaranteed to be same as insertion order. → **False** (Use `LinkedHashMap`).
 2. `HashSet` uses a `HashMap` internally with a dummy value. → **True**.
 3. Primitives like `int` are stored on the Heap if they are part of an Object. → **True**.
-4. Garbage Collection collects objects immediately when their reference count hits 0. → **False** (Non-deterministic
-   timing).
+4. Garbage Collection collects objects immediately when their reference count hits 0. → **False** (Java does not
+   count references; the collector frees objects that are no longer reachable, at a time of its choosing).
 5. `Arrays.asList(arr)` creates a deep copy of the array. → **False** (Fixed-size view of the original).
 6. Recursive calls never use Heap space. → **False** (Local variables go to Stack, but `new` objects go to Heap).
 7. `TreeMap` operations take O(1) constant time. → **False** (O(log n)).

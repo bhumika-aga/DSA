@@ -291,7 +291,7 @@ Work out the time and space complexity of each snippet before checking the answe
 ## 🔍 Self-Assessment — True / False
 
 1. Dynamic programming needs overlapping subproblems. → **True** — otherwise there is nothing to reuse
-2. Memoisation and tabulation always have the same Big-O. → **True** — though their constants and stack use differ
+2. Memoisation and tabulation always have the same Big-O. → **False** — usually they do, but memoisation only computes the states it actually reaches, so it can be faster when few of them are needed
 3. Every recursive problem benefits from memoisation. → **False** — only when the same arguments repeat
 4. A 1D DP can often be reduced to O(1) space. → **True** — when each state needs only the last few
 5. The DP state is defined by the question "what must I know to finish?" → **True**
