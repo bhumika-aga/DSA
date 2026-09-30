@@ -310,4 +310,4 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ---
 
-**← [Lecture 39 · String Algorithms (KMP, Z, Rabin-Karp, Manacher)](../Lecture39/Assignment.md)** &nbsp;·&nbsp; **Lecture 41 · Balanced BSTs & Ordered Structures — coming soon →**
+**← [Lecture 39 · String Algorithms (KMP, Z, Rabin-Karp, Manacher)](../Lecture39/Assignment.md)** &nbsp;·&nbsp; **[Lecture 41 · Balanced BSTs & Ordered Structures](../Lecture41/Assignment.md) →**

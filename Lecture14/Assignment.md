@@ -1,8 +1,8 @@
-# 🗂️ Assignment 11 — Linked Lists
+# 🗂️ Assignment 14 — Linked Lists
 
 > **Lecture:** 14 of 45 — Linked Lists
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 6 days · **Total Problems:** 28 (9 Easy · 16 Medium · 3 Hard)
+> **Estimated Time:** 6 days · **Total Problems:** 27 (9 Easy · 16 Medium · 2 Hard)
 > **Goal:** Master pointer rerouting, Fast & Slow pointer paradigms, and complex cache design invariants (LRU/LFU).
 
 ---
@@ -257,7 +257,7 @@ _Focus on multi-step logic and complex pointer state management._
 
 ---
 
-## 🔴 Hard Tier (3 Problems)
+## 🔴 Hard Tier (2 Problems)
 
 _Focus on cache design invariants and k-sized re-grouping._
 
@@ -270,16 +270,7 @@ _Focus on cache design invariants and k-sized re-grouping._
 
 ---
 
-### H2 · Design Skiplist
-
-**🔗 [LC 1206 — Design Skiplist](https://leetcode.com/problems/design-skiplist/)** · Hard
-**Pattern:** Linked Levels (Skiplist) | **Companies:** Google, Amazon
-
-**Hint:** Each node has `next[]` pointers, one per level. To search, start at the top level and move right while the next value is smaller, then drop a level. Insert with a random height (coin flips), recording the predecessor at each level.
-
----
-
-### H3 · LFU Cache
+### H2 · LFU Cache
 
 **🔗 [LC 460 — LFU Cache](https://leetcode.com/problems/lfu-cache/)** · Hard
 **Pattern:** Freq Maps | **Companies:** Google, Amazon, Uber
@@ -352,7 +343,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 | Company       | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                 |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Amazon**    | [Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/), [Design Skiplist](https://leetcode.com/problems/design-skiplist/), [LFU Cache](https://leetcode.com/problems/lfu-cache/)                       |
+| **Amazon**    | [Convert Binary Number in a Linked List to Integer](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/), [LFU Cache](https://leetcode.com/problems/lfu-cache/)                                                                                          |
 | **Microsoft** | [Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/), [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/), [Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/), [Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)                 |
 | **Meta**      | [Add Two Numbers](https://leetcode.com/problems/add-two-numbers/), [Add Two Numbers II](https://leetcode.com/problems/add-two-numbers-ii/), [Flatten a Multilevel Doubly Linked List](https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/), [Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)                                             |
 | **Google**    | [Split Linked List in Parts](https://leetcode.com/problems/split-linked-list-in-parts/), [Swapping Nodes in a Linked List](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/), [Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/), [Design Front Middle Back Queue](https://leetcode.com/problems/design-front-middle-back-queue/) |
@@ -362,9 +353,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 13 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 9 Easy problems solved
+- [ ] All 16 Medium problems solved
+- [ ] All 2 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 4 conceptual questions answered out loud

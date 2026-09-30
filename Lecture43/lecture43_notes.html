@@ -3,12 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Lecture 38 &mdash; Square Root Decomposition &amp; Mo&#39;s Algorithm
-    </title>
+    <title>Lecture 43 &mdash; Design Data Structures</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Designing data structures for interviews: a five-step method, HashMap + linked list, array + index map, buckets by count, lazy deletion, history lists, lazy iterators and common follow-up questions — with pseudocode."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1398,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Sqrt Decomposition &amp; Mo&rsquo;s</div>
+        <div class="sb-title">Design Data Structures</div>
         <div class="sb-meta">
-          Lecture 38 of 45 &middot; Phase 5 &mdash; Advanced Structures
+          Lecture 43 of 45 &middot; Phase 6 &mdash; Interview Mastery
         </div>
       </div>
       <div class="sb-scroll">
@@ -1408,19 +1406,26 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#blocks"
-          ><span class="toc-icon">&#129521;</span>Square Root Blocks</a
+        <a class="toc-item" href="#method"
+          ><span class="toc-icon">&#128506;&#65039;</span>The Design Method</a
         >
-        <a class="toc-item toc-sub" href="#why-sqrt">Why &radic;n?</a>
-        <a class="toc-item" href="#heavy"
-          ><span class="toc-icon">&#9878;&#65039;</span>Heavy and Light</a
+        <a class="toc-item" href="#combos"
+          ><span class="toc-icon">&#129513;</span>Classic Combinations</a
         >
-        <a class="toc-item" href="#mo"
-          ><span class="toc-icon">&#128666;</span>Mo&rsquo;s Algorithm</a
+        <a class="toc-item toc-sub" href="#lru">Map + Linked List</a>
+        <a class="toc-item toc-sub" href="#swap">Array + Map of Indices</a>
+        <a class="toc-item toc-sub" href="#buckets">Buckets by Count</a>
+        <a class="toc-item" href="#lazy"
+          ><span class="toc-icon">&#128164;</span>Lazy Deletion</a
         >
-        <a class="toc-item toc-sub" href="#freq">Frequency of Frequencies</a>
-        <a class="toc-item" href="#choose"
-          ><span class="toc-icon">&#129513;</span>Choosing a Tool</a
+        <a class="toc-item" href="#history"
+          ><span class="toc-icon">&#128339;</span>History &amp; Snapshots</a
+        >
+        <a class="toc-item" href="#iterators"
+          ><span class="toc-icon">&#10145;&#65039;</span>Iterators</a
+        >
+        <a class="toc-item" href="#followups"
+          ><span class="toc-icon">&#128172;</span>Follow-up Questions</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1437,12 +1442,11 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture37/lecture37_notes.html"
-          >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+        <a class="toc-item" href="../Lecture42/lecture42_notes.html"
+          >&larr; Lecture 42 &middot; Advanced Math &amp; Game Theory</a
         >
-        <a class="toc-item" href="../Lecture39/lecture39_notes.html"
-          >&rarr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-          Manacher)</a
+        <a class="toc-item" href="../Lecture44/lecture44_notes.html"
+          >&rarr; Lecture 44 &middot; Company Pattern Drills</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
         <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
@@ -1454,8 +1458,8 @@
       <div id="topbar">
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
-          <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
-          <span>Lecture 38 &mdash; Sqrt Decomposition &amp; Mo&rsquo;s</span>
+          <a href="../index.html#phase6">Phase 6</a><span>&rsaquo;</span>
+          <span>Lecture 43 &mdash; Design Data Structures</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1473,24 +1477,22 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129717;</span>
-          <h1 class="page-title">
-            Square Root Decomposition &amp; Mo&rsquo;s Algorithm
-          </h1>
+          <span class="page-emoji">&#128736;&#65039;</span>
+          <h1 class="page-title">Design Data Structures</h1>
           <p class="page-sub">
-            &ldquo;When a tree is too much: split into blocks, or change the
-            order of the questions.&rdquo;
+            &ldquo;One structure per job, linked by keys, kept consistent on
+            every call.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 38 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 43 of 45</span>
             <span class="meta-chip accent"
-              >Phase 5 &mdash; Advanced Structures</span
+              >Phase 6 &mdash; Interview Mastery</span
             >
-            <span class="meta-chip yellow">&#9201; 3 days</span>
-            <span class="meta-chip green">&#127919; 12 problems</span>
+            <span class="meta-chip yellow">&#9201; 5 days</span>
+            <span class="meta-chip green">&#127919; 20 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta &middot;
-              Microsoft</span
+              >&#128188; Google &middot; Amazon &middot; Meta &middot; Microsoft
+              &middot; Uber</span
             >
           </div>
         </div>
@@ -1501,15 +1503,14 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 37 gave you trees that answer range questions in O(log n).
-            This short lecture gives you two simpler ideas that are sometimes
-            the better tool. <em>Square root decomposition</em> splits an array
-            into &radic;n blocks and keeps a summary per block &mdash; slower
-            than a tree, but written in minutes.
-            <em>Mo&rsquo;s algorithm</em> answers a whole batch of range
-            questions by choosing a clever order to answer them in, which
-            handles questions like &ldquo;how many distinct values?&rdquo; that
-            no tree combines neatly.
+            &ldquo;Design a class that supports these four operations, each in
+            O(1)&rdquo; is one of the most common interview formats, because it
+            tests everything at once: knowing what each structure is fast at,
+            combining them, and writing code that keeps several pieces of state
+            in agreement. No single structure from this course answers such a
+            question alone. The skill is choosing the right two or three and
+            wiring them together &mdash; and that skill follows a method you can
+            learn.
           </div>
         </div>
 
@@ -1517,21 +1518,24 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Split an array into &radic;n blocks and answer range queries in
-              O(&radic;n)
+              Turn a list of operations and speed limits into a design, step by
+              step
             </li>
             <li>
-              Explain why &radic;n is the right block size, from the balancing
-              argument
-            </li>
-            <li>Separate heavy and light values to bound the work per query</li>
-            <li>
-              Order offline queries with Mo&rsquo;s algorithm and slide a window
-              between them
+              Recognise the classic combinations: map + linked list, array +
+              map, buckets, heap + map, ordered sets
             </li>
             <li>
-              Track distinct counts and most-frequent values under add and
-              remove
+              Use lazy deletion, history lists and lazy iterators when direct
+              updates are too slow
+            </li>
+            <li>
+              State the invariant that links your structures, and check every
+              operation against it
+            </li>
+            <li>
+              Answer the usual follow-ups: thread safety, memory limits and
+              scale
             </li>
           </ul>
         </div>
@@ -1542,239 +1546,308 @@
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
             <strong
-              >The picture to keep in your head: a book with chapters.</strong
+              >The picture to keep in your head: a restaurant kitchen.</strong
             >
-            To count the words from page 37 to page 912, nobody counts every
-            page. You count the loose pages at each end, and for every complete
-            chapter in between you read the total off a list. That is square
-            root decomposition: whole blocks answered from a stored total, only
-            the two ragged ends done by hand. Mo&rsquo;s algorithm is a delivery
-            driver who sorts the day&rsquo;s stops by neighbourhood instead of
-            driving them in the order they were booked &mdash; same deliveries,
-            far less driving.
+            No single cook does everything. The
+            <strong>ticket rail</strong> keeps orders in sequence, the
+            <strong>pass</strong> holds dishes ready to go out, and the
+            <strong>order number</strong> printed on every ticket and plate is
+            what ties them together. A designed data structure is the same: each
+            part is fast at one job, and a shared key &mdash; an id, a node
+            reference, an array index &mdash; lets one part find the matching
+            entry in another. The rule of the kitchen is the rule of the code:
+            when an order changes, every station that holds it must hear about
+            it.
           </div>
         </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#127919;</span>
+        <div class="callout blue">
+          <span class="callout-icon">&#8617;&#65039;</span>
           <div class="callout-body">
-            <strong>How often will you need this?</strong> Honestly: rarely in
-            an interview, often in programming contests. A Fenwick or segment
-            tree (Lecture 37) is usually the expected answer. This lecture is
-            short because the two ideas in it &mdash;
-            <em>split into blocks</em> and
-            <em>answer queries in a clever order</em> &mdash; are worth knowing
-            on their own, and because some questions (&ldquo;how many distinct
-            values in this range?&rdquo;) are genuinely easier with them than
-            with any tree.
+            <strong
+              >Built on Lectures 5, 6, 14&ndash;16, 20 and 41 &mdash; and the
+              full treatment of their previews.</strong
+            >
+            You have already solved many design problems: Min Stack and the
+            circular queues (Lecture 15), LRU Cache (Lecture 16), LFU Cache
+            (Lecture 14, whose cache section was a first look at this lecture),
+            Insert Delete GetRandom and Time-Based Key-Value Store (Lecture 5),
+            Design Twitter and the running median (Lecture 20), and the TreeMap
+            designs of Lecture 41. This lecture collects what they have in
+            common into one method, then adds the techniques they did not need.
           </div>
         </div>
-        <h2 class="h1" id="blocks">&#129521; Square Root Decomposition</h2>
+
+        <h2 class="h1" id="method">&#128506;&#65039; The Design Method</h2>
         <p>
-          Split an array of n items into blocks of about &radic;n items each,
-          and store one summary per block &mdash; its sum, its minimum, whatever
-          the question needs. For n = 10,000 that is 100 blocks of 100. A range
-          query then has three parts: the partial block at the left end, the
-          whole blocks in the middle, and the partial block at the right end.
+          Every design question hands you the same two lists: the
+          <strong>operations</strong> and how fast each must be. Work through
+          five steps, out loud, before writing any code.
         </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build, Query, Update</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>B ← floor(sqrt(n))                      <span class="pc-cm">// block size</span>
-blockSum ← array of (n ÷ B + 1) zeros
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + a[i]
-
-<span class="pc-kw">function</span> query(l, r):                   <span class="pc-cm">// sum of a[l..r]</span>
-    total ← 0
-    <span class="pc-kw">while</span> l ≤ r <span class="pc-kw">and</span> l mod B ≠ 0:        <span class="pc-cm">// ragged left end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">while</span> l + B - 1 ≤ r:                <span class="pc-cm">// whole blocks</span>
-        total ← total + blockSum[l ÷ B];  l ← l + B
-    <span class="pc-kw">while</span> l ≤ r:                        <span class="pc-cm">// ragged right end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">return</span> total
-
-<span class="pc-kw">function</span> update(i, value):              <span class="pc-cm">// point update in O(1)</span>
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + (value - a[i])
-    a[i] ← value</pre>
-        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Structure</th>
-                <th>Range query</th>
-                <th>Point update</th>
-                <th>Code size</th>
+                <th>Step</th>
+                <th>Ask yourself</th>
+                <th>Example: insert, remove, getRandom &mdash; all O(1)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Plain array</td>
-                <td>O(n)</td>
-                <td>O(1)</td>
-                <td>Trivial</td>
+                <td><strong>1. List</strong></td>
+                <td>What are the operations and their required costs?</td>
+                <td>Three operations, each O(1)</td>
               </tr>
               <tr>
-                <td>Prefix sums</td>
-                <td>O(1)</td>
-                <td>O(n)</td>
-                <td>Tiny</td>
+                <td><strong>2. Match</strong></td>
+                <td>Which structure does each operation fast?</td>
+                <td>Random pick: an array. Find a value: a HashMap.</td>
               </tr>
               <tr>
-                <td><strong>Square root blocks</strong></td>
-                <td><strong>O(&radic;n)</strong></td>
-                <td><strong>O(1)</strong></td>
-                <td><strong>Small</strong></td>
+                <td><strong>3. Link</strong></td>
+                <td>What does one structure store about the other?</td>
+                <td>The map stores each value&rsquo;s index in the array</td>
               </tr>
               <tr>
-                <td>Fenwick / segment tree</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Medium</td>
+                <td><strong>4. Invariant</strong></td>
+                <td>What must always be true between them?</td>
+                <td>map[v] = i exactly when array[i] = v</td>
+              </tr>
+              <tr>
+                <td><strong>5. Walk</strong></td>
+                <td>Does every operation keep the invariant?</td>
+                <td>
+                  Remove fills the gap with the last element &mdash; so fix that
+                  element&rsquo;s index too
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <h3 class="h2" id="why-sqrt">Why &radic;n, exactly?</h3>
-        <p>
-          With blocks of size B, a query touches at most n ÷ B whole blocks plus
-          up to 2B loose items. Make B small and there are too many blocks; make
-          it large and the ragged ends get long. The total, n ÷ B + 2B, is
-          smallest when the two terms are about equal &mdash; which happens at B
-          &asymp; &radic;n. That balancing argument is the whole idea, and it
-          applies well beyond sums.
-        </p>
-        <h2 class="h1" id="heavy">&#9878;&#65039; Heavy and Light Elements</h2>
-        <p>
-          The same balancing trick works on <em>values</em> instead of
-          positions. In an array of n items, at most &radic;n different values
-          can each appear more than &radic;n times &mdash; there simply is not
-          room for more. Call those values <strong>heavy</strong>. You can
-          afford to precompute something for every heavy value (such as a prefix
-          count), and handle every <strong>light</strong>
-          value by brute force, because a light value never appears more than
-          &radic;n times. The worked example on Online Majority Element uses
-          this split &mdash; with the cut-off at &radic;n/2, for a reason the
-          example explains.
-        </p>
-        <h2 class="h1" id="mo">&#128666; Mo&rsquo;s Algorithm</h2>
-        <p>
-          Some range questions are awkward for any tree: &ldquo;how many
-          distinct numbers are in <code>a[l..r]</code>?&rdquo; does not combine
-          neatly from two halves. But if you already know the answer for one
-          range, you can get the answer for a neighbouring range cheaply &mdash;
-          add one element on the right, or remove one on the left, updating a
-          count table as you go. Mo&rsquo;s algorithm makes that cheap-step idea
-          fast by answering the queries in a smart <em>order</em>.
-        </p>
-        <p>
-          The order: group queries by which &radic;n-block their left end falls
-          in, and within a group sort by right end. Then walk a window from
-          query to query. Inside one group the right end only moves forward, and
-          the left end only wobbles within one block &mdash; so the total
-          movement is about (n + q)&radic;n steps instead of n &times; q.
-        </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Mo’s Algorithm — Count Distinct
-              Values in Each Query Range</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>B ← floor(sqrt(n))
-order ← query indices sorted by (l ÷ B, then r)
-count ← array of zeros;  distinct ← 0
-curL ← 0;  curR ← -1                  <span class="pc-cm">// the current window is empty</span>
-
-<span class="pc-kw">function</span> add(i):
-    count[a[i]] ← count[a[i]] + 1
-    <span class="pc-kw">if</span> count[a[i]] = 1: distinct ← distinct + 1
-<span class="pc-kw">function</span> remove(i):
-    count[a[i]] ← count[a[i]] - 1
-    <span class="pc-kw">if</span> count[a[i]] = 0: distinct ← distinct - 1
-
-<span class="pc-kw">for</span> q <span class="pc-kw">in</span> order:
-    (l, r) ← queries[q]
-    <span class="pc-kw">while</span> curR &lt; r: curR ← curR + 1;  add(curR)       <span class="pc-cm">// grow right</span>
-    <span class="pc-kw">while</span> curL &gt; l: curL ← curL - 1;  add(curL)       <span class="pc-cm">// grow left</span>
-    <span class="pc-kw">while</span> curR &gt; r: remove(curR);  curR ← curR - 1    <span class="pc-cm">// shrink right</span>
-    <span class="pc-kw">while</span> curL &lt; l: remove(curL);  curL ← curL + 1    <span class="pc-cm">// shrink left</span>
-    answer[q] ← distinct
-
-<span class="pc-kw">return</span> answer                          <span class="pc-cm">// in the ORIGINAL query order</span></pre>
-        </div>
-        <div class="callout blue">
-          <span class="callout-icon">&#128161;</span>
-          <div class="callout-body">
-            <strong>Offline means you see every question first.</strong>
-            Mo&rsquo;s algorithm only works when all the queries are known
-            before you answer any of them, so you can reorder them. That is
-            called answering <em>offline</em>. If each query depends on the
-            answer to the previous one, you are <em>online</em>, and Mo&rsquo;s
-            is off the table.
-          </div>
-        </div>
-        <h3 class="h2" id="freq">Frequency of Frequencies</h3>
-        <p>
-          Counting distinct values needs one table. Tracking the
-          <em>most frequent</em> value as the window moves needs two:
-          <code>count[v]</code> (how often value v appears) and
-          <code>howMany[f]</code> (how many values currently appear exactly f
-          times). When you remove an element, the maximum frequency can only
-          drop by one, and <code>howMany</code> tells you instantly whether it
-          did. This is the trick behind most &ldquo;mode in a range&rdquo;
-          questions.
-        </p>
-        <h2 class="h1" id="choose">&#129513; Choosing a Tool</h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>The situation</th>
+                <th>You need, fast&hellip;</th>
                 <th>Reach for</th>
-                <th>Why</th>
+                <th>Seen in</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Range sums, array never changes</td>
-                <td>Prefix sums</td>
-                <td>O(1) per query</td>
+                <td>Lookup by key</td>
+                <td>HashMap</td>
+                <td>Lecture 16</td>
+              </tr>
+              <tr>
+                <td>Random element; index access</td>
+                <td>Array / ArrayList</td>
+                <td>Lecture 11</td>
+              </tr>
+              <tr>
+                <td>Move or remove a known element anywhere</td>
+                <td>Doubly linked list</td>
+                <td>Lecture 14</td>
+              </tr>
+              <tr>
+                <td>Newest / oldest item</td>
+                <td>Stack / queue / deque</td>
+                <td>Lecture 15</td>
+              </tr>
+              <tr>
+                <td>Smallest or largest, repeatedly</td>
+                <td>Heap</td>
+                <td>Lecture 20</td>
+              </tr>
+              <tr>
+                <td>Nearest, range, both ends, arbitrary delete</td>
+                <td>TreeMap / TreeSet</td>
+                <td>Lecture 41</td>
+              </tr>
+              <tr>
+                <td>Prefix searches over strings</td>
+                <td>Trie</td>
+                <td>Lecture 36</td>
               </tr>
               <tr>
                 <td>Range sums with updates</td>
-                <td>Fenwick tree (Lecture 37)</td>
-                <td>O(log n) both, very little code</td>
-              </tr>
-              <tr>
-                <td>Range min/max with updates</td>
-                <td>Segment tree (Lecture 37)</td>
-                <td>Min and max are not invertible</td>
-              </tr>
-              <tr>
-                <td>Updates, and a tree feels like too much code</td>
-                <td>Square root blocks</td>
-                <td>O(&radic;n), written in five minutes</td>
-              </tr>
-              <tr>
-                <td>
-                  Distinct count or mode in many ranges, all known upfront
-                </td>
-                <td>Mo&rsquo;s algorithm</td>
-                <td>Answers do not merge, but they slide</td>
-              </tr>
-              <tr>
-                <td>Values in a small range (say &minus;50 to 50)</td>
-                <td>Counting buckets</td>
-                <td>Scan 101 buckets instead of sorting</td>
+                <td>Fenwick / segment tree</td>
+                <td>Lecture 37</td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <h2 class="h1" id="combos">&#129513; Classic Combinations</h2>
+
+        <h3 class="h2" id="lru">
+          HashMap + doubly linked list: order you can rearrange
+        </h3>
+        <p>
+          A linked list keeps things in an order and can move or remove a node
+          in O(1) &mdash; <em>if you already hold the node</em>. A HashMap from
+          key to node gives you exactly that. This is the LRU cache you built in
+          Lecture 16: the list runs from most to least recently used,
+          <code>get</code> moves a node to the front, and eviction removes the
+          back. The list is <strong>doubly</strong> linked because removing a
+          node means reconnecting its previous and next neighbours.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; LRU in Ten Lines (Recap of Lecture
+              16)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>map ← key → node;  list ← doubly linked list with dummy head and tail
+
+<span class="pc-kw">function</span> get(key):
+    <span class="pc-kw">if</span> key <span class="pc-kw">not</span> <span class="pc-kw">in</span> map: <span class="pc-kw">return</span> -1
+    node ← map[key];  list.moveToFront(node)       <span class="pc-cm">// O(1): we hold the node</span>
+    <span class="pc-kw">return</span> node.value
+
+<span class="pc-kw">function</span> put(key, value):
+    <span class="pc-kw">if</span> key <span class="pc-kw">in</span> map: map[key].value ← value;  list.moveToFront(map[key]);  <span class="pc-kw">return</span>
+    <span class="pc-kw">if</span> size(map) = capacity:
+        old ← list.removeBack();  map.remove(old.key)   <span class="pc-cm">// node stores its key for this</span>
+    node ← new node(key, value);  list.addFront(node);  map[key] ← node</pre>
+        </div>
+
+        <h3 class="h2" id="swap">
+          Array + map of indices: O(1) delete and random pick
+        </h3>
+        <p>
+          An array picks a random element in O(1) but deletes from the middle in
+          O(n). Unless order matters: then
+          <strong>swap with the last</strong> element and pop the end. A map
+          from value to index finds the element to remove. The step people
+          forget is updating the <em>moved</em> element&rsquo;s index.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Remove by Swapping With the
+              Last</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> remove(val):                       <span class="pc-cm">// arr, and pos: value → index</span>
+    <span class="pc-kw">if</span> val <span class="pc-kw">not</span> <span class="pc-kw">in</span> pos: <span class="pc-kw">return</span> false
+    i ← pos[val];  last ← arr[length(arr) - 1]
+    arr[i] ← last;  pos[last] ← i                 <span class="pc-cm">// move the last element into the hole</span>
+    arr.removeLast();  pos.remove(val)            <span class="pc-cm">// works even when val IS the last element</span>
+    <span class="pc-kw">return</span> true</pre>
+        </div>
+
+        <h3 class="h2" id="buckets">
+          Buckets by count: O(1) &ldquo;most&rdquo; and &ldquo;least&rdquo;
+        </h3>
+        <p>
+          When the query is &ldquo;the most (or least) frequent&rdquo; and
+          counts change by one at a time, keep a <strong>bucket</strong> per
+          count: a map from count to the keys that have it, plus the current
+          minimum or maximum count. A key moves to the neighbouring bucket on
+          each update, and the extreme bucket is always known. LFU Cache
+          (Lecture 14), All O&rsquo;one (Lecture 16) and Maximum Frequency Stack
+          (Lecture 6) are all this idea.
+        </p>
+
+        <h2 class="h1" id="lazy">&#128164; Lazy Deletion</h2>
+        <p>
+          Java&rsquo;s PriorityQueue cannot change or remove an arbitrary entry
+          quickly (<code>remove(x)</code> is O(n)). The fix is to stop trying.
+          Keep the true state in a HashMap; treat the heap as a list of
+          <em>hints</em>. On an update, push a new entry and leave the old one
+          where it is. When an entry reaches the top, check it against the map:
+          if it no longer matches, it is <strong>stale</strong> &mdash; throw it
+          away and look again.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Heap With Lazy Deletion</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre>current ← id → priority                         <span class="pc-cm">// the truth</span>
+heap ← max-heap of (priority, id)               <span class="pc-cm">// hints, possibly stale</span>
+
+<span class="pc-kw">function</span> update(id, p):  current[id] ← p;  heap.push((p, id))
+<span class="pc-kw">function</span> remove(id):     current.remove(id)          <span class="pc-cm">// the heap is not touched</span>
+
+<span class="pc-kw">function</span> popBest():
+    <span class="pc-kw">while</span> heap is <span class="pc-kw">not</span> empty:
+        (p, id) ← heap.pop()
+        <span class="pc-kw">if</span> id <span class="pc-kw">in</span> current <span class="pc-kw">and</span> current[id] = p:   <span class="pc-cm">// still true?</span>
+            current.remove(id);  <span class="pc-kw">return</span> id
+    <span class="pc-kw">return</span> none
+<span class="pc-cm">// Every entry is pushed once and popped at most once: O(log n) amortised per call.</span></pre>
+        </div>
+
+        <h2 class="h1" id="history">&#128339; History &amp; Snapshots</h2>
+        <p>
+          &ldquo;What was the value at time t?&rdquo; Copying everything at
+          every snapshot is too slow and too big. Instead, record only the
+          <em>changes</em>: for each key, a list of (time, value) pairs. Times
+          only increase, so the list is sorted, and the value at time t is the
+          last change at or before t &mdash; a binary search (Lecture 13). You
+          met this in Time-Based Key-Value Store (Lecture 5); Snapshot Array
+          below is the same idea with a snapshot counter as the clock.
+        </p>
+
+        <h2 class="h1" id="iterators">&#10145;&#65039; Iterators</h2>
+        <p>
+          An iterator hands out items one at a time through
+          <code>hasNext()</code> and <code>next()</code>. The good ones are
+          <strong>lazy</strong>: rather than building the whole answer in the
+          constructor, they do just enough work to produce the next item. That
+          saves memory, and an iterator over a huge or endless source only works
+          this way. Put the work in <code>hasNext()</code>, make it safe to call
+          twice in a row, and have <code>next()</code> call it first.
+        </p>
+
+        <h2 class="h1" id="followups">&#128172; Follow-up Questions</h2>
+        <p>
+          After the code works, interviewers often push on the design. You are
+          not expected to build these, only to reason about them.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Follow-up</th>
+                <th>A good first answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&ldquo;Several threads use it at once.&rdquo;</td>
+                <td>
+                  Guard every method with one lock (<code>synchronized</code>)
+                  so the structures never disagree; then mention finer-grained
+                  locks or <code>ConcurrentHashMap</code> as an optimisation.
+                </td>
+              </tr>
+              <tr>
+                <td>&ldquo;It no longer fits in memory.&rdquo;</td>
+                <td>
+                  Evict (LRU/LFU), or split the keys across machines by hash
+                  &mdash; a first step towards the system design of Lecture 45.
+                </td>
+              </tr>
+              <tr>
+                <td>&ldquo;Reads far outnumber writes.&rdquo;</td>
+                <td>Precompute on write so that reads are trivial.</td>
+              </tr>
+              <tr>
+                <td>&ldquo;Lazy deletion grows the heap.&rdquo;</td>
+                <td>
+                  Rebuild the heap from the live entries once stale ones
+                  outnumber live ones.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <h2 class="h1" id="pitfalls">
           &#9888;&#65039; Complexity &amp; Classic Bugs
         </h2>
@@ -1782,36 +1855,36 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
           <table>
             <thead>
               <tr>
-                <th>Operation</th>
+                <th>Design</th>
+                <th>Operations</th>
                 <th>Cost</th>
-                <th>Note</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Build the blocks</td>
-                <td>O(n)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Block range query</td>
-                <td>O(&radic;n)</td>
-                <td>Two ragged ends plus whole blocks</td>
-              </tr>
-              <tr>
-                <td>Block point update</td>
+                <td>HashMap + doubly linked list</td>
+                <td>get, put, evict</td>
                 <td>O(1)</td>
-                <td>Update the item and its block</td>
               </tr>
               <tr>
-                <td>Mo&rsquo;s algorithm, q queries</td>
-                <td>O((n + q)&radic;n)</td>
-                <td>Plus O(q log q) to sort the queries</td>
+                <td>Array + map of indices</td>
+                <td>insert, remove, getRandom</td>
+                <td>O(1) average</td>
               </tr>
               <tr>
-                <td>Heavy/light precompute</td>
-                <td>O(n&radic;n) worst case</td>
-                <td>Prefix counts for at most &radic;n heavy values</td>
+                <td>Buckets by count</td>
+                <td>increment, decrement, min/max</td>
+                <td>O(1)</td>
+              </tr>
+              <tr>
+                <td>Heap + lazy deletion</td>
+                <td>update, remove, pop best</td>
+                <td>O(log n) amortised</td>
+              </tr>
+              <tr>
+                <td>History list per key</td>
+                <td>set, get at time t</td>
+                <td>O(1) set, O(log h) get</td>
               </tr>
             </tbody>
           </table>
@@ -1827,44 +1900,42 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             </thead>
             <tbody>
               <tr>
-                <td>Block size of 0 when n is tiny</td>
-                <td>Division by zero</td>
-                <td>Use <code>max(1, floor(sqrt(n)))</code></td>
-              </tr>
-              <tr>
-                <td>Returning Mo&rsquo;s answers in sorted order</td>
-                <td>Answers attached to the wrong queries</td>
-                <td>Store each answer at its original index</td>
-              </tr>
-              <tr>
-                <td>Shrinking before growing the window</td>
+                <td>Updating one structure but not the other</td>
+                <td>Lookups return values that were removed</td>
                 <td>
-                  Removing an element that was never added; negative counts
-                </td>
-                <td>
-                  Grow first (<code>curR</code> up, <code>curL</code> down),
-                  then shrink
+                  Write the invariant down; check it at the end of every method
                 </td>
               </tr>
               <tr>
-                <td>Off-by-one on the whole-block loop</td>
-                <td>Double-counts or skips the last full block</td>
-                <td>Loop while <code>l + B − 1 ≤ r</code></td>
+                <td>Swap-with-last without fixing the moved index</td>
+                <td>Later removes delete the wrong element</td>
+                <td>Set <code>pos[last] ← i</code> before popping</td>
               </tr>
               <tr>
-                <td>Forgetting to update the block summary</td>
-                <td>Queries ignore the update</td>
-                <td>Update both the item and its block</td>
+                <td>LRU node that does not store its key</td>
+                <td>Cannot remove the evicted key from the map</td>
+                <td>Store the key in the node</td>
               </tr>
               <tr>
-                <td>Using Mo&rsquo;s on online queries</td>
-                <td>Impossible to reorder</td>
-                <td>Use a tree, or rethink the problem</td>
+                <td>Popping a heap entry without checking it</td>
+                <td>Returns an item that was edited or removed</td>
+                <td>Compare with the map; skip stale entries</td>
               </tr>
               <tr>
-                <td>A count array sized by value on huge values</td>
-                <td>Out of memory</td>
-                <td>Compress the values first</td>
+                <td>Changing state before knowing the call can succeed</td>
+                <td>A failed withdrawal still removes notes</td>
+                <td>Plan on a copy; commit only on success</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>next()</code> without calling
+                  <code>hasNext()</code> first
+                </td>
+                <td>Returns a list, or crashes on an empty one</td>
+                <td>
+                  Put the preparation in <code>hasNext()</code>; call it from
+                  <code>next()</code>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1872,413 +1943,179 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
         <div class="callout green">
           <span class="callout-icon">&#128269;</span>
           <div class="callout-body">
-            <strong>How to spot it.</strong> A pile of range queries, all given
-            up front, asking something that does not split into halves &mdash;
-            distinct count, mode, pairs of equal values. Or a constraint around
-            10&#8309; where you would like a simpler alternative to a tree. And
-            if the <em>values</em> are small, try buckets before anything
-            clever.
+            <strong>How to spot it.</strong> &ldquo;Design a class&rdquo;,
+            &ldquo;implement the following methods&rdquo;, a required cost per
+            operation (&ldquo;each in O(1)&rdquo;, &ldquo;average O(1)&rdquo;),
+            or a list of calls with expected outputs instead of a single input.
           </div>
         </div>
+
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Four problems, one per idea in this lecture: the cheap add/remove
-          step, buckets over a small value range, answering queries in a better
-          order, and the heavy/light split.
+          Five designs, one per technique: an array with an index map, a history
+          list, a heap of free slots, lazy deletion, and a lazy iterator.
         </p>
 
-        <!-- Problem 01: Count the Number of Good Subarrays -->
+        <!-- Problem 01: Insert Delete GetRandom O(1) - Duplicates allowed -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 01 &middot; The Add/Remove Primitive
+                Problem 01 &middot; Array + Map of Indices
               </div>
-              <div class="prob-title">Count the Number of Good Subarrays</div>
+              <div class="prob-title">
+                Insert Delete GetRandom O(1) - Duplicates allowed
+              </div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/count-the-number-of-good-subarrays/"
+                  href="https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 2537 - Count the Number of Good Subarrays</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Window with a running pair count</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Count the subarrays that contain at least <code>k</code> pairs
-                of equal elements (<code>i &lt; j</code> with
-                <code>nums[i] = nums[j]</code>).
-              </p>
-              <div class="iobox">nums = [3,1,4,3,2,2,4], k = 2 → 4</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    When one more copy of a value x enters a window that already
-                    holds c copies, how many new equal pairs appear?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Exactly c. And removing a copy removes c − 1 pairs. So the
-                    pair count updates in O(1) per step — exactly the cheap
-                    add/remove step Mo&rsquo;s algorithm is built on.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The whole trick is the O(1) update: adding a value that already
-                appears c times creates c new pairs, removing one destroys (c −
-                1). With that, a sliding window works. For each right end,
-                shrink the left end while the window still has at least k pairs;
-                then every start position before the current left end gives a
-                good subarray. This add/remove bookkeeping is the same primitive
-                Mo&rsquo;s algorithm uses &mdash; here the queries happen to
-                arrive in a convenient order already.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Pairs Change by the Current
-                      Count</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countGood(nums, k):
-    count ← empty map;  pairs ← 0;  left ← 0;  result ← 0
-    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        x ← nums[right]
-        pairs ← pairs + count[x]            <span class="pc-cm">// x pairs with every copy already here</span>
-        count[x] ← count[x] + 1
-        <span class="pc-kw">while</span> pairs ≥ k:                    <span class="pc-cm">// window [left..right] is good</span>
-            y ← nums[left]
-            count[y] ← count[y] - 1
-            pairs ← pairs - count[y]        <span class="pc-cm">// lost pairs with the copies that remain</span>
-            left ← left + 1
-        result ← result + left              <span class="pc-cm">// starts 0..left-1 all give good subarrays</span>
-    <span class="pc-kw">return</span> result</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 02: Sliding Subarray Beauty -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot; Small Values → Buckets
-              </div>
-              <div class="prob-title">Sliding Subarray Beauty</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/sliding-subarray-beauty/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2653 - Sliding Subarray Beauty</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Counting buckets in a window</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For every window of length <code>k</code>, report its
-                <em>beauty</em>: the x-th smallest negative number in the
-                window, or 0 if there are fewer than x negatives.
-              </p>
-              <div class="iobox">
-                nums = [1,-1,-3,-2,3], k = 3, x = 2 → [-1,-2,-2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sorting every window costs O(k log k) each time. Look at the
-                    constraints on the values — how many different values can
-                    there be?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Values lie between −50 and 50. Keep a count for each of the
-                    50 negative values; the x-th smallest is found by walking
-                    those 50 buckets.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                When the <em>values</em> are small, bucket them. A window update
-                is O(1) &mdash; add one count, remove one count &mdash; and a
-                query walks at most 50 buckets from &minus;50 upwards until x
-                negatives have been passed. That makes the whole thing O(n
-                &times; 50), independent of k. It is the same &ldquo;fixed-size
-                summary per block&rdquo; idea as square root decomposition,
-                applied to the value range instead of the positions.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; 50 Buckets per Window</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> getSubarrayBeauty(nums, k, x):
-    count ← array of 51 zeros               <span class="pc-cm">// count[v] for v = -50..-1, stored at index -v</span>
-    result ← empty list
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">if</span> nums[i] &lt; 0: count[-nums[i]] ← count[-nums[i]] + 1
-        <span class="pc-kw">if</span> i ≥ k <span class="pc-kw">and</span> nums[i - k] &lt; 0:       <span class="pc-cm">// the element leaving the window</span>
-            count[-nums[i - k]] ← count[-nums[i - k]] - 1
-        <span class="pc-kw">if</span> i ≥ k - 1:
-            seen ← 0;  beauty ← 0
-            <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 50 <span class="pc-kw">down to</span> 1:        <span class="pc-cm">// -50, -49, ... smallest first</span>
-                seen ← seen + count[v]
-                <span class="pc-kw">if</span> seen ≥ x: beauty ← -v;  <span class="pc-kw">break</span>
-            result.append(beauty)
-    <span class="pc-kw">return</span> result</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n &middot; 50)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 03: Count Zero Request Servers -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 03 &middot; Reorder the Queries
-              </div>
-              <div class="prob-title">Count Zero Request Servers</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/count-zero-request-servers/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2747 - Count Zero Request Servers</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Offline queries + sliding window</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given server logs <code>[serverId, time]</code> and queries
-                asking about the interval <code>[q − x, q]</code>, return, for
-                each query, how many of the <code>n</code> servers received no
-                requests in that interval.
-              </p>
-              <div class="iobox">
-                n = 3, logs = [[1,3],[2,6],[1,5]], x = 5, queries = [10,11] →
-                [1,2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Answering each query by scanning every log is O(logs ×
-                    queries). What if you answered the queries in increasing
-                    order of time instead of the order given?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sort the logs by time and the queries by time. The window [q
-                    − x, q] then only ever moves forward: add logs entering on
-                    the right, remove logs leaving on the left, and keep a count
-                    of servers with at least one request.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the core of Mo&rsquo;s algorithm in its simplest form:
-                <strong
-                  >answer the queries in a different order from the one they
-                  were asked in</strong
-                >, so that each step reuses the previous answer. Once queries
-                are sorted by time, both window ends only move forward, so every
-                log is added once and removed once. The only extra care is to
-                remember each query&rsquo;s original position and write its
-                answer there.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sort Queries, Slide
-                      Once</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countServers(n, logs, x, queries):
-    sort logs by time
-    order ← query indices sorted by queries[i]
-    count ← array of n + 1 zeros;  active ← 0     <span class="pc-cm">// servers with ≥ 1 request</span>
-    lo ← 0;  hi ← 0;  answer ← array of length(queries)
-    <span class="pc-kw">for</span> qi <span class="pc-kw">in</span> order:
-        q ← queries[qi]
-        <span class="pc-kw">while</span> hi &lt; length(logs) <span class="pc-kw">and</span> logs[hi].time ≤ q:          <span class="pc-cm">// entering</span>
-            s ← logs[hi].server
-            <span class="pc-kw">if</span> count[s] = 0: active ← active + 1
-            count[s] ← count[s] + 1;  hi ← hi + 1
-        <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> logs[lo].time &lt; q - x:                <span class="pc-cm">// leaving</span>
-            s ← logs[lo].server
-            count[s] ← count[s] - 1
-            <span class="pc-kw">if</span> count[s] = 0: active ← active - 1
-            lo ← lo + 1
-        answer[qi] ← n - active                                  <span class="pc-cm">// original position</span>
-    <span class="pc-kw">return</span> answer</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(L log L + Q log Q)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n + Q)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 04: Online Majority Element In Subarray -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Heavy and Light</div>
-              <div class="prob-title">Online Majority Element In Subarray</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/online-majority-element-in-subarray/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1157 - Online Majority Element In Subarray</a
+                  >&#128279; LC 381 - Insert Delete GetRandom O(1) - Duplicates
+                  allowed</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Square root split by frequency</span>
+                <span class="tag tag-pat">Swap with last, sets of indices</span>
+                <span class="tag tag-co"
+                  >Amazon &middot; Meta &middot; LinkedIn</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                A collection that may hold duplicates. <code>insert(val)</code>
+                returns true if val was not present before;
+                <code>remove(val)</code> removes one copy and returns true if
+                there was one; <code>getRandom()</code> returns an element with
+                probability proportional to how many copies it has. Every call
+                must be O(1) on average.
+              </p>
+              <div class="iobox">
+                insert(1) → true, insert(1) → false, insert(2) → true
+                getRandom() → 1 with probability 2/3 remove(1) → true,
+                getRandom() → 1 or 2, each with probability 1/2
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Without duplicates this is Lecture 5&rsquo;s RandomizedSet:
+                    an array plus value &rarr; index. What must change when a
+                    value can sit in several places?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Map each value to a <em>set</em> of indices. Removing takes
+                    any one index from val&rsquo;s set, moves the last element
+                    into it, and moves that element&rsquo;s index in its own set
+                    from the end to the hole.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Run the design method. getRandom in O(1) forces an array: a
+                uniform random index is automatically proportional to the number
+                of copies. Finding <em>some</em> copy of val forces a map, and
+                since a value may sit at several indices, the map stores a set
+                of them. The invariant: i is in idx[v] exactly when nums[i] = v.
+                Insert appends and records the index. Remove takes any index i
+                of val, copies the last element into position i, adds i to the
+                last element&rsquo;s set and removes its old index (the end),
+                then pops. The order of those two set updates matters when the
+                element removed is itself the last one &mdash; add first, then
+                discard, and the case takes care of itself.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Array + Value &rarr; Set of
+                      Indices</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>nums ← empty array;  idx ← value → set of indices
+
+<span class="pc-kw">function</span> insert(val):
+    idx[val].add(length(nums));  nums.append(val)
+    <span class="pc-kw">return</span> size(idx[val]) = 1                     <span class="pc-cm">// first copy?</span>
+
+<span class="pc-kw">function</span> remove(val):
+    <span class="pc-kw">if</span> idx[val] is empty: <span class="pc-kw">return</span> false
+    i ← any element of idx[val];  idx[val].remove(i)
+    lastIndex ← length(nums) - 1;  last ← nums[lastIndex]
+    nums[i] ← last
+    idx[last].add(i)                              <span class="pc-cm">// add first ...</span>
+    idx[last].remove(lastIndex)                   <span class="pc-cm">// ... then drop the old slot</span>
+    nums.removeLast()
+    <span class="pc-kw">return</span> true
+
+<span class="pc-kw">function</span> getRandom():
+    <span class="pc-kw">return</span> nums[randomInt(0, length(nums) - 1)]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) average per call</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 02: Snapshot Array -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; History List</div>
+              <div class="prob-title">Snapshot Array</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/snapshot-array/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1146 - Snapshot Array</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Changes per index + binary search</span
+                >
                 <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
@@ -2290,16 +2127,15 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Build a structure over an array that answers
-                <code>query(left, right, threshold)</code>: the element
-                appearing at least <code>threshold</code> times in
-                <code>arr[left..right]</code>, or −1. It is guaranteed that
-                <code>2 × threshold &gt; right − left + 1</code>, so the answer
-                is a strict majority.
+                An array of length n starts as all zeros.
+                <code>set(index, val)</code> changes one element;
+                <code>snap()</code> takes a snapshot and returns its id (0, 1,
+                2&hellip;); <code>get(index, snapId)</code> returns the value
+                the element had when that snapshot was taken.
               </p>
               <div class="iobox">
-                arr = [1,1,2,2,1,1]; query(0,5,4) → 1, query(0,3,3) → −1,
-                query(2,3,2) → 2
+                SnapshotArray(3), set(0, 5), snap() → 0, set(0, 6), get(0, 0) →
+                5
               </div>
             </div>
             <div class="prob-section">
@@ -2311,9 +2147,9 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    Short ranges are easy: a single Boyer-Moore pass finds the
-                    majority candidate. What about long ranges — which values
-                    could possibly be a majority of a long range?
+                    Copying the array on each snap costs O(n) per call and O(n
+                    &middot; snaps) memory. Most elements never change between
+                    snapshots &mdash; what is worth recording?
                   </p>
                 </div>
               </details>
@@ -2324,12 +2160,9 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    A range longer than &radic;n needs more than &radic;n/2
-                    copies of its majority, so only values appearing more than
-                    &radic;n/2 times in the whole array can win it — and there
-                    are at most 2&radic;n of those. Give each such
-                    <em>heavy</em> value a prefix-count array; handle short
-                    ranges (length ≤ &radic;n) by brute force.
+                    Only the changes. For each index, keep a list of (snapId,
+                    value). A get finds the last change with snapId &le; the
+                    requested one by binary search.
                   </p>
                 </div>
               </details>
@@ -2337,19 +2170,16 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The split is by <em>frequency</em>, and the threshold is
-                &radic;n. A range longer than &radic;n needs a majority of more
-                than &radic;n/2 copies, so its answer must appear more than
-                &radic;n/2 times in the whole array &mdash; and at most
-                2&radic;n values do, each checked in O(1) with prefix counts.
-                (Setting the cut-off at &radic;n instead is a tempting bug: a
-                value with, say, 0.7&radic;n copies can still be the majority of
-                a range just over &radic;n long.) A range of length at most
-                &radic;n is scanned directly with Boyer-Moore voting. Every
-                query is therefore O(&radic;n). Binary search on each
-                value&rsquo;s positions, or a segment tree of Boyer-Moore votes,
-                also work &mdash; but the heavy/light split is the square-root
-                idea in its purest form.
+                This is the history technique with the snapshot counter as the
+                clock. Each index starts with the entry (&minus;1, 0), so a get
+                before any change finds 0. A set appends (currentSnapId, val)
+                &mdash; or overwrites the last entry if it already has the
+                current id, because only the final value before a snap counts.
+                <code>snap()</code> just returns the counter and increments it:
+                O(1), with nothing copied. Because snapIds in each list only
+                increase, get can binary-search for the last entry at or before
+                the requested snapshot. Memory is proportional to the number of
+                sets, not to n times the number of snapshots.
               </p>
             </div>
             <details>
@@ -2360,35 +2190,434 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix Counts for Heavy
-                      Values, Brute Force for Short Ranges</span
+                      >&#128208; Pseudocode &middot; Record Changes, Not
+                      Copies</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> MajorityChecker(arr):
-    n ← length(arr);  S ← floor(sqrt(n))
-    heavy ← values appearing more than S ÷ 2 <span class="pc-kw">times</span> <span class="pc-kw">in</span> arr    <span class="pc-cm">// at most 2S of them</span>
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:
-        pref[v] ← prefix counts of v over arr                 <span class="pc-cm">// pref[v][i] = copies in arr[0..i-1]</span>
+                  <pre>history[i] ← [(-1, 0)] <span class="pc-kw">for</span> every index i;  snapId ← 0
 
-<span class="pc-kw">function</span> query(left, right, threshold):
-    <span class="pc-kw">if</span> right - left + 1 ≤ S:                                  <span class="pc-cm">// short range: vote directly</span>
-        cand ← Boyer-Moore majority candidate of arr[left..right]
-        <span class="pc-kw">return</span> cand <span class="pc-kw">if</span> count of cand <span class="pc-kw">in</span> arr[left..right] ≥ threshold <span class="pc-kw">else</span> -1
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:                                      <span class="pc-cm">// long range: only heavy values qualify</span>
-        <span class="pc-kw">if</span> pref[v][right + 1] - pref[v][left] ≥ threshold:
-            <span class="pc-kw">return</span> v
+<span class="pc-kw">function</span> set(index, val):
+    h ← history[index]
+    <span class="pc-kw">if</span> h.last.snap = snapId: h.last.value ← val   <span class="pc-cm">// same snapshot: overwrite</span>
+    <span class="pc-kw">else</span>: h.append((snapId, val))
+
+<span class="pc-kw">function</span> snap():
+    snapId ← snapId + 1
+    <span class="pc-kw">return</span> snapId - 1
+
+<span class="pc-kw">function</span> get(index, id):
+    h ← history[index]
+    k ← last position <span class="pc-kw">in</span> h with h[k].snap ≤ id   <span class="pc-cm">// binary search</span>
+    <span class="pc-kw">return</span> h[k].value</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O(1) set/snap &middot; O(log s) get</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n + sets)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Dinner Plate Stacks -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 03 &middot; Heap of Free Slots</div>
+              <div class="prob-title">Dinner Plate Stacks</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/dinner-plate-stacks/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1172 - Dinner Plate Stacks</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Stacks + min-heap of non-full</span>
+                <span class="tag tag-co">Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                An endless row of stacks, each holding at most
+                <code>capacity</code> plates. <code>push(val)</code> goes on the
+                <em>leftmost</em> stack that is not full;
+                <code>pop()</code> takes from the <em>rightmost</em> non-empty
+                stack; <code>popAtStack(i)</code> takes from stack i. Pops
+                return &minus;1 when there is nothing to take.
+              </p>
+              <div class="iobox">
+                capacity 2: push 1, 2, 3, 4, 5 → stacks [1,2] [3,4] [5]
+                popAtStack(0) → 2, push(20), push(21), popAtStack(0) → 20,
+                popAtStack(2) → 21 pop() → 5, pop() → 4, pop() → 3, pop() → 1,
+                pop() → -1
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Push and pop each need a different &ldquo;extreme&rdquo;
+                    stack. Which one is cheap to find already, and which needs a
+                    helper structure?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The rightmost non-empty stack is the end of the list once
+                    empty stacks are trimmed off. The leftmost non-full stack
+                    needs a min-heap of indices &mdash; add an index when a pop
+                    makes a full stack non-full, and skip entries that went
+                    stale.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Scanning for the leftmost non-full stack is O(number of stacks)
+                per push, too slow for 2 &times; 10&#8309; calls. So keep a
+                min-heap <code>free</code> of indices that <em>might</em> be
+                non-full. Entries can go stale in two ways: the stack filled up
+                again, or it was trimmed off the end. Rather than deleting them,
+                push checks the top and discards stale entries &mdash; lazy
+                deletion from the lecture. A stack enters the heap when it is
+                created with room left, or when a pop takes it from full to not
+                full. Pop trims empty stacks from the end of the list, then pops
+                the last one. Each index is pushed into and popped from the heap
+                a bounded number of times per operation, so everything is O(log
+                n) amortised.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Lazily Cleaned Heap of Free
+                      Stacks</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>stacks ← empty list of stacks;  free ← min-heap of indices
+
+<span class="pc-kw">function</span> push(val):
+    <span class="pc-kw">while</span> free is <span class="pc-kw">not</span> empty <span class="pc-kw">and</span>
+          (free.top ≥ length(stacks) <span class="pc-kw">or</span> stacks[free.top] is full):
+        free.pop()                                <span class="pc-cm">// stale entry</span>
+    <span class="pc-kw">if</span> free is <span class="pc-kw">not</span> empty:
+        i ← free.top;  stacks[i].push(val)
+        <span class="pc-kw">if</span> stacks[i] is full: free.pop()
+    <span class="pc-kw">else</span>:
+        stacks.append(new stack containing val)
+        <span class="pc-kw">if</span> capacity &gt; 1: free.push(length(stacks) - 1)
+
+<span class="pc-kw">function</span> pop():
+    <span class="pc-kw">while</span> stacks is <span class="pc-kw">not</span> empty <span class="pc-kw">and</span> stacks.last is empty:
+        stacks.removeLast()                       <span class="pc-cm">// trim empty stacks off the end</span>
+    <span class="pc-kw">if</span> stacks is empty: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">return</span> popAtStack(length(stacks) - 1)
+
+<span class="pc-kw">function</span> popAtStack(i):
+    <span class="pc-kw">if</span> i ≥ length(stacks) <span class="pc-kw">or</span> stacks[i] is empty: <span class="pc-kw">return</span> -1
+    <span class="pc-kw">if</span> stacks[i] is full: free.push(i)          <span class="pc-cm">// it is about to have room</span>
+    <span class="pc-kw">return</span> stacks[i].pop()</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log n) amortised</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Design Task Manager -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Lazy Deletion</div>
+              <div class="prob-title">Design Task Manager</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/design-task-manager/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 3408 - Design Task Manager</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Map of truth + heap of hints</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Tasks have a user, a unique id and a priority. Support
+                <code>add</code>, <code>edit(taskId, newPriority)</code>,
+                <code>rmv(taskId)</code>, and <code>execTop()</code>, which
+                removes the task with the highest priority (the highest taskId
+                on ties) and returns its userId, or &minus;1 if none are left.
+              </p>
+              <div class="iobox">
+                TaskManager([[1,101,10],[2,102,20],[3,103,15]]) add(4,104,5),
+                edit(102,8), execTop() → 3 (task 103, priority 15) rmv(101),
+                add(5,105,15), execTop() → 5
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    A heap gives the top task quickly. What goes wrong when a
+                    task&rsquo;s priority is edited, or it is removed?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Leave old heap entries alone. Keep taskId &rarr; (userId,
+                    priority) in a map as the truth, push a fresh entry on every
+                    edit, and in execTop discard any popped entry that no longer
+                    matches the map.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is lazy deletion exactly as in the lecture. The map is the
+                single source of truth; the max-heap, ordered by (priority,
+                taskId), may contain entries that are out of date. An edit
+                updates the map and pushes a new heap entry; a remove only
+                deletes from the map. execTop pops until it finds an entry whose
+                task still exists <em>with the same priority</em> &mdash; the
+                priority check matters, because an edited task leaves its old
+                entry behind, and without the check the task would run at its
+                old priority. Every entry is pushed once and discarded at most
+                once, so each call is O(log n) amortised.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Skip Stale Entries at the
+                      Top</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>info ← taskId → (userId, priority)               <span class="pc-cm">// the truth</span>
+heap ← max-heap of (priority, taskId)           <span class="pc-cm">// ties: larger taskId first</span>
+
+<span class="pc-kw">function</span> add(userId, taskId, priority):
+    info[taskId] ← (userId, priority);  heap.push((priority, taskId))
+
+<span class="pc-kw">function</span> edit(taskId, newPriority):
+    add(info[taskId].userId, taskId, newPriority)   <span class="pc-cm">// old entry becomes stale</span>
+
+<span class="pc-kw">function</span> rmv(taskId): info.remove(taskId)
+
+<span class="pc-kw">function</span> execTop():
+    <span class="pc-kw">while</span> heap is <span class="pc-kw">not</span> empty:
+        (p, t) ← heap.pop()
+        <span class="pc-kw">if</span> t <span class="pc-kw">in</span> info <span class="pc-kw">and</span> info[t].priority = p:
+            user ← info[t].userId;  info.remove(t)
+            <span class="pc-kw">return</span> user
     <span class="pc-kw">return</span> -1</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(&radic;n) per query</span>
+                    ><span class="cx-val green">O(log n) amortised</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n&radic;n)</span>
+                    ><span class="cx-val green">O(n + edits)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Flatten Nested List Iterator -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 05 &middot; Lazy Iterator</div>
+              <div class="prob-title">Flatten Nested List Iterator</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/flatten-nested-list-iterator/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 341 - Flatten Nested List Iterator</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Stack, work done in hasNext</span>
+                <span class="tag tag-co"
+                  >Meta &middot; Google &middot; LinkedIn</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Each element of a nested list is either an integer or another
+                nested list. Build an iterator that returns all the integers in
+                order through <code>hasNext()</code> and <code>next()</code>.
+              </p>
+              <div class="iobox">
+                [[1,1],2,[1,1]] → 1, 1, 2, 1, 1 [1,[4,[6]]] → 1, 4, 6
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Flattening everything in the constructor with recursion
+                    works. How would you avoid doing all that work up front?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Keep a stack of items still to visit, in reverse order. In
+                    hasNext, while a list is on top, replace it by its elements
+                    (reversed). When an integer is on top, you are ready.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The eager version flattens the whole structure with a DFS in the
+                constructor &mdash; correct, and fine in most interviews, but it
+                spends all its time and memory before the first
+                <code>next()</code>. The lazy version replaces the recursion
+                with an explicit stack, as in Lecture 18&rsquo;s iterative
+                traversals. The stack holds items still to visit, the next one
+                on top. <code>hasNext()</code> unpacks lists on the top until an
+                integer surfaces or the stack is empty; it changes nothing if an
+                integer is already on top, so calling it twice is safe.
+                <code>next()</code> calls <code>hasNext()</code> and pops. Empty
+                inner lists simply unpack to nothing.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Unpack Only When
+                      Needed</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> constructor(nestedList):
+    stack ← elements of nestedList, pushed <span class="pc-kw">from</span> last <span class="pc-kw">to</span> first
+
+<span class="pc-kw">function</span> hasNext():
+    <span class="pc-kw">while</span> stack is <span class="pc-kw">not</span> empty <span class="pc-kw">and</span> stack.top is a list:
+        list ← stack.pop()
+        push the elements of list <span class="pc-kw">from</span> last <span class="pc-kw">to</span> first   <span class="pc-cm">// first element ends on top</span>
+    <span class="pc-kw">return</span> stack is <span class="pc-kw">not</span> empty
+
+<span class="pc-kw">function</span> next():
+    hasNext()                                     <span class="pc-cm">// make sure an integer is on top</span>
+    <span class="pc-kw">return</span> stack.pop()</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(1) amortised per call</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(N + L)</span>
                   </div>
                 </div>
               </div>
@@ -2402,13 +2631,13 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 38 Assignment &mdash; 12 Problems (2 Easy &middot; 6
-              Medium &middot; 4 Hard)</strong
+              >Lecture 43 Assignment &mdash; 20 Problems (2 Easy &middot; 13
+              Medium &middot; 5 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 39.<br /><br />
+            before moving to Lecture 44.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture38/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture43/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2425,68 +2654,60 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 39.</p>
+        <p>Check each item before advancing to Lecture 44.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the block build, query and point update from memory
+            I can run the five design steps out loud on a new problem
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can derive the &radic;n block size from n ÷ B + 2B
+            I can write LRU Cache and swap-with-last removal from memory
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why at most &radic;n values can be heavy
+            I can explain lazy deletion and say how to recognise a stale entry
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can sort queries in Mo&rsquo;s order and say why the total
-            movement is about (n + q)&radic;n
+            I can store history per key and answer &ldquo;value at time t&rdquo;
+            with binary search
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write add and remove for a distinct-count window
+            I can write a lazy iterator whose hasNext is safe to call twice
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I know when a problem is offline, and why that matters
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">I completed all 12 assignment problems</div>
+          <div class="cb-text">I completed all 20 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 39: String Algorithms</strong><br />
-            The &ldquo;never re-read what you already know&rdquo; idea behind
-            Mo&rsquo;s algorithm returns in a sharper form: KMP, the
-            Z-algorithm, rolling hashes and Manacher all find patterns in text
-            in linear time.
+            <strong>Next up &mdash; Lecture 44: Company Pattern Drills</strong
+            ><br />
+            No new theory: timed rounds, company by company, that turn
+            everything in this course into speed and recall.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture37/lecture37_notes.html"
-            >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+          <a href="../Lecture42/lecture42_notes.html"
+            >&larr; Lecture 42 &middot; Advanced Math &amp; Game Theory</a
           >
-          <a class="next" href="../Lecture39/lecture39_notes.html"
-            >Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-            Manacher) &rarr;</a
+          <a class="next" href="../Lecture44/lecture44_notes.html"
+            >Lecture 44 &middot; Company Pattern Drills &rarr;</a
           >
         </div>
       </div>

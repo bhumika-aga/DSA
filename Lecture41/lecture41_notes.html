@@ -3,12 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Lecture 38 &mdash; Square Root Decomposition &amp; Mo&#39;s Algorithm
-    </title>
+    <title>Lecture 41 &mdash; Balanced BSTs &amp; Ordered Structures</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Balanced BSTs and ordered structures: TreeMap and TreeSet neighbour queries, sorted multisets, rotations, AVL and red-black rules, order statistics and skip lists — with pseudocode and Java."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1398,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Sqrt Decomposition &amp; Mo&rsquo;s</div>
+        <div class="sb-title">Balanced BSTs &amp; Ordered Structures</div>
         <div class="sb-meta">
-          Lecture 38 of 45 &middot; Phase 5 &mdash; Advanced Structures
+          Lecture 41 of 45 &middot; Phase 5 &mdash; Advanced Structures
         </div>
       </div>
       <div class="sb-scroll">
@@ -1408,19 +1406,23 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#blocks"
-          ><span class="toc-icon">&#129521;</span>Square Root Blocks</a
+        <a class="toc-item" href="#api"
+          ><span class="toc-icon">&#9749;</span>Java&rsquo;s Ordered API</a
         >
-        <a class="toc-item toc-sub" href="#why-sqrt">Why &radic;n?</a>
-        <a class="toc-item" href="#heavy"
-          ><span class="toc-icon">&#9878;&#65039;</span>Heavy and Light</a
+        <a class="toc-item toc-sub" href="#multiset">TreeMap as a Multiset</a>
+        <a class="toc-item" href="#balance"
+          ><span class="toc-icon">&#9878;&#65039;</span>Why Balance Matters</a
         >
-        <a class="toc-item" href="#mo"
-          ><span class="toc-icon">&#128666;</span>Mo&rsquo;s Algorithm</a
+        <a class="toc-item toc-sub" href="#rotations">Rotations</a>
+        <a class="toc-item toc-sub" href="#avl-rb">AVL &amp; Red-Black</a>
+        <a class="toc-item" href="#order-stat"
+          ><span class="toc-icon">&#128290;</span>Order Statistics</a
         >
-        <a class="toc-item toc-sub" href="#freq">Frequency of Frequencies</a>
+        <a class="toc-item" href="#skiplist"
+          ><span class="toc-icon">&#129692;</span>Skip Lists</a
+        >
         <a class="toc-item" href="#choose"
-          ><span class="toc-icon">&#129513;</span>Choosing a Tool</a
+          ><span class="toc-icon">&#129513;</span>Choosing a Structure</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1437,12 +1439,11 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture37/lecture37_notes.html"
-          >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+        <a class="toc-item" href="../Lecture40/lecture40_notes.html"
+          >&larr; Lecture 40 &middot; Advanced Graph Algorithms</a
         >
-        <a class="toc-item" href="../Lecture39/lecture39_notes.html"
-          >&rarr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-          Manacher)</a
+        <a class="toc-item" href="../Lecture42/lecture42_notes.html"
+          >&rarr; Lecture 42 &middot; Advanced Math &amp; Game Theory</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
         <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
@@ -1455,7 +1456,7 @@
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
           <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
-          <span>Lecture 38 &mdash; Sqrt Decomposition &amp; Mo&rsquo;s</span>
+          <span>Lecture 41 &mdash; Balanced BSTs</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1473,23 +1474,21 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129717;</span>
-          <h1 class="page-title">
-            Square Root Decomposition &amp; Mo&rsquo;s Algorithm
-          </h1>
+          <span class="page-emoji">&#127898;&#65039;</span>
+          <h1 class="page-title">Balanced BSTs &amp; Ordered Structures</h1>
           <p class="page-sub">
-            &ldquo;When a tree is too much: split into blocks, or change the
-            order of the questions.&rdquo;
+            &ldquo;Keep everything sorted, even while it changes &mdash; and
+            find the nearest value in a single step.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 38 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 41 of 45</span>
             <span class="meta-chip accent"
               >Phase 5 &mdash; Advanced Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 3 days</span>
-            <span class="meta-chip green">&#127919; 12 problems</span>
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 18 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta &middot;
+              >&#128188; Google &middot; Amazon &middot; Bloomberg &middot;
               Microsoft</span
             >
           </div>
@@ -1501,15 +1500,15 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 37 gave you trees that answer range questions in O(log n).
-            This short lecture gives you two simpler ideas that are sometimes
-            the better tool. <em>Square root decomposition</em> splits an array
-            into &radic;n blocks and keeps a summary per block &mdash; slower
-            than a tree, but written in minutes.
-            <em>Mo&rsquo;s algorithm</em> answers a whole batch of range
-            questions by choosing a clever order to answer them in, which
-            handles questions like &ldquo;how many distinct values?&rdquo; that
-            no tree combines neatly.
+            A HashMap answers &ldquo;is x here?&rdquo; instantly, but it has no
+            idea which key is <em>next to</em> x. A heap knows its smallest item
+            but nothing else. Many interview problems need both: keys kept in
+            sorted order <em>while</em> items are added and removed, plus quick
+            answers to &ldquo;what is the closest value to x?&rdquo;,
+            &ldquo;what is the largest key below 50?&rdquo; or &ldquo;what is
+            the k-th smallest?&rdquo;. A <strong>balanced</strong> binary search
+            tree does all of that in O(log n) &mdash; and in Java you already
+            have one, called <code>TreeMap</code>.
           </div>
         </div>
 
@@ -1517,22 +1516,23 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Split an array into &radic;n blocks and answer range queries in
-              O(&radic;n)
+              Use TreeMap and TreeSet&rsquo;s floor, ceiling, higher, lower and
+              subMap without looking them up
+            </li>
+            <li>Fake a multiset with a TreeMap of counts</li>
+            <li>
+              Explain why a plain BST can become slow, and how a rotation fixes
+              it
             </li>
             <li>
-              Explain why &radic;n is the right block size, from the balancing
-              argument
-            </li>
-            <li>Separate heavy and light values to bound the work per query</li>
-            <li>
-              Order offline queries with Mo&rsquo;s algorithm and slide a window
-              between them
+              State the AVL and red-black rules in plain words, without
+              memorising their code
             </li>
             <li>
-              Track distinct counts and most-frequent values under add and
-              remove
+              Find the k-th smallest with subtree sizes, and explain how a skip
+              list stays fast
             </li>
+            <li>Choose between TreeMap, PriorityQueue and a sorted array</li>
           </ul>
         </div>
 
@@ -1542,239 +1542,459 @@
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
             <strong
-              >The picture to keep in your head: a book with chapters.</strong
+              >The picture to keep in your head: a dictionary on a
+              shelf.</strong
             >
-            To count the words from page 37 to page 912, nobody counts every
-            page. You count the loose pages at each end, and for every complete
-            chapter in between you read the total off a list. That is square
-            root decomposition: whole blocks answered from a stored total, only
-            the two ragged ends done by hand. Mo&rsquo;s algorithm is a delivery
-            driver who sorts the day&rsquo;s stops by neighbourhood instead of
-            driving them in the order they were booked &mdash; same deliveries,
-            far less driving.
+            A HashMap is a coat-check desk: hand over your ticket and you get
+            your coat back at once, but nobody can tell you whose coat hangs
+            next to yours. A TreeMap is a <strong>dictionary</strong>: every
+            word sits in alphabetical order, so you can open it at
+            &ldquo;mango&rdquo;, and if &ldquo;mango&rdquo; is missing, the
+            words just before and just after it are right there. Balancing is
+            the publisher making sure the dictionary is never one enormous
+            chapter &mdash; every lookup takes the same few page-flips.
           </div>
         </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#127919;</span>
+        <div class="callout blue">
+          <span class="callout-icon">&#8617;&#65039;</span>
           <div class="callout-body">
-            <strong>How often will you need this?</strong> Honestly: rarely in
-            an interview, often in programming contests. A Fenwick or segment
-            tree (Lecture 37) is usually the expected answer. This lecture is
-            short because the two ideas in it &mdash;
-            <em>split into blocks</em> and
-            <em>answer queries in a clever order</em> &mdash; are worth knowing
-            on their own, and because some questions (&ldquo;how many distinct
-            values in this range?&rdquo;) are genuinely easier with them than
-            with any tree.
+            <strong>Built on Lectures 19 and 20.</strong> Lecture 19 taught the
+            BST rule (smaller keys to the left, larger to the right) and search,
+            insert and delete on it. Lecture 20 taught heaps. This lecture shows
+            what goes wrong with a plain BST, how real libraries prevent it, and
+            when an ordered tree beats a heap. Lecture 37&rsquo;s Fenwick tree
+            appears once more as an alternative for rank queries.
           </div>
         </div>
-        <h2 class="h1" id="blocks">&#129521; Square Root Decomposition</h2>
+
+        <h2 class="h1" id="api">&#9749; Java&rsquo;s Ordered API</h2>
         <p>
-          Split an array of n items into blocks of about &radic;n items each,
-          and store one summary per block &mdash; its sum, its minimum, whatever
-          the question needs. For n = 10,000 that is 100 blocks of 100. A range
-          query then has three parts: the partial block at the left end, the
-          whole blocks in the middle, and the partial block at the right end.
+          <code>TreeMap&lt;K, V&gt;</code> keeps its keys sorted;
+          <code>TreeSet&lt;E&gt;</code> is the same thing without values.
+          Besides the usual <code>get</code>, <code>put</code> and
+          <code>remove</code>, they answer <em>neighbour</em> questions. Each
+          one below runs in O(log n), and each returns <code>null</code> when no
+          such key exists.
         </p>
-        <div class="code-block pseudo">
-          <div class="code-header">
-            <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build, Query, Update</span
-            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-          </div>
-          <pre>B ← floor(sqrt(n))                      <span class="pc-cm">// block size</span>
-blockSum ← array of (n ÷ B + 1) zeros
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + a[i]
-
-<span class="pc-kw">function</span> query(l, r):                   <span class="pc-cm">// sum of a[l..r]</span>
-    total ← 0
-    <span class="pc-kw">while</span> l ≤ r <span class="pc-kw">and</span> l mod B ≠ 0:        <span class="pc-cm">// ragged left end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">while</span> l + B - 1 ≤ r:                <span class="pc-cm">// whole blocks</span>
-        total ← total + blockSum[l ÷ B];  l ← l + B
-    <span class="pc-kw">while</span> l ≤ r:                        <span class="pc-cm">// ragged right end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">return</span> total
-
-<span class="pc-kw">function</span> update(i, value):              <span class="pc-cm">// point update in O(1)</span>
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + (value - a[i])
-    a[i] ← value</pre>
-        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Structure</th>
-                <th>Range query</th>
-                <th>Point update</th>
-                <th>Code size</th>
+                <th>Method</th>
+                <th>Returns</th>
+                <th>Example: keys {10, 20, 30}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Plain array</td>
-                <td>O(n)</td>
-                <td>O(1)</td>
-                <td>Trivial</td>
+                <td><code>floorKey(x)</code></td>
+                <td>Largest key <strong>&le;</strong> x</td>
+                <td>floorKey(25) = 20, floorKey(20) = 20</td>
               </tr>
               <tr>
-                <td>Prefix sums</td>
-                <td>O(1)</td>
-                <td>O(n)</td>
-                <td>Tiny</td>
+                <td><code>ceilingKey(x)</code></td>
+                <td>Smallest key <strong>&ge;</strong> x</td>
+                <td>ceilingKey(25) = 30, ceilingKey(31) = null</td>
               </tr>
               <tr>
-                <td><strong>Square root blocks</strong></td>
-                <td><strong>O(&radic;n)</strong></td>
-                <td><strong>O(1)</strong></td>
-                <td><strong>Small</strong></td>
+                <td><code>lowerKey(x)</code></td>
+                <td>Largest key <strong>&lt;</strong> x</td>
+                <td>lowerKey(20) = 10</td>
               </tr>
               <tr>
-                <td>Fenwick / segment tree</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Medium</td>
+                <td><code>higherKey(x)</code></td>
+                <td>Smallest key <strong>&gt;</strong> x</td>
+                <td>higherKey(20) = 30</td>
+              </tr>
+              <tr>
+                <td><code>firstKey()</code> / <code>lastKey()</code></td>
+                <td>Smallest / largest key</td>
+                <td>10 / 30</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>pollFirstEntry()</code> /
+                  <code>pollLastEntry()</code>
+                </td>
+                <td>Remove and return the smallest / largest</td>
+                <td>Like a heap&rsquo;s poll, from either end</td>
+              </tr>
+              <tr>
+                <td><code>headMap(x)</code> / <code>tailMap(x)</code></td>
+                <td>A live view of keys &lt; x / keys &ge; x</td>
+                <td>headMap(30) = {10, 20}</td>
+              </tr>
+              <tr>
+                <td><code>subMap(a, true, b, true)</code></td>
+                <td>A live view of keys in [a, b]</td>
+                <td>subMap(15, true, 30, true) = {20, 30}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <h3 class="h2" id="why-sqrt">Why &radic;n, exactly?</h3>
         <p>
-          With blocks of size B, a query touches at most n ÷ B whole blocks plus
-          up to 2B loose items. Make B small and there are too many blocks; make
-          it large and the ragged ends get long. The total, n ÷ B + 2B, is
-          smallest when the two terms are about equal &mdash; which happens at B
-          &asymp; &radic;n. That balancing argument is the whole idea, and it
-          applies well beyond sums.
+          TreeSet has the same family without the word &ldquo;Key&rdquo;:
+          <code>floor</code>, <code>ceiling</code>, <code>lower</code>,
+          <code>higher</code>, <code>first</code>, <code>last</code>,
+          <code>pollFirst</code>, <code>headSet</code>, <code>subSet</code>.
         </p>
-        <h2 class="h1" id="heavy">&#9878;&#65039; Heavy and Light Elements</h2>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">&#9749; Java &middot; Nearest Value</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="kw">TreeSet</span>&lt;<span class="cls">Integer</span>&gt; set = <span class="kw">new</span> <span class="cls">TreeSet</span>&lt;&gt;(<span class="cls">List</span>.<span class="fn">of</span>(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>));
+
+<span class="kw">int</span> <span class="fn">closest</span>(<span class="cls">TreeSet</span>&lt;<span class="cls">Integer</span>&gt; set, <span class="kw">int</span> x) {
+    <span class="cls">Integer</span> lo = set.<span class="fn">floor</span>(x);     <span class="cm">// Integer, not int: it may be null</span>
+    <span class="cls">Integer</span> hi = set.<span class="fn">ceiling</span>(x);
+    <span class="kw">if</span> (lo == <span class="kw">null</span>) <span class="kw">return</span> hi;
+    <span class="kw">if</span> (hi == <span class="kw">null</span>) <span class="kw">return</span> lo;
+    <span class="kw">return</span> (x - lo &lt;= hi - x) ? lo : hi;
+}
+<span class="cm">// closest(set, 24) → 20,  closest(set, 26) → 30,  closest(set, 99) → 30</span></pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Only the neighbours matter.</strong> In sorted order, the
+            value closest to x is always either the one just below it or the one
+            just above it &mdash; never anything further away. That single fact
+            is behind almost every problem in this lecture: you never scan the
+            whole set, you ask for the floor and the ceiling.
+          </div>
+        </div>
+
+        <h3 class="h2" id="multiset">TreeMap as a multiset</h3>
         <p>
-          The same balancing trick works on <em>values</em> instead of
-          positions. In an array of n items, at most &radic;n different values
-          can each appear more than &radic;n times &mdash; there simply is not
-          room for more. Call those values <strong>heavy</strong>. You can
-          afford to precompute something for every heavy value (such as a prefix
-          count), and handle every <strong>light</strong>
-          value by brute force, because a light value never appears more than
-          &radic;n times. The worked example on Online Majority Element uses
-          this split &mdash; with the cut-off at &radic;n/2, for a reason the
-          example explains.
-        </p>
-        <h2 class="h1" id="mo">&#128666; Mo&rsquo;s Algorithm</h2>
-        <p>
-          Some range questions are awkward for any tree: &ldquo;how many
-          distinct numbers are in <code>a[l..r]</code>?&rdquo; does not combine
-          neatly from two halves. But if you already know the answer for one
-          range, you can get the answer for a neighbouring range cheaply &mdash;
-          add one element on the right, or remove one on the left, updating a
-          count table as you go. Mo&rsquo;s algorithm makes that cheap-step idea
-          fast by answering the queries in a smart <em>order</em>.
-        </p>
-        <p>
-          The order: group queries by which &radic;n-block their left end falls
-          in, and within a group sort by right end. Then walk a window from
-          query to query. Inside one group the right end only moves forward, and
-          the left end only wobbles within one block &mdash; so the total
-          movement is about (n + q)&radic;n steps instead of n &times; q.
+          A TreeSet cannot hold the same value twice, and Java has no built-in
+          sorted multiset. The standard fix is a <code>TreeMap</code> from value
+          to <em>how many copies</em> there are. The one rule to never forget:
+          when a count drops to zero, remove the key, or
+          <code>firstKey()</code> will report a value that is no longer there.
         </p>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Mo’s Algorithm — Count Distinct
-              Values in Each Query Range</span
+              >&#128208; Pseudocode &middot; Sorted Multiset From a
+              TreeMap</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>B ← floor(sqrt(n))
-order ← query indices sorted by (l ÷ B, then r)
-count ← array of zeros;  distinct ← 0
-curL ← 0;  curR ← -1                  <span class="pc-cm">// the current window is empty</span>
+          <pre><span class="pc-kw">function</span> addOne(counts, x):
+    counts[x] ← counts.getOrDefault(x, 0) + 1
 
-<span class="pc-kw">function</span> add(i):
-    count[a[i]] ← count[a[i]] + 1
-    <span class="pc-kw">if</span> count[a[i]] = 1: distinct ← distinct + 1
-<span class="pc-kw">function</span> remove(i):
-    count[a[i]] ← count[a[i]] - 1
-    <span class="pc-kw">if</span> count[a[i]] = 0: distinct ← distinct - 1
+<span class="pc-kw">function</span> removeOne(counts, x):
+    counts[x] ← counts[x] - 1
+    <span class="pc-kw">if</span> counts[x] = 0:
+        counts.remove(x)                       <span class="pc-cm">// essential: keep only values still present</span>
 
-<span class="pc-kw">for</span> q <span class="pc-kw">in</span> order:
-    (l, r) ← queries[q]
-    <span class="pc-kw">while</span> curR &lt; r: curR ← curR + 1;  add(curR)       <span class="pc-cm">// grow right</span>
-    <span class="pc-kw">while</span> curL &gt; l: curL ← curL - 1;  add(curL)       <span class="pc-cm">// grow left</span>
-    <span class="pc-kw">while</span> curR &gt; r: remove(curR);  curR ← curR - 1    <span class="pc-cm">// shrink right</span>
-    <span class="pc-kw">while</span> curL &lt; l: remove(curL);  curL ← curL + 1    <span class="pc-cm">// shrink left</span>
-    answer[q] ← distinct
+<span class="pc-cm">// smallest = counts.firstKey(),  largest = counts.lastKey()  — both O(log n)</span>
+<span class="pc-cm">// A heap can give you one end; this gives you both ends AND lets you delete any value.</span></pre>
+        </div>
 
-<span class="pc-kw">return</span> answer                          <span class="pc-cm">// in the ORIGINAL query order</span></pre>
+        <h2 class="h1" id="balance">&#9878;&#65039; Why Balance Matters</h2>
+        <p>
+          Every BST operation walks one path from the root, so it costs the
+          tree&rsquo;s <strong>height</strong>. With n keys the height can be as
+          small as about log&#8322; n &mdash; or as large as n. Insert 1, 2, 3,
+          4, 5 in that order into a plain BST and each key goes to the right of
+          the last one: the &ldquo;tree&rdquo; is a linked list, and search is
+          O(n).
+        </p>
+        <div class="ascii-tree">
+          Inserted 1,2,3,4,5 (plain BST) Same keys, balanced
+          <span class="nd">1</span> <span class="nd">3</span>
+          \ / \
+          <span class="nd">2</span> <span class="nd">2</span>
+          <span class="nd">4</span>
+          \ / \
+          <span class="nd">3</span> <span class="nd">1</span>
+          <span class="nd">5</span>
+          \
+          <span class="nd">4</span> height 3: every search ≤ 3 steps \
+          <span class="nd">5</span> height 5: search = walk the whole list
+        </div>
+        <p>
+          Sorted input is not a rare accident &mdash; timestamps, IDs and
+          anything read from a sorted file all arrive in order. A
+          <strong>self-balancing</strong> BST repairs its shape after every
+          insert and delete so the height stays O(log n) no matter what order
+          the keys arrive in.
+        </p>
+
+        <h3 class="h2" id="rotations">Rotations: the only repair tool</h3>
+        <p>
+          A <strong>rotation</strong> lifts a child above its parent while
+          keeping the BST order intact. Picture a mobile hanging from the
+          ceiling: you move the hook from one bar to the one below it, and the
+          pieces rearrange so that one side hangs higher and the other lower.
+          Only three pointers change.
+        </p>
+        <div class="ascii-tree">
+          Right rotation at <span class="hl">y</span> Left rotation at
+          <span class="hl">x</span> <span class="hl">y</span>
+          <span class="nd">x</span>
+          / \ / \
+          <span class="nd">x</span> C ──→ A <span class="hl">y</span> / \ / \ A
+          B B C In-order before and after: A, x, B, y, C — the order never
+          changes.
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Rotations</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> rotateRight(y):
+    x ← y.left
+    y.left ← x.right                          <span class="pc-cm">// B moves across: it was between x and y, and still is</span>
+    x.right ← y
+    update height (or size) of y, <span class="pc-kw">then</span> of x     <span class="pc-cm">// y is now below x, so y first</span>
+    <span class="pc-kw">return</span> x                                  <span class="pc-cm">// the new root of this subtree</span>
+
+<span class="pc-kw">function</span> rotateLeft(x):
+    y ← x.right
+    x.right ← y.left
+    y.left ← x
+    update x, <span class="pc-kw">then</span> y
+    <span class="pc-kw">return</span> y</pre>
+        </div>
+
+        <h3 class="h2" id="avl-rb">AVL and red-black trees, at a glance</h3>
+        <p>
+          The two classic self-balancing trees differ only in the rule they
+          enforce and how often they rotate. You will almost never be asked to
+          code one in full; you <em>will</em> be asked what they guarantee and
+          why.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>AVL tree</th>
+                <th>Red-black tree</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>The rule</strong></td>
+                <td>
+                  At every node, the heights of the two subtrees differ by at
+                  most 1
+                </td>
+                <td>
+                  Nodes are red or black; no red node has a red child; every
+                  path from a node down to an empty spot passes the same number
+                  of black nodes
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Height</strong></td>
+                <td>&le; about 1.44 log&#8322; n (tighter)</td>
+                <td>&le; 2 log&#8322;(n + 1) (looser)</td>
+              </tr>
+              <tr>
+                <td><strong>Good at</strong></td>
+                <td>Lookups (shorter paths)</td>
+                <td>Inserts and deletes (fewer rotations)</td>
+              </tr>
+              <tr>
+                <td><strong>Where you meet it</strong></td>
+                <td>Textbooks, read-heavy indexes</td>
+                <td>
+                  Java&rsquo;s <code>TreeMap</code> and <code>TreeSet</code>,
+                  and a HashMap bucket that grows past 8 entries
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          AVL insert is short enough to read once. Insert as in a plain BST;
+          then, on the way back up, any node whose subtrees differ in height by
+          2 is fixed by one or two rotations. There are four cases, named by the
+          path from the unbalanced node down to the new key.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; AVL Insert (Read, Don&rsquo;t
+              Memorise)</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> height(node): <span class="pc-kw">return</span> 0 <span class="pc-kw">if</span> node = null <span class="pc-kw">else</span> node.height
+<span class="pc-kw">function</span> balance(node): <span class="pc-kw">return</span> height(node.left) - height(node.right)
+
+<span class="pc-kw">function</span> insert(node, key):
+    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span> new node(key) with height 1
+    <span class="pc-kw">if</span> key &lt; node.key: node.left ← insert(node.left, key)
+    <span class="pc-kw">else</span>:              node.right ← insert(node.right, key)
+    node.height ← 1 + max(height(node.left), height(node.right))
+    b ← balance(node)
+    <span class="pc-kw">if</span> b &gt; 1 <span class="pc-kw">and</span> key &lt; node.left.key:  <span class="pc-kw">return</span> rotateRight(node)       <span class="pc-cm">// left-left</span>
+    <span class="pc-kw">if</span> b &lt; -1 <span class="pc-kw">and</span> key &gt; node.right.key: <span class="pc-kw">return</span> rotateLeft(node)       <span class="pc-cm">// right-right</span>
+    <span class="pc-kw">if</span> b &gt; 1:                                                     <span class="pc-cm">// left-right</span>
+        node.left ← rotateLeft(node.left);  <span class="pc-kw">return</span> rotateRight(node)
+    <span class="pc-kw">if</span> b &lt; -1:                                                    <span class="pc-cm">// right-left</span>
+        node.right ← rotateRight(node.right);  <span class="pc-kw">return</span> rotateLeft(node)
+    <span class="pc-kw">return</span> node</pre>
+        </div>
+        <div class="callout purple">
+          <span class="callout-icon">&#127919;</span>
+          <div class="callout-body">
+            <strong>What an interviewer wants to hear.</strong> &ldquo;A plain
+            BST can degrade to O(n) on sorted input. Self-balancing trees fix
+            the shape with rotations after each update, which preserve the
+            in-order sequence. AVL keeps subtree heights within 1; red-black
+            uses colours and allows up to twice the minimum height but rotates
+            less. Java&rsquo;s TreeMap is red-black, so its operations are O(log
+            n) in the worst case.&rdquo;
+          </div>
+        </div>
+
+        <h2 class="h1" id="order-stat">&#128290; Order Statistics</h2>
+        <p>
+          TreeMap cannot answer &ldquo;what is the k-th smallest key?&rdquo; or
+          &ldquo;how many keys are smaller than x?&rdquo; faster than walking
+          through them. Add one field to every node &mdash;
+          <code>size</code>, the number of nodes in its subtree &mdash; and both
+          become a single walk down the tree. The result is called an
+          <strong>order-statistic tree</strong>. Rotations must update
+          <code>size</code> exactly as they update <code>height</code>.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; k-th Smallest and Rank With Subtree
+              Sizes</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> size(node): <span class="pc-kw">return</span> 0 <span class="pc-kw">if</span> node = null <span class="pc-kw">else</span> node.size
+
+<span class="pc-kw">function</span> kth(node, k):                       <span class="pc-cm">// 1-based</span>
+    left ← size(node.left)
+    <span class="pc-kw">if</span> k ≤ left:     <span class="pc-kw">return</span> kth(node.left, k)
+    <span class="pc-kw">if</span> k = left + 1: <span class="pc-kw">return</span> node.key            <span class="pc-cm">// exactly 'left' keys are smaller</span>
+    <span class="pc-kw">return</span> kth(node.right, k - left - 1)        <span class="pc-cm">// skip the left subtree and this node</span>
+
+<span class="pc-kw">function</span> rank(node, x):                     <span class="pc-cm">// how many keys are &lt; x</span>
+    <span class="pc-kw">if</span> node = null: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">if</span> x ≤ node.key: <span class="pc-kw">return</span> rank(node.left, x)
+    <span class="pc-kw">return</span> size(node.left) + 1 + rank(node.right, x)</pre>
         </div>
         <div class="callout blue">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>Offline means you see every question first.</strong>
-            Mo&rsquo;s algorithm only works when all the queries are known
-            before you answer any of them, so you can reorder them. That is
-            called answering <em>offline</em>. If each query depends on the
-            answer to the previous one, you are <em>online</em>, and Mo&rsquo;s
-            is off the table.
+            <strong>In Java, without writing a tree.</strong> If every value is
+            known in advance (or can be), compress them to indices 1..m and keep
+            a Fenwick tree of counts from Lecture 37: rank is a prefix sum, and
+            the k-th smallest is a binary search over prefix sums. That is what
+            most accepted solutions to &ldquo;k-th&rdquo; and &ldquo;count
+            smaller&rdquo; problems actually do.
           </div>
         </div>
-        <h3 class="h2" id="freq">Frequency of Frequencies</h3>
+
+        <h2 class="h1" id="skiplist">&#129692; Skip Lists</h2>
         <p>
-          Counting distinct values needs one table. Tracking the
-          <em>most frequent</em> value as the window moves needs two:
-          <code>count[v]</code> (how often value v appears) and
-          <code>howMany[f]</code> (how many values currently appear exactly f
-          times). When you remove an element, the maximum frequency can only
-          drop by one, and <code>howMany</code> tells you instantly whether it
-          did. This is the trick behind most &ldquo;mode in a range&rdquo;
-          questions.
+          A <strong>skip list</strong> gets balanced-tree speed without any
+          rotations. Start with a sorted linked list (Lecture 14). Give each
+          node a random height by flipping a coin: heads, it also joins the
+          level above; heads again, the level above that. Roughly half the nodes
+          reach level 2, a quarter reach level 3, and so on. The upper levels
+          are express lanes: search along the top level until the next value
+          would overshoot, drop down a level, and repeat.
         </p>
-        <h2 class="h1" id="choose">&#129513; Choosing a Tool</h2>
+        <div class="ascii-tree">
+          level 3: head ───────────────────────────&gt;
+          <span class="nd">30</span> ────────────&gt; null level 2: head
+          ─────────&gt; <span class="nd">10</span> ─────────&gt;
+          <span class="nd">30</span> ────&gt; <span class="nd">50</span> ──&gt;
+          null level 1: head ─&gt; <span class="nd">5</span> ─&gt;
+          <span class="nd">10</span> ─&gt; <span class="nd">20</span> ─&gt;
+          <span class="nd">30</span> ─&gt; <span class="nd">40</span> ─&gt;
+          <span class="nd">50</span> ─&gt; null Search 40: level 3 → 30, level 2
+          → (50 overshoots) stay at 30, level 1 → <span class="hl">40</span> ✓
+        </div>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Skip List Search and Insert</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> predecessors(list, target):          <span class="pc-cm">// last node &lt; target on every level</span>
+    pred ← array of size MAX_LEVEL;  cur ← list.head
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> list.level - 1 <span class="pc-kw">down to</span> 0:
+        <span class="pc-kw">while</span> cur.next[lv] ≠ null <span class="pc-kw">and</span> cur.next[lv].value &lt; target:
+            cur ← cur.next[lv]                  <span class="pc-cm">// move right in the express lane</span>
+        pred[lv] ← cur                          <span class="pc-cm">// then drop one level</span>
+    <span class="pc-kw">return</span> pred
+
+<span class="pc-kw">function</span> insert(list, x):
+    pred ← predecessors(list, x)
+    h ← 1
+    <span class="pc-kw">while</span> h &lt; MAX_LEVEL <span class="pc-kw">and</span> coin flip is heads: h ← h + 1
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> list.level <span class="pc-kw">to</span> h - 1: pred[lv] ← list.head   <span class="pc-cm">// brand-new levels start at head</span>
+    list.level ← max(list.level, h)
+    node ← new node(x) with h next-pointers
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> h - 1:                      <span class="pc-cm">// splice in, exactly like a linked list</span>
+        node.next[lv] ← pred[lv].next[lv]
+        pred[lv].next[lv] ← node</pre>
+        </div>
+        <p>
+          Searches, inserts and deletes all cost O(log n) <em>expected</em>
+          &mdash; the randomness is in the coin flips, not in the input, so no
+          insertion order can make it slow on purpose. Java ships one as
+          <code>ConcurrentSkipListMap</code>, used when many threads share an
+          ordered map, because updating a few linked-list pointers is easier to
+          make thread-safe than a rotation.
+        </p>
+
+        <h2 class="h1" id="choose">&#129513; Choosing a Structure</h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>The situation</th>
-                <th>Reach for</th>
-                <th>Why</th>
+                <th>You need&hellip;</th>
+                <th>Use</th>
+                <th>Why not the others</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Range sums, array never changes</td>
-                <td>Prefix sums</td>
-                <td>O(1) per query</td>
+                <td>Exact lookup only, no order</td>
+                <td>HashMap / HashSet</td>
+                <td>O(1) beats O(log n)</td>
               </tr>
               <tr>
-                <td>Range sums with updates</td>
-                <td>Fenwick tree (Lecture 37)</td>
-                <td>O(log n) both, very little code</td>
+                <td>Repeatedly take the smallest (or largest) only</td>
+                <td>PriorityQueue</td>
+                <td>Simpler and faster constant; no arbitrary delete needed</td>
               </tr>
               <tr>
-                <td>Range min/max with updates</td>
-                <td>Segment tree (Lecture 37)</td>
-                <td>Min and max are not invertible</td>
+                <td>Both ends, or delete any item, while inserting</td>
+                <td>TreeMap multiset</td>
+                <td>PriorityQueue.remove(x) is O(n)</td>
               </tr>
               <tr>
-                <td>Updates, and a tree feels like too much code</td>
-                <td>Square root blocks</td>
-                <td>O(&radic;n), written in five minutes</td>
+                <td>Nearest value, or keys in a range, while inserting</td>
+                <td>TreeMap / TreeSet</td>
+                <td>A sorted array needs O(n) per insert</td>
               </tr>
               <tr>
-                <td>
-                  Distinct count or mode in many ranges, all known upfront
-                </td>
-                <td>Mo&rsquo;s algorithm</td>
-                <td>Answers do not merge, but they slide</td>
+                <td>Nearest value, but the data never changes</td>
+                <td>Sorted array + binary search</td>
+                <td>Less memory, faster in practice</td>
               </tr>
               <tr>
-                <td>Values in a small range (say &minus;50 to 50)</td>
-                <td>Counting buckets</td>
-                <td>Scan 101 buckets instead of sorting</td>
+                <td>k-th smallest or rank, while inserting</td>
+                <td>Fenwick tree over compressed values, or two heaps</td>
+                <td>TreeMap would walk k entries</td>
               </tr>
             </tbody>
           </table>
         </div>
+
         <h2 class="h1" id="pitfalls">
           &#9888;&#65039; Complexity &amp; Classic Bugs
         </h2>
@@ -1783,35 +2003,41 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <thead>
               <tr>
                 <th>Operation</th>
-                <th>Cost</th>
-                <th>Note</th>
+                <th>Plain BST (worst)</th>
+                <th>TreeMap / AVL / red-black</th>
+                <th>Skip list</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Build the blocks</td>
+                <td>Search, insert, delete</td>
                 <td>O(n)</td>
-                <td></td>
+                <td>O(log n)</td>
+                <td>O(log n) expected</td>
               </tr>
               <tr>
-                <td>Block range query</td>
-                <td>O(&radic;n)</td>
-                <td>Two ragged ends plus whole blocks</td>
+                <td>floor / ceiling / higher / lower</td>
+                <td>O(n)</td>
+                <td>O(log n)</td>
+                <td>O(log n) expected</td>
               </tr>
               <tr>
-                <td>Block point update</td>
-                <td>O(1)</td>
-                <td>Update the item and its block</td>
+                <td>First / last key</td>
+                <td>O(n)</td>
+                <td>O(log n)</td>
+                <td>O(1) first, O(log n) last</td>
               </tr>
               <tr>
-                <td>Mo&rsquo;s algorithm, q queries</td>
-                <td>O((n + q)&radic;n)</td>
-                <td>Plus O(q log q) to sort the queries</td>
+                <td>Iterate over k keys in a range</td>
+                <td>O(n)</td>
+                <td>O(log n + k)</td>
+                <td>O(log n + k)</td>
               </tr>
               <tr>
-                <td>Heavy/light precompute</td>
-                <td>O(n&radic;n) worst case</td>
-                <td>Prefix counts for at most &radic;n heavy values</td>
+                <td>k-th smallest</td>
+                <td>O(n)</td>
+                <td>O(k) in TreeMap; O(log n) with subtree sizes</td>
+                <td>O(n)</td>
               </tr>
             </tbody>
           </table>
@@ -1827,44 +2053,51 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             </thead>
             <tbody>
               <tr>
-                <td>Block size of 0 when n is tiny</td>
-                <td>Division by zero</td>
-                <td>Use <code>max(1, floor(sqrt(n)))</code></td>
-              </tr>
-              <tr>
-                <td>Returning Mo&rsquo;s answers in sorted order</td>
-                <td>Answers attached to the wrong queries</td>
-                <td>Store each answer at its original index</td>
-              </tr>
-              <tr>
-                <td>Shrinking before growing the window</td>
                 <td>
-                  Removing an element that was never added; negative counts
+                  <code>int x = set.floor(v);</code> when nothing is &le; v
+                </td>
+                <td><code>NullPointerException</code> from unboxing</td>
+                <td>Store the result in an <code>Integer</code>; check null</td>
+              </tr>
+              <tr>
+                <td>Leaving zero counts in a TreeMap multiset</td>
+                <td><code>firstKey()</code> returns a value already removed</td>
+                <td>Remove the key the moment its count hits 0</td>
+              </tr>
+              <tr>
+                <td>Comparator that ignores a tie-breaker</td>
+                <td>
+                  TreeSet silently drops a different item that &ldquo;compares
+                  equal&rdquo;
+                </td>
+                <td>Break ties with a unique field such as a name or id</td>
+              </tr>
+              <tr>
+                <td>
+                  Changing an object&rsquo;s sort field while it is in a TreeSet
                 </td>
                 <td>
-                  Grow first (<code>curR</code> up, <code>curL</code> down),
-                  then shrink
+                  <code>remove</code> and <code>contains</code> stop finding it
+                </td>
+                <td>Remove it, change the field, then add it back</td>
+              </tr>
+              <tr>
+                <td>Comparator written as <code>a - b</code></td>
+                <td>Overflow flips the order for large values</td>
+                <td>Use <code>Integer.compare(a, b)</code></td>
+              </tr>
+              <tr>
+                <td>Calling <code>subMap(...).size()</code> in a loop</td>
+                <td>Time limit exceeded</td>
+                <td>
+                  A range view&rsquo;s size is O(k), not O(1); count some other
+                  way
                 </td>
               </tr>
               <tr>
-                <td>Off-by-one on the whole-block loop</td>
-                <td>Double-counts or skips the last full block</td>
-                <td>Loop while <code>l + B − 1 ≤ r</code></td>
-              </tr>
-              <tr>
-                <td>Forgetting to update the block summary</td>
-                <td>Queries ignore the update</td>
-                <td>Update both the item and its block</td>
-              </tr>
-              <tr>
-                <td>Using Mo&rsquo;s on online queries</td>
-                <td>Impossible to reorder</td>
-                <td>Use a tree, or rethink the problem</td>
-              </tr>
-              <tr>
-                <td>A count array sized by value on huge values</td>
-                <td>Out of memory</td>
-                <td>Compress the values first</td>
+                <td>Rotation that updates the parent before the child</td>
+                <td>Wrong heights or sizes, then wrong balancing</td>
+                <td>Update the node that moved down first</td>
               </tr>
             </tbody>
           </table>
@@ -1872,413 +2105,162 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
         <div class="callout green">
           <span class="callout-icon">&#128269;</span>
           <div class="callout-body">
-            <strong>How to spot it.</strong> A pile of range queries, all given
-            up front, asking something that does not split into halves &mdash;
-            distinct count, mode, pairs of equal values. Or a constraint around
-            10&#8309; where you would like a simpler alternative to a tree. And
-            if the <em>values</em> are small, try buckets before anything
-            clever.
+            <strong>How to spot it.</strong> &ldquo;Closest&rdquo;,
+            &ldquo;nearest&rdquo;, &ldquo;just below&rdquo;, &ldquo;next
+            available&rdquo;, &ldquo;within t of each other&rdquo;, a maximum or
+            minimum that must survive deletions or corrections, or
+            &ldquo;k-th&rdquo; as items keep arriving.
           </div>
         </div>
+
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Four problems, one per idea in this lecture: the cheap add/remove
-          step, buckets over a small value range, answering queries in a better
-          order, and the heavy/light split.
+          Five problems, one per idea: an ordered sliding window, a TreeMap
+          multiset, neighbours in a TreeSet, building a skip list yourself, and
+          tracking a moving k-th element.
         </p>
 
-        <!-- Problem 01: Count the Number of Good Subarrays -->
+        <!-- Problem 01: Contains Duplicate III -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 01 &middot; The Add/Remove Primitive
+                Problem 01 &middot; Ordered Sliding Window
               </div>
-              <div class="prob-title">Count the Number of Good Subarrays</div>
+              <div class="prob-title">Contains Duplicate III</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/count-the-number-of-good-subarrays/"
+                  href="https://leetcode.com/problems/contains-duplicate-iii/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 2537 - Count the Number of Good Subarrays</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Window with a running pair count</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Count the subarrays that contain at least <code>k</code> pairs
-                of equal elements (<code>i &lt; j</code> with
-                <code>nums[i] = nums[j]</code>).
-              </p>
-              <div class="iobox">nums = [3,1,4,3,2,2,4], k = 2 → 4</div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    When one more copy of a value x enters a window that already
-                    holds c copies, how many new equal pairs appear?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Exactly c. And removing a copy removes c − 1 pairs. So the
-                    pair count updates in O(1) per step — exactly the cheap
-                    add/remove step Mo&rsquo;s algorithm is built on.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                The whole trick is the O(1) update: adding a value that already
-                appears c times creates c new pairs, removing one destroys (c −
-                1). With that, a sliding window works. For each right end,
-                shrink the left end while the window still has at least k pairs;
-                then every start position before the current left end gives a
-                good subarray. This add/remove bookkeeping is the same primitive
-                Mo&rsquo;s algorithm uses &mdash; here the queries happen to
-                arrive in a convenient order already.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Pairs Change by the Current
-                      Count</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countGood(nums, k):
-    count ← empty map;  pairs ← 0;  left ← 0;  result ← 0
-    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        x ← nums[right]
-        pairs ← pairs + count[x]            <span class="pc-cm">// x pairs with every copy already here</span>
-        count[x] ← count[x] + 1
-        <span class="pc-kw">while</span> pairs ≥ k:                    <span class="pc-cm">// window [left..right] is good</span>
-            y ← nums[left]
-            count[y] ← count[y] - 1
-            pairs ← pairs - count[y]        <span class="pc-cm">// lost pairs with the copies that remain</span>
-            left ← left + 1
-        result ← result + left              <span class="pc-cm">// starts 0..left-1 all give good subarrays</span>
-    <span class="pc-kw">return</span> result</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 02: Sliding Subarray Beauty -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot; Small Values → Buckets
-              </div>
-              <div class="prob-title">Sliding Subarray Beauty</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/sliding-subarray-beauty/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2653 - Sliding Subarray Beauty</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Counting buckets in a window</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For every window of length <code>k</code>, report its
-                <em>beauty</em>: the x-th smallest negative number in the
-                window, or 0 if there are fewer than x negatives.
-              </p>
-              <div class="iobox">
-                nums = [1,-1,-3,-2,3], k = 3, x = 2 → [-1,-2,-2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sorting every window costs O(k log k) each time. Look at the
-                    constraints on the values — how many different values can
-                    there be?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Values lie between −50 and 50. Keep a count for each of the
-                    50 negative values; the x-th smallest is found by walking
-                    those 50 buckets.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                When the <em>values</em> are small, bucket them. A window update
-                is O(1) &mdash; add one count, remove one count &mdash; and a
-                query walks at most 50 buckets from &minus;50 upwards until x
-                negatives have been passed. That makes the whole thing O(n
-                &times; 50), independent of k. It is the same &ldquo;fixed-size
-                summary per block&rdquo; idea as square root decomposition,
-                applied to the value range instead of the positions.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; 50 Buckets per Window</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> getSubarrayBeauty(nums, k, x):
-    count ← array of 51 zeros               <span class="pc-cm">// count[v] for v = -50..-1, stored at index -v</span>
-    result ← empty list
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">if</span> nums[i] &lt; 0: count[-nums[i]] ← count[-nums[i]] + 1
-        <span class="pc-kw">if</span> i ≥ k <span class="pc-kw">and</span> nums[i - k] &lt; 0:       <span class="pc-cm">// the element leaving the window</span>
-            count[-nums[i - k]] ← count[-nums[i - k]] - 1
-        <span class="pc-kw">if</span> i ≥ k - 1:
-            seen ← 0;  beauty ← 0
-            <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 50 <span class="pc-kw">down to</span> 1:        <span class="pc-cm">// -50, -49, ... smallest first</span>
-                seen ← seen + count[v]
-                <span class="pc-kw">if</span> seen ≥ x: beauty ← -v;  <span class="pc-kw">break</span>
-            result.append(beauty)
-    <span class="pc-kw">return</span> result</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n &middot; 50)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(1)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 03: Count Zero Request Servers -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 03 &middot; Reorder the Queries
-              </div>
-              <div class="prob-title">Count Zero Request Servers</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/count-zero-request-servers/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2747 - Count Zero Request Servers</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Offline queries + sliding window</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given server logs <code>[serverId, time]</code> and queries
-                asking about the interval <code>[q − x, q]</code>, return, for
-                each query, how many of the <code>n</code> servers received no
-                requests in that interval.
-              </p>
-              <div class="iobox">
-                n = 3, logs = [[1,3],[2,6],[1,5]], x = 5, queries = [10,11] →
-                [1,2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Answering each query by scanning every log is O(logs ×
-                    queries). What if you answered the queries in increasing
-                    order of time instead of the order given?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sort the logs by time and the queries by time. The window [q
-                    − x, q] then only ever moves forward: add logs entering on
-                    the right, remove logs leaving on the left, and keep a count
-                    of servers with at least one request.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the core of Mo&rsquo;s algorithm in its simplest form:
-                <strong
-                  >answer the queries in a different order from the one they
-                  were asked in</strong
-                >, so that each step reuses the previous answer. Once queries
-                are sorted by time, both window ends only move forward, so every
-                log is added once and removed once. The only extra care is to
-                remember each query&rsquo;s original position and write its
-                answer there.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sort Queries, Slide
-                      Once</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countServers(n, logs, x, queries):
-    sort logs by time
-    order ← query indices sorted by queries[i]
-    count ← array of n + 1 zeros;  active ← 0     <span class="pc-cm">// servers with ≥ 1 request</span>
-    lo ← 0;  hi ← 0;  answer ← array of length(queries)
-    <span class="pc-kw">for</span> qi <span class="pc-kw">in</span> order:
-        q ← queries[qi]
-        <span class="pc-kw">while</span> hi &lt; length(logs) <span class="pc-kw">and</span> logs[hi].time ≤ q:          <span class="pc-cm">// entering</span>
-            s ← logs[hi].server
-            <span class="pc-kw">if</span> count[s] = 0: active ← active + 1
-            count[s] ← count[s] + 1;  hi ← hi + 1
-        <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> logs[lo].time &lt; q - x:                <span class="pc-cm">// leaving</span>
-            s ← logs[lo].server
-            count[s] ← count[s] - 1
-            <span class="pc-kw">if</span> count[s] = 0: active ← active - 1
-            lo ← lo + 1
-        answer[qi] ← n - active                                  <span class="pc-cm">// original position</span>
-    <span class="pc-kw">return</span> answer</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(L log L + Q log Q)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n + Q)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 04: Online Majority Element In Subarray -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Heavy and Light</div>
-              <div class="prob-title">Online Majority Element In Subarray</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/online-majority-element-in-subarray/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1157 - Online Majority Element In Subarray</a
+                  >&#128279; LC 220 - Contains Duplicate III</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Square root split by frequency</span>
+                <span class="tag tag-pat">TreeSet window + ceiling</span>
+                <span class="tag tag-co"
+                  >Google &middot; Airbnb &middot; Amazon</span
+                >
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Return true if there are two different indices i and j with |i
+                &minus; j| &le; indexDiff and |nums[i] &minus; nums[j]| &le;
+                valueDiff.
+              </p>
+              <div class="iobox">
+                nums = [1,2,3,1], indexDiff = 3, valueDiff = 0 → true nums =
+                [1,5,9,1,5,9], indexDiff = 2, valueDiff = 3 → false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    For each j, only the last indexDiff values can pair with
+                    nums[j]. Among those, which single value is worth checking?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The smallest value that is at least x &minus; valueDiff:
+                    <code>ceiling(x &minus; valueDiff)</code>. If even that one
+                    is above x + valueDiff, nothing in the window is close
+                    enough.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                The brute force compares every pair within indexDiff: O(n
+                &middot; indexDiff). Keep the window of the last indexDiff
+                values in a TreeSet instead. Any valid partner for x lies in [x
+                &minus; valueDiff, x + valueDiff], and the only candidate worth
+                testing is the smallest value in the window that is &ge; x
+                &minus; valueDiff. One ceiling query per element makes the whole
+                scan O(n log k). Two details: compute x &minus; valueDiff in
+                <code>long</code> to avoid overflow, and note that the window
+                never holds duplicates &mdash; a duplicate would already have
+                returned true &mdash; so a set is enough.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; One Ceiling Query per
+                      Element</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> containsNearbyAlmostDuplicate(nums, indexDiff, valueDiff):
+    window ← empty TreeSet
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
+        x ← nums[i]
+        c ← window.ceiling(x - valueDiff)             <span class="pc-cm">// in long arithmetic</span>
+        <span class="pc-kw">if</span> c ≠ null <span class="pc-kw">and</span> c ≤ x + valueDiff: <span class="pc-kw">return</span> true
+        window.add(x)
+        <span class="pc-kw">if</span> i ≥ indexDiff:
+            window.remove(nums[i - indexDiff])         <span class="pc-cm">// keep only the last indexDiff values</span>
+    <span class="pc-kw">return</span> false</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n log k)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(k)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 02: Stock Price Fluctuation -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 02 &middot; TreeMap Multiset</div>
+              <div class="prob-title">Stock Price Fluctuation</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/stock-price-fluctuation/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2034 - Stock Price Fluctuation</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Value &rarr; count TreeMap</span>
                 <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
@@ -2290,16 +2272,16 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Build a structure over an array that answers
-                <code>query(left, right, threshold)</code>: the element
-                appearing at least <code>threshold</code> times in
-                <code>arr[left..right]</code>, or −1. It is guaranteed that
-                <code>2 × threshold &gt; right − left + 1</code>, so the answer
-                is a strict majority.
+                Price records arrive as (timestamp, price), possibly out of
+                order, and a later record for the same timestamp
+                <em>corrects</em> the earlier one. Support
+                <code>current()</code> (price at the latest timestamp),
+                <code>maximum()</code> and <code>minimum()</code> over all
+                current records.
               </p>
               <div class="iobox">
-                arr = [1,1,2,2,1,1]; query(0,5,4) → 1, query(0,3,3) → −1,
-                query(2,3,2) → 2
+                update(1,10), update(2,5), current() → 5, maximum() → 10
+                update(1,3), maximum() → 5, update(4,2), minimum() → 2
               </div>
             </div>
             <div class="prob-section">
@@ -2311,9 +2293,8 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    Short ranges are easy: a single Boyer-Moore pass finds the
-                    majority candidate. What about long ranges — which values
-                    could possibly be a majority of a long range?
+                    A correction must <em>remove</em> the old price from
+                    whatever tracks the maximum. What does that rule out?
                   </p>
                 </div>
               </details>
@@ -2324,12 +2305,9 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    A range longer than &radic;n needs more than &radic;n/2
-                    copies of its majority, so only values appearing more than
-                    &radic;n/2 times in the whole array can win it — and there
-                    are at most 2&radic;n of those. Give each such
-                    <em>heavy</em> value a prefix-count array; handle short
-                    ranges (length ≤ &radic;n) by brute force.
+                    Two prices can be equal, so you need a sorted multiset: a
+                    TreeMap from price to how many timestamps have it. Max and
+                    min are its last and first keys.
                   </p>
                 </div>
               </details>
@@ -2337,19 +2315,14 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The split is by <em>frequency</em>, and the threshold is
-                &radic;n. A range longer than &radic;n needs a majority of more
-                than &radic;n/2 copies, so its answer must appear more than
-                &radic;n/2 times in the whole array &mdash; and at most
-                2&radic;n values do, each checked in O(1) with prefix counts.
-                (Setting the cut-off at &radic;n instead is a tempting bug: a
-                value with, say, 0.7&radic;n copies can still be the majority of
-                a range just over &radic;n long.) A range of length at most
-                &radic;n is scanned directly with Boyer-Moore voting. Every
-                query is therefore O(&radic;n). Binary search on each
-                value&rsquo;s positions, or a segment tree of Boyer-Moore votes,
-                also work &mdash; but the heavy/light split is the square-root
-                idea in its purest form.
+                A HashMap from timestamp to price answers
+                <code>current()</code>, together with the largest timestamp
+                seen. The maximum and minimum are the hard part, because a
+                correction deletes an old price. A heap can only delete lazily
+                (you would pop stale entries later); a TreeMap multiset deletes
+                directly. On update, if the timestamp already had a price,
+                remove one copy of it, then add one copy of the new price. Both
+                ends of the TreeMap are then O(log n) away.
               </p>
             </div>
             <details>
@@ -2360,35 +2333,445 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix Counts for Heavy
-                      Values, Brute Force for Short Ranges</span
+                      >&#128208; Pseudocode &middot; HashMap + TreeMap of
+                      Counts</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> MajorityChecker(arr):
-    n ← length(arr);  S ← floor(sqrt(n))
-    heavy ← values appearing more than S ÷ 2 <span class="pc-kw">times</span> <span class="pc-kw">in</span> arr    <span class="pc-cm">// at most 2S of them</span>
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:
-        pref[v] ← prefix counts of v over arr                 <span class="pc-cm">// pref[v][i] = copies in arr[0..i-1]</span>
+                  <pre>priceAt ← empty HashMap        <span class="pc-cm">// timestamp → price</span>
+counts ← empty TreeMap         <span class="pc-cm">// price → how many timestamps have it</span>
+latest ← 0
 
-<span class="pc-kw">function</span> query(left, right, threshold):
-    <span class="pc-kw">if</span> right - left + 1 ≤ S:                                  <span class="pc-cm">// short range: vote directly</span>
-        cand ← Boyer-Moore majority candidate of arr[left..right]
-        <span class="pc-kw">return</span> cand <span class="pc-kw">if</span> count of cand <span class="pc-kw">in</span> arr[left..right] ≥ threshold <span class="pc-kw">else</span> -1
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:                                      <span class="pc-cm">// long range: only heavy values qualify</span>
-        <span class="pc-kw">if</span> pref[v][right + 1] - pref[v][left] ≥ threshold:
-            <span class="pc-kw">return</span> v
-    <span class="pc-kw">return</span> -1</pre>
+<span class="pc-kw">function</span> update(t, price):
+    <span class="pc-kw">if</span> t <span class="pc-kw">in</span> priceAt:
+        removeOne(counts, priceAt[t])          <span class="pc-cm">// the correction replaces the old price</span>
+    priceAt[t] ← price
+    addOne(counts, price)
+    latest ← max(latest, t)
+
+<span class="pc-kw">function</span> current(): <span class="pc-kw">return</span> priceAt[latest]
+<span class="pc-kw">function</span> maximum(): <span class="pc-kw">return</span> counts.lastKey()
+<span class="pc-kw">function</span> minimum(): <span class="pc-kw">return</span> counts.firstKey()
+<span class="pc-cm">// addOne / removeOne are the multiset helpers from the lecture</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(&radic;n) per query</span>
+                    ><span class="cx-val green">O(log n) per call</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n&radic;n)</span>
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Exam Room -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Neighbours in a TreeSet
+              </div>
+              <div class="prob-title">Exam Room</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/exam-room/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 855 - Exam Room</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Widest gap between neighbours</span>
+                <span class="tag tag-co">Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                n seats in a row, numbered 0 to n &minus; 1. Each arriving
+                student takes the seat that is as far as possible from the
+                nearest other student (the lowest number on ties; seat 0 if the
+                room is empty). Students may also leave.
+              </p>
+              <div class="iobox">
+                n = 10: seat() → 0, seat() → 9, seat() → 4, seat() → 2,
+                leave(4), seat() → 5
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Between two neighbouring students at a and b, where is the
+                    best seat, and how far is it from both?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    At a + (b &minus; a) / 2, distance (b &minus; a) / 2. The
+                    two ends are special: seat 0 is first-student positions
+                    away, seat n &minus; 1 is (n &minus; 1 &minus; last) away.
+                    Keep the students in a TreeSet so neighbours are adjacent.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Only three kinds of seat can ever be best: seat 0, the middle of
+                a gap between two neighbouring students, or seat n &minus; 1.
+                Keep the taken seats in a TreeSet, walk it once comparing
+                candidates in increasing seat order, and replace the best only
+                on a <em>strictly</em> larger distance &mdash; that is what
+                makes ties go to the smaller seat. <code>leave</code> is a
+                single O(log n) removal. With at most 10&#8308; calls, the O(n)
+                scan per seat is fast enough; the faster version keeps the gaps
+                themselves in a TreeSet ordered by size.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Scan Neighbouring
+                      Pairs</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>taken ← empty TreeSet
+
+<span class="pc-kw">function</span> seat():
+    <span class="pc-kw">if</span> taken is empty:
+        p ← 0
+    <span class="pc-kw">else</span>:
+        best ← taken.first();  p ← 0                 <span class="pc-cm">// sitting at seat 0</span>
+        prev ← null
+        <span class="pc-kw">for</span> s <span class="pc-kw">in</span> taken, <span class="pc-kw">in</span> increasing order:
+            <span class="pc-kw">if</span> prev ≠ null:
+                d ← (s - prev) / 2                     <span class="pc-cm">// integer division</span>
+                <span class="pc-kw">if</span> d &gt; best: best ← d;  p ← prev + d  <span class="pc-cm">// strictly larger: ties keep the smaller seat</span>
+            prev ← s
+        <span class="pc-kw">if</span> (n - 1) - taken.last() &gt; best:
+            p ← n - 1
+    taken.add(p)
+    <span class="pc-kw">return</span> p
+
+<span class="pc-kw">function</span> leave(p): taken.remove(p)</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow"
+                      >O(k) seat &middot; O(log k) leave</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(k)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: Design Skiplist -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Skip List</div>
+              <div class="prob-title">Design Skiplist</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/design-skiplist/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1206 - Design Skiplist</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Linked levels, random heights</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Build a skip list without any library ordered structure. Support
+                <code>search(target)</code>, <code>add(num)</code> and
+                <code>erase(num)</code> (which removes one copy and reports
+                whether it existed). Duplicates are allowed.
+              </p>
+              <div class="iobox">
+                add(1), add(2), add(3), search(0) → false, add(4), search(1) →
+                true erase(0) → false, erase(1) → true, search(1) → false
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    All three operations begin the same way. What do you need to
+                    know on every level before you can insert or unlink a node?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The last node smaller than the target on each level &mdash;
+                    its predecessor. Write that walk once. Search checks the
+                    node after the level-0 predecessor; add and erase splice in
+                    or out after each predecessor.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Use a head node with the maximum number of levels (16 is plenty
+                for 5 &times; 10&#8308; operations) and a
+                <code>level</code> counter for how many are in use. The
+                predecessor walk from the lecture does the real work: start at
+                the top, move right while the next value is smaller, record
+                where you stopped, drop a level. Add picks a coin-flip height
+                and splices the new node in after each recorded predecessor,
+                exactly as a linked-list insert. Erase finds the first node
+                equal to the target on level 0 and unlinks it from every level
+                where the predecessor points at it. Because the walk stops
+                <em>before</em> equal values, duplicates need no special
+                handling.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; One Predecessor Walk, Three
+                      Operations</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre>MAX_LEVEL ← 16
+head ← node with MAX_LEVEL next-pointers;  level ← 1
+
+<span class="pc-kw">function</span> predecessors(target):
+    pred ← array of size MAX_LEVEL;  cur ← head
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> level - 1 <span class="pc-kw">down to</span> 0:
+        <span class="pc-kw">while</span> cur.next[lv] ≠ null <span class="pc-kw">and</span> cur.next[lv].value &lt; target:
+            cur ← cur.next[lv]
+        pred[lv] ← cur
+    <span class="pc-kw">return</span> pred
+
+<span class="pc-kw">function</span> search(target):
+    node ← predecessors(target)[0].next[0]
+    <span class="pc-kw">return</span> node ≠ null <span class="pc-kw">and</span> node.value = target
+
+<span class="pc-kw">function</span> add(num):
+    pred ← predecessors(num)
+    h ← 1
+    <span class="pc-kw">while</span> h &lt; MAX_LEVEL <span class="pc-kw">and</span> random() &lt; 0.5: h ← h + 1
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> level <span class="pc-kw">to</span> h - 1: pred[lv] ← head
+    level ← max(level, h)
+    node ← new node(num) with h next-pointers
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> h - 1:
+        node.next[lv] ← pred[lv].next[lv];  pred[lv].next[lv] ← node
+
+<span class="pc-kw">function</span> erase(num):
+    pred ← predecessors(num)
+    node ← pred[0].next[0]
+    <span class="pc-kw">if</span> node = null <span class="pc-kw">or</span> node.value ≠ num: <span class="pc-kw">return</span> false
+    <span class="pc-kw">for</span> lv <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> (number of levels of node) - 1:
+        <span class="pc-kw">if</span> pred[lv].next[lv] = node:            <span class="pc-cm">// the same node, not merely an equal value</span>
+            pred[lv].next[lv] ← node.next[lv]
+    <span class="pc-kw">while</span> level &gt; 1 <span class="pc-kw">and</span> head.next[level - 1] = null: level ← level - 1
+    <span class="pc-kw">return</span> true</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log n) expected</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n) expected</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Sequentially Ordinal Rank Tracker -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot; A Moving k-th Element
+              </div>
+              <div class="prob-title">Sequentially Ordinal Rank Tracker</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/sequentially-ordinal-rank-tracker/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 2102 - Sequentially Ordinal Rank Tracker</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Two heaps split at k</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Locations are added with a name and a score. A higher score is
+                better; on equal scores the alphabetically smaller name is
+                better. The i-th call to <code>get()</code> returns the i-th
+                best location added so far.
+              </p>
+              <div class="iobox">
+                add("bradford",2), add("branford",3), get() → "branford"
+                add("alps",2), get() → "alps" add("orland",2), get() →
+                "bradford"
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The position you are asked for only moves forward by one.
+                    Can you keep the items split into &ldquo;already
+                    returned&rdquo; and &ldquo;the rest&rdquo;?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Two heaps, as in the running median of Lecture 20. The
+                    &ldquo;top&rdquo; heap keeps the best i &minus; 1 items with
+                    its <em>worst</em> on top; the &ldquo;rest&rdquo; heap keeps
+                    everything else with its <em>best</em> on top &mdash; which
+                    is exactly the answer to the next get.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                An order-statistic tree would answer &ldquo;i-th best&rdquo;
+                directly, but Java does not have one. The query index only ever
+                grows by one, and that makes two heaps enough. Keep the
+                invariant: before the i-th get, <code>top</code> holds exactly
+                the best i &minus; 1 items. A new item might belong in it, so
+                push it into <code>top</code> and then move top&rsquo;s worst
+                item into <code>rest</code> &mdash; top keeps its size and its
+                &ldquo;best items&rdquo; property. A get moves the best of
+                <code>rest</code> into <code>top</code> and returns it: it is
+                the best item not among the best i &minus; 1, which is the i-th
+                best. Both heaps use the same comparison, one reversed.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; The Boundary Moves One Step
+                      per Get</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-cm">// better(a, b): a.score &gt; b.score, or equal scores and a.name &lt; b.name</span>
+top ← heap with the WORST item on top          <span class="pc-cm">// the best i - 1 items</span>
+rest ← heap with the BEST item on top          <span class="pc-cm">// everything else</span>
+
+<span class="pc-kw">function</span> add(name, score):
+    top.push((name, score))
+    rest.push(top.pop())                          <span class="pc-cm">// top keeps its size; its worst moves out</span>
+
+<span class="pc-kw">function</span> get():
+    item ← rest.pop()                             <span class="pc-cm">// best item outside the top i - 1</span>
+    top.push(item)                                <span class="pc-cm">// top now holds the best i</span>
+    <span class="pc-kw">return</span> item.name</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(log n) per call</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2402,13 +2785,13 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 38 Assignment &mdash; 12 Problems (2 Easy &middot; 6
-              Medium &middot; 4 Hard)</strong
+              >Lecture 41 Assignment &mdash; 18 Problems (4 Easy &middot; 9
+              Medium &middot; 5 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 39.<br /><br />
+            before moving to Lecture 42.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture38/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture41/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2425,68 +2808,71 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 39.</p>
+        <p>Check each item before advancing to Lecture 42.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the block build, query and point update from memory
+            I can say what floor, ceiling, lower and higher return, including
+            when they return null
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can derive the &radic;n block size from n ÷ B + 2B
+            I can build a sorted multiset from a TreeMap and remove zero counts
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why at most &radic;n values can be heavy
+            I can explain why sorted input makes a plain BST O(n)
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can sort queries in Mo&rsquo;s order and say why the total
-            movement is about (n + q)&radic;n
+            I can draw a left and a right rotation and show the in-order
+            sequence is unchanged
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write add and remove for a distinct-count window
+            I can state the AVL rule and the red-black rules in plain words
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I know when a problem is offline, and why that matters
+            I can find the k-th smallest with subtree sizes, and explain how a
+            skip list searches
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">I completed all 12 assignment problems</div>
+          <div class="cb-text">I completed all 18 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 39: String Algorithms</strong><br />
-            The &ldquo;never re-read what you already know&rdquo; idea behind
-            Mo&rsquo;s algorithm returns in a sharper form: KMP, the
-            Z-algorithm, rolling hashes and Manacher all find patterns in text
-            in linear time.
+            <strong
+              >Next up &mdash; Lecture 42: Advanced Math &amp; Game
+              Theory</strong
+            ><br />
+            Computing the millionth Fibonacci number in a few dozen steps,
+            counting arrangements without listing them, expected values, and
+            deciding who wins a game before the first move.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture37/lecture37_notes.html"
-            >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+          <a href="../Lecture40/lecture40_notes.html"
+            >&larr; Lecture 40 &middot; Advanced Graph Algorithms</a
           >
-          <a class="next" href="../Lecture39/lecture39_notes.html"
-            >Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-            Manacher) &rarr;</a
+          <a class="next" href="../Lecture42/lecture42_notes.html"
+            >Lecture 42 &middot; Advanced Math &amp; Game Theory &rarr;</a
           >
         </div>
       </div>

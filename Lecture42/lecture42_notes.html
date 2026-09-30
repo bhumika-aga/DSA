@@ -3,12 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Lecture 38 &mdash; Square Root Decomposition &amp; Mo&#39;s Algorithm
-    </title>
+    <title>Lecture 42 &mdash; Advanced Math &amp; Game Theory</title>
     <meta
       name="description"
-      content="Master two pointers and sliding windows: converging pointers, fixed and variable windows, the expand/shrink template, and the at-most trick — with pseudocode and Java."
+      content="Advanced maths for interviews: matrix exponentiation, nCr modulo a prime, inclusion-exclusion, probability and expected value, random sampling, and game theory with win/lose positions, Nim and Grundy numbers — with pseudocode."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -1398,9 +1396,9 @@
     <nav id="sidebar">
       <div class="sb-header">
         <div class="sb-badge">&#128218; DSA Course</div>
-        <div class="sb-title">Sqrt Decomposition &amp; Mo&rsquo;s</div>
+        <div class="sb-title">Advanced Math &amp; Game Theory</div>
         <div class="sb-meta">
-          Lecture 38 of 45 &middot; Phase 5 &mdash; Advanced Structures
+          Lecture 42 of 45 &middot; Phase 5 &mdash; Advanced Structures
         </div>
       </div>
       <div class="sb-scroll">
@@ -1408,19 +1406,27 @@
         <a class="toc-item" href="#intro"
           ><span class="toc-icon">&#127807;</span>Introduction</a
         >
-        <a class="toc-item" href="#blocks"
-          ><span class="toc-icon">&#129521;</span>Square Root Blocks</a
+        <a class="toc-item" href="#matrix"
+          ><span class="toc-icon">&#128290;</span>Matrix Exponentiation</a
         >
-        <a class="toc-item toc-sub" href="#why-sqrt">Why &radic;n?</a>
-        <a class="toc-item" href="#heavy"
-          ><span class="toc-icon">&#9878;&#65039;</span>Heavy and Light</a
+        <a class="toc-item" href="#combin"
+          ><span class="toc-icon">&#127922;</span>Counting (Combinatorics)</a
         >
-        <a class="toc-item" href="#mo"
-          ><span class="toc-icon">&#128666;</span>Mo&rsquo;s Algorithm</a
+        <a class="toc-item toc-sub" href="#ncr">nCr Modulo a Prime</a>
+        <a class="toc-item toc-sub" href="#formulas">Four Famous Counts</a>
+        <a class="toc-item toc-sub" href="#incl">Inclusion&ndash;Exclusion</a>
+        <a class="toc-item" href="#prob"
+          ><span class="toc-icon">&#127808;</span>Probability &amp;
+          Expectation</a
         >
-        <a class="toc-item toc-sub" href="#freq">Frequency of Frequencies</a>
+        <a class="toc-item toc-sub" href="#random">Random Sampling</a>
+        <a class="toc-item" href="#games"
+          ><span class="toc-icon">&#9823;&#65039;</span>Game Theory</a
+        >
+        <a class="toc-item toc-sub" href="#nim">Nim &amp; Grundy Numbers</a>
+        <a class="toc-item toc-sub" href="#minimax">Score Games</a>
         <a class="toc-item" href="#choose"
-          ><span class="toc-icon">&#129513;</span>Choosing a Tool</a
+          ><span class="toc-icon">&#129513;</span>Choosing a Technique</a
         >
         <a class="toc-item" href="#pitfalls"
           ><span class="toc-icon">&#9888;&#65039;</span>Complexity &amp; Bugs</a
@@ -1437,12 +1443,11 @@
       </div>
       <div class="sb-foot">
         <div class="toc-label">Navigate</div>
-        <a class="toc-item" href="../Lecture37/lecture37_notes.html"
-          >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+        <a class="toc-item" href="../Lecture41/lecture41_notes.html"
+          >&larr; Lecture 41 &middot; Balanced BSTs &amp; Ordered Structures</a
         >
-        <a class="toc-item" href="../Lecture39/lecture39_notes.html"
-          >&rarr; Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-          Manacher)</a
+        <a class="toc-item" href="../Lecture43/lecture43_notes.html"
+          >&rarr; Lecture 43 &middot; Design Data Structures</a
         >
         <a class="toc-item" href="../index.html">&uarr; All 45 lectures</a>
         <a class="toc-item" href="../glossary.html">&#128214; Glossary</a>
@@ -1455,7 +1460,7 @@
         <div class="breadcrumb">
           <a href="../index.html">DSA Course</a><span>&rsaquo;</span>
           <a href="../index.html#phase5">Phase 5</a><span>&rsaquo;</span>
-          <span>Lecture 38 &mdash; Sqrt Decomposition &amp; Mo&rsquo;s</span>
+          <span>Lecture 42 &mdash; Advanced Math &amp; Games</span>
         </div>
         <div class="topbar-right">
           <span style="font-size: 12px; color: var(--text3)">Progress</span>
@@ -1473,24 +1478,22 @@
       <div id="content">
         <!-- PAGE HEADER -->
         <div class="page-header">
-          <span class="page-emoji">&#129717;</span>
-          <h1 class="page-title">
-            Square Root Decomposition &amp; Mo&rsquo;s Algorithm
-          </h1>
+          <span class="page-emoji">&#127922;</span>
+          <h1 class="page-title">Advanced Math &amp; Game Theory</h1>
           <p class="page-sub">
-            &ldquo;When a tree is too much: split into blocks, or change the
-            order of the questions.&rdquo;
+            &ldquo;Count without listing, jump a billion steps ahead, and know
+            who wins before the first move.&rdquo;
           </p>
           <div class="meta-row">
-            <span class="meta-chip accent">&#128218; Lecture 38 of 45</span>
+            <span class="meta-chip accent">&#128218; Lecture 42 of 45</span>
             <span class="meta-chip accent"
               >Phase 5 &mdash; Advanced Structures</span
             >
-            <span class="meta-chip yellow">&#9201; 3 days</span>
-            <span class="meta-chip green">&#127919; 12 problems</span>
+            <span class="meta-chip yellow">&#9201; 4 days</span>
+            <span class="meta-chip green">&#127919; 18 problems</span>
             <span class="meta-chip"
-              >&#128188; Google &middot; Amazon &middot; Meta &middot;
-              Microsoft</span
+              >&#128188; Google &middot; Goldman Sachs &middot; Amazon &middot;
+              Adobe</span
             >
           </div>
         </div>
@@ -1501,15 +1504,14 @@
           <span class="callout-icon">&#127757;</span>
           <div class="callout-body">
             <strong>Why does this topic matter?</strong><br />
-            Lecture 37 gave you trees that answer range questions in O(log n).
-            This short lecture gives you two simpler ideas that are sometimes
-            the better tool. <em>Square root decomposition</em> splits an array
-            into &radic;n blocks and keeps a summary per block &mdash; slower
-            than a tree, but written in minutes.
-            <em>Mo&rsquo;s algorithm</em> answers a whole batch of range
-            questions by choosing a clever order to answer them in, which
-            handles questions like &ldquo;how many distinct values?&rdquo; that
-            no tree combines neatly.
+            Some problems are impossible to brute-force not because the logic is
+            hard but because the numbers are huge: the billionth term of a
+            sequence, the number of ways to arrange a hundred thousand items,
+            the chance of an outcome after endless random draws. Others ask who
+            wins a game &ldquo;if both players play perfectly&rdquo;. Each of
+            these has a small, reusable mathematical tool. None needs advanced
+            maths &mdash; just multiplication, a little counting, and one clear
+            definition of winning and losing.
           </div>
         </div>
 
@@ -1517,21 +1519,22 @@
           <div class="objectives-title">By the end of this lecture you can</div>
           <ul>
             <li>
-              Split an array into &radic;n blocks and answer range queries in
-              O(&radic;n)
+              Turn a linear recurrence into a matrix and compute its n-th term
+              in O(log n) steps
             </li>
             <li>
-              Explain why &radic;n is the right block size, from the balancing
-              argument
-            </li>
-            <li>Separate heavy and light values to bound the work per query</li>
-            <li>
-              Order offline queries with Mo&rsquo;s algorithm and slide a window
-              between them
+              Compute nCr modulo a prime with factorials and inverse factorials
             </li>
             <li>
-              Track distinct counts and most-frequent values under add and
-              remove
+              Count with inclusion&ndash;exclusion without double counting
+            </li>
+            <li>
+              Use linearity of expectation, reservoir sampling and rejection
+              sampling
+            </li>
+            <li>
+              Label game positions as winning or losing, and use XOR and Grundy
+              numbers for Nim-like games
             </li>
           </ul>
         </div>
@@ -1542,239 +1545,422 @@
           <span class="callout-icon">&#129504;</span>
           <div class="callout-body">
             <strong
-              >The picture to keep in your head: a book with chapters.</strong
+              >The picture to keep in your head: a vending machine and a
+              chessboard.</strong
             >
-            To count the words from page 37 to page 912, nobody counts every
-            page. You count the loose pages at each end, and for every complete
-            chapter in between you read the total off a list. That is square
-            root decomposition: whole blocks answered from a stored total, only
-            the two ragged ends done by hand. Mo&rsquo;s algorithm is a delivery
-            driver who sorts the day&rsquo;s stops by neighbourhood instead of
-            driving them in the order they were booked &mdash; same deliveries,
-            far less driving.
+            A recurrence is a <strong>vending machine</strong>: put
+            today&rsquo;s numbers in, get tomorrow&rsquo;s out, always by the
+            same rule. Write the rule as a matrix and &ldquo;press the button a
+            billion times&rdquo; becomes &ldquo;square the matrix thirty
+            times&rdquo;. A game is a
+            <strong>chessboard read backwards</strong>: start from the finished
+            positions, where you already know who won, and label every earlier
+            position by looking one move ahead.
           </div>
         </div>
-        <div class="callout yellow">
-          <span class="callout-icon">&#127919;</span>
+        <div class="callout blue">
+          <span class="callout-icon">&#8617;&#65039;</span>
           <div class="callout-body">
-            <strong>How often will you need this?</strong> Honestly: rarely in
-            an interview, often in programming contests. A Fenwick or segment
-            tree (Lecture 37) is usually the expected answer. This lecture is
-            short because the two ideas in it &mdash;
-            <em>split into blocks</em> and
-            <em>answer queries in a clever order</em> &mdash; are worth knowing
-            on their own, and because some questions (&ldquo;how many distinct
-            values in this range?&rdquo;) are genuinely easier with them than
-            with any tree.
+            <strong>Built on Lectures 10, 32 and 35.</strong> Lecture 10 taught
+            modular arithmetic and fast power (repeated squaring) and named nCr
+            and modular inverses in passing; this lecture teaches them in full.
+            Lecture 32&rsquo;s recurrences are what the matrices speed up, and
+            Lecture 35 already solved Stone Game and Predict the Winner as
+            interval DP &mdash; here you get the general theory of games behind
+            them.
           </div>
         </div>
-        <h2 class="h1" id="blocks">&#129521; Square Root Decomposition</h2>
+
+        <h2 class="h1" id="matrix">&#128290; Matrix Exponentiation</h2>
         <p>
-          Split an array of n items into blocks of about &radic;n items each,
-          and store one summary per block &mdash; its sum, its minimum, whatever
-          the question needs. For n = 10,000 that is 100 blocks of 100. A range
-          query then has three parts: the partial block at the left end, the
-          whole blocks in the middle, and the partial block at the right end.
+          Fibonacci says F(n) = F(n &minus; 1) + F(n &minus; 2). A loop gets
+          F(n) in O(n) steps, which is fine for n = 10&#8310; and hopeless for n
+          = 10&#185;&#8312;. The trick is to see one step of the recurrence as a
+          <strong>matrix multiplication</strong>: a fixed matrix M turns the
+          pair (F(n), F(n &minus; 1)) into (F(n + 1), F(n)).
+        </p>
+        <div class="ascii-tree">
+          | F(n+1) | | <span class="nd">1 1</span> | | F(n) | | | = | | · | | so
+          (F(n+1), F(n)) = M&#8319; · (F(1), F(0)) | F(n) | |
+          <span class="nd">1 0</span> | | F(n-1) | <span class="hl">M</span>
+        </div>
+        <p>
+          Doing n steps means multiplying by M n times, which is M&#8319;
+          &mdash; and fast power from Lecture 10 computes any power with about
+          log&#8322; n squarings. The same works for <em>any</em> recurrence
+          where the next values are a fixed weighted sum of the last few: put
+          the weights in the matrix.
         </p>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Build, Query, Update</span
+              >&#128208; Pseudocode &middot; Matrix Fast Power</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>B ← floor(sqrt(n))                      <span class="pc-cm">// block size</span>
-blockSum ← array of (n ÷ B + 1) zeros
-<span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n - 1:
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + a[i]
+          <pre><span class="pc-kw">function</span> multiply(A, B):                      <span class="pc-cm">// k × k matrices, mod MOD</span>
+    C ← k × k zeros
+    <span class="pc-kw">for</span> i, j, t <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> k - 1:
+        C[i][j] ← (C[i][j] + A[i][t] · B[t][j]) mod MOD
+    <span class="pc-kw">return</span> C
 
-<span class="pc-kw">function</span> query(l, r):                   <span class="pc-cm">// sum of a[l..r]</span>
-    total ← 0
-    <span class="pc-kw">while</span> l ≤ r <span class="pc-kw">and</span> l mod B ≠ 0:        <span class="pc-cm">// ragged left end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">while</span> l + B - 1 ≤ r:                <span class="pc-cm">// whole blocks</span>
-        total ← total + blockSum[l ÷ B];  l ← l + B
-    <span class="pc-kw">while</span> l ≤ r:                        <span class="pc-cm">// ragged right end</span>
-        total ← total + a[l];  l ← l + 1
-    <span class="pc-kw">return</span> total
-
-<span class="pc-kw">function</span> update(i, value):              <span class="pc-cm">// point update in O(1)</span>
-    blockSum[i ÷ B] ← blockSum[i ÷ B] + (value - a[i])
-    a[i] ← value</pre>
+<span class="pc-kw">function</span> power(M, n):
+    result ← identity matrix                     <span class="pc-cm">// plays the role of 1</span>
+    <span class="pc-kw">while</span> n &gt; 0:
+        <span class="pc-kw">if</span> n is odd: result ← multiply(result, M)
+        M ← multiply(M, M)                       <span class="pc-cm">// M, M², M⁴, M⁸, ...</span>
+        n ← n / 2                                <span class="pc-cm">// integer division</span>
+    <span class="pc-kw">return</span> result
+<span class="pc-cm">// Cost: O(k³ log n). With k = 2 that is about 8 · 60 multiplications for n = 10¹⁸.</span></pre>
         </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>How to build the matrix.</strong> List the numbers you need
+            to know at each step &mdash; the <em>state</em>. Row i of the matrix
+            says how the new value of state i is made from the old states.
+            Counting walks works the same way: if state j can move to state i,
+            put a 1 in row i, column j. Then M&#8319; counts every walk of
+            length n.
+          </div>
+        </div>
+
+        <h2 class="h1" id="combin">&#127922; Counting Without Listing</h2>
+        <p>
+          Two rules do most of the work. <strong>Multiply</strong> when choices
+          happen one after another (3 shirts and 4 trousers make 3 &times; 4 =
+          12 outfits). <strong>Add</strong> when you pick one case or another
+          and the cases cannot overlap. Everything else is built from these.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Structure</th>
-                <th>Range query</th>
-                <th>Point update</th>
-                <th>Code size</th>
+                <th>Question</th>
+                <th>Count</th>
+                <th>Example</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Plain array</td>
-                <td>O(n)</td>
-                <td>O(1)</td>
-                <td>Trivial</td>
+                <td>Orders of n different items</td>
+                <td>n! (n factorial)</td>
+                <td>ABC: 3! = 6 orders</td>
               </tr>
               <tr>
-                <td>Prefix sums</td>
-                <td>O(1)</td>
-                <td>O(n)</td>
-                <td>Tiny</td>
+                <td>Choose r of n, order does not matter</td>
+                <td>C(n, r) = n! / (r! &middot; (n &minus; r)!)</td>
+                <td>2 of {A, B, C, D}: C(4, 2) = 6</td>
               </tr>
               <tr>
-                <td><strong>Square root blocks</strong></td>
-                <td><strong>O(&radic;n)</strong></td>
-                <td><strong>O(1)</strong></td>
-                <td><strong>Small</strong></td>
-              </tr>
-              <tr>
-                <td>Fenwick / segment tree</td>
-                <td>O(log n)</td>
-                <td>O(log n)</td>
-                <td>Medium</td>
+                <td>Choose r of n, order matters</td>
+                <td>n! / (n &minus; r)!</td>
+                <td>Gold and silver from 4 runners: 12</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <h3 class="h2" id="why-sqrt">Why &radic;n, exactly?</h3>
+
+        <h3 class="h2" id="ncr">nCr modulo a prime</h3>
         <p>
-          With blocks of size B, a query touches at most n ÷ B whole blocks plus
-          up to 2B loose items. Make B small and there are too many blocks; make
-          it large and the ragged ends get long. The total, n ÷ B + 2B, is
-          smallest when the two terms are about equal &mdash; which happens at B
-          &asymp; &radic;n. That balancing argument is the whole idea, and it
-          applies well beyond sums.
-        </p>
-        <h2 class="h1" id="heavy">&#9878;&#65039; Heavy and Light Elements</h2>
-        <p>
-          The same balancing trick works on <em>values</em> instead of
-          positions. In an array of n items, at most &radic;n different values
-          can each appear more than &radic;n times &mdash; there simply is not
-          room for more. Call those values <strong>heavy</strong>. You can
-          afford to precompute something for every heavy value (such as a prefix
-          count), and handle every <strong>light</strong>
-          value by brute force, because a light value never appears more than
-          &radic;n times. The worked example on Online Majority Element uses
-          this split &mdash; with the cut-off at &radic;n/2, for a reason the
-          example explains.
-        </p>
-        <h2 class="h1" id="mo">&#128666; Mo&rsquo;s Algorithm</h2>
-        <p>
-          Some range questions are awkward for any tree: &ldquo;how many
-          distinct numbers are in <code>a[l..r]</code>?&rdquo; does not combine
-          neatly from two halves. But if you already know the answer for one
-          range, you can get the answer for a neighbouring range cheaply &mdash;
-          add one element on the right, or remove one on the left, updating a
-          count table as you go. Mo&rsquo;s algorithm makes that cheap-step idea
-          fast by answering the queries in a smart <em>order</em>.
-        </p>
-        <p>
-          The order: group queries by which &radic;n-block their left end falls
-          in, and within a group sort by right end. Then walk a window from
-          query to query. Inside one group the right end only moves forward, and
-          the left end only wobbles within one block &mdash; so the total
-          movement is about (n + q)&radic;n steps instead of n &times; q.
+          The answer is usually wanted &ldquo;modulo 10&#8313; + 7&rdquo;, and
+          modular arithmetic has no division. It has something just as good:
+          because 10&#8313; + 7 is prime, dividing by a is the same as
+          multiplying by a<sup>p &minus; 2</sup> (Fermat&rsquo;s little
+          theorem), which fast power computes. Precompute every factorial and
+          every <em>inverse</em> factorial once; then each C(n, r) is two
+          multiplications.
         </p>
         <div class="code-block pseudo">
           <div class="code-header">
             <span class="code-lang"
-              >&#128208; Pseudocode &middot; Mo’s Algorithm — Count Distinct
-              Values in Each Query Range</span
+              >&#128208; Pseudocode &middot; Factorials and Inverse
+              Factorials</span
             ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
           </div>
-          <pre>B ← floor(sqrt(n))
-order ← query indices sorted by (l ÷ B, then r)
-count ← array of zeros;  distinct ← 0
-curL ← 0;  curR ← -1                  <span class="pc-cm">// the current window is empty</span>
+          <pre><span class="pc-kw">function</span> precompute(N):                     <span class="pc-cm">// P = 10⁹ + 7</span>
+    fact[0] ← 1
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> N: fact[i] ← fact[i - 1] · i mod P
+    invFact[N] ← modPow(fact[N], P - 2, P)       <span class="pc-cm">// ONE inverse, by Fermat</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> N <span class="pc-kw">down to</span> 1:
+        invFact[i - 1] ← invFact[i] · i mod P    <span class="pc-cm">// 1/(i-1)! = i · 1/i!</span>
 
-<span class="pc-kw">function</span> add(i):
-    count[a[i]] ← count[a[i]] + 1
-    <span class="pc-kw">if</span> count[a[i]] = 1: distinct ← distinct + 1
-<span class="pc-kw">function</span> remove(i):
-    count[a[i]] ← count[a[i]] - 1
-    <span class="pc-kw">if</span> count[a[i]] = 0: distinct ← distinct - 1
-
-<span class="pc-kw">for</span> q <span class="pc-kw">in</span> order:
-    (l, r) ← queries[q]
-    <span class="pc-kw">while</span> curR &lt; r: curR ← curR + 1;  add(curR)       <span class="pc-cm">// grow right</span>
-    <span class="pc-kw">while</span> curL &gt; l: curL ← curL - 1;  add(curL)       <span class="pc-cm">// grow left</span>
-    <span class="pc-kw">while</span> curR &gt; r: remove(curR);  curR ← curR - 1    <span class="pc-cm">// shrink right</span>
-    <span class="pc-kw">while</span> curL &lt; l: remove(curL);  curL ← curL + 1    <span class="pc-cm">// shrink left</span>
-    answer[q] ← distinct
-
-<span class="pc-kw">return</span> answer                          <span class="pc-cm">// in the ORIGINAL query order</span></pre>
+<span class="pc-kw">function</span> nCr(n, r):
+    <span class="pc-kw">if</span> r &lt; 0 <span class="pc-kw">or</span> r &gt; n: <span class="pc-kw">return</span> 0
+    <span class="pc-kw">return</span> fact[n] · invFact[r] mod P · invFact[n - r] mod P
+<span class="pc-cm">// For small n (up to ~1000) Pascal's rule also works: C(n, r) = C(n-1, r-1) + C(n-1, r).</span></pre>
         </div>
+
+        <h3 class="h2" id="formulas">Four famous counts</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Counts</th>
+                <th>Formula</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Stars and bars</strong></td>
+                <td>Ways to split n identical sweets among k children</td>
+                <td>C(n + k &minus; 1, k &minus; 1)</td>
+              </tr>
+              <tr>
+                <td><strong>Catalan numbers</strong></td>
+                <td>
+                  Valid bracket strings with n pairs; BST shapes with n nodes
+                </td>
+                <td>C(2n, n) / (n + 1): 1, 1, 2, 5, 14, 42&hellip;</td>
+              </tr>
+              <tr>
+                <td><strong>Derangements</strong></td>
+                <td>Orders where nothing stays in its own place</td>
+                <td>D(n) = (n &minus; 1)(D(n &minus; 1) + D(n &minus; 2))</td>
+              </tr>
+              <tr>
+                <td><strong>Grid paths</strong></td>
+                <td>Right/down paths through an r &times; c grid</td>
+                <td>C(r + c &minus; 2, r &minus; 1)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="h2" id="incl">Inclusion&ndash;exclusion</h3>
+        <p>
+          How many numbers from 1 to 100 are divisible by 4 or 6? Adding 25
+          (fours) and 16 (sixes) counts the multiples of 12 twice, so subtract
+          them once: 25 + 16 &minus; 8 = 33. With three sets you add the
+          singles, subtract the pairs, and add back the triple, which was
+          subtracted once too often. In general:
+          <em>odd-sized groups add, even-sized groups subtract</em>.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Count Multiples of Any
+              Divisor</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> countDivisibleByAny(x, divisors):     <span class="pc-cm">// numbers in 1..x</span>
+    total ← 0;  m ← length(divisors)
+    <span class="pc-kw">for</span> mask <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> 2^m - 1:                 <span class="pc-cm">// every non-empty group</span>
+        l ← lcm of the divisors whose bits are set in mask
+        <span class="pc-kw">if</span> popcount(mask) is odd: total ← total + x / l
+        <span class="pc-kw">else</span>:                     total ← total - x / l
+    <span class="pc-kw">return</span> total
+<span class="pc-cm">// Use the lcm, not the product: multiples of both 4 and 6 are multiples of 12, not 24.</span></pre>
+        </div>
+
+        <h2 class="h1" id="prob">&#127808; Probability &amp; Expectation</h2>
+        <p>
+          A <strong>probability</strong> is a number from 0 to 1: favourable
+          outcomes divided by all outcomes, when they are equally likely. The
+          <strong>expected value</strong> is the average result over many
+          repeats: each outcome times its probability, added up. A fair die
+          expects (1 + 2 + &hellip; + 6) / 6 = 3.5.
+        </p>
+        <p>
+          The most useful fact is <strong>linearity of expectation</strong>: the
+          expected value of a sum is the sum of the expected values &mdash;
+          always, even when the parts depend on each other. It turns scary
+          questions into small ones.
+          <em
+            >n people throw their hats in a pile and each takes one at random;
+            how many expect their own hat back?</em
+          >
+          Each person has a 1/n chance, so the answer is n &times; 1/n = 1,
+          however large n is.
+        </p>
         <div class="callout blue">
           <span class="callout-icon">&#128161;</span>
           <div class="callout-body">
-            <strong>Offline means you see every question first.</strong>
-            Mo&rsquo;s algorithm only works when all the queries are known
-            before you answer any of them, so you can reorder them. That is
-            called answering <em>offline</em>. If each query depends on the
-            answer to the previous one, you are <em>online</em>, and Mo&rsquo;s
-            is off the table.
+            <strong>Probability DP.</strong> When a process moves between states
+            at random, dp[state] = the chance of ending well from that state =
+            the average of dp over the states it can move to. It is ordinary DP
+            from Lecture 32 with averages instead of minimums &mdash; New 21
+            Game and Soup Servings are both this shape.
           </div>
         </div>
-        <h3 class="h2" id="freq">Frequency of Frequencies</h3>
+
+        <h3 class="h2" id="random">Random sampling</h3>
         <p>
-          Counting distinct values needs one table. Tracking the
-          <em>most frequent</em> value as the window moves needs two:
-          <code>count[v]</code> (how often value v appears) and
-          <code>howMany[f]</code> (how many values currently appear exactly f
-          times). When you remove an element, the maximum frequency can only
-          drop by one, and <code>howMany</code> tells you instantly whether it
-          did. This is the trick behind most &ldquo;mode in a range&rdquo;
-          questions.
+          Two interview favourites. <strong>Reservoir sampling</strong> picks
+          one item uniformly from a stream whose length you do not know: keep
+          the i-th item with probability 1/i.
+          <strong>Rejection sampling</strong> builds one random range from
+          another: generate a bigger uniform range, keep the part that splits
+          evenly, and retry on the rest.
         </p>
-        <h2 class="h1" id="choose">&#129513; Choosing a Tool</h2>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Reservoir and Rejection
+              Sampling</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> pickUniform(stream):
+    choice ← none;  i ← 0
+    <span class="pc-kw">for</span> item <span class="pc-kw">in</span> stream:
+        i ← i + 1
+        <span class="pc-kw">if</span> randomInt(1, i) = 1: choice ← item     <span class="pc-cm">// probability 1/i</span>
+    <span class="pc-kw">return</span> choice
+<span class="pc-cm">// Item i survives if picked (1/i) and never replaced: 1/i · i/(i+1) · ... · (n-1)/n = 1/n.</span>
+
+<span class="pc-kw">function</span> rand10():                              <span class="pc-cm">// from rand7()</span>
+    <span class="pc-kw">repeat</span>:
+        x ← (rand7() - 1) · 7 + rand7()          <span class="pc-cm">// uniform on 1..49</span>
+        <span class="pc-kw">if</span> x ≤ 40: <span class="pc-kw">return</span> (x - 1) mod 10 + 1   <span class="pc-cm">// 40 = four full copies of 1..10</span></pre>
+        </div>
+
+        <h2 class="h1" id="games">&#9823;&#65039; Game Theory</h2>
+        <p>
+          Interview games are between two players who take turns, see
+          everything, and play perfectly; there is no luck. Every position is
+          then either <strong>winning</strong> (the player to move can force a
+          win) or <strong>losing</strong>. The two rules that decide it:
+        </p>
+        <ul>
+          <li>
+            A position is <strong>winning</strong> if <em>some</em> move leads
+            to a losing position (for the opponent).
+          </li>
+          <li>
+            A position is <strong>losing</strong> if <em>every</em> move leads
+            to a winning position &mdash; including having no moves at all.
+          </li>
+        </ul>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Label Every Position</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> firstPlayerWins(n):                 <span class="pc-cm">// positions 0..n, moves shrink the position</span>
+    win ← array of n + 1 false                   <span class="pc-cm">// win[0] = false: no move possible</span>
+    <span class="pc-kw">for</span> pos <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        <span class="pc-kw">for</span> <span class="pc-kw">each</span> legal move m <span class="pc-kw">from</span> pos:
+            <span class="pc-kw">if</span> <span class="pc-kw">not</span> win[pos - m]:                 <span class="pc-cm">// hand the opponent a losing spot</span>
+                win[pos] ← true;  <span class="pc-kw">break</span>
+    <span class="pc-kw">return</span> win[n]
+<span class="pc-cm">// Nim Game (take 1–3): win[pos] is false exactly when pos is a multiple of 4.</span></pre>
+        </div>
+        <div class="callout yellow">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-body">
+            <strong>Print the table, spot the pattern.</strong> Many easy game
+            problems have a one-line answer (n % 4 &ne; 0, &ldquo;n is
+            even&rdquo;). Fill the win array for n = 1 to 20 on paper; the
+            pattern is usually obvious, and the DP proves it.
+          </div>
+        </div>
+
+        <h3 class="h2" id="nim">Nim and Grundy numbers</h3>
+        <p>
+          In <strong>Nim</strong>, there are several piles, and a move takes any
+          number of stones from one pile. The player to move loses exactly when
+          the XOR of all pile sizes is 0. (From XOR 0, every move changes one
+          pile and makes the XOR non-zero; from non-zero, there is always a move
+          back to 0.)
+        </p>
+        <p>
+          The <strong>Sprague&ndash;Grundy theorem</strong> extends this to any
+          game that splits into independent parts. Give each position a
+          <strong>Grundy number</strong>: the smallest non-negative number
+          <em>not</em> among the Grundy numbers of the positions you can move to
+          (the <strong>mex</strong>). A position with Grundy number 0 is losing;
+          for several independent games, XOR their Grundy numbers exactly like
+          Nim piles.
+        </p>
+        <div class="code-block pseudo">
+          <div class="code-header">
+            <span class="code-lang"
+              >&#128208; Pseudocode &middot; Grundy Numbers by mex</span
+            ><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><span class="pc-kw">function</span> grundy(n):
+    g ← array of n + 1
+    <span class="pc-kw">for</span> pos <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> n:
+        reachable ← { g[pos - m] <span class="pc-kw">for</span> <span class="pc-kw">each</span> legal move m <span class="pc-kw">from</span> pos }
+        v ← 0
+        <span class="pc-kw">while</span> v <span class="pc-kw">in</span> reachable: v ← v + 1           <span class="pc-cm">// mex: smallest missing value</span>
+        g[pos] ← v
+    <span class="pc-kw">return</span> g
+<span class="pc-cm">// Several independent games: the player to move wins iff g[a] XOR g[b] XOR ... ≠ 0.</span></pre>
+        </div>
+
+        <h3 class="h2" id="minimax">Score games: best difference</h3>
+        <p>
+          When the question is <em>by how much</em> a player wins, store the
+          best score difference &ldquo;(mine &minus; theirs) for the player to
+          move&rdquo;. Because the opponent then faces the same question from
+          their side, one function covers both players:
+          <code
+            >best(state) = max over moves of (gain &minus; best(next
+            state))</code
+          >. Lecture 35 used exactly this for Stone Game and Predict the Winner.
+          And when every item is taken by someone, look for a greedy rule first:
+          in Stone Game VI, taking an item is worth
+          <em>your value plus the value you deny</em> the other player.
+        </p>
+
+        <h2 class="h1" id="choose">&#129513; Choosing a Technique</h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>The situation</th>
+                <th>The problem says&hellip;</th>
                 <th>Reach for</th>
-                <th>Why</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Range sums, array never changes</td>
-                <td>Prefix sums</td>
-                <td>O(1) per query</td>
-              </tr>
-              <tr>
-                <td>Range sums with updates</td>
-                <td>Fenwick tree (Lecture 37)</td>
-                <td>O(log n) both, very little code</td>
-              </tr>
-              <tr>
-                <td>Range min/max with updates</td>
-                <td>Segment tree (Lecture 37)</td>
-                <td>Min and max are not invertible</td>
-              </tr>
-              <tr>
-                <td>Updates, and a tree feels like too much code</td>
-                <td>Square root blocks</td>
-                <td>O(&radic;n), written in five minutes</td>
+                <td>
+                  n up to 10&#8313; or more, each step a fixed rule on a few
+                  numbers
+                </td>
+                <td>Matrix exponentiation</td>
               </tr>
               <tr>
                 <td>
-                  Distinct count or mode in many ranges, all known upfront
+                  &ldquo;How many ways&rdquo;, choosing positions or groups
                 </td>
-                <td>Mo&rsquo;s algorithm</td>
-                <td>Answers do not merge, but they slide</td>
+                <td>nCr with inverse factorials</td>
               </tr>
               <tr>
-                <td>Values in a small range (say &minus;50 to 50)</td>
-                <td>Counting buckets</td>
-                <td>Scan 101 buckets instead of sorting</td>
+                <td>
+                  &ldquo;Divisible by a or b&rdquo;, &ldquo;at least one
+                  of&rdquo;
+                </td>
+                <td>Inclusion&ndash;exclusion</td>
+              </tr>
+              <tr>
+                <td>&ldquo;Probability&rdquo; of reaching a state</td>
+                <td>Probability DP</td>
+              </tr>
+              <tr>
+                <td>&ldquo;Expected number of&hellip;&rdquo;</td>
+                <td>Linearity of expectation</td>
+              </tr>
+              <tr>
+                <td>
+                  Uniform pick from a stream; one random range from another
+                </td>
+                <td>Reservoir / rejection sampling</td>
+              </tr>
+              <tr>
+                <td>&ldquo;Can the first player win?&rdquo;</td>
+                <td>Win / lose DP; XOR for Nim-like games</td>
+              </tr>
+              <tr>
+                <td>&ldquo;Maximum score difference&rdquo;</td>
+                <td>best = max(gain &minus; best(next))</td>
               </tr>
             </tbody>
           </table>
         </div>
+
         <h2 class="h1" id="pitfalls">
           &#9888;&#65039; Complexity &amp; Classic Bugs
         </h2>
@@ -1782,36 +1968,32 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
           <table>
             <thead>
               <tr>
-                <th>Operation</th>
-                <th>Cost</th>
-                <th>Note</th>
+                <th>Technique</th>
+                <th>Time</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Build the blocks</td>
-                <td>O(n)</td>
-                <td></td>
+                <td>Matrix power, k &times; k matrix</td>
+                <td>O(k&sup3; log n)</td>
               </tr>
               <tr>
-                <td>Block range query</td>
-                <td>O(&radic;n)</td>
-                <td>Two ragged ends plus whole blocks</td>
+                <td>Factorials + inverse factorials up to N</td>
+                <td>O(N) once, then O(1) per nCr</td>
               </tr>
               <tr>
-                <td>Block point update</td>
-                <td>O(1)</td>
-                <td>Update the item and its block</td>
+                <td>Inclusion&ndash;exclusion over m sets</td>
+                <td>O(2&#7504;)</td>
               </tr>
               <tr>
-                <td>Mo&rsquo;s algorithm, q queries</td>
-                <td>O((n + q)&radic;n)</td>
-                <td>Plus O(q log q) to sort the queries</td>
+                <td>Reservoir sampling</td>
+                <td>O(n) time, O(1) space</td>
               </tr>
               <tr>
-                <td>Heavy/light precompute</td>
-                <td>O(n&radic;n) worst case</td>
-                <td>Prefix counts for at most &radic;n heavy values</td>
+                <td>
+                  Win / lose or Grundy table up to n, with up to m moves each
+                </td>
+                <td>O(n &middot; m)</td>
               </tr>
             </tbody>
           </table>
@@ -1827,44 +2009,39 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             </thead>
             <tbody>
               <tr>
-                <td>Block size of 0 when n is tiny</td>
-                <td>Division by zero</td>
-                <td>Use <code>max(1, floor(sqrt(n)))</code></td>
+                <td>Multiplying two ints near 10&#8313; before taking mod</td>
+                <td>Overflow, wrong answers</td>
+                <td>Use <code>long</code> for every product</td>
               </tr>
               <tr>
-                <td>Returning Mo&rsquo;s answers in sorted order</td>
-                <td>Answers attached to the wrong queries</td>
-                <td>Store each answer at its original index</td>
+                <td>Dividing under a modulus</td>
+                <td>Nonsense results</td>
+                <td>Multiply by the modular inverse instead</td>
               </tr>
               <tr>
-                <td>Shrinking before growing the window</td>
-                <td>
-                  Removing an element that was never added; negative counts
-                </td>
-                <td>
-                  Grow first (<code>curR</code> up, <code>curL</code> down),
-                  then shrink
-                </td>
+                <td>Subtracting under a modulus</td>
+                <td>Negative answers</td>
+                <td>Write <code>(a - b + MOD) % MOD</code></td>
               </tr>
               <tr>
-                <td>Off-by-one on the whole-block loop</td>
-                <td>Double-counts or skips the last full block</td>
-                <td>Loop while <code>l + B − 1 ≤ r</code></td>
+                <td>Using a &middot; b instead of lcm(a, b)</td>
+                <td>Inclusion&ndash;exclusion over-subtracts</td>
+                <td>lcm(a, b) = a / gcd(a, b) &middot; b</td>
               </tr>
               <tr>
-                <td>Forgetting to update the block summary</td>
-                <td>Queries ignore the update</td>
-                <td>Update both the item and its block</td>
+                <td>Matrix built transposed</td>
+                <td>Correct for Fibonacci, wrong for other tables</td>
+                <td>Row = new state, column = old state; test n = 2 by hand</td>
               </tr>
               <tr>
-                <td>Using Mo&rsquo;s on online queries</td>
-                <td>Impossible to reorder</td>
-                <td>Use a tree, or rethink the problem</td>
+                <td>Forgetting that &ldquo;no moves&rdquo; is losing</td>
+                <td>Game DP wrong from the base case</td>
+                <td>Set the terminal positions first</td>
               </tr>
               <tr>
-                <td>A count array sized by value on huge values</td>
-                <td>Out of memory</td>
-                <td>Compress the values first</td>
+                <td>Comparing doubles with <code>==</code></td>
+                <td>Probability checks fail by 10&#8315;&#185;&#8310;</td>
+                <td>Compare with a tolerance</td>
               </tr>
             </tbody>
           </table>
@@ -1872,42 +2049,38 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
         <div class="callout green">
           <span class="callout-icon">&#128269;</span>
           <div class="callout-body">
-            <strong>How to spot it.</strong> A pile of range queries, all given
-            up front, asking something that does not split into halves &mdash;
-            distinct count, mode, pairs of equal values. Or a constraint around
-            10&#8309; where you would like a simpler alternative to a tree. And
-            if the <em>values</em> are small, try buckets before anything
-            clever.
+            <strong>How to spot it.</strong> &ldquo;Modulo 10&#8313; + 7&rdquo;,
+            a limit like n &le; 10&#8313;, &ldquo;how many ways&rdquo;,
+            &ldquo;probability&rdquo;, &ldquo;expected&rdquo;, &ldquo;uniformly
+            at random&rdquo;, &ldquo;both players play optimally&rdquo;.
           </div>
         </div>
+
         <h2 class="h1" id="practice">&#128170; In-Lecture Practice Problems</h2>
         <p>
-          Four problems, one per idea in this lecture: the cheap add/remove
-          step, buckets over a small value range, answering queries in a better
-          order, and the heavy/light split.
+          Five problems, one per tool: a transition matrix, nCr,
+          inclusion&ndash;exclusion, a probability DP, and a win/lose game.
         </p>
 
-        <!-- Problem 01: Count the Number of Good Subarrays -->
+        <!-- Problem 01: Count Vowels Permutation -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
               <div class="prob-num">
-                Problem 01 &middot; The Add/Remove Primitive
+                Problem 01 &middot; Matrix Exponentiation
               </div>
-              <div class="prob-title">Count the Number of Good Subarrays</div>
+              <div class="prob-title">Count Vowels Permutation</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/count-the-number-of-good-subarrays/"
+                  href="https://leetcode.com/problems/count-vowels-permutation/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 2537 - Count the Number of Good Subarrays</a
+                  >&#128279; LC 1220 - Count Vowels Permutation</a
                 >
               </div>
               <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Window with a running pair count</span
-                >
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">5 &times; 5 transition matrix</span>
                 <span class="tag tag-co">Amazon &middot; Google</span>
               </div>
             </div>
@@ -1919,11 +2092,11 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Count the subarrays that contain at least <code>k</code> pairs
-                of equal elements (<code>i &lt; j</code> with
-                <code>nums[i] = nums[j]</code>).
+                Count strings of length n made of the vowels a, e, i, o, u where
+                a is only followed by e; e by a or i; i by anything except i; o
+                by i or u; and u by a. Return the count modulo 10&#8313; + 7.
               </p>
-              <div class="iobox">nums = [3,1,4,3,2,2,4], k = 2 → 4</div>
+              <div class="iobox">n = 1 → 5, n = 2 → 10, n = 5 → 68</div>
             </div>
             <div class="prob-section">
               <div class="prob-section-label">Hints</div>
@@ -1934,8 +2107,8 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    When one more copy of a value x enters a window that already
-                    holds c copies, how many new equal pairs appear?
+                    What is the only thing you need to know about a string so
+                    far to decide how it can be extended?
                   </p>
                 </div>
               </details>
@@ -1946,9 +2119,9 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    Exactly c. And removing a copy removes c − 1 pairs. So the
-                    pair count updates in O(1) per step — exactly the cheap
-                    add/remove step Mo&rsquo;s algorithm is built on.
+                    Its last vowel. Keep five counts, one per last vowel. One
+                    extra letter maps the five counts to five new counts by a
+                    fixed rule &mdash; a 5 &times; 5 matrix.
                   </p>
                 </div>
               </details>
@@ -1956,14 +2129,17 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The whole trick is the O(1) update: adding a value that already
-                appears c times creates c new pairs, removing one destroys (c −
-                1). With that, a sliding window works. For each right end,
-                shrink the left end while the window still has at least k pairs;
-                then every start position before the current left end gives a
-                good subarray. This add/remove bookkeeping is the same primitive
-                Mo&rsquo;s algorithm uses &mdash; here the queries happen to
-                arrive in a convenient order already.
+                Let count[v] be the number of valid strings ending in vowel v.
+                Adding a letter gives new[j] = the sum of count[i] over every
+                vowel i that may be followed by j. With n &le; 2 &times;
+                10&#8308; a loop of n &minus; 1 such steps already passes. The
+                lecture version writes the rule as a matrix T with T[j][i] = 1
+                when i may be followed by j, so the counts after n &minus; 1
+                steps are T<sup>n&minus;1</sup> times the starting vector of all
+                ones. Matrix fast power makes that O(5&sup3; log n) &mdash; fast
+                even if n were 10&#185;&#8312;. Checking by hand: for n = 2 the
+                allowed pairs are ae, ea, ei, ia, ie, io, iu, oi, ou, ua &mdash;
+                10.
               </p>
             </div>
             <details>
@@ -1974,151 +2150,25 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Pairs Change by the Current
-                      Count</span
+                      >&#128208; Pseudocode &middot; Transition Matrix to the
+                      Power n &minus; 1</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> countGood(nums, k):
-    count ← empty map;  pairs ← 0;  left ← 0;  result ← 0
-    <span class="pc-kw">for</span> right <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        x ← nums[right]
-        pairs ← pairs + count[x]            <span class="pc-cm">// x pairs with every copy already here</span>
-        count[x] ← count[x] + 1
-        <span class="pc-kw">while</span> pairs ≥ k:                    <span class="pc-cm">// window [left..right] is good</span>
-            y ← nums[left]
-            count[y] ← count[y] - 1
-            pairs ← pairs - count[y]        <span class="pc-cm">// lost pairs with the copies that remain</span>
-            left ← left + 1
-        result ← result + left              <span class="pc-cm">// starts 0..left-1 all give good subarrays</span>
-    <span class="pc-kw">return</span> result</pre>
+                  <pre><span class="pc-kw">function</span> countVowelPermutation(n):
+    <span class="pc-cm">// index 0..4 = a, e, i, o, u;  follows[v] = vowels allowed after v</span>
+    follows ← { a: [e],  e: [a, i],  i: [a, e, o, u],  o: [i, u],  u: [a] }
+    T ← 5 × 5 zeros
+    <span class="pc-kw">for</span> <span class="pc-kw">each</span> vowel i, <span class="pc-kw">for</span> <span class="pc-kw">each</span> j <span class="pc-kw">in</span> follows[i]:
+        T[j][i] ← 1                              <span class="pc-cm">// row = new last vowel, column = old</span>
+    P ← power(T, n - 1)                          <span class="pc-cm">// matrix fast power, mod 10⁹ + 7</span>
+    <span class="pc-kw">return</span> (sum of every entry of P) mod (10⁹ + 7)   <span class="pc-cm">// P times a vector of all ones</span></pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 02: Sliding Subarray Beauty -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">
-                Problem 02 &middot; Small Values → Buckets
-              </div>
-              <div class="prob-title">Sliding Subarray Beauty</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/sliding-subarray-beauty/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 2653 - Sliding Subarray Beauty</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat">Counting buckets in a window</span>
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                For every window of length <code>k</code>, report its
-                <em>beauty</em>: the x-th smallest negative number in the
-                window, or 0 if there are fewer than x negatives.
-              </p>
-              <div class="iobox">
-                nums = [1,-1,-3,-2,3], k = 3, x = 2 → [-1,-2,-2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sorting every window costs O(k log k) each time. Look at the
-                    constraints on the values — how many different values can
-                    there be?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Values lie between −50 and 50. Keep a count for each of the
-                    50 negative values; the x-th smallest is found by walking
-                    those 50 buckets.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                When the <em>values</em> are small, bucket them. A window update
-                is O(1) &mdash; add one count, remove one count &mdash; and a
-                query walks at most 50 buckets from &minus;50 upwards until x
-                negatives have been passed. That makes the whole thing O(n
-                &times; 50), independent of k. It is the same &ldquo;fixed-size
-                summary per block&rdquo; idea as square root decomposition,
-                applied to the value range instead of the positions.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; 50 Buckets per Window</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> getSubarrayBeauty(nums, k, x):
-    count ← array of 51 zeros               <span class="pc-cm">// count[v] for v = -50..-1, stored at index -v</span>
-    result ← empty list
-    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 0 <span class="pc-kw">to</span> length(nums) - 1:
-        <span class="pc-kw">if</span> nums[i] &lt; 0: count[-nums[i]] ← count[-nums[i]] + 1
-        <span class="pc-kw">if</span> i ≥ k <span class="pc-kw">and</span> nums[i - k] &lt; 0:       <span class="pc-cm">// the element leaving the window</span>
-            count[-nums[i - k]] ← count[-nums[i - k]] - 1
-        <span class="pc-kw">if</span> i ≥ k - 1:
-            seen ← 0;  beauty ← 0
-            <span class="pc-kw">for</span> v <span class="pc-kw">from</span> 50 <span class="pc-kw">down to</span> 1:        <span class="pc-cm">// -50, -49, ... smallest first</span>
-                seen ← seen + count[v]
-                <span class="pc-kw">if</span> seen ≥ x: beauty ← -v;  <span class="pc-kw">break</span>
-            result.append(beauty)
-    <span class="pc-kw">return</span> result</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(n &middot; 50)</span>
+                    ><span class="cx-val green">O(5&sup3; log n)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
@@ -2129,156 +2179,26 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             </details>
           </div>
         </div>
-        <!-- Problem 03: Count Zero Request Servers -->
+        <!-- Problem 02: Number of Ways to Reach a Position After Exactly k Steps -->
         <div class="prob-card">
           <div class="prob-header" onclick="toggleProb(this)">
             <div class="prob-left">
-              <div class="prob-num">
-                Problem 03 &middot; Reorder the Queries
+              <div class="prob-num">Problem 02 &middot; nCr Modulo a Prime</div>
+              <div class="prob-title">
+                Number of Ways to Reach a Position After Exactly k Steps
               </div>
-              <div class="prob-title">Count Zero Request Servers</div>
               <div style="margin-top: 4px">
                 <a
-                  href="https://leetcode.com/problems/count-zero-request-servers/"
+                  href="https://leetcode.com/problems/number-of-ways-to-reach-a-position-after-exactly-k-steps/"
                   target="_blank"
                   style="font-size: 12px"
-                  >&#128279; LC 2747 - Count Zero Request Servers</a
+                  >&#128279; LC 2400 - Number of Ways to Reach a Position After
+                  Exactly k Steps</a
                 >
               </div>
               <div class="prob-tags">
                 <span class="tag tag-med">Medium</span>
-                <span class="tag tag-pat"
-                  >Offline queries + sliding window</span
-                >
-                <span class="tag tag-co">Amazon &middot; Google</span>
-              </div>
-            </div>
-            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
-              >&rsaquo;</span
-            >
-          </div>
-          <div class="prob-body" style="display: none">
-            <div class="prob-section">
-              <div class="prob-section-label">Problem</div>
-              <p>
-                Given server logs <code>[serverId, time]</code> and queries
-                asking about the interval <code>[q − x, q]</code>, return, for
-                each query, how many of the <code>n</code> servers received no
-                requests in that interval.
-              </p>
-              <div class="iobox">
-                n = 3, logs = [[1,3],[2,6],[1,5]], x = 5, queries = [10,11] →
-                [1,2]
-              </div>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Hints</div>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
-                  nudge
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Answering each query by scanning every log is O(logs ×
-                    queries). What if you answered the queries in increasing
-                    order of time instead of the order given?
-                  </p>
-                </div>
-              </details>
-              <details class="hint">
-                <summary>
-                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
-                  key idea
-                </summary>
-                <div class="details-body">
-                  <p>
-                    Sort the logs by time and the queries by time. The window [q
-                    − x, q] then only ever moves forward: add logs entering on
-                    the right, remove logs leaving on the left, and keep a count
-                    of servers with at least one request.
-                  </p>
-                </div>
-              </details>
-            </div>
-            <div class="prob-section">
-              <div class="prob-section-label">Solution</div>
-              <p>
-                This is the core of Mo&rsquo;s algorithm in its simplest form:
-                <strong
-                  >answer the queries in a different order from the one they
-                  were asked in</strong
-                >, so that each step reuses the previous answer. Once queries
-                are sorted by time, both window ends only move forward, so every
-                log is added once and removed once. The only extra care is to
-                remember each query&rsquo;s original position and write its
-                answer there.
-              </p>
-            </div>
-            <details>
-              <summary>
-                <span class="toggle-arrow">&#9654;</span>Full solution
-              </summary>
-              <div class="details-body">
-                <div class="code-block pseudo">
-                  <div class="code-header">
-                    <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Sort Queries, Slide
-                      Once</span
-                    ><button class="copy-btn" onclick="copyCode(this)">
-                      Copy
-                    </button>
-                  </div>
-                  <pre><span class="pc-kw">function</span> countServers(n, logs, x, queries):
-    sort logs by time
-    order ← query indices sorted by queries[i]
-    count ← array of n + 1 zeros;  active ← 0     <span class="pc-cm">// servers with ≥ 1 request</span>
-    lo ← 0;  hi ← 0;  answer ← array of length(queries)
-    <span class="pc-kw">for</span> qi <span class="pc-kw">in</span> order:
-        q ← queries[qi]
-        <span class="pc-kw">while</span> hi &lt; length(logs) <span class="pc-kw">and</span> logs[hi].time ≤ q:          <span class="pc-cm">// entering</span>
-            s ← logs[hi].server
-            <span class="pc-kw">if</span> count[s] = 0: active ← active + 1
-            count[s] ← count[s] + 1;  hi ← hi + 1
-        <span class="pc-kw">while</span> lo &lt; hi <span class="pc-kw">and</span> logs[lo].time &lt; q - x:                <span class="pc-cm">// leaving</span>
-            s ← logs[lo].server
-            count[s] ← count[s] - 1
-            <span class="pc-kw">if</span> count[s] = 0: active ← active - 1
-            lo ← lo + 1
-        answer[qi] ← n - active                                  <span class="pc-cm">// original position</span>
-    <span class="pc-kw">return</span> answer</pre>
-                </div>
-                <div class="complexity-row">
-                  <div class="cx-badge green">
-                    <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(L log L + Q log Q)</span>
-                  </div>
-                  <div class="cx-badge green">
-                    <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n + Q)</span>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        </div>
-        <!-- Problem 04: Online Majority Element In Subarray -->
-        <div class="prob-card">
-          <div class="prob-header" onclick="toggleProb(this)">
-            <div class="prob-left">
-              <div class="prob-num">Problem 04 &middot; Heavy and Light</div>
-              <div class="prob-title">Online Majority Element In Subarray</div>
-              <div style="margin-top: 4px">
-                <a
-                  href="https://leetcode.com/problems/online-majority-element-in-subarray/"
-                  target="_blank"
-                  style="font-size: 12px"
-                  >&#128279; LC 1157 - Online Majority Element In Subarray</a
-                >
-              </div>
-              <div class="prob-tags">
-                <span class="tag tag-hard">Hard</span>
-                <span class="tag tag-pat">Square root split by frequency</span>
+                <span class="tag tag-pat">Choose which steps go right</span>
                 <span class="tag tag-co">Google &middot; Amazon</span>
               </div>
             </div>
@@ -2290,16 +2210,13 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Problem</div>
               <p>
-                Build a structure over an array that answers
-                <code>query(left, right, threshold)</code>: the element
-                appearing at least <code>threshold</code> times in
-                <code>arr[left..right]</code>, or −1. It is guaranteed that
-                <code>2 × threshold &gt; right − left + 1</code>, so the answer
-                is a strict majority.
+                Starting at startPos on an infinite number line, take exactly k
+                steps, each one to the left or right. Count the different step
+                sequences that end at endPos, modulo 10&#8313; + 7.
               </p>
               <div class="iobox">
-                arr = [1,1,2,2,1,1]; query(0,5,4) → 1, query(0,3,3) → −1,
-                query(2,3,2) → 2
+                startPos = 1, endPos = 2, k = 3 → 3 (RRL, RLR, LRR) startPos =
+                2, endPos = 5, k = 10 → 0
               </div>
             </div>
             <div class="prob-section">
@@ -2311,9 +2228,8 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    Short ranges are easy: a single Boyer-Moore pass finds the
-                    majority candidate. What about long ranges — which values
-                    could possibly be a majority of a long range?
+                    Does the order of the steps change where you finish? What
+                    does, then?
                   </p>
                 </div>
               </details>
@@ -2324,12 +2240,9 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 </summary>
                 <div class="details-body">
                   <p>
-                    A range longer than &radic;n needs more than &radic;n/2
-                    copies of its majority, so only values appearing more than
-                    &radic;n/2 times in the whole array can win it — and there
-                    are at most 2&radic;n of those. Give each such
-                    <em>heavy</em> value a prefix-count array; handle short
-                    ranges (length ≤ &radic;n) by brute force.
+                    Only how many steps go towards the target. If r do, then r
+                    &minus; (k &minus; r) = distance, so r = (k + distance) / 2.
+                    Choosing which r of the k steps they are: C(k, r).
                   </p>
                 </div>
               </details>
@@ -2337,19 +2250,14 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
             <div class="prob-section">
               <div class="prob-section-label">Solution</div>
               <p>
-                The split is by <em>frequency</em>, and the threshold is
-                &radic;n. A range longer than &radic;n needs a majority of more
-                than &radic;n/2 copies, so its answer must appear more than
-                &radic;n/2 times in the whole array &mdash; and at most
-                2&radic;n values do, each checked in O(1) with prefix counts.
-                (Setting the cut-off at &radic;n instead is a tempting bug: a
-                value with, say, 0.7&radic;n copies can still be the majority of
-                a range just over &radic;n long.) A range of length at most
-                &radic;n is scanned directly with Boyer-Moore voting. Every
-                query is therefore O(&radic;n). Binary search on each
-                value&rsquo;s positions, or a segment tree of Boyer-Moore votes,
-                also work &mdash; but the heavy/light split is the square-root
-                idea in its purest form.
+                A DP over (position, steps left) works, but counting is shorter.
+                The finish depends only on how many steps go towards endPos.
+                With distance d = |endPos &minus; startPos|, the r steps towards
+                and k &minus; r away must satisfy r &minus; (k &minus; r) = d.
+                If d &gt; k, or k &minus; d is odd, no whole-number r exists and
+                the answer is 0. Otherwise any choice of which r steps go
+                towards the target works, and there are C(k, r) such choices
+                &mdash; computed with factorials and inverse factorials.
               </p>
             </div>
             <details>
@@ -2360,35 +2268,390 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
                 <div class="code-block pseudo">
                   <div class="code-header">
                     <span class="code-lang"
-                      >&#128208; Pseudocode &middot; Prefix Counts for Heavy
-                      Values, Brute Force for Short Ranges</span
+                      >&#128208; Pseudocode &middot; C(k, r) With Inverse
+                      Factorials</span
                     ><button class="copy-btn" onclick="copyCode(this)">
                       Copy
                     </button>
                   </div>
-                  <pre><span class="pc-kw">function</span> MajorityChecker(arr):
-    n ← length(arr);  S ← floor(sqrt(n))
-    heavy ← values appearing more than S ÷ 2 <span class="pc-kw">times</span> <span class="pc-kw">in</span> arr    <span class="pc-cm">// at most 2S of them</span>
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:
-        pref[v] ← prefix counts of v over arr                 <span class="pc-cm">// pref[v][i] = copies in arr[0..i-1]</span>
-
-<span class="pc-kw">function</span> query(left, right, threshold):
-    <span class="pc-kw">if</span> right - left + 1 ≤ S:                                  <span class="pc-cm">// short range: vote directly</span>
-        cand ← Boyer-Moore majority candidate of arr[left..right]
-        <span class="pc-kw">return</span> cand <span class="pc-kw">if</span> count of cand <span class="pc-kw">in</span> arr[left..right] ≥ threshold <span class="pc-kw">else</span> -1
-    <span class="pc-kw">for</span> <span class="pc-kw">each</span> v <span class="pc-kw">in</span> heavy:                                      <span class="pc-cm">// long range: only heavy values qualify</span>
-        <span class="pc-kw">if</span> pref[v][right + 1] - pref[v][left] ≥ threshold:
-            <span class="pc-kw">return</span> v
-    <span class="pc-kw">return</span> -1</pre>
+                  <pre><span class="pc-kw">function</span> numberOfWays(startPos, endPos, k):
+    d ← |endPos - startPos|
+    <span class="pc-kw">if</span> d &gt; k <span class="pc-kw">or</span> (k - d) is odd: <span class="pc-kw">return</span> 0
+    r ← (k + d) / 2                              <span class="pc-cm">// steps towards the target</span>
+    precompute(k)                                <span class="pc-cm">// fact and invFact up to k</span>
+    <span class="pc-kw">return</span> nCr(k, r)</pre>
                 </div>
                 <div class="complexity-row">
                   <div class="cx-badge green">
                     <span class="cx-label">Time</span
-                    ><span class="cx-val green">O(&radic;n) per query</span>
+                    ><span class="cx-val green">O(k)</span>
                   </div>
                   <div class="cx-badge green">
                     <span class="cx-label">Space</span
-                    ><span class="cx-val green">O(n&radic;n)</span>
+                    ><span class="cx-val green">O(k)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 03: Ugly Number III -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 03 &middot; Inclusion&ndash;Exclusion
+              </div>
+              <div class="prob-title">Ugly Number III</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/ugly-number-iii/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1201 - Ugly Number III</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat"
+                  >Count &le; x, then binary search x</span
+                >
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                An ugly number here is a positive integer divisible by a, b or
+                c. Return the n-th ugly number. n, a, b and c are up to
+                10&#8313;; the answer is guaranteed to be at most 2 &times;
+                10&#8313;.
+              </p>
+              <div class="iobox">
+                n = 3, a = 2, b = 3, c = 5 → 4 (2, 3, 4, 5, 6, ...) n = 4, a =
+                2, b = 3, c = 4 → 6 (2, 3, 4, 6, 8, ...)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Listing the numbers one by one is far too slow. Could you
+                    instead count how many ugly numbers are &le; some x?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Inclusion&ndash;exclusion over the three divisors gives that
+                    count in O(1). The count only grows with x, so binary search
+                    for the smallest x whose count reaches n.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                Two tools combine. Inclusion&ndash;exclusion counts the numbers
+                up to x divisible by a, b or c: add x/a, x/b and x/c, subtract
+                the three pairs using their <em>lcm</em>, and add back the
+                triple. That count never decreases as x grows, which is exactly
+                the condition for &ldquo;binary search on the answer&rdquo; from
+                Lecture 13: the n-th ugly number is the smallest x whose count
+                is at least n. Use <code>long</code> for the lcms &mdash; the
+                product of two numbers near 10&#8313; overflows an int.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Count, Then Search</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> nthUglyNumber(n, a, b, c):
+    ab ← lcm(a, b);  bc ← lcm(b, c);  ac ← lcm(a, c);  abc ← lcm(ab, c)   <span class="pc-cm">// long</span>
+    <span class="pc-kw">function</span> count(x):
+        <span class="pc-kw">return</span> x/a + x/b + x/c - x/ab - x/bc - x/ac + x/abc
+    lo ← 1;  hi ← 2 · 10⁹
+    <span class="pc-kw">while</span> lo &lt; hi:
+        mid ← lo + (hi - lo) / 2
+        <span class="pc-kw">if</span> count(mid) ≥ n: hi ← mid                <span class="pc-cm">// mid might be the answer</span>
+        <span class="pc-kw">else</span>:              lo ← mid + 1
+    <span class="pc-kw">return</span> lo</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green"
+                      >O(log(2 &middot; 10&#8313;))</span
+                    >
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(1)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 04: New 21 Game -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">Problem 04 &middot; Probability DP</div>
+              <div class="prob-title">New 21 Game</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/new-21-game/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 837 - New 21 Game</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-med">Medium</span>
+                <span class="tag tag-pat">Average over a sliding window</span>
+                <span class="tag tag-co">Google &middot; Amazon</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                Alice starts with 0 points and keeps drawing while she has fewer
+                than k. Each draw adds a whole number from 1 to maxPts, all
+                equally likely. Return the probability that she finishes with at
+                most n points.
+              </p>
+              <div class="iobox">
+                n = 10, k = 1, maxPts = 10 → 1.00000 n = 6, k = 1, maxPts = 10 →
+                0.60000 n = 21, k = 17, maxPts = 10 → 0.73278
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Let dp[i] be the probability of ever holding exactly i
+                    points. Which earlier scores can jump to i in one draw?
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    The previous maxPts scores &mdash; but only those still
+                    drawing (below k). dp[i] is their sum divided by maxPts.
+                    Keep the sum as a sliding window instead of re-adding it.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the lecture&rsquo;s probability DP. Score i is reached
+                from score j with a single draw of i &minus; j, which happens
+                with probability 1/maxPts, and only if j &lt; k (at k or above
+                she has stopped). So dp[i] = (sum of dp[j] for j in [i &minus;
+                maxPts, i &minus; 1] with j &lt; k) / maxPts. Summing that range
+                each time costs O(n &middot; maxPts); a running window sum,
+                adding dp[i] while i &lt; k and dropping dp[i &minus; maxPts],
+                makes it O(n). The answer adds dp[i] for the final scores k &le;
+                i &le; n. The shortcut at the top handles k = 0 and the case
+                where she cannot possibly exceed n.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; dp With a Running Window
+                      Sum</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> new21Game(n, k, maxPts):
+    <span class="pc-kw">if</span> k = 0 <span class="pc-kw">or</span> n ≥ k - 1 + maxPts: <span class="pc-kw">return</span> 1.0      <span class="pc-cm">// she can never go over n</span>
+    dp ← array of n + 1 zeros;  dp[0] ← 1.0
+    window ← 1.0;  answer ← 0.0                 <span class="pc-cm">// window = dp sum of the last maxPts drawing scores</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        dp[i] ← window / maxPts
+        <span class="pc-kw">if</span> i &lt; k: window ← window + dp[i]       <span class="pc-cm">// still drawing: feeds later scores</span>
+        <span class="pc-kw">else</span>:     answer ← answer + dp[i]       <span class="pc-cm">// stopped here, and i ≤ n</span>
+        <span class="pc-kw">if</span> i - maxPts ≥ 0 <span class="pc-kw">and</span> i - maxPts &lt; k:
+            window ← window - dp[i - maxPts]     <span class="pc-cm">// too far back to reach i + 1</span>
+    <span class="pc-kw">return</span> answer</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge green">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+        <!-- Problem 05: Stone Game IV -->
+        <div class="prob-card">
+          <div class="prob-header" onclick="toggleProb(this)">
+            <div class="prob-left">
+              <div class="prob-num">
+                Problem 05 &middot; Win / Lose Positions
+              </div>
+              <div class="prob-title">Stone Game IV</div>
+              <div style="margin-top: 4px">
+                <a
+                  href="https://leetcode.com/problems/stone-game-iv/"
+                  target="_blank"
+                  style="font-size: 12px"
+                  >&#128279; LC 1510 - Stone Game IV</a
+                >
+              </div>
+              <div class="prob-tags">
+                <span class="tag tag-hard">Hard</span>
+                <span class="tag tag-pat">Label positions 0..n</span>
+                <span class="tag tag-co">Amazon &middot; Google</span>
+              </div>
+            </div>
+            <span style="color: var(--text3); font-size: 18px; margin-top: 2px"
+              >&rsaquo;</span
+            >
+          </div>
+          <div class="prob-body" style="display: none">
+            <div class="prob-section">
+              <div class="prob-section-label">Problem</div>
+              <p>
+                There are n stones. Alice and Bob take turns, Alice first; a
+                move removes any non-zero <em>square</em> number of stones (1,
+                4, 9, &hellip;). The player who cannot move loses. Return true
+                if Alice wins with perfect play.
+              </p>
+              <div class="iobox">
+                n = 1 → true (take 1) n = 2 → false (take 1, Bob takes the last)
+                n = 4 → true (take all 4)
+              </div>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Hints</div>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 1 &mdash; a
+                  nudge
+                </summary>
+                <div class="details-body">
+                  <p>
+                    Who wins with 0 stones left, from the point of view of the
+                    player whose turn it is? Build up from there.
+                  </p>
+                </div>
+              </details>
+              <details class="hint">
+                <summary>
+                  <span class="toggle-arrow">&#9654;</span>Hint 2 &mdash; the
+                  key idea
+                </summary>
+                <div class="details-body">
+                  <p>
+                    win[i] is true if some square j&sup2; &le; i leaves a losing
+                    position: win[i &minus; j&sup2;] is false.
+                  </p>
+                </div>
+              </details>
+            </div>
+            <div class="prob-section">
+              <div class="prob-section-label">Solution</div>
+              <p>
+                This is the lecture&rsquo;s win/lose labelling with
+                &ldquo;remove a square&rdquo; as the move. Position 0 is losing
+                &mdash; the player to move has no move. For each i from 1 to n,
+                try every square j&sup2; &le; i; if one of them hands the
+                opponent a losing position, i is winning, and you can stop
+                trying. There are about &radic;i squares to try for each i, so
+                the table costs O(n &radic;n) &mdash; about 3 &times; 10&#8311;
+                steps for n = 10&#8309;. Unlike Nim, there is no neat formula
+                here: the DP <em>is</em> the solution.
+              </p>
+            </div>
+            <details>
+              <summary>
+                <span class="toggle-arrow">&#9654;</span>Full solution
+              </summary>
+              <div class="details-body">
+                <div class="code-block pseudo">
+                  <div class="code-header">
+                    <span class="code-lang"
+                      >&#128208; Pseudocode &middot; Winning If Some Move Hands
+                      Over a Loss</span
+                    ><button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><span class="pc-kw">function</span> winnerSquareGame(n):
+    win ← array of n + 1 false                   <span class="pc-cm">// win[0] = false</span>
+    <span class="pc-kw">for</span> i <span class="pc-kw">from</span> 1 <span class="pc-kw">to</span> n:
+        j ← 1
+        <span class="pc-kw">while</span> j · j ≤ i:
+            <span class="pc-kw">if</span> <span class="pc-kw">not</span> win[i - j · j]:
+                win[i] ← true;  <span class="pc-kw">break</span>
+            j ← j + 1
+    <span class="pc-kw">return</span> win[n]</pre>
+                </div>
+                <div class="complexity-row">
+                  <div class="cx-badge yellow">
+                    <span class="cx-label">Time</span
+                    ><span class="cx-val yellow">O(n &radic;n)</span>
+                  </div>
+                  <div class="cx-badge green">
+                    <span class="cx-label">Space</span
+                    ><span class="cx-val green">O(n)</span>
                   </div>
                 </div>
               </div>
@@ -2402,13 +2665,13 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
           <span class="callout-icon">&#128203;</span>
           <div class="callout-body">
             <strong
-              >Lecture 38 Assignment &mdash; 12 Problems (2 Easy &middot; 6
-              Medium &middot; 4 Hard)</strong
+              >Lecture 42 Assignment &mdash; 18 Problems (4 Easy &middot; 9
+              Medium &middot; 5 Hard)</strong
             ><br />
             Every problem is LeetCode-linked and company-tagged. Complete it
-            before moving to Lecture 39.<br /><br />
+            before moving to Lecture 43.<br /><br />
             <a
-              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture38/Assignment.md"
+              href="https://github.com/bhumika-aga/DSA/blob/main/Lecture42/Assignment.md"
               style="
                 background: var(--accent);
                 color: #fff;
@@ -2425,68 +2688,64 @@ curL ← 0;  curR ← -1                  <span class="pc-cm">// the current win
 
         <!-- CHECKLIST -->
         <h2 class="h1" id="checklist">&#9989; Lecture Completion Checklist</h2>
-        <p>Check each item before advancing to Lecture 39.</p>
+        <p>Check each item before advancing to Lecture 43.</p>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write the block build, query and point update from memory
+            I can write a recurrence as a matrix and compute its n-th term with
+            fast power
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can derive the &radic;n block size from n ÷ B + 2B
+            I can precompute factorials and inverse factorials and answer nCr
+            mod p
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can explain why at most &radic;n values can be heavy
+            I can count &ldquo;divisible by a or b or c&rdquo; with
+            inclusion&ndash;exclusion
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can sort queries in Mo&rsquo;s order and say why the total
-            movement is about (n + q)&radic;n
+            I can explain linearity of expectation and reservoir sampling
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
           <div class="cb-text">
-            I can write add and remove for a distinct-count window
+            I can label game positions as winning or losing, and use XOR for Nim
           </div>
         </div>
         <div class="checklist-item">
           <div class="cb-box"></div>
-          <div class="cb-text">
-            I know when a problem is offline, and why that matters
-          </div>
-        </div>
-        <div class="checklist-item">
-          <div class="cb-box"></div>
-          <div class="cb-text">I completed all 12 assignment problems</div>
+          <div class="cb-text">I completed all 18 assignment problems</div>
         </div>
 
         <div class="callout green">
           <span class="callout-icon">&#127881;</span>
           <div class="callout-body">
-            <strong>Next up &mdash; Lecture 39: String Algorithms</strong><br />
-            The &ldquo;never re-read what you already know&rdquo; idea behind
-            Mo&rsquo;s algorithm returns in a sharper form: KMP, the
-            Z-algorithm, rolling hashes and Manacher all find patterns in text
-            in linear time.
+            <strong>Next up &mdash; Lecture 43: Design Data Structures</strong
+            ><br />
+            Phase 6 begins. Combine the structures you know into new ones that
+            do several jobs in O(1) &mdash; LRU and LFU caches, randomised sets,
+            and the design questions interviewers love.
           </div>
         </div>
 
         <!-- BOTTOM NAV -->
         <div class="page-nav">
-          <a href="../Lecture37/lecture37_notes.html"
-            >&larr; Lecture 37 &middot; Segment Trees &amp; Fenwick Trees</a
+          <a href="../Lecture41/lecture41_notes.html"
+            >&larr; Lecture 41 &middot; Balanced BSTs &amp; Ordered
+            Structures</a
           >
-          <a class="next" href="../Lecture39/lecture39_notes.html"
-            >Lecture 39 &middot; String Algorithms (KMP, Z, Rabin-Karp,
-            Manacher) &rarr;</a
+          <a class="next" href="../Lecture43/lecture43_notes.html"
+            >Lecture 43 &middot; Design Data Structures &rarr;</a
           >
         </div>
       </div>

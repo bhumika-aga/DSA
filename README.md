@@ -13,8 +13,8 @@
 | **Phases**         | 6                                                    |
 | **Study Days**     | 215 days of content                                  |
 | **Duration**       | ~34 weeks at one lecture block at a time             |
-| **Total Problems** | 1038                                                 |
-| **Written So Far** | 40 lectures · 927 problems                           |
+| **Total Problems** | 1037                                                 |
+| **Written So Far** | 45 lectures · 1037 problems                          |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 > 📖 **New to the vocabulary?** Every term the course uses is defined in plain English in the [Glossary](glossary.html).
@@ -54,7 +54,7 @@
 | 11  | 📋 Arrays & Strings                                         | Phase 2 | 7d   | 35       | ✅     |
 | 12  | 🔀 Sorting Algorithms                                       | Phase 2 | 4d   | 25       | ✅     |
 | 13  | 🔎 Searching Algorithms                                     | Phase 2 | 5d   | 28       | ✅     |
-| 14  | 🗂️ Linked Lists                                             | Phase 2 | 6d   | 28       | ✅     |
+| 14  | 🗂️ Linked Lists                                             | Phase 2 | 6d   | 27       | ✅     |
 | 15  | 📚 Stacks & Queues                                          | Phase 2 | 4d   | 16       | ✅     |
 | 16  | 🗃️ HashMap & HashSet                                        | Phase 2 | 4d   | 25       | ✅     |
 | 17  | 🧮 Matrix Problems                                          | Phase 2 | 4d   | 24       | ✅     |
@@ -81,11 +81,11 @@
 | 38  | 🪵 Square Root Decomposition & Mo's Algorithm               | Phase 5 | 3d   | 12       | ✅     |
 | 39  | 🔡 String Algorithms (KMP, Z, Rabin-Karp, Manacher)         | Phase 5 | 5d   | 20       | ✅     |
 | 40  | 🕳️ Advanced Graph Algorithms                                | Phase 5 | 6d   | 22       | ✅     |
-| 41  | 🎚️ Balanced BSTs & Ordered Structures                       | Phase 5 | 4d   | 18       | 📝     |
-| 42  | 🎲 Advanced Math & Game Theory                              | Phase 5 | 4d   | 18       | 📝     |
-| 43  | 🛠️ Design Data Structures                                   | Phase 6 | 5d   | 20       | 📝     |
-| 44  | ⏱️ Company Pattern Drills                                   | Phase 6 | 8d   | 40       | 📝     |
-| 45  | 🎓 Mock Interviews & System Thinking                        | Phase 6 | 7d   | 15       | 📝     |
+| 41  | 🎚️ Balanced BSTs & Ordered Structures                       | Phase 5 | 4d   | 18       | ✅     |
+| 42  | 🎲 Advanced Math & Game Theory                              | Phase 5 | 4d   | 18       | ✅     |
+| 43  | 🛠️ Design Data Structures                                   | Phase 6 | 5d   | 20       | ✅     |
+| 44  | ⏱️ Company Pattern Drills                                   | Phase 6 | 8d   | 40       | ✅     |
+| 45  | 🎓 Mock Interviews & System Thinking                        | Phase 6 | 7d   | 15       | ✅     |
 
 ---
 
@@ -509,7 +509,7 @@
 
 > The structures every interview is built from — arrays through graphs, each with its own notes and assignment.
 
-**14 lectures · 67 days · 307 problems**
+**14 lectures · 67 days · 306 problems**
 
 ---
 
@@ -653,8 +653,8 @@
 | Detail               | Value                                                                                   |
 | -------------------- | --------------------------------------------------------------------------------------- |
 | **Duration**         | 6 days                                                                                  |
-| **Problems**         | 28                                                                                      |
-| **Difficulty Split** | 9 Easy · 16 Medium · 3 Hard                                                             |
+| **Problems**         | 27                                                                                      |
+| **Difficulty Split** | 9 Easy · 16 Medium · 2 Hard                                                             |
 | **Prerequisites**    | Lectures 5, 8                                                                           |
 | **Status**           | ✅ Notes + assignment written                                                           |
 | **Material**         | [Lecture Notes](Lecture14/lecture14_notes.html) · [Assignment](Lecture14/Assignment.md) |
@@ -1817,13 +1817,14 @@
 
 ### Lecture 41: 🎚️ Balanced BSTs & Ordered Structures
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 18                         |
-| **Difficulty Split** | 5 Easy · 9 Medium · 4 Hard |
-| **Prerequisites**    | Lectures 18, 20            |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 18                                                                                      |
+| **Difficulty Split** | 4 Easy · 9 Medium · 5 Hard                                                              |
+| **Prerequisites**    | Lectures 19, 20                                                                         |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture41/lecture41_notes.html) · [Assignment](Lecture41/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1835,21 +1836,24 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                    | Description                                          | Example Problem               |
-| -------------------------- | ---------------------------------------------------- | ----------------------------- |
-| **Floor / ceiling query**  | Jump to the nearest key on either side of a value    | My Calendar I                 |
-| **Ordered sliding window** | A TreeMap acting as a multiset inside a window       | Sliding Window Median         |
-| **Rotation**               | Left and right rotations restore height balance      | AVL insert                    |
-| **Order statistics**       | Subtree sizes give rank and the k-th element         | Kth Smallest Element in a BST |
-| **Skip list**              | Probabilistic levels give O(log n) without rotations | Design Skiplist               |
+| Pattern                   | Description                                          | Example Problem                   |
+| ------------------------- | ---------------------------------------------------- | --------------------------------- |
+| **Floor / ceiling query** | Jump to the nearest key on either side of a value    | Contains Duplicate III            |
+| **TreeMap multiset**      | Value → count keeps both ends while items change     | Stock Price Fluctuation           |
+| **Rotation**              | Left and right rotations restore height balance      | Increasing Order Search Tree      |
+| **Order statistics**      | Subtree sizes (or two heaps) give the k-th element   | Sequentially Ordinal Rank Tracker |
+| **Skip list**             | Probabilistic levels give O(log n) without rotations | Design Skiplist                   |
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** Java's ordered API — TreeMap, TreeSet, NavigableMap, subMap, and their genuine complexities.
-2. **Day 2:** Why balance matters — degenerate BSTs, left/right rotations, the AVL height invariant, red-black rules at
-   a glance.
-3. **Day 3:** Ordered-structure problems — My Calendar I/II/III, Sliding Window Median, Contains Duplicate III.
-4. **Day 4:** Order-statistic trees, Design Skiplist, and a decision table: TreeMap vs heap vs sorted array.
+1. **Day 1:** Java's ordered API — TreeMap, TreeSet, floor/ceiling/higher/lower, range views, and a TreeMap as a sorted
+   multiset. Stock Price Fluctuation, Exam Room.
+2. **Day 2:** Why balance matters — degenerate BSTs, left/right rotations, the AVL height rule, red-black rules at a
+   glance.
+3. **Day 3:** Ordered-structure problems — Contains Duplicate III, Data Stream as Disjoint Intervals, Find Servers That
+   Handled Most Number of Requests.
+4. **Day 4:** Order statistics (subtree sizes, two heaps), Design Skiplist, and a decision table: TreeMap vs heap vs
+   sorted array.
 
 #### 🏢 Companies That Ask These
 
@@ -1859,13 +1863,14 @@
 
 ### Lecture 42: 🎲 Advanced Math & Game Theory
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 4 days                     |
-| **Problems**         | 18                         |
-| **Difficulty Split** | 4 Easy · 9 Medium · 5 Hard |
-| **Prerequisites**    | Lectures 10, 32            |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 4 days                                                                                  |
+| **Problems**         | 18                                                                                      |
+| **Difficulty Split** | 4 Easy · 9 Medium · 5 Hard                                                              |
+| **Prerequisites**    | Lectures 10, 32, 35                                                                     |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture42/lecture42_notes.html) · [Assignment](Lecture42/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1908,13 +1913,14 @@
 
 ### Lecture 43: 🛠️ Design Data Structures
 
-| Detail               | Value                       |
-| -------------------- | --------------------------- |
-| **Duration**         | 5 days                      |
-| **Problems**         | 20                          |
-| **Difficulty Split** | 4 Easy · 11 Medium · 5 Hard |
-| **Prerequisites**    | Lectures 14–20, 41          |
-| **Status**           | 📝 Planned                  |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 5 days                                                                                  |
+| **Problems**         | 20                                                                                      |
+| **Difficulty Split** | 2 Easy · 13 Medium · 5 Hard                                                             |
+| **Prerequisites**    | Lectures 14–20, 41                                                                      |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture43/lecture43_notes.html) · [Assignment](Lecture43/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1925,21 +1931,21 @@
 
 #### 🔑 Key Patterns
 
-| Pattern             | Description                                  | Example Problem                         |
-| ------------------- | -------------------------------------------- | --------------------------------------- |
-| **HashMap + DLL**   | O(1) access + O(1) ordered eviction          | LRU Cache, LFU Cache                    |
-| **HashMap + Array** | O(1) lookup + O(1) random access             | RandomizedSet (insert/remove/getRandom) |
-| **Two DS Trick**    | Combine two structures to get O(1) from both | Min Stack, Max Stack                    |
-| **Augmented BST**   | BST with extra size/count per node           | Order Statistics Tree                   |
-| **Lazy Cleaning**   | Mark deleted instead of actually removing    | Design Twitter (lazy operations)        |
+| Pattern             | Description                                         | Example Problem                          |
+| ------------------- | --------------------------------------------------- | ---------------------------------------- |
+| **HashMap + DLL**   | O(1) access + O(1) ordered eviction                 | LRU Cache (L16), LFU Cache (L14)         |
+| **HashMap + Array** | O(1) lookup + O(1) random access via swap-with-last | Insert Delete GetRandom - Duplicates     |
+| **Lazy deletion**   | The map is the truth; skip stale heap entries       | Design Task Manager, Dinner Plate Stacks |
+| **History lists**   | Record changes per key; binary search the time      | Snapshot Array                           |
+| **Lazy iterator**   | Do the work in hasNext, one item at a time          | Flatten Nested List Iterator             |
 
 #### 📝 Sub-Topics & Lecture Flow
 
-1. **Day 1:** LRU Cache — HashMap + Doubly Linked List. Why this pair achieves O(1) get/put/evict
-2. **Day 2:** LFU Cache — two HashMaps + DLL per frequency. O(1) all operations analysis
-3. **Day 3:** Min Stack, Max Stack (two-stack trick), Median Stream (two heaps), RandomizedSet
-4. **Day 4:** Design Search Autocomplete System, Time-Based Key-Value Store, Snapshot Array
-5. **Day 5:** Advanced — Design Twitter (heap + lists), In-Memory File System, Skip List
+1. **Day 1:** The five-step design method; the structure-per-operation table; LRU and LFU revisited from Lectures 14 and 16.
+2. **Day 2:** Array + index map (swap-with-last) and buckets by count — Insert Delete GetRandom with duplicates.
+3. **Day 3:** Lazy deletion with heaps and free-slot heaps — Design Task Manager, Dinner Plate Stacks, Seat Reservation.
+4. **Day 4:** History and snapshots, iterators — Snapshot Array, Flatten Nested List Iterator, Iterator for Combination.
+5. **Day 5:** Multi-structure designs and follow-ups — Movie Rental System, Encrypt and Decrypt Strings, thread safety.
 
 #### 🏢 Companies That Ask These
 
@@ -1949,13 +1955,14 @@
 
 ### Lecture 44: ⏱️ Company Pattern Drills
 
-| Detail               | Value                         |
-| -------------------- | ----------------------------- |
-| **Duration**         | 8 days                        |
-| **Problems**         | 40                            |
-| **Difficulty Split** | 10 Easy · 20 Medium · 10 Hard |
-| **Prerequisites**    | Phases 1–5                    |
-| **Status**           | 📝 Planned                    |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 8 days                                                                                  |
+| **Problems**         | 40                                                                                      |
+| **Difficulty Split** | 10 Easy · 20 Medium · 10 Hard                                                           |
+| **Prerequisites**    | Phases 1–5                                                                              |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture44/lecture44_notes.html) · [Assignment](Lecture44/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -1994,13 +2001,14 @@
 
 ### Lecture 45: 🎓 Mock Interviews & System Thinking
 
-| Detail               | Value                      |
-| -------------------- | -------------------------- |
-| **Duration**         | 7 days                     |
-| **Problems**         | 15                         |
-| **Difficulty Split** | 3 Easy · 7 Medium · 5 Hard |
-| **Prerequisites**    | Lectures 4–44              |
-| **Status**           | 📝 Planned                 |
+| Detail               | Value                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| **Duration**         | 7 days                                                                                  |
+| **Problems**         | 15                                                                                      |
+| **Difficulty Split** | 3 Easy · 7 Medium · 5 Hard                                                              |
+| **Prerequisites**    | Lectures 4–44                                                                           |
+| **Status**           | ✅ Notes + assignment written                                                           |
+| **Material**         | [Lecture Notes](Lecture45/lecture45_notes.html) · [Assignment](Lecture45/Assignment.md) |
 
 #### 🎓 Learning Objectives
 
@@ -2056,12 +2064,12 @@
 | Phase                                    | Lectures | Lectures # | Days    | Problems |
 | ---------------------------------------- | -------- | ---------- | ------- | -------- |
 | **1 — Foundations**                      | 10       | 1–10       | 38      | 261      |
-| **2 — Core Data Structures**             | 14       | 11–24      | 67      | 307      |
+| **2 — Core Data Structures**             | 14       | 11–24      | 67      | 306      |
 | **3 — Core Patterns**                    | 7        | 25–31      | 32      | 160      |
 | **4 — Dynamic Programming**              | 4        | 32–35      | 26      | 105      |
 | **5 — Advanced Structures & Algorithms** | 7        | 36–42      | 32      | 130      |
 | **6 — Interview Mastery**                | 3        | 43–45      | 20      | 75       |
-| **Total**                                | **45**   | **1–45**   | **215** | **1038** |
+| **Total**                                | **45**   | **1–45**   | **215** | **1037** |
 
 ---
 
