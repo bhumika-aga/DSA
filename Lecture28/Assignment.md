@@ -1,4 +1,4 @@
-# 📐 Assignment 21 — Intervals & Sweep Line
+# 📐 Assignment 28 — Intervals & Sweep Line
 
 > **Lecture:** 28 of 45 — Intervals & Sweep Line
 > **Phase:** 3 — Core Patterns

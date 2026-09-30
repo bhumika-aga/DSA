@@ -38,7 +38,7 @@ _The BST property at its simplest — searching, summing a range, and building a
 ### E2 · Range Sum of BST
 
 **🔗 [LC 938 — Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/)** · Easy
-**Pattern:** BST Property | **Companies:** Amazon, Facebook
+**Pattern:** BST Property | **Companies:** Amazon, Meta
 
 **Hint:** Use BST pruning — if node.val < low go right only; if node.val > high go left only; else add node.val and recurse both.
 
@@ -105,7 +105,7 @@ _The working set: validating, ordering, inserting, deleting, finding ancestors, 
 ### M5 · Lowest Common Ancestor of a Binary Tree
 
 **🔗 [LC 236 — Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)** · Medium
-**Pattern:** LCA | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** LCA | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Return node when null/p/q found. If both left and right return non-null → split here → current is LCA. Else bubble up whichever side is non-null.
 
@@ -114,7 +114,7 @@ _The working set: validating, ordering, inserting, deleting, finding ancestors, 
 ### M6 · Lowest Common Ancestor of a Binary Search Tree
 
 **🔗 [LC 235 — Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)** · Medium
-**Pattern:** BST Property + LCA | **Companies:** Amazon, Google, Facebook
+**Pattern:** BST Property + LCA | **Companies:** Amazon, Google, Meta
 
 **Hint:** Simpler than LC 236. If both p and q are less than node.val → go left. If both greater → go right. Otherwise → this IS the LCA (split point).
 
@@ -123,7 +123,7 @@ _The working set: validating, ordering, inserting, deleting, finding ancestors, 
 ### M7 · Construct Binary Tree from Preorder and Inorder Traversal
 
 **🔗 [LC 105 — Construct Binary Tree from Preorder and Inorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)** · Medium
-**Pattern:** DFS + Divide & Conquer | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** DFS + Divide & Conquer | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Preorder[0] is always the root. Find that value in inorder — everything to its left is the left subtree, everything to its right is the right subtree. Use a HashMap for O(1) inorder index lookup. Recurse with adjusted index bounds.
 
@@ -141,7 +141,7 @@ _The working set: validating, ordering, inserting, deleting, finding ancestors, 
 ### M9 · Binary Search Tree Iterator
 
 **🔗 [LC 173 — Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/)** · Medium
-**Pattern:** BST Inorder (Lazy) | **Companies:** Amazon, Microsoft, Facebook
+**Pattern:** BST Inorder (Lazy) | **Companies:** Amazon, Microsoft, Meta
 
 **Hint:** Use an explicit stack for iterative inorder. `next()` = pop from stack, push right child and its leftmost chain. `hasNext()` = check stack is not empty. Amortised O(1) per call, O(h) space.
 
@@ -163,7 +163,7 @@ _Two problems that combine the ordering property with a post-order walk that mus
 ### H1 · Serialize and Deserialize Binary Tree
 
 **🔗 [LC 297 — Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)** · Hard
-**Pattern:** DFS Preorder | **Companies:** Google, Amazon, Facebook, Microsoft, Uber
+**Pattern:** DFS Preorder | **Companies:** Google, Amazon, Meta, Microsoft, Uber
 
 **Hint:** Serialize using preorder DFS — write node value, then left, then right; write "null" for null nodes. Deserialize using a queue of tokens — poll the front, create a node, recurse for left and right.
 
@@ -243,7 +243,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | **Amazon**    | [Maximum Sum BST in Binary Tree](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/), [Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/), [Delete Node in a BST](https://leetcode.com/problems/delete-node-in-a-bst/), [Insert into a Binary Search Tree](https://leetcode.com/problems/insert-into-a-binary-search-tree/) |
 | **Google**    | [Convert Sorted Array to Binary Search Tree](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/), [Search in a Binary Search Tree](https://leetcode.com/problems/search-in-a-binary-search-tree/), [Maximum Sum BST in Binary Tree](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/), [Insert into a Binary Search Tree](https://leetcode.com/problems/insert-into-a-binary-search-tree/)             |
 | **Microsoft** | [Find Mode in Binary Search Tree](https://leetcode.com/problems/find-mode-in-binary-search-tree/), [Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/), [Delete Node in a BST](https://leetcode.com/problems/delete-node-in-a-bst/), [Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/)         |
-| **Facebook**  | [Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/), [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/), [Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/), [Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)                             |
+| **Meta**      | [Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/), [Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/), [Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/), [Serialize and Deserialize Binary Tree](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)                             |
 | **Bloomberg** | [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/), [Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)                                                                                                                                                                                                                                                   |
 
 ---
@@ -252,7 +252,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 - [ ] All 4 Easy problems solved
 - [ ] All 10 Medium problems solved
-- [ ] All 2 Hard problems attempted
+- [ ] Both Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 7 conceptual questions answered out loud

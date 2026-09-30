@@ -1,4 +1,4 @@
-# 🔣 Assignment 6 — Bit Manipulation
+# 🔣 Assignment 9 — Bit Manipulation
 
 > **Lecture:** 9 of 45 — Bit Manipulation
 > **Phase:** 1 — Foundations
@@ -405,9 +405,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 16 Easy problems solved
+- [ ] All 14 Medium problems solved
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

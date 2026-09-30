@@ -1,4 +1,4 @@
-# ⚡ Assignment 4 — Java 8+ Modern Features
+# ⚡ Assignment 7 — Java 8+ Modern Features
 
 > **Lecture:** 7 of 45 — Java 8+ Modern Features
 > **Phase:** 1 — Foundations
@@ -341,9 +341,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 10 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 12 Easy problems solved
+- [ ] All 9 Medium problems solved
+- [ ] All 4 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

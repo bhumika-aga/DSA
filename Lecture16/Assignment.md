@@ -1,4 +1,4 @@
-# 🗃️ Assignment 13 — HashMap & HashSet
+# 🗃️ Assignment 16 — HashMap & HashSet
 
 > **Lecture:** 16 of 45 — HashMap & HashSet
 > **Phase:** 2 — Core Data Structures
@@ -332,8 +332,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 ## ✅ Completion Checklist
 
 - [ ] All 7 Easy problems solved
-- [ ] All 13 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 14 Medium problems solved
+- [ ] All 4 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

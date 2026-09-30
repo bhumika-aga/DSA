@@ -1,4 +1,4 @@
-# 🔁 Assignment 5 — Recursion & Backtracking
+# 🔁 Assignment 8 — Recursion & Backtracking
 
 > **Lecture:** 8 of 45 — Recursion — The Mental Model
 > **Phase:** 1 — Foundations

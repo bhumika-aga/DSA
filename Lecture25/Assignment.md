@@ -1,4 +1,4 @@
-# 🎯 Assignment 18 — Two Pointers & Sliding Window
+# 🎯 Assignment 25 — Two Pointers & Sliding Window
 
 > **Lecture:** 25 of 45 — Two Pointers & Sliding Window
 > **Phase:** 3 — Core Patterns
@@ -30,12 +30,12 @@
 
 _No Easy problems at this stage of the course._
 
-### E1 · Valid Palindrome
+### E1 · Long Pressed Name
 
-**🔗 [LC 125 — Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)** · Easy
-**Pattern:** Opposite Ends | **Companies:** Meta, Amazon, Microsoft
+**🔗 [LC 925 — Long Pressed Name](https://leetcode.com/problems/long-pressed-name/)** · Easy
+**Pattern:** Two pointers, same direction | **Companies:** Google, Amazon
 
-**Hint:** Two pointers converging, skipping any character that is not alphanumeric. Compare lowercase forms. The skipping happens inside the outer loop, not before it.
+**Hint:** Walk `typed` with j and `name` with i. If typed[j] matches name[i], advance both; otherwise it must repeat typed[j − 1] (a long press), or the answer is false. At the end, i must have reached the end of `name`.
 
 ---
 
@@ -379,8 +379,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 15 Medium problems solved
+- [ ] All 9 Easy problems solved
+- [ ] All 16 Medium problems solved
 - [ ] All 5 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes

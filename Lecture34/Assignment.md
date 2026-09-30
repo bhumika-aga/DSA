@@ -1,4 +1,4 @@
-# 🎒 Assignment 27 — Dynamic Programming III — Knapsack & Subsets
+# 🎒 Assignment 34 — Dynamic Programming III — Knapsack & Subsets
 
 > **Lecture:** 34 of 45 — Dynamic Programming III — Knapsack & Subsets
 > **Phase:** 4 — Dynamic Programming

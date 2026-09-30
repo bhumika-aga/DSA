@@ -14,7 +14,6 @@
 | **Study Days**     | 215 days of content                                  |
 | **Duration**       | ~34 weeks at one lecture block at a time             |
 | **Total Problems** | 1037                                                 |
-| **Written So Far** | 45 lectures · 1037 problems                          |
 | **Approach**       | Pattern-first, intuition before code, company-tagged |
 
 > 📖 **New to the vocabulary?** Every term the course uses is defined in plain English in the [Glossary](glossary.html).
@@ -30,10 +29,9 @@
 
 ### 🚦 Status Key
 
-| Symbol | Meaning                                                                |
-| ------ | ---------------------------------------------------------------------- |
-| ✅     | Lecture notes and assignment are written and linked                    |
-| 📝     | Planned — the syllabus below is fixed, the material is not written yet |
+| Symbol | Meaning                                             |
+| ------ | --------------------------------------------------- |
+| ✅     | Lecture notes and assignment are written and linked |
 
 ---
 

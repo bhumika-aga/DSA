@@ -1,4 +1,4 @@
-# 🧱 Assignment 26 — Dynamic Programming II — Grids & Strings
+# 🧱 Assignment 33 — Dynamic Programming II — Grids & Strings
 
 > **Lecture:** 33 of 45 — Dynamic Programming II — Grids & Strings
 > **Phase:** 4 — Dynamic Programming

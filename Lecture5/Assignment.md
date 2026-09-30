@@ -1,4 +1,4 @@
-# 🧠 Assignment 2 — Java Memory Management
+# 🧠 Assignment 5 — Java Memory Management
 
 > **Lecture:** 5 of 45 — Java Memory Management
 > **Phase:** 1 — Foundations
@@ -499,9 +499,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 15 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 20 Easy problems solved
+- [ ] All 14 Medium problems solved
+- [ ] All 1 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

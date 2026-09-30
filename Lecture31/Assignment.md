@@ -1,4 +1,4 @@
-# 🔗 Assignment 24 — Union-Find (Disjoint Set Union)
+# 🔗 Assignment 31 — Union-Find (Disjoint Set Union)
 
 > **Lecture:** 31 of 45 — Union-Find (Disjoint Set Union)
 > **Phase:** 3 — Core Patterns

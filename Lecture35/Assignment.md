@@ -1,4 +1,4 @@
-# 🎛️ Assignment 28 — Dynamic Programming IV — Interval, Tree, Bitmask & Digit
+# 🎛️ Assignment 35 — Dynamic Programming IV — Interval, Tree, Bitmask & Digit
 
 > **Lecture:** 35 of 45 — Dynamic Programming IV — Interval, Tree, Bitmask & Digit
 > **Phase:** 4 — Dynamic Programming

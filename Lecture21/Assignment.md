@@ -118,7 +118,7 @@ also land in grid1. Track with a flag: if any cell of the DFS is water in grid1,
 ### M6 · Number of Provinces
 
 **🔗 [LC 547 — Number of Provinces](https://leetcode.com/problems/number-of-provinces/)** · Medium
-**Pattern:** DFS connected components | **Companies:** Google, Amazon, Facebook
+**Pattern:** DFS connected components | **Companies:** Google, Amazon, Meta
 
 **Hint:** Input is an adjacency matrix. DFS/BFS from each unvisited city. Each traversal = one province. Very similar to
 Number of Islands but on an adjacency matrix.
@@ -128,7 +128,7 @@ Number of Islands but on an adjacency matrix.
 ### M7 · Clone Graph
 
 **🔗 [LC 133 — Clone Graph](https://leetcode.com/problems/clone-graph/)** · Medium
-**Pattern:** DFS/BFS with HashMap | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** DFS/BFS with HashMap | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Use a `HashMap<Node, Node>` (original → clone). DFS: if `map.containsKey(node)`, return its clone. Otherwise
 create a new node, add to map, then clone all neighbours recursively.
@@ -151,7 +151,7 @@ _BFS where the state is more than a node — a word, a route, or a position plus
 ### H1 · Word Ladder
 
 **🔗 [LC 127 — Word Ladder](https://leetcode.com/problems/word-ladder/)** · Hard
-**Pattern:** BFS on implicit graph | **Companies:** Google, Amazon, Facebook, Microsoft
+**Pattern:** BFS on implicit graph | **Companies:** Google, Amazon, Meta, Microsoft
 
 > ⚠️ LeetCode rates this **Hard** — the core BFS concept is Medium; the challenge is the implicit graph construction and
 > avoiding TLE.
@@ -165,7 +165,7 @@ steps.
 ### H2 · Word Ladder II
 
 **🔗 [LC 126 — Word Ladder II](https://leetcode.com/problems/word-ladder-ii/)** · Hard
-**Pattern:** BFS + DFS (find all shortest paths) | **Companies:** Google, Amazon, Facebook
+**Pattern:** BFS + DFS (find all shortest paths) | **Companies:** Google, Amazon, Meta
 
 **Hint:** BFS to compute shortest distance from `beginWord` to every reachable word. Then DFS/backtracking from
 `endWord` backward, following only edges that strictly decrease the BFS distance. This avoids storing all paths during
@@ -261,7 +261,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Amazon**    | [Destination City](https://leetcode.com/problems/destination-city/), [Find Center of Star Graph](https://leetcode.com/problems/find-center-of-star-graph/), [Count Unreachable Pairs of Nodes in an Undirected Graph](https://leetcode.com/problems/count-unreachable-pairs-of-nodes-in-an-undirected-graph/), [Keys and Rooms](https://leetcode.com/problems/keys-and-rooms/)                                   |
 | **Google**    | [Count Sub Islands](https://leetcode.com/problems/count-sub-islands/), [Bus Routes](https://leetcode.com/problems/bus-routes/), [Number of Operations to Make Network Connected](https://leetcode.com/problems/number-of-operations-to-make-network-connected/), [Reorder Routes to Make All Paths Lead to the City Zero](https://leetcode.com/problems/reorder-routes-to-make-all-paths-lead-to-the-city-zero/) |
-| **Facebook**  | [Word Ladder II](https://leetcode.com/problems/word-ladder-ii/), [Number of Provinces](https://leetcode.com/problems/number-of-provinces/), [Word Ladder](https://leetcode.com/problems/word-ladder/), [Clone Graph](https://leetcode.com/problems/clone-graph/)                                                                                                                                                 |
+| **Meta**      | [Word Ladder II](https://leetcode.com/problems/word-ladder-ii/), [Number of Provinces](https://leetcode.com/problems/number-of-provinces/), [Word Ladder](https://leetcode.com/problems/word-ladder/), [Clone Graph](https://leetcode.com/problems/clone-graph/)                                                                                                                                                 |
 | **Microsoft** | [Find the Town Judge](https://leetcode.com/problems/find-the-town-judge/), [Open the Lock](https://leetcode.com/problems/open-the-lock/), [Word Ladder](https://leetcode.com/problems/word-ladder/), [Clone Graph](https://leetcode.com/problems/clone-graph/)                                                                                                                                                   |
 | **Uber**      | [Bus Routes](https://leetcode.com/problems/bus-routes/), [Shortest Path in a Grid with Obstacles Elimination](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/)                                                                                                                                                                                                                 |
 

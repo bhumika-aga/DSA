@@ -42,7 +42,7 @@ _Ordering first, then routing. For each one, decide which of the four algorithms
 ### M2 · Course Schedule
 
 **🔗 [LC 207 — Course Schedule](https://leetcode.com/problems/course-schedule/)** · Medium
-**Pattern:** Cycle detection in directed graph | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** Cycle detection in directed graph | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Build directed graph: prerequisite → course. Run Kahn's topological sort. If you can process all n courses (
 idx == n), no cycle exists → return true.
@@ -52,7 +52,7 @@ idx == n), no cycle exists → return true.
 ### M3 · Course Schedule II
 
 **🔗 [LC 210 — Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)** · Medium
-**Pattern:** Topological sort | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** Topological sort | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Same as LC 207 but return the topological order. Use Kahn's: when in-degree reaches 0, add to queue and to
 result array. If result length < n, cycle exists.
@@ -71,7 +71,7 @@ result array. If result length < n, cycle exists.
 ### M5 · Network Delay Time
 
 **🔗 [LC 743 — Network Delay Time](https://leetcode.com/problems/network-delay-time/)** · Medium
-**Pattern:** Dijkstra | **Companies:** Google, Amazon, Facebook, Uber
+**Pattern:** Dijkstra | **Companies:** Google, Amazon, Meta, Uber
 
 **Hint:** Build weighted directed adjacency list. Dijkstra from node `k`. Answer = max of all `dist[i]`. If any node has
 `dist = ∞`, return -1.
@@ -233,7 +233,7 @@ Answer these out loud, without looking at the notes:
 2. **Dijkstra’s assumption:** State it precisely, then give a small graph with a negative edge where Dijkstra returns the wrong answer.
 3. **Settling:** Why may Dijkstra ignore a node the second time it pops it?
 4. **Bellman-Ford rounds:** Why V−1 rounds and not V? What does a V-th successful relaxation prove?
-5. **Floyd-Warshall order:** Why must the k loop be outermost? What does dp[i][j] mean after k rounds?
+5. **Floyd-Warshall order:** Why must the k loop be outermost? What does dp`[i][j]` mean after k rounds?
 6. **Choosing:** Given V = 400 and a request for all-pairs distances, which algorithm and why? What if V = 100000 with one source?
 
 ---
@@ -246,7 +246,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Google**    | [Swim in Rising Water](https://leetcode.com/problems/swim-in-rising-water/), [Largest Color Value in a Directed Graph](https://leetcode.com/problems/largest-color-value-in-a-directed-graph/), [Sort Items by Groups Respecting Dependencies](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/), [Find All Possible Recipes from Given Supplies](https://leetcode.com/problems/find-all-possible-recipes-from-given-supplies/)                           |
 | **Amazon**    | [Find Champion II](https://leetcode.com/problems/find-champion-ii/), [Find Eventual Safe States](https://leetcode.com/problems/find-eventual-safe-states/), [Find the City With the Smallest Number of Neighbors at a Threshold Distance](https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/), [Minimum Number of Vertices to Reach All Nodes](https://leetcode.com/problems/minimum-number-of-vertices-to-reach-all-nodes/) |
-| **Facebook**  | [Course Schedule](https://leetcode.com/problems/course-schedule/), [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/), [Network Delay Time](https://leetcode.com/problems/network-delay-time/)                                                                                                                                                                                                                                                                  |
+| **Meta**      | [Course Schedule](https://leetcode.com/problems/course-schedule/), [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/), [Network Delay Time](https://leetcode.com/problems/network-delay-time/)                                                                                                                                                                                                                                                                  |
 | **Microsoft** | [Course Schedule](https://leetcode.com/problems/course-schedule/), [Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)                                                                                                                                                                                                                                                                                                                                           |
 | **Uber**      | [Cheapest Flights Within K Stops](https://leetcode.com/problems/cheapest-flights-within-k-stops/), [Network Delay Time](https://leetcode.com/problems/network-delay-time/)                                                                                                                                                                                                                                                                                                           |
 
@@ -254,7 +254,6 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 0 Easy problems solved
 - [ ] All 13 Medium problems solved
 - [ ] All 3 Hard problems attempted
 - [ ] Every complexity exercise answered before checking

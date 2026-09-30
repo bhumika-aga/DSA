@@ -33,7 +33,7 @@ _Spanning trees, two-colouring and degree arguments — structural questions rat
 ### M1 · Is Graph Bipartite?
 
 **🔗 [LC 785 — Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)** · Medium
-**Pattern:** BFS 2-coloring | **Companies:** Google, Amazon, Facebook
+**Pattern:** BFS 2-coloring | **Companies:** Google, Amazon, Meta
 
 **Hint:** BFS coloring: assign color 0 to the start, alternate colors for neighbours. If any neighbour has the same color
 as current node → not bipartite. Must handle disconnected graphs (loop all nodes).
@@ -191,18 +191,17 @@ Answer these out loud, without looking at the notes:
 
 The companies that ask this lecture's problems most often, with the problems to start from:
 
-| Company      | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Amazon**   | [Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree](https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/), [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/), [Detonate the Maximum Bombs](https://leetcode.com/problems/detonate-the-maximum-bombs/), [Maximal Network Rank](https://leetcode.com/problems/maximal-network-rank/) |
-| **Google**   | [Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/), [Minimum Fuel Cost to Report to the Capital](https://leetcode.com/problems/minimum-fuel-cost-to-report-to-the-capital/), [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/), [Possible Bipartition](https://leetcode.com/problems/possible-bipartition/)                                       |
-| **Facebook** | [Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)                                                                                                                                                                                                                                                                                                                                                 |
-| **Uber**     | [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)                                                                                                                                                                                                                                                                                                                    |
+| Company    | Problems to Prioritise                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Amazon** | [Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree](https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/), [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/), [Detonate the Maximum Bombs](https://leetcode.com/problems/detonate-the-maximum-bombs/), [Maximal Network Rank](https://leetcode.com/problems/maximal-network-rank/) |
+| **Google** | [Min Cost to Connect All Points](https://leetcode.com/problems/min-cost-to-connect-all-points/), [Minimum Fuel Cost to Report to the Capital](https://leetcode.com/problems/minimum-fuel-cost-to-report-to-the-capital/), [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/), [Possible Bipartition](https://leetcode.com/problems/possible-bipartition/)                                       |
+| **Meta**   | [Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)                                                                                                                                                                                                                                                                                                                                                 |
+| **Uber**   | [Critical Connections in a Network](https://leetcode.com/problems/critical-connections-in-a-network/)                                                                                                                                                                                                                                                                                                                    |
 
 ---
 
 ## ✅ Completion Checklist
 
-- [ ] All 0 Easy problems solved
 - [ ] All 7 Medium problems solved
 - [ ] All 3 Hard problems attempted
 - [ ] Every complexity exercise answered before checking

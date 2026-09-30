@@ -101,7 +101,7 @@ _Pure recursion practice. Every one of these is four lines once you trust the tw
 ### E9 · Diameter of Binary Tree
 
 **🔗 [LC 543 — Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/)** · Easy
-**Pattern:** Global via Local | **Companies:** Google, Facebook, Amazon
+**Pattern:** Global via Local | **Companies:** Google, Meta, Amazon
 
 **Hint:** DFS returns height. At each node update global `max = max(max, leftH + rightH)`. The diameter passes through this node.
 
@@ -161,7 +161,7 @@ _The same patterns with a twist: an extra piece of state, a different traversal 
 ### M4 · Binary Tree Right Side View
 
 **🔗 [LC 199 — Binary Tree Right Side View](https://leetcode.com/problems/binary-tree-right-side-view/)** · Medium
-**Pattern:** BFS Level-Order | **Companies:** Facebook, Amazon, Google
+**Pattern:** BFS Level-Order | **Companies:** Meta, Amazon, Google
 
 **Hint:** BFS — the last node dequeued in each level is the rightmost visible node. Add it to results.
 
@@ -179,7 +179,7 @@ _The same patterns with a twist: an extra piece of state, a different traversal 
 ### M6 · Path Sum III
 
 **🔗 [LC 437 — Path Sum III](https://leetcode.com/problems/path-sum-iii/)** · Medium
-**Pattern:** DFS + Prefix Sum HashMap | **Companies:** Amazon, Google, Facebook
+**Pattern:** DFS + Prefix Sum HashMap | **Companies:** Amazon, Google, Meta
 
 **Hint:** The classic "subarray sum = k" approach applied to trees. Store prefix sums in a map. At each node, check if `prefixSum - targetSum` exists in map. Backtrack by decrementing the map count on return.
 
@@ -251,7 +251,7 @@ _The same patterns with a twist: an extra piece of state, a different traversal 
 ### M14 · Maximum Width of Binary Tree
 
 **🔗 [LC 662 — Maximum Width of Binary Tree](https://leetcode.com/problems/maximum-width-of-binary-tree/)** · Medium
-**Pattern:** BFS Level-Order + Index arithmetic | **Companies:** Amazon, Google, Facebook
+**Pattern:** BFS Level-Order + Index arithmetic | **Companies:** Amazon, Google, Meta
 
 **Hint:** Assign index to each node (root=1, left child=2i, right child=2i+1). Width of a level = last index - first index + 1. Use BFS; store `(node, index)` pairs. Normalise indices per level to prevent overflow.
 
@@ -264,7 +264,7 @@ _Problems where the return value and the global answer are two different things.
 ### H1 · Binary Tree Maximum Path Sum
 
 **🔗 [LC 124 — Binary Tree Maximum Path Sum](https://leetcode.com/problems/binary-tree-maximum-path-sum/)** · Hard
-**Pattern:** Global via Local | **Companies:** Google, Amazon, Facebook, Microsoft
+**Pattern:** Global via Local | **Companies:** Google, Amazon, Meta, Microsoft
 
 **Hint:** DFS returns max one-side gain from node = `max(0, leftGain, rightGain) + node.val`. Update global answer with `leftGain + node.val + rightGain` at each node.
 
@@ -293,7 +293,7 @@ _Problems where the return value and the global answer are two different things.
 ### H4 · Vertical Order Traversal of a Binary Tree
 
 **🔗 [LC 987 — Vertical Order Traversal of a Binary Tree](https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/)** · Hard
-**Pattern:** DFS + Coordinate mapping | **Companies:** Facebook, Amazon, Google
+**Pattern:** DFS + Coordinate mapping | **Companies:** Meta, Amazon, Google
 
 **Hint:** Assign each node `(col, row)` coordinates. Root is `(0, 0)`. Left child: `(col-1, row+1)`, right child: `(col+1, row+1)`. Collect all `(col, row, val)` tuples, sort by col → row → val, then group by col.
 
@@ -368,7 +368,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | **Amazon**    | [Binary Tree Level Order Traversal II](https://leetcode.com/problems/binary-tree-level-order-traversal-ii/), [Binary Tree Cameras](https://leetcode.com/problems/binary-tree-cameras/), [Height of Binary Tree After Subtree Removal Queries](https://leetcode.com/problems/height-of-binary-tree-after-subtree-removal-queries/), [All Nodes Distance K in Binary Tree](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/) |
 | **Google**    | [Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/), [Count Complete Tree Nodes](https://leetcode.com/problems/count-complete-tree-nodes/), [Delete Nodes And Return Forest](https://leetcode.com/problems/delete-nodes-and-return-forest/), [House Robber III](https://leetcode.com/problems/house-robber-iii/)                                                                                   |
 | **Microsoft** | [Path Sum](https://leetcode.com/problems/path-sum/), [Flatten Binary Tree to Linked List](https://leetcode.com/problems/flatten-binary-tree-to-linked-list/), [Populating Next Right Pointers in Each Node](https://leetcode.com/problems/populating-next-right-pointers-in-each-node/), [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)                                                         |
-| **Facebook**  | [Vertical Order Traversal of a Binary Tree](https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/), [Binary Tree Right Side View](https://leetcode.com/problems/binary-tree-right-side-view/), [Maximum Width of Binary Tree](https://leetcode.com/problems/maximum-width-of-binary-tree/), [Path Sum III](https://leetcode.com/problems/path-sum-iii/)                                                                   |
+| **Meta**      | [Vertical Order Traversal of a Binary Tree](https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/), [Binary Tree Right Side View](https://leetcode.com/problems/binary-tree-right-side-view/), [Maximum Width of Binary Tree](https://leetcode.com/problems/maximum-width-of-binary-tree/), [Path Sum III](https://leetcode.com/problems/path-sum-iii/)                                                                   |
 | **Bloomberg** | [Same Tree](https://leetcode.com/problems/same-tree/), [Binary Tree Zigzag Level Order Traversal](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/), [Balanced Binary Tree](https://leetcode.com/problems/balanced-binary-tree/), [Symmetric Tree](https://leetcode.com/problems/symmetric-tree/)                                                                                                                     |
 
 ---

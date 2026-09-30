@@ -1,4 +1,4 @@
-# 📶 Assignment 30 — Segment Trees & Fenwick Trees
+# 📶 Assignment 37 — Segment Trees & Fenwick Trees
 
 > **Lecture:** 37 of 45 — Segment Trees & Fenwick Trees
 > **Phase:** 5 — Advanced Structures & Algorithms

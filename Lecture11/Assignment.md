@@ -1,4 +1,4 @@
-# 📋 Assignment 8 — Arrays & Strings
+# 📋 Assignment 11 — Arrays & Strings
 
 > **Lecture:** 11 of 45 — Arrays & Strings
 > **Phase:** 2 — Core Data Structures
@@ -442,8 +442,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 ## ✅ Completion Checklist
 
 - [ ] All 10 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 10 Hard problems attempted
+- [ ] All 20 Medium problems solved
+- [ ] All 5 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

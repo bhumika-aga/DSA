@@ -1,8 +1,8 @@
-# 📉 Assignment 20 — Monotonic Stack & Queue
+# 📉 Assignment 27 — Monotonic Stack & Queue
 
 > **Lecture:** 27 of 45 — Monotonic Stack & Queue
 > **Phase:** 3 — Core Patterns
-> **Estimated Time:** 4 days · **Total Problems:** 29 (5 Easy · 16 Medium · 8 Hard)
+> **Estimated Time:** 5 days · **Total Problems:** 29 (5 Easy · 16 Medium · 8 Hard)
 > **Goal:** Write one template for all four variants, then use it for spans, contributions, budgets and sliding windows.
 
 ---

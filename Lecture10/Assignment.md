@@ -1,4 +1,4 @@
-# 🔢 Assignment 7 — Mathematics for DSA
+# 🔢 Assignment 10 — Mathematics for DSA
 
 > **Lecture:** 10 of 45 — Mathematics for DSA
 > **Phase:** 1 — Foundations
@@ -395,9 +395,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 10 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 12 Easy problems solved
+- [ ] All 12 Medium problems solved
+- [ ] All 6 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

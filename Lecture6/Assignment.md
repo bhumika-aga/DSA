@@ -1,4 +1,4 @@
-# 🏗️ Assignment 3 — OOP & Java Collections Deep Dive
+# 🏗️ Assignment 6 — OOP & Java Collections Deep Dive
 
 > **Lecture:** 6 of 45 — OOP & Java Collections Deep Dive
 > **Phase:** 1 — Foundations
@@ -442,9 +442,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 15 Easy problems solved
-- [ ] All 15 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 18 Easy problems solved
+- [ ] All 13 Medium problems solved
+- [ ] All 4 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 5 conceptual questions answered out loud

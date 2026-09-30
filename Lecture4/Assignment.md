@@ -1,4 +1,4 @@
-# ⚙️ Assignment 1 — Java & Programming Fundamentals
+# ⚙️ Assignment 4 — Java & Programming Fundamentals
 
 > **Lecture:** 4 of 45 — Java & Programming Fundamentals
 > **Phase:** 1 — Foundations
@@ -518,9 +518,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 20 Easy problems solved
+- [ ] All 30 Easy problems solved
 - [ ] All 10 Medium problems solved
-- [ ] All 10 Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 6 conceptual questions answered out loud

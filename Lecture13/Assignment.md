@@ -1,4 +1,4 @@
-# 🔎 Assignment 10 — Searching Algorithms
+# 🔎 Assignment 13 — Searching Algorithms
 
 > **Lecture:** 13 of 45 — Searching Algorithms
 > **Phase:** 2 — Core Data Structures
@@ -336,9 +336,9 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 8 Easy problems solved
-- [ ] All 13 Medium problems solved
-- [ ] All 7 Hard problems attempted
+- [ ] All 6 Easy problems solved
+- [ ] All 16 Medium problems solved
+- [ ] All 6 Hard problems attempted
 - [ ] Self-assessment completed without looking at the notes
 - [ ] Every complexity exercise answered before checking
 - [ ] All 4 conceptual questions answered out loud

@@ -1,4 +1,4 @@
-# 🧮 Assignment 14 — Matrix Problems
+# 🧮 Assignment 17 — Matrix Problems
 
 > **Lecture:** 17 of 45 — Matrix Problems
 > **Phase:** 2 — Core Data Structures
@@ -97,7 +97,7 @@ _Each problem requires identifying and correctly applying one of the 4 core patt
 ### M1 · Spiral Matrix
 
 **🔗 [LC 54 — Spiral Matrix](https://leetcode.com/problems/spiral-matrix/)** · Medium
-**Pattern:** Boundary Walk | **Companies:** Amazon, Google, Microsoft, Facebook
+**Pattern:** Boundary Walk | **Companies:** Amazon, Google, Microsoft, Meta
 
 **Problem:** Return all elements of an m×n matrix in spiral order.
 
@@ -364,7 +364,7 @@ for r from 0 to m - 1:
 
 ## 🔍 Self-Assessment — True / False
 
-1. grid[r][c] means row r, column c. → **True**
+1. grid`[r][c]` means row r, column c. → **True**
 2. Counting islands with a flood fill from every cell is O((m · n)²). → **False** — visited cells are never refilled, so it is O(m · n)
 3. Rotating a matrix by 90° requires a second matrix. → **False** — transpose then reverse each row, in place
 4. A recursive flood fill on a 1000 × 1000 grid is always safe. → **False** — the recursion can go a million deep; use BFS
@@ -408,8 +408,8 @@ The companies that ask this lecture's problems most often, with the problems to 
 ## ✅ Completion Checklist
 
 - [ ] All 5 Easy problems solved
-- [ ] All 14 Medium problems solved
-- [ ] All 5 Hard problems attempted
+- [ ] All 17 Medium problems solved
+- [ ] Both Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 6 conceptual questions answered out loud

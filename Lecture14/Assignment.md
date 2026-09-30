@@ -355,7 +355,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 - [ ] All 9 Easy problems solved
 - [ ] All 16 Medium problems solved
-- [ ] All 2 Hard problems attempted
+- [ ] Both Hard problems attempted
 - [ ] Every complexity exercise answered before checking
 - [ ] Self-assessment completed without looking at the notes
 - [ ] All 4 conceptual questions answered out loud

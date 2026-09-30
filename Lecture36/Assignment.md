@@ -1,4 +1,4 @@
-# 🔤 Assignment 29 — Tries (Prefix Trees)
+# 🔤 Assignment 36 — Tries (Prefix Trees)
 
 > **Lecture:** 36 of 45 — Tries (Prefix Trees)
 > **Phase:** 5 — Advanced Structures & Algorithms

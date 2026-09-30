@@ -1,4 +1,4 @@
-# 🔍 Assignment 23 — Divide & Conquer
+# 🔍 Assignment 30 — Divide & Conquer
 
 > **Lecture:** 30 of 45 — Divide & Conquer
 > **Phase:** 3 — Core Patterns

@@ -1,4 +1,4 @@
-# 🧾 Assignment 19 — Prefix Sums & Difference Arrays
+# 🧾 Assignment 26 — Prefix Sums & Difference Arrays
 
 > **Lecture:** 26 of 45 — Prefix Sums & Difference Arrays
 > **Phase:** 3 — Core Patterns

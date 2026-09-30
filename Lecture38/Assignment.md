@@ -208,7 +208,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 
 ## ✅ Completion Checklist
 
-- [ ] All 2 Easy problems solved
+- [ ] Both Easy problems solved
 - [ ] All 6 Medium problems solved
 - [ ] All 4 Hard problems attempted
 - [ ] Every complexity exercise answered before checking

@@ -1,4 +1,4 @@
-# ⛰️ Assignment 16 — Heaps & Priority Queues
+# ⛰️ Assignment 20 — Heaps & Priority Queues
 
 > **Lecture:** 20 of 45 — Heaps & Priority Queues
 > **Phase:** 2 — Core Data Structures
@@ -86,25 +86,25 @@ _Core Interview Patterns._
 ### M2 · Kth Largest Element in an Array
 
 **🔗 [LC 215 — Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)** · Medium
-**Pattern:** Single Min-Heap | **Companies:** Amazon, Google, Facebook, Microsoft
+**Pattern:** Single Min-Heap | **Companies:** Amazon, Google, Meta, Microsoft
 
 **Hint:** Size-K min-heap. Offer each element; if size > K, poll. Return peek. Alternative: QuickSelect O(n) average.
 
 ---
 
-### M3 · Top K Frequent Elements
+### M3 · Reduce Array Size to The Half
 
-**🔗 [LC 347 — Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)** · Medium
-**Pattern:** Top K | **Companies:** Amazon, Google, Facebook
+**🔗 [LC 1338 — Reduce Array Size to The Half](https://leetcode.com/problems/reduce-array-size-to-the-half/)** · Medium
+**Pattern:** Frequencies + max-heap | **Companies:** Amazon, Google
 
-**Hint:** HashMap for frequencies + size-K min-heap sorted by frequency. Alternative: bucket sort in O(n).
+**Hint:** Count each value, then remove whole values starting from the most frequent (a max-heap of counts, or the counts sorted descending) until at least half the array is gone. Top K Frequent Elements, which uses the same counts, was solved in Lecture 16.
 
 ---
 
 ### M4 · K Closest Points to Origin
 
 **🔗 [LC 973 — K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)** · Medium
-**Pattern:** Top K | **Companies:** Amazon, Google, Facebook, Uber
+**Pattern:** Top K | **Companies:** Amazon, Google, Meta, Uber
 
 **Hint:** Max-heap of size K by squared distance. If new point is closer than farthest in heap, swap. Use squared distance (avoid sqrt). Return heap contents.
 
@@ -122,7 +122,7 @@ _Core Interview Patterns._
 ### M6 · Reorganize String
 
 **🔗 [LC 767 — Reorganize String](https://leetcode.com/problems/reorganize-string/)** · Medium
-**Pattern:** Greedy Heap | **Companies:** Google, Amazon, Facebook
+**Pattern:** Greedy Heap | **Companies:** Google, Amazon, Meta
 
 **Hint:** Max-heap by frequency. Each round: poll two most frequent chars, append both, decrement. If only one char left and its count > 1 → impossible (return "").
 
@@ -131,7 +131,7 @@ _Core Interview Patterns._
 ### M7 · Task Scheduler
 
 **🔗 [LC 621 — Task Scheduler](https://leetcode.com/problems/task-scheduler/)** · Medium
-**Pattern:** Greedy Heap | **Companies:** Amazon, Facebook, Uber
+**Pattern:** Greedy Heap | **Companies:** Amazon, Meta, Uber
 
 **Hint:** Max-heap + wait queue `[(remaining, available_at)]`. At each tick: if heap non-empty do the most frequent task. Enqueue to wait with `time + n`. Recheck wait queue each tick.
 
@@ -195,7 +195,7 @@ _FAANG Mastery._
 ### H3 · Merge k Sorted Lists
 
 **🔗 [LC 23 — Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)** · Hard
-**Pattern:** K-way Merge | **Companies:** Amazon, Google, Microsoft, Facebook
+**Pattern:** K-way Merge | **Companies:** Amazon, Google, Microsoft, Meta
 
 **Hint:** Push all K heads. Poll minimum, add to result, push its next. O(N log K).
 
@@ -285,7 +285,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Amazon**    | [Design Twitter](https://leetcode.com/problems/design-twitter/), [Last Stone Weight](https://leetcode.com/problems/last-stone-weight/), [Take Gifts From the Richest Pile](https://leetcode.com/problems/take-gifts-from-the-richest-pile/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/)                                                               |
 | **Google**    | [Maximum Subsequence Score](https://leetcode.com/problems/maximum-subsequence-score/), [Relative Ranks](https://leetcode.com/problems/relative-ranks/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/), [Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) |
-| **Facebook**  | [Reorganize String](https://leetcode.com/problems/reorganize-string/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                                   |
+| **Meta**      | [Reorganize String](https://leetcode.com/problems/reorganize-string/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [Reduce Array Size to The Half](https://leetcode.com/problems/reduce-array-size-to-the-half/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                       |
 | **Microsoft** | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [IPO](https://leetcode.com/problems/ipo/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                   |
 | **Uber**      | [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)                                                                                                                                                                                                                                 |
 

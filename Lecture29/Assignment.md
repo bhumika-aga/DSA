@@ -1,4 +1,4 @@
-# 💡 Assignment 22 — Greedy Algorithms
+# 💡 Assignment 29 — Greedy Algorithms
 
 > **Lecture:** 29 of 45 — Greedy Algorithms
 > **Phase:** 3 — Core Patterns

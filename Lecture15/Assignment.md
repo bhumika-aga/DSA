@@ -1,8 +1,8 @@
-# 📚 Assignment 12 — Stacks & Queues
+# 📚 Assignment 15 — Stacks & Queues
 
 > **Lecture:** 15 of 45 — Stacks & Queues
 > **Phase:** 2 — Core Data Structures
-> **Estimated Time:** 5 days · **Total Problems:** 16 (9 Easy · 6 Medium · 1 Hard)
+> **Estimated Time:** 4 days · **Total Problems:** 16 (9 Easy · 6 Medium · 1 Hard)
 > **Goal:** Master LIFO/FIFO fundamentals and stack-driven expression evaluation, and get a first look at the monotonic stack (taught fully in Lecture 27).
 
 ---

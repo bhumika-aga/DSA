@@ -1,4 +1,4 @@
-# 🧩 Assignment 25 — Dynamic Programming I — Foundations & 1D
+# 🧩 Assignment 32 — Dynamic Programming I — Foundations & 1D
 
 > **Lecture:** 32 of 45 — Dynamic Programming I — Foundations & 1D
 > **Phase:** 4 — Dynamic Programming
