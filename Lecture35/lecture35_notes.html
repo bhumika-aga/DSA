@@ -1326,7 +1326,49 @@
         flex: 1;
         min-width: 0;
       }
+
+      /* Phones: the sidebar is hidden, so a collapsible contents list takes its place */
+      .m-toc {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .m-toc {
+          display: block;
+          margin: 0 0 24px;
+        }
+
+        .m-toc .m-toc-links {
+          padding: 6px 0;
+          background: var(--bg);
+          border-top: 1px solid var(--border);
+          font-size: 13px;
+        }
+
+        .m-toc .toc-item {
+          padding: 7px 16px;
+        }
+      }
     </style>
+    <script>
+      // Apply the saved theme before the page is drawn, so dark mode never flashes light
+      (function () {
+        var t = null;
+        try {
+          t =
+            localStorage.getItem("dsa-theme") ||
+            localStorage.getItem("dsa-notes-theme");
+        } catch (e) {}
+        if (
+          !t &&
+          window.matchMedia &&
+          matchMedia("(prefers-color-scheme: dark)").matches
+        )
+          t = "dark";
+        if (t === "dark")
+          document.documentElement.setAttribute("data-theme", "dark");
+      })();
+    </script>
   </head>
   <body>
     <!-- SIDEBAR -->
@@ -2939,6 +2981,42 @@ dp[0] ← 1
             }
           });
         });
+      })();
+
+      // 7. Phones: a collapsible contents list built from the sidebar
+      (function initMobileToc() {
+        const content = document.getElementById("content");
+        const side = document.getElementById("sidebar");
+        if (!content || !side || content.querySelector(".m-toc")) return;
+        const links = side.querySelectorAll(
+          ".sb-scroll .toc-item, .sb-foot .toc-item",
+        );
+        if (!links.length) return;
+        const det = document.createElement("details");
+        det.className = "m-toc";
+        det.innerHTML =
+          '<summary><span class="toggle-arrow">&#9654;</span>Contents &amp; navigation</summary>' +
+          '<div class="m-toc-links"></div>';
+        const box = det.querySelector(".m-toc-links");
+        links.forEach((a) => {
+          const c = a.cloneNode(true);
+          c.classList.remove("active");
+          c.addEventListener("click", (e) => {
+            const href = c.getAttribute("href") || "";
+            if (!href.startsWith("#")) return; // other pages: follow the link
+            e.preventDefault();
+            det.open = false; // close first, so the jump lands in the right place
+            const t = document.getElementById(href.slice(1));
+            if (t) t.scrollIntoView();
+          });
+          box.appendChild(c);
+        });
+        det.addEventListener("toggle", () => {
+          det.querySelector(".toggle-arrow").style.transform = det.open
+            ? "rotate(90deg)"
+            : "rotate(0deg)";
+        });
+        content.insertBefore(det, content.firstChild);
       })();
     </script>
   </body>

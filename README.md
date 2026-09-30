@@ -532,14 +532,14 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                 | Description                                     | Example Problem                              |
-| ----------------------- | ----------------------------------------------- | -------------------------------------------- |
-| **Two Pointers**        | Converge from both ends or chase pointers       | Two Sum (sorted), 3Sum, Container with Water |
-| **Sliding Window**      | Fixed or variable-size window over array/string | Longest Substring Without Repeating          |
-| **Prefix Sum**          | Precompute cumulative sums for O(1) queries     | Subarray Sum Equals K, Range Sum Query       |
-| **Kadane's Algorithm**  | Track max subarray sum ending at each index     | Maximum Subarray, Max Product Subarray       |
-| **Dutch National Flag** | 3-way partition in single pass                  | Sort Colors                                  |
-| **In-place reversal**   | Reverse portions of array without extra space   | Rotate Array, Reverse Words in String        |
+| Pattern                 | Description                                     | Example Problem                                      |
+| ----------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| **Two Pointers**        | Converge from both ends or chase pointers       | String Compression, Rearrange Array Elements by Sign |
+| **Sliding Window**      | Fixed or variable-size window over array/string | Longest Substring Without Repeating Characters (L25) |
+| **Prefix Sum**          | Precompute cumulative sums for O(1) queries     | Range Sum Query - Immutable, Find Pivot Index        |
+| **Kadane's Algorithm**  | Track max subarray sum ending at each index     | Maximum Subarray, Maximum Sum Circular Subarray      |
+| **Dutch National Flag** | 3-way partition in single pass                  | Sort Colors (L12)                                    |
+| **In-place reversal**   | Reverse portions of array without extra space   | Rotate Array                                         |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -579,13 +579,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                  | Description                                   | Example Problem                   |
-| ------------------------ | --------------------------------------------- | --------------------------------- |
-| **Merge Sort D&C**       | Split, sort halves, merge — stable O(n log n) | Merge Sort, Count Inversions      |
-| **Quick Sort Partition** | Partition around pivot — avg O(n log n)       | Quick Sort, Dutch National Flag   |
-| **Counting/Radix Sort**  | Non-comparison sort for bounded integer range | Maximum Gap, Sort Colors          |
-| **Sort as preprocess**   | Sort first, then apply linear algorithm       | Meeting Rooms, 3Sum               |
-| **Custom sort (lambda)** | Sort by derived key using Comparator          | Sort by frequency, Sort by parity |
+| Pattern                  | Description                                   | Example Problem                                                |
+| ------------------------ | --------------------------------------------- | -------------------------------------------------------------- |
+| **Merge Sort D&C**       | Split, sort halves, merge — stable O(n log n) | Merge Sort, Count Inversions                                   |
+| **Quick Sort Partition** | Partition around pivot — avg O(n log n)       | Quick Sort, Dutch National Flag                                |
+| **Counting/Radix Sort**  | Non-comparison sort for bounded integer range | Maximum Gap, Sort Colors                                       |
+| **Sort as preprocess**   | Sort first, then apply linear algorithm       | Can Make Arithmetic Progression From Sequence, Merge Intervals |
+| **Custom sort (lambda)** | Sort by derived key using Comparator          | Largest Number, Sort Array By Parity                           |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -630,7 +630,7 @@
 | **First/Last Occurrence**   | Leftmost or rightmost bounded index limits   | Find First and Last Position in Array        |
 | **Rotated Array Search**    | Identify sorted halves to locate target      | Search in Rotated Sorted Array I/II          |
 | **Binary Search on Answer** | Search the optimal answer in monotonic space | Koko Eating Bananas, Split Array Largest Sum |
-| **2D Matrix Searching**     | Treating a 2D matrix as a sorted pipeline    | Search a 2D Matrix I/II                      |
+| **2D Matrix Searching**     | Treating a 2D matrix as a sorted pipeline    | Search a 2D Matrix (II is in L17)            |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -671,7 +671,7 @@
 | ------------------------ | -------------------------------------------- | ---------------------------------------- |
 | **Fast & Slow Pointers** | Detect cycle, find middle, find nth from end | Linked List Cycle, Middle of LL          |
 | **Reverse In-Place**     | Reverse entire list or k-groups iteratively  | Reverse Linked List, Reverse in K-Groups |
-| **Merge Two Lists**      | Merge sorted lists using dummy head node     | Merge Two Sorted Lists, Merge K Sorted   |
+| **Merge Two Lists**      | Merge sorted lists using dummy head node     | Merge Two Sorted Lists, Sort List        |
 | **Cycle Detection**      | Floyd's tortoise and hare algorithm          | Linked List Cycle II (find cycle start)  |
 | **Dummy Head**           | Sentinel node simplifies all edge cases      | Remove Nth Node from End                 |
 
@@ -710,13 +710,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                   | Description                                         | Example Problem                   |
-| ------------------------- | --------------------------------------------------- | --------------------------------- |
-| **Monotonic Stack**       | Maintain increasing/decreasing stack for span probs | Next Greater Element, Daily Temps |
-| **Histogram Stack**       | Track left/right boundaries for area calculation    | Largest Rectangle in Histogram    |
-| **Deque Sliding Window**  | O(n) sliding window max/min using deque             | Sliding Window Maximum            |
-| **BFS via Queue**         | Level-by-level graph/tree traversal                 | Binary Tree Level Order           |
-| **Expression Evaluation** | Stack for infix/postfix/calculator problems         | Basic Calculator, Evaluate RPN    |
+| Pattern                   | Description                                         | Example Problem                         |
+| ------------------------- | --------------------------------------------------- | --------------------------------------- |
+| **Monotonic Stack**       | Maintain increasing/decreasing stack for span probs | Next Greater Element, Daily Temps       |
+| **Histogram Stack**       | Track left/right boundaries for area calculation    | Largest Rectangle in Histogram (L27)    |
+| **Deque Sliding Window**  | O(n) sliding window max/min using deque             | Sliding Window Maximum (L27)            |
+| **BFS via Queue**         | Level-by-level graph/tree traversal                 | Binary Tree Level Order Traversal (L18) |
+| **Expression Evaluation** | Stack for infix/postfix/calculator problems         | Basic Calculator, Evaluate RPN          |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -752,13 +752,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                | Description                                     | Example Problem                            |
-| ---------------------- | ----------------------------------------------- | ------------------------------------------ |
-| **Frequency Counting** | Count occurrences for duplicates/majority/top-K | Top K Frequent Elements                    |
-| **Complement Lookup**  | Store complements for O(1) pair finding         | Two Sum                                    |
-| **Grouping by Key**    | Group elements by a derived computed key        | Group Anagrams                             |
-| **Prefix Sum + Map**   | Store prefix sums in map for subarray problems  | Subarray Sum Equals K                      |
-| **Seen Set**           | Track visited elements for cycle/dup detection  | Happy Number, Longest Consecutive Sequence |
+| Pattern                | Description                                     | Example Problem                                  |
+| ---------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| **Frequency Counting** | Count occurrences for duplicates/majority/top-K | Top K Frequent Elements                          |
+| **Complement Lookup**  | Store complements for O(1) pair finding         | Two Sum                                          |
+| **Grouping by Key**    | Group elements by a derived computed key        | Group Anagrams                                   |
+| **Prefix Sum + Map**   | Store prefix sums in map for subarray problems  | Subarray Sum Equals K                            |
+| **Seen Set**           | Track visited elements for cycle/dup detection  | Contains Duplicate, Longest Consecutive Sequence |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1185,13 +1185,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern              | Description                                                 | Example Problem               |
-| -------------------- | ----------------------------------------------------------- | ----------------------------- |
-| **Prefix sum array** | Precompute cumulative totals; answer a range by subtraction | Range Sum Query — Immutable   |
-| **Prefix + HashMap** | Store seen prefix values to count subarrays summing to k    | Subarray Sum Equals K         |
-| **Difference array** | Mark +v at start, −v after end, prefix once at the end      | Corporate Flight Bookings     |
-| **2D prefix sum**    | Inclusion–exclusion over four corners of a rectangle        | Range Sum Query 2D            |
-| **Prefix XOR**       | XOR is its own inverse, so subtraction becomes XOR          | Count Triplets With Equal XOR |
+| Pattern              | Description                                                 | Example Problem                |
+| -------------------- | ----------------------------------------------------------- | ------------------------------ |
+| **Prefix sum array** | Precompute cumulative totals; answer a range by subtraction | Find the Middle Index in Array |
+| **Prefix + HashMap** | Store seen prefix values to count subarrays summing to k    | Binary Subarrays With Sum      |
+| **Difference array** | Mark +v at start, −v after end, prefix once at the end      | Corporate Flight Bookings      |
+| **2D prefix sum**    | Inclusion–exclusion over four corners of a rectangle        | Matrix Block Sum               |
+| **Prefix XOR**       | XOR is its own inverse, so subtraction becomes XOR          | Count Triplets With Equal XOR  |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1226,13 +1226,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                      | Description                                  | Example Problem                |
-| ---------------------------- | -------------------------------------------- | ------------------------------ |
-| **Next Greater Element**     | Pop when current > top; stack stores indices | Daily Temperatures, NGE I/II   |
-| **Previous Greater Element** | Same stack, different traversal direction    | Stock Span Problem             |
-| **Next Smaller Element**     | Pop when current < top                       | Largest Rectangle in Histogram |
-| **Contribution Technique**   | Each element as min/max of some subarray     | Sum of Subarray Minimums       |
-| **Monotone Deque**           | Sliding window min/max in O(n)               | Sliding Window Maximum         |
+| Pattern                      | Description                                  | Example Problem                                           |
+| ---------------------------- | -------------------------------------------- | --------------------------------------------------------- |
+| **Next Greater Element**     | Pop when current > top; stack stores indices | Next Greater Element II, Next Greater Node In Linked List |
+| **Previous Greater Element** | Same stack, different traversal direction    | Stock Span Problem                                        |
+| **Next Smaller Element**     | Pop when current < top                       | Largest Rectangle in Histogram                            |
+| **Contribution Technique**   | Each element as min/max of some subarray     | Sum of Subarray Minimums                                  |
+| **Monotone Deque**           | Sliding window min/max in O(n)               | Sliding Window Maximum                                    |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1267,13 +1267,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                 | Description                                  | Example Problem                        |
-| ----------------------- | -------------------------------------------- | -------------------------------------- |
-| **Event Sweep**         | Convert intervals to events, sort, process   | Meeting Rooms II (minimum rooms)       |
-| **Difference Array**    | Range increment O(1), reconstruct in O(n)    | Car Pooling, Corporate Flight Bookings |
-| **Interval Merging**    | Sort by start, merge overlapping intervals   | Merge Intervals, Insert Interval       |
-| **Sweep Line**          | Sweep a vertical line, track active segments | Skyline Problem, Rectangle Area Union  |
-| **Coordinate Compress** | Map large sparse coordinates to dense range  | Count Smaller Numbers After Self       |
+| Pattern                 | Description                                  | Example Problem                                    |
+| ----------------------- | -------------------------------------------- | -------------------------------------------------- |
+| **Event Sweep**         | Convert intervals to events, sort, process   | Maximum Number of Events That Can Be Attended      |
+| **Difference Array**    | Range increment O(1), reconstruct in O(n)    | Car Pooling (L26), Corporate Flight Bookings (L26) |
+| **Interval Merging**    | Sort by start, merge overlapping intervals   | Teemo Attacking, Remove Covered Intervals          |
+| **Sweep Line**          | Sweep a vertical line, track active segments | The Skyline Problem                                |
+| **Coordinate Compress** | Map large sparse coordinates to dense range  | Rectangle Area II                                  |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1308,13 +1308,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                 | Description                                     | Example Problem           |
-| ----------------------- | ----------------------------------------------- | ------------------------- |
-| **Interval Scheduling** | Sort by end time, greedily pick non-overlapping | Non-Overlapping Intervals |
-| **Activity Selection**  | Select max non-conflicting activities           | Meeting Rooms I/II        |
-| **Jump Greedy**         | Track max reachable index, expand as you go     | Jump Game I/II            |
-| **Gas Station**         | Net surplus greedy — start from valley          | Gas Station               |
-| **Assignment**          | Sort both arrays, match greedily                | Assign Cookies            |
+| Pattern                 | Description                                     | Example Problem                    |
+| ----------------------- | ----------------------------------------------- | ---------------------------------- |
+| **Interval Scheduling** | Sort by end time, greedily pick non-overlapping | Non-Overlapping Intervals (L28)    |
+| **Activity Selection**  | Select max non-conflicting activities           | Maximum Length of Pair Chain (L28) |
+| **Jump Greedy**         | Track max reachable index, expand as you go     | Jump Game II                       |
+| **Gas Station**         | Net surplus greedy — start from valley          | Gas Station                        |
+| **Assignment**          | Sort both arrays, match greedily                | Assign Cookies                     |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1350,12 +1350,12 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                  | Description                               | Example Problem              |
-| ------------------------ | ----------------------------------------- | ---------------------------- |
-| **D&C on Sorted Arrays** | Divide sorted structure, combine results  | Median of Two Sorted Arrays  |
-| **QuickSelect**          | Partition-based O(n) average selection    | Kth Largest Element in Array |
-| **Fast Exponentiation**  | Compute pow(x, n) by squaring — O(log n)  | Pow(x, n)                    |
-| **Merge Sort Variants**  | Count useful properties during merge step | Count Inversions             |
+| Pattern                  | Description                               | Example Problem                                                        |
+| ------------------------ | ----------------------------------------- | ---------------------------------------------------------------------- |
+| **D&C on Sorted Arrays** | Divide sorted structure, combine results  | Number of Pairs Satisfying Inequality, Count Good Triplets in an Array |
+| **QuickSelect**          | Partition-based O(n) average selection    | Kth Largest Element in an Array (L20)                                  |
+| **Fast Exponentiation**  | Compute pow(x, n) by squaring — O(log n)  | Pow(x, n)                                                              |
+| **Merge Sort Variants**  | Count useful properties during merge step | Count Inversions                                                       |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1390,13 +1390,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                  | Description                                   | Example Problem                      |
-| ------------------------ | --------------------------------------------- | ------------------------------------ |
-| **Path Compression**     | Flatten the find() tree — near O(1) amortised | Standard DSU find()                  |
-| **Union by Rank/Size**   | Always attach smaller tree to larger          | Standard DSU union()                 |
-| **Connected Components** | Count or query connectivity dynamically       | Number of Provinces, Friend Circles  |
-| **Cycle Detection**      | If both nodes already in same set → cycle     | Redundant Connection                 |
-| **Dynamic Merging**      | Merge sets over time, query connectivity      | Accounts Merge, Number of Islands II |
+| Pattern                  | Description                                   | Example Problem                                                                     |
+| ------------------------ | --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Path Compression**     | Flatten the find() tree — near O(1) amortised | Standard DSU find()                                                                 |
+| **Union by Rank/Size**   | Always attach smaller tree to larger          | Standard DSU union()                                                                |
+| **Connected Components** | Count or query connectivity dynamically       | Count the Number of Complete Components, Minimum Score of a Path Between Two Cities |
+| **Cycle Detection**      | If both nodes already in same set → cycle     | Redundant Connection                                                                |
+| **Dynamic Merging**      | Merge sets over time, query connectivity      | Accounts Merge, Checking Existence of Edge Length Limited Paths                     |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1441,8 +1441,8 @@
 
 | Pattern                | Description                                            | Example Problem                |
 | ---------------------- | ------------------------------------------------------ | ------------------------------ |
-| **Memoisation**        | Cache recursion results in an array keyed by state     | Climbing Stairs                |
-| **Tabulation**         | Fill states bottom-up in dependency order              | House Robber                   |
+| **Memoisation**        | Cache recursion results in an array keyed by state     | Word Break                     |
+| **Tabulation**         | Fill states bottom-up in dependency order              | House Robber II                |
 | **Space optimisation** | Keep only the last k states instead of the whole table | Fibonacci in O(1) space        |
 | **Take / skip**        | At every index choose include or exclude               | House Robber II                |
 | **LIS (patience)**     | Binary search on a tails array for O(n log n)          | Longest Increasing Subsequence |
@@ -1485,13 +1485,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern              | Description                                       | Example Problem               |
-| -------------------- | ------------------------------------------------- | ----------------------------- |
-| **Grid path DP**     | dp`[i][j]` built from its top and left neighbours | Unique Paths                  |
-| **Match / mismatch** | Chars equal → diagonal + 1, else best of the two  | Longest Common Subsequence    |
-| **Edit distance**    | Insert, delete and replace as three transitions   | Edit Distance                 |
-| **Palindrome DP**    | Iterate over substring length, not index          | Longest Palindromic Substring |
-| **Row rolling**      | Keep the previous row only, dropping a dimension  | LCS in O(n) space             |
+| Pattern              | Description                                       | Example Problem            |
+| -------------------- | ------------------------------------------------- | -------------------------- |
+| **Grid path DP**     | dp`[i][j]` built from its top and left neighbours | Unique Paths II            |
+| **Match / mismatch** | Chars equal → diagonal + 1, else best of the two  | Longest Common Subsequence |
+| **Edit distance**    | Insert, delete and replace as three transitions   | Edit Distance              |
+| **Palindrome DP**    | Iterate over substring length, not index          | Palindromic Substrings     |
+| **Row rolling**      | Keep the previous row only, dropping a dimension  | LCS in O(n) space          |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1535,8 +1535,8 @@
 | **0/1 knapsack**       | Each item used at most once — iterate capacity descending | Partition Equal Subset Sum |
 | **Unbounded knapsack** | Item reusable — iterate capacity ascending                | Coin Change II             |
 | **Subset sum**         | Boolean knapsack over achievable totals                   | Subset Sum                 |
-| **Count-the-ways**     | Sum instead of max over identical transitions             | Target Sum                 |
-| **1D compression**     | Reuse one row; loop direction decides reuse               | Coin Change (1D)           |
+| **Count-the-ways**     | Sum instead of max over identical transitions             | Coin Change II             |
+| **1D compression**     | Reuse one row; loop direction decides reuse               | Coin Change II             |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1574,13 +1574,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern         | Description                                            | Example Problem                     |
-| --------------- | ------------------------------------------------------ | ----------------------------------- |
-| **Interval DP** | dp`[i][j]` over a range, split at every k between them | Burst Balloons                      |
-| **Tree DP**     | Post-order return of (take, skip) for each node        | House Robber III                    |
-| **Bitmask DP**  | State is a subset bitmask; viable while n ≤ 20         | Shortest Path Visiting All Nodes    |
-| **Digit DP**    | Build the number digit by digit with a tight flag      | Numbers With Repeated Digits        |
-| **DP on a DAG** | Longest path in topological order                      | Longest Increasing Path in a Matrix |
+| Pattern         | Description                                            | Example Problem                                                |
+| --------------- | ------------------------------------------------------ | -------------------------------------------------------------- |
+| **Interval DP** | dp`[i][j]` over a range, split at every k between them | Burst Balloons                                                 |
+| **Tree DP**     | Post-order returns carrying what the parent needs      | Binary Tree Coloring Game, Sum of Distances in Tree            |
+| **Bitmask DP**  | State is a subset bitmask; viable while n ≤ 20         | Shortest Path Visiting All Nodes                               |
+| **Digit DP**    | Build the number digit by digit with a tight flag      | Rotated Digits, Non-negative Integers without Consecutive Ones |
+| **DP on a DAG** | Longest path in topological order                      | Longest Increasing Path in a Matrix (L33)                      |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1667,13 +1667,13 @@
 
 #### 🔑 Key Patterns
 
-| Pattern              | Description                                   | Example Problem             |
-| -------------------- | --------------------------------------------- | --------------------------- |
-| **Range Sum Query**  | Query sum of [l, r] after point updates       | Range Sum Query - Mutable   |
-| **Point Update**     | Update single element, propagate through tree | All segment tree problems   |
-| **Lazy Propagation** | Defer range updates until children queried    | Range Update + Range Query  |
-| **Fenwick BIT**      | Simpler structure: prefix sum + point update  | BIT implementation          |
-| **Count Inversions** | Merge sort variant or BIT counting            | Count of Smaller After Self |
+| Pattern              | Description                                   | Example Problem            |
+| -------------------- | --------------------------------------------- | -------------------------- |
+| **Range Sum Query**  | Query sum of [l, r] after point updates       | Range Sum Query - Mutable  |
+| **Point Update**     | Update single element, propagate through tree | All segment tree problems  |
+| **Lazy Propagation** | Defer range updates until children queried    | Range Update + Range Query |
+| **Fenwick BIT**      | Simpler structure: prefix sum + point update  | BIT implementation         |
+| **Count Inversions** | Merge sort variant or BIT counting            | Count Number of Teams      |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1712,7 +1712,7 @@
 | Pattern                 | Description                                      | Example Problem                        |
 | ----------------------- | ------------------------------------------------ | -------------------------------------- |
 | **Mo's Algorithm**      | Sort queries by block to reach O((N+Q)√N)        | Range Distinct Elements                |
-| **Block Decomposition** | Precompute values for blocks of size √N          | Range Sum Query (SQRT)                 |
+| **Block Decomposition** | Precompute values for blocks of size √N          | Range Sum Query - Mutable (L37)        |
 | **Block-based Updates** | Update element and its corresponding block value | SQRT Point Update                      |
 | **Frequency Frequency** | Use two arrays to track freq of freqs with Mo's  | Mo's on most frequent element problems |
 
@@ -1748,12 +1748,12 @@
 
 #### 🔑 Key Patterns
 
-| Pattern                       | Description                              | Example Problem               |
-| ----------------------------- | ---------------------------------------- | ----------------------------- |
-| **KMP Failure Function**      | O(n+m) pattern matching, no backtracking | Implement strStr()            |
-| **Rolling Hash (Rabin-Karp)** | O(n) average matching via hash           | Repeated String Match         |
-| **Z-algorithm**               | Z-array for O(n) prefix matching         | String matching applications  |
-| **Manacher's Algorithm**      | All palindromic substrings in O(n)       | Longest Palindromic Substring |
+| Pattern                       | Description                              | Example Problem                                             |
+| ----------------------------- | ---------------------------------------- | ----------------------------------------------------------- |
+| **KMP Failure Function**      | O(n+m) pattern matching, no backtracking | Find the Index of the First Occurrence in a String          |
+| **Rolling Hash (Rabin-Karp)** | O(n) average matching via hash           | Repeated String Match                                       |
+| **Z-algorithm**               | Z-array for O(n) prefix matching         | String matching applications                                |
+| **Manacher's Algorithm**      | All palindromic substrings in O(n)       | Maximum Product of the Length of Two Palindromic Substrings |
 
 #### 📝 Sub-Topics & Lecture Flow
 
@@ -1886,7 +1886,7 @@
 | **nCr mod p**             | Factorials plus a Fermat's-little-theorem inverse  | Unique Paths on a huge grid |
 | **Inclusion–exclusion**   | Add singles, subtract pairs, add triples           | Numbers divisible by a or b |
 | **Expected value**        | Linearity of expectation over indicator variables  | Soup Servings               |
-| **Grundy numbers**        | mex of reachable states decides win or lose        | Nim Game, Stone Game        |
+| **Grundy numbers**        | mex of reachable states decides win or lose        | Nim Game, Stone Game IV     |
 
 #### 📝 Sub-Topics & Lecture Flow
 

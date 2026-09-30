@@ -30,12 +30,12 @@
 
 _No Easy problems at this stage of the course._
 
-### E1 · Long Pressed Name
+### E1 · Valid Palindrome
 
-**🔗 [LC 925 — Long Pressed Name](https://leetcode.com/problems/long-pressed-name/)** · Easy
-**Pattern:** Two pointers, same direction | **Companies:** Google, Amazon
+**🔗 [LC 125 — Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)** · Easy
+**Pattern:** Opposite Ends | **Companies:** Meta, Amazon, Microsoft
 
-**Hint:** Walk `typed` with j and `name` with i. If typed[j] matches name[i], advance both; otherwise it must repeat typed[j − 1] (a long press), or the answer is false. At the end, i must have reached the end of `name`.
+**Hint:** Two pointers converging, skipping any character that is not alphanumeric. Compare lowercase forms. The skipping happens inside the outer loop, not before it.
 
 ---
 

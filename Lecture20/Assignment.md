@@ -92,12 +92,12 @@ _Core Interview Patterns._
 
 ---
 
-### M3 · Reduce Array Size to The Half
+### M3 · Top K Frequent Elements
 
-**🔗 [LC 1338 — Reduce Array Size to The Half](https://leetcode.com/problems/reduce-array-size-to-the-half/)** · Medium
-**Pattern:** Frequencies + max-heap | **Companies:** Amazon, Google
+**🔗 [LC 347 — Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/)** · Medium
+**Pattern:** Top K | **Companies:** Amazon, Google, Meta
 
-**Hint:** Count each value, then remove whole values starting from the most frequent (a max-heap of counts, or the counts sorted descending) until at least half the array is gone. Top K Frequent Elements, which uses the same counts, was solved in Lecture 16.
+**Hint:** HashMap for frequencies + size-K min-heap sorted by frequency. Alternative: bucket sort in O(n).
 
 ---
 
@@ -285,7 +285,7 @@ The companies that ask this lecture's problems most often, with the problems to 
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Amazon**    | [Design Twitter](https://leetcode.com/problems/design-twitter/), [Last Stone Weight](https://leetcode.com/problems/last-stone-weight/), [Take Gifts From the Richest Pile](https://leetcode.com/problems/take-gifts-from-the-richest-pile/), [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/)                                                               |
 | **Google**    | [Maximum Subsequence Score](https://leetcode.com/problems/maximum-subsequence-score/), [Relative Ranks](https://leetcode.com/problems/relative-ranks/), [Smallest Range Covering Elements from K Lists](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/), [Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) |
-| **Meta**      | [Reorganize String](https://leetcode.com/problems/reorganize-string/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [Reduce Array Size to The Half](https://leetcode.com/problems/reduce-array-size-to-the-half/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                       |
+| **Meta**      | [Reorganize String](https://leetcode.com/problems/reorganize-string/), [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                                   |
 | **Microsoft** | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/), [IPO](https://leetcode.com/problems/ipo/), [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/), [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)                                                                   |
 | **Uber**      | [Task Scheduler](https://leetcode.com/problems/task-scheduler/), [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)                                                                                                                                                                                                                                 |
 

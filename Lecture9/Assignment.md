@@ -13,12 +13,12 @@
 Before writing any code, match the problem to a shape. Aim to do it **within 30 seconds**:
 
 | Signal in the Problem                | Pattern             | Move                                       |
-| ------------------------------------ | ------------------- | ------------------------------------------ | ------------- |
+| ------------------------------------ | ------------------- | ------------------------------------------ |
 | "appears twice except one"           | XOR Cancellation    | XOR everything; pairs vanish               |
 | "power of two", "lowest set bit"     | `n & (n - 1)`       | clears the lowest set bit                  |
 | "count 1 bits"                       | Kernighan's Loop    | repeat `n &= n - 1`                        |
 | "all subsets" with n ≤ 20            | Bitmask Enumeration | `for mask in 0 .. 2ⁿ - 1`                  |
-| "check / set / clear / toggle bit i" | Bit Masks           | `1 << i` with `&`, `                       | `, `& ~`, `^` |
+| "check / set / clear / toggle bit i" | Bit Masks           | `1 << i` with `&`, `\|`, `& ~`, `^`        |
 | "without + or -"                     | Bitwise Arithmetic  | XOR for the sum, AND + shift for the carry |
 
 ---
